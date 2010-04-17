@@ -1,0 +1,63 @@
+// Created by Microsoft (R) C/C++ Compiler Version 12.00.8168.0 (eb3797c8).
+
+
+
+#pragma once
+
+
+
+inline HRESULT IZip::Init ( ) {
+    HRESULT _hr = raw_Init();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IZip::AddFile ( LPSTR Filename ) {
+    HRESULT _hr = raw_AddFile(Filename);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IZip::ZipFiles ( ) {
+    HRESULT _hr = raw_ZipFiles();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IZip::SetDes ( LPSTR des ) {
+    HRESULT _hr = raw_SetDes(des);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IZip::GetVision ( long * ver ) {
+    HRESULT _hr = raw_GetVision(ver);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+
+
+inline HRESULT IUnZip::InitUnZip ( ) {
+    HRESULT _hr = raw_InitUnZip();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IUnZip::SetExtractFile ( LPSTR Filename ) {
+    HRESULT _hr = raw_SetExtractFile(Filename);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IUnZip::SetDestPath ( LPSTR path ) {
+    HRESULT _hr = raw_SetDestPath(path);
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}
+
+inline HRESULT IUnZip::Extract ( ) {
+    HRESULT _hr = raw_Extract();
+    if (FAILED(_hr)) _com_issue_errorex(_hr, this, __uuidof(this));
+    return _hr;
+}

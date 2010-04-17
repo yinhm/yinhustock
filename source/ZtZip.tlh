@@ -1,0 +1,79 @@
+// Created by Microsoft (R) C/C++ Compiler Version 12.00.8168.0 (eb3797c8).
+
+
+#pragma once
+#pragma pack(push, 8)
+
+#include <comdef.h>
+
+
+
+struct /* coclass */ Zip;
+struct __declspec(uuid("0d527181-ce62-11d3-88f7-0080c8e20736"))
+/* dual interface */ IZip;
+struct __declspec(uuid("a2f6e601-cf1c-11d3-88f7-0080c8e20736"))
+/* interface */ IUnZip;
+
+
+
+_COM_SMARTPTR_TYPEDEF(IZip, __uuidof(IZip));
+_COM_SMARTPTR_TYPEDEF(IUnZip, __uuidof(IUnZip));
+
+
+
+struct __declspec(uuid("0d527182-ce62-11d3-88f7-0080c8e20736"))
+Zip;
+   
+struct __declspec(uuid("0d527181-ce62-11d3-88f7-0080c8e20736"))
+IZip : IDispatch
+{
+    
+
+    HRESULT Init ( );
+    HRESULT AddFile (
+        LPSTR Filename );
+    HRESULT ZipFiles ( );
+    HRESULT SetDes (
+        LPSTR des );
+    HRESULT GetVision (
+        long * ver );
+
+    
+
+    virtual HRESULT __stdcall raw_Init ( ) = 0;
+    virtual HRESULT __stdcall raw_AddFile (
+        LPSTR Filename ) = 0;
+    virtual HRESULT __stdcall raw_ZipFiles ( ) = 0;
+    virtual HRESULT __stdcall raw_SetDes (
+        LPSTR des ) = 0;
+    virtual HRESULT __stdcall raw_GetVision (
+        long * ver ) = 0;
+};
+
+struct __declspec(uuid("a2f6e601-cf1c-11d3-88f7-0080c8e20736"))
+IUnZip : IUnknown
+{
+    
+
+    HRESULT InitUnZip ( );
+    HRESULT SetExtractFile (
+        LPSTR Filename );
+    HRESULT SetDestPath (
+        LPSTR path );
+    HRESULT Extract ( );
+
+   
+
+    virtual HRESULT __stdcall raw_InitUnZip ( ) = 0;
+    virtual HRESULT __stdcall raw_SetExtractFile (
+        LPSTR Filename ) = 0;
+    virtual HRESULT __stdcall raw_SetDestPath (
+        LPSTR path ) = 0;
+    virtual HRESULT __stdcall raw_Extract ( ) = 0;
+};
+
+
+
+#include "c:\Ô´Âëtc\release\ZtZip.tli"
+
+#pragma pack(pop)
