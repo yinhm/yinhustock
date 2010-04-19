@@ -93,12 +93,11 @@ CTaiKlineDlgNeuralLearn *CMainFrame::m_pDlgNL;
 CTaiScreenTest *CMainFrame::dialogtjxgmmtest;
 
 bool m_gbDestroyed = false;
-IMPLEMENT_DYNAMIC(CMainFrame, CMDIFrameWnd)
+IMPLEMENT_DYNCREATE(CMainFrame, CMDIFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWnd)
 	//{{AFX_MSG_MAP(CMainFrame)
 	ON_WM_CREATE()
-	ON_MESSAGE(Gp_Msg_StkData,OnStkDataOK)
 	ON_MESSAGE(DA_SERVICE_MSG_EXT,OnExtService)
 	ON_WM_DESTROY()
 	ON_WM_TIMER()
@@ -165,6 +164,8 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWnd)
 	ON_COMMAND(ID_LOGIN_SERVER, OnLoginServer)
 	ON_COMMAND(ID_RECV_STOCKCODE, OnRecvStockcode)
 #endif
+
+	ON_MESSAGE(Gp_Msg_StkData, OnStkDataOK)
 END_MESSAGE_MAP()
 
 static UINT palette[] =
@@ -324,6 +325,26 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;    
 	}
 
+	// Initialize the command bars
+	if (!InitCommandBars())
+		return -1;
+
+	// Get a pointer to the command bars object.
+	CXTPCommandBars* pCommandBars = GetCommandBars();
+	if (pCommandBars == NULL)
+	{
+		TRACE0("Failed to create command bars object.\n");
+		return -1;      // fail to create
+	}
+
+	// Add the menu bar
+	CXTPToolBar* pMenuBar = pCommandBars->SetMenu(_T("Menu Bar"), IDR_MAINFRAME);
+	if (pMenuBar == NULL)
+	{
+		TRACE0("Failed to create menu bar.\n");
+		return -1;      // fail to create
+	}
+
 	return 0;
 }
 
@@ -334,362 +355,6 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	
 	return TRUE;
 }
-
-
-LONG CMainFrame::OnStkDataOK(
-		UINT wFileType,			
-		LONG lPara)			
-{
-	int i;
-	PBYTE pFileBuf = NULL;
-
-#ifdef WIDE_NET_VERSION
-	RCV_WIDEREPORT_STRUCTEx Buf;
-#else
-	RCV_REPORT_STRUCTEx Buf;
-
-#endif
-	RCV_DATA *	pHeader;
-	DWORD m_dwAttrib;
-	CString m_FileName;
-      
-	pHeader = (RCV_DATA *) lPara;
-	
-	LONG m_FileLong;
-    int m_FileType;
-	FILE * fp;
-    CString m_File;
-		
-		
-   
-    if(m_MDIChildWnd==NULL)          
-	{
-	   m_MDIChildWnd=MDIGetActive();
-	   if (m_MDIChildWnd==NULL)
-	      return 0;
-	   
-	   while(!m_MDIChildWnd->IsKindOf(RUNTIME_CLASS(CChildFrame))&&this->m_MDIChildWnd !=NULL)
-	   {
-	      this->MDINext();
-	      m_MDIChildWnd=MDIGetActive();
-	   }
-        
-	}
-
-	if (m_taiShanDoc==NULL)       
-    { 
-        return 0;
-    } 
-
-	if(m_taiShanDoc->m_nIsClose)
-	   return 0;
-
-	try{
-	switch (wFileType)
-	{
-	case RCV_REPORT:                                 
-		for(i=0; i<pHeader->m_nPacketNum; i++)
-		{
-#ifdef WIDE_NET_VERSION
-			Buf = pHeader->m_pWideReport[i];
-            m_taiShanDoc->m_sharesCompute.WideStockDataUpdate(&Buf);                   
-			CString ss = Buf.pMarketReport.m_szLabel ;
-			if(ss == "0001")
-			TRACE("%d   ;%s = 0001\r\n",GetTickCount(),Buf.pMarketReport.m_szLabel );
-#else
-			if(pHeader->m_pReport[0].m_cbSize ==SH_MARKET_EX||pHeader->m_pReport[0].m_cbSize ==SZ_MARKET_EX)
-			{
-				RCV_REPORT_STRUCTEx_OLD *pMyBuf;
-				pMyBuf=(RCV_REPORT_STRUCTEx_OLD*)pHeader->m_pReport;
-				Buf.m_fAmount=pMyBuf[i].m_fAmount ;
-				Buf.m_fBuyPrice[0]=pMyBuf[i].m_fBuyPrice[0];
-				Buf.m_fBuyPrice[1]=pMyBuf[i].m_fBuyPrice[1];
-				Buf.m_fBuyPrice[2]=pMyBuf[i].m_fBuyPrice[2];
-				Buf.m_fBuyVolume[0] =pMyBuf[i].m_fBuyVolume[0] ;
-				Buf.m_fBuyVolume[1] =pMyBuf[i].m_fBuyVolume[1] ;
-				Buf.m_fBuyVolume[2] =pMyBuf[i].m_fBuyVolume[2] ;
-				Buf.m_fHigh=pMyBuf[i].m_fHigh;
-				Buf.m_fLastClose=pMyBuf[i].m_fLastClose;
-				Buf.m_fLow=pMyBuf[i].m_fLow;
-				Buf.m_fNewPrice=pMyBuf[i].m_fNewPrice;
-				Buf.m_fOpen=pMyBuf[i].m_fOpen;
-				Buf.m_fSellPrice[0]=pMyBuf[i].m_fSellPrice[0];
-				Buf.m_fSellPrice[1]=pMyBuf[i].m_fSellPrice[1];
-				Buf.m_fSellPrice[2]=pMyBuf[i].m_fSellPrice[2];
-				Buf.m_fSellVolume[0]=pMyBuf[i].m_fSellVolume[0];
-				Buf.m_fSellVolume[1]=pMyBuf[i].m_fSellVolume[1];
-				Buf.m_fSellVolume[2]=pMyBuf[i].m_fSellVolume[2];
-				Buf.m_fVolume=pMyBuf[i].m_fVolume;
-				Buf.m_wMarket=pMyBuf[i].m_wMarket;
-				strcpy(Buf.m_szLabel,pMyBuf[i].m_szLabel);
-				strcpy(Buf.m_szName,pMyBuf[i].m_szName);
-			}
-			//else
-			//{
-			//	memset(&Buf,0,sizeof(Buf));
-			//	BYTE *totalmem;
-			//	totalmem=(BYTE *)pHeader->m_pReport;
-			//	BYTE mymem[142];
-			//	memcpy(mymem,totalmem+(i*142),142);
-			//	char sym[10];
-			//	char name[32];
-			//	WORD mysize;
-			//	time_t mytime;
-			//	WORD mymarket;
-			//	memcpy(&mysize,mymem,2);
-			//	memcpy(&mytime,mymem+2,4);
-			//	memcpy(&mymarket,mymem+6,2);
-			//	memcpy(sym,mymem+8,10);
-			//	memcpy(name,mymem+18,32);
-			//	Buf.m_cbSize=mysize;
-			//	Buf.m_time=mytime;
-			//	Buf.m_wMarket=mymarket;
-			//	strcpy(Buf.m_szLabel,sym);
-			//	strcpy(Buf.m_szName,name);
-			//	memcpy(&(Buf.m_fLastClose),mymem+50,94);
-			//	
-			//}				
-            m_taiShanDoc->m_sharesCompute.StockDataUpdate(/*&Buf*/pHeader->m_pReport);
-#endif
-		}
-		
-		m_wndStatusBar.bColor[m_wndStatusBar.nCount]=RGB(0,128,255);
-		m_wndStatusBar.PaintRect();
-		m_wndStatusBar.nCount++;
-		m_wndStatusBar.nCount%=6;
-		break;
-	case RCV_FILEDATA:
-	    if( !pHeader->m_pData || pHeader->m_wDataType == FILE_TYPE_RES)
-		{
-			TRACE("MSG: CStkDemo::OnStkDataOK, Replaced data \n");
-			break;
-		}
-		switch(pHeader->m_wDataType)
-		{
-		case FILE_HISTORY_EX:						
-		    DAY_TOTAL_STRUCTEx m_GpDay;
-			m_GpDay.m_RcvDay= pHeader->m_pDay;
-            m_GpDay.Day_Count =pHeader->m_nPacketNum;
-            if(m_taiShanDoc->m_systemOption.autoday)
-			{
-                m_taiShanDoc->m_sharesCompute.StockDataDayUpdate( &m_GpDay);                             
-
-				m_wndStatusBar.bColor[m_wndStatusBar.nCount]=RGB(255,0,0);
-				m_wndStatusBar.PaintRect();
-				m_wndStatusBar.nCount++;
-				m_wndStatusBar.nCount%=6;
-			}
-	        
-			break;
-        case FILE_POWER_EX:
-#ifndef WIDE_NET_VERSION
-			POWER_TOTAL_STRUCTEx m_PowerData;
-            m_PowerData.Power_Count=pHeader->m_nPacketNum;
-			m_PowerData.m_RcvPower=pHeader->m_pPower;
-            m_taiShanDoc->m_sharesCompute.StockDataPowerUpdate(& m_PowerData);                             
-#endif
-			break;
-
-		case FILE_MINUTE_EX:					
-            MIN_TOTAL_STRUCTEx m_GpMinute;
-            m_GpMinute.m_RcvMinute = pHeader->m_pMinute;
-            m_GpMinute.Min_Count = pHeader->m_nPacketNum;
-#ifdef WIDE_NET_VERSION
-            m_taiShanDoc->m_sharesCompute.WideStockDataMinUpdate(& m_GpMinute);                           
-#else
- 		    if(m_taiShanDoc->m_systemOption.autominute)
-			{
-                m_taiShanDoc->m_sharesCompute.StockDataMinUpdate(& m_GpMinute);                           
-				m_wndStatusBar.bColor[m_wndStatusBar.nCount]=RGB(128,0,255);
-				m_wndStatusBar.PaintRect();
-				m_wndStatusBar.nCount++;
-				m_wndStatusBar.nCount%=6;
-			}
-#endif
-	        
-			break;
-
-		case FILE_BASE_EX:	
-			m_wndStatusBar.bColor[m_wndStatusBar.nCount]=RGB(255,255,0);
-			m_wndStatusBar.PaintRect();
-			m_wndStatusBar.nCount++;
-			m_wndStatusBar.nCount%=6;
-	        
-			m_File.Format("%s",pHeader->m_File.m_szFileName);
-
-		
-			{
-				::SetCurrentDirectory(this->m_taiShanDoc->m_CurrentWorkDirectory);  
-				if(pHeader->m_File.m_dwAttrib==SH_MARKET_EX)
-					m_FileName=g_sF10sh+m_File;
-				else
-					m_FileName=g_sF10sz+m_File;
-
-				m_FileLong=pHeader->m_File.m_dwLen    ;
-				m_FileType=pHeader->m_wDataType ;
-				m_dwAttrib=pHeader->m_File.m_dwAttrib   ;
-				if (m_dwAttrib==-1) 
-					break; 
-                
-				if( (fp=fopen(m_FileName.GetBuffer(0) ,"wb+"))!=NULL) 				
-				{
-				   fwrite(pHeader->m_pData , sizeof( char ),m_FileLong , fp );      
-				   fclose(fp) ;
-				}
-  
-				fp=_fsopen("news\\news.log","r+b",SH_DENYNO);
-	            fseek(fp,0,SEEK_END);
-				char filename[51];
-				strcpy(filename,m_File.GetBuffer(0));
-				fwrite(filename,50,1,fp);
-                fclose(fp);
-                m_taiShanDoc->m_NewsFileNameMap[m_File]=m_File;
-			}
-
-			break;
-		case FILE_NEWS_EX:					
-    		m_File.Format("%s",pHeader->m_File.m_szFileName);
-		
-            if(this->m_taiShanDoc->m_NewsFileNameMap.Lookup( m_File, m_FileName ) != TRUE)
-			{
-			   ::SetCurrentDirectory(this->m_taiShanDoc->m_CurrentWorkDirectory);  
-            
-			   int nPos;
-			   BOOL bPath;
-			   bPath=FALSE;
-			   int nTmp;
-			   int ab;
-				nPos=m_File.Find("\\",0);
-				if (nPos==-1) 
-				{
-					nTmp=m_File.Find("/",0);
-					while(nTmp==0)
-					{
-						CString delchar=m_File.Mid(1);
-						nTmp=delchar.Find("/",0);
-						m_File=delchar;
-					}
-					if(nTmp==-1)
-						bPath=FALSE;
-					else
-						bPath=TRUE;	
-					ab=nTmp;
-				}
-				else
-				{
-					while(nPos==0)
-					{
-						CString delchar=m_File.Mid(1);
-						nPos=delchar.Find("\\",0);
-						m_File=delchar;
-					}
-					if (nPos!=-1)
-					{
-						ab=nPos;
-						bPath=TRUE;	
-					}
-					nTmp=m_File.Find("/",0);
-					while(nTmp==0)
-					{
-						CString delchar=m_File.Mid(1);
-						nTmp=delchar.Find("/",0);
-						m_File=delchar;
-					}
-					if(nTmp!=-1)
-					{
-						ab=nTmp;
-						bPath=TRUE;	
-					}
-				}
-				if(!bPath)
-				{
-		
-					switch(pHeader->m_File.m_dwAttrib)
-					{
-					case News_Sha_Ex:				 		
-						m_FileName.Format("news\\shanghai\\%d.dat",this->m_taiShanDoc->m_lDay ) ;
-						break;
-					case News_Szn_Ex:				 		
-						m_FileName.Format("news\\shenzhen\\%d.dat",this->m_taiShanDoc->m_lDay ) ;
-						break;
-					case News_Fin_Ex:				 		
-						m_FileName.Format("news\\cj\\%d.dat",this->m_taiShanDoc->m_lDay ) ;
-						break;
-					case News_TVSta_Ex:			 		
-						return 0; 
-						
-					case News_Unknown_Ex:			 		
-						return 0 ;
-					}
-		
-				}
-				else
-				{
-					CString sTmp;
-					sTmp=m_File;
-					sTmp=m_File.Left(ab);
-					if(_access(sTmp,0)==-1)
-					{
-						sTmp="news\\" + sTmp;
-						_mkdir(sTmp);
-					}
-					m_FileName=sTmp;
-					m_FileName+="\\";
-					CString sFName=m_File.Mid(ab+1);
-					m_FileName+=sFName;
-				}
-			
-				m_FileLong=pHeader->m_File.m_dwLen    ;
-				m_FileType=pHeader->m_wDataType ;
-				m_dwAttrib=pHeader->m_File.m_dwAttrib   ;
-				if (m_dwAttrib==-1) 
-					break; 
-
-				if(_access(m_FileName.GetBuffer(0),0)!=0)   
-				{
-						fp=_fsopen(m_FileName.GetBuffer(0),"w+b",SH_DENYNO);
-						fclose(fp);
-				}
- 				if( (fp=fopen(m_FileName.GetBuffer(0) ,"r+b"))!=NULL)           
-                {
-					fseek(fp,0,SEEK_END);
-				    fwrite(pHeader->m_pData , sizeof( char ),m_FileLong , fp );      
-				    fclose(fp) ;
-				}
-  				fp=_fsopen("news\\news.log","r+b",SH_DENYNO);
-	            fseek(fp,0,SEEK_END);
-				char filename[51];
-				strcpy(filename,m_File.GetBuffer(0));
-				fwrite(filename,50,1,fp);
-                fclose(fp);
-                m_taiShanDoc->m_NewsFileNameMap[m_File]=m_File;
-			}
-
-		default:
-			return 0;
-		}
-		break;
-	}
-	}
-	catch(...)
-	{
-		ASSERT(FALSE);
-	}
-	
-
-#ifndef WIDE_NET_VERSION
-	HWND mywnd;
-	mywnd=(HWND)FindWindow(NULL,"图文卡数据接收明细");
-	if(mywnd!=NULL)
-	{
-		CDialogMYXMZ *pDlg=(CDialogMYXMZ*)mywnd;			 
-		::SendMessage(pDlg->m_hWnd,WM_MYMSG,wFileType,(LPARAM)lPara);
-	}
-
-#endif
-	return 0L;
-}
-
 
 
 
@@ -2166,3 +1831,324 @@ void CMainFrame::ShowMYXMZ()
 	m_pViewMYXMZ->ShowWindow(SW_SHOW);
 	m_pViewMYXMZ->UpdateWindow();
 }
+
+
+LONG CMainFrame::OnStkDataOK(UINT wFileType, LONG lPara)
+{
+	int i;
+	PBYTE pFileBuf = NULL;
+
+#ifdef WIDE_NET_VERSION
+	RCV_WIDEREPORT_STRUCTEx Buf;
+#else
+	RCV_REPORT_STRUCTEx Buf;
+
+#endif
+	RCV_DATA *	pHeader;
+	DWORD m_dwAttrib;
+	CString m_FileName;
+
+	pHeader = (RCV_DATA *) lPara;
+
+	LONG m_FileLong;
+	int m_FileType;
+	FILE * fp;
+	CString m_File;
+
+
+
+	if(m_MDIChildWnd==NULL)          
+	{
+		m_MDIChildWnd=MDIGetActive();
+		if (m_MDIChildWnd==NULL)
+			return 0;
+
+		while(!m_MDIChildWnd->IsKindOf(RUNTIME_CLASS(CChildFrame))&&this->m_MDIChildWnd !=NULL)
+		{
+			this->MDINext();
+			m_MDIChildWnd=MDIGetActive();
+		}
+
+	}
+
+	if (m_taiShanDoc==NULL)       
+	{ 
+		return 0;
+	} 
+
+	if(m_taiShanDoc->m_nIsClose)
+		return 0;
+
+
+	try
+	{
+		switch (wFileType)
+		{
+		case RCV_REPORT:		// 行情报表
+			{
+				BYTE* pBuffBase = (BYTE*)&pHeader->m_pReport[0];
+				int nBuffSize = pHeader->m_pReport[0].m_cbSize;
+
+				for (i = 0; i < pHeader->m_nPacketNum; i++)
+				{
+#ifdef WIDE_NET_VERSION
+					RCV_WIDOFEREPORT_STRUCTEx report = pHeader->m_pWideReport[i];
+					m_taiShanDoc->m_sharesCompute.WideStockDataUpdate(&report);
+#else
+					RCV_REPORT_STRUCTEx* pReport = (RCV_REPORT_STRUCTEx*)(pBuffBase + nBuffSize * i);
+					m_taiShanDoc->m_sharesCompute.StockDataUpdate(pReport);
+#endif
+				}
+
+				m_wndStatusBar.bColor[m_wndStatusBar.nCount] = RGB(0, 128, 255);
+				m_wndStatusBar.PaintRect();
+				m_wndStatusBar.nCount++;
+				m_wndStatusBar.nCount %= 6;
+			}
+			break;
+
+		case RCV_FILEDATA:
+			if (!pHeader->m_pData || pHeader->m_wDataType == FILE_TYPE_RES)
+			{
+				break;
+			}
+			switch (pHeader->m_wDataType)
+			{
+			case FILE_HISTORY_EX:						
+				DAY_TOTAL_STRUCTEx m_GpDay;
+				m_GpDay.m_RcvDay= pHeader->m_pDay;
+				m_GpDay.Day_Count = pHeader->m_nPacketNum;
+				if (m_taiShanDoc->m_systemOption.autoday)
+				{
+					m_taiShanDoc->m_sharesCompute.StockDataDayUpdate(&m_GpDay);
+
+					m_wndStatusBar.bColor[m_wndStatusBar.nCount] = RGB(255, 0, 0);
+					m_wndStatusBar.PaintRect();
+					m_wndStatusBar.nCount++;
+					m_wndStatusBar.nCount %= 6;
+				}
+				break;
+
+			case FILE_POWER_EX:
+#ifndef WIDE_NET_VERSION
+				POWER_TOTAL_STRUCTEx m_PowerData;
+				m_PowerData.Power_Count=pHeader->m_nPacketNum;
+				m_PowerData.m_RcvPower=pHeader->m_pPower;
+				m_taiShanDoc->m_sharesCompute.StockDataPowerUpdate(& m_PowerData);                             
+#endif
+				break;
+
+			case FILE_MINUTE_EX:					
+				MIN_TOTAL_STRUCTEx m_GpMinute;
+				m_GpMinute.m_RcvMinute = pHeader->m_pMinute;
+				m_GpMinute.Min_Count = pHeader->m_nPacketNum;
+#ifdef WIDE_NET_VERSION
+				m_taiShanDoc->m_sharesCompute.WideStockDataMinUpdate(& m_GpMinute);                           
+#else
+				if(m_taiShanDoc->m_systemOption.autominute)
+				{
+					m_taiShanDoc->m_sharesCompute.StockDataMinUpdate(& m_GpMinute);                           
+					m_wndStatusBar.bColor[m_wndStatusBar.nCount]=RGB(128,0,255);
+					m_wndStatusBar.PaintRect();
+					m_wndStatusBar.nCount++;
+					m_wndStatusBar.nCount%=6;
+				}
+#endif
+
+				break;
+
+			case FILE_BASE_EX:
+				m_File.Format("%s", pHeader->m_File.m_szFileName);
+
+				if (TRUE)
+				{
+					SetCurrentDirectory(m_taiShanDoc->m_CurrentWorkDirectory);
+
+					if (pHeader->m_File.m_dwAttrib == SH_MARKET_EX)
+					{
+						m_FileName = g_sF10sh + m_File;
+					}
+					else
+					{
+						m_FileName = g_sF10sz + m_File;
+					}
+
+					m_FileLong = pHeader->m_File.m_dwLen;
+					m_FileType = pHeader->m_wDataType;
+					m_dwAttrib = pHeader->m_File.m_dwAttrib;
+					if (m_dwAttrib == -1)
+						break; 
+
+					if ((fp = fopen(m_FileName.GetBuffer(0), "wb+")) != NULL)
+					{
+						fwrite(pHeader->m_pData, sizeof(char), m_FileLong, fp);
+						fclose(fp);
+					}
+
+					fp = _fsopen("news\\news.log", "r+b", SH_DENYNO);
+					fseek(fp, 0, SEEK_END);
+
+					char filename[256];
+					strcpy(filename, m_File.GetBuffer(0));
+					fwrite(filename, 50, 1, fp);
+					fclose(fp);
+
+					m_taiShanDoc->m_NewsFileNameMap[m_File] = m_File;
+				}
+
+				m_wndStatusBar.bColor[m_wndStatusBar.nCount] = RGB(255, 255, 0);
+				m_wndStatusBar.PaintRect();
+				m_wndStatusBar.nCount++;
+				m_wndStatusBar.nCount %= 6;
+				break;
+
+			case FILE_NEWS_EX:					
+				m_File.Format("%s", pHeader->m_File.m_szFileName);
+
+				if (m_taiShanDoc->m_NewsFileNameMap.Lookup(m_File, m_FileName) != TRUE)
+				{
+					SetCurrentDirectory(m_taiShanDoc->m_CurrentWorkDirectory);
+
+					BOOL bPath = FALSE;
+					int nTmp;
+					int ab;
+
+					int nPos = m_File.Find("\\", 0);
+					if (nPos == -1)
+					{
+						nTmp = m_File.Find("/", 0);
+
+						while (nTmp == 0)
+						{
+							CString delchar = m_File.Mid(1);
+							nTmp = delchar.Find("/", 0);
+							m_File = delchar;
+						}
+
+						if (nTmp == -1)
+						{
+							bPath = FALSE;
+						}
+						else
+						{
+							bPath = TRUE;
+						}
+
+						ab = nTmp;
+					}
+					else
+					{
+						while (nPos == 0)
+						{
+							CString delchar = m_File.Mid(1);
+							nPos = delchar.Find("\\", 0);
+							m_File = delchar;
+						}
+						if (nPos != -1)
+						{
+							ab = nPos;
+							bPath = TRUE;
+						}
+						nTmp = m_File.Find("/", 0);
+						while (nTmp == 0)
+						{
+							CString delchar = m_File.Mid(1);
+							nTmp = delchar.Find("/", 0);
+							m_File = delchar;
+						}
+						if (nTmp != -1)
+						{
+							ab = nTmp;
+							bPath = TRUE;
+						}
+					}
+
+					if (!bPath)
+					{
+
+						switch (pHeader->m_File.m_dwAttrib)
+						{
+						case News_Sha_Ex:
+							m_FileName.Format("news\\shanghai\\%d.dat", m_taiShanDoc->m_lDay);
+							break;
+						case News_Szn_Ex:
+							m_FileName.Format("news\\shenzhen\\%d.dat", m_taiShanDoc->m_lDay);
+							break;
+						case News_Fin_Ex:
+							m_FileName.Format("news\\cj\\%d.dat", m_taiShanDoc->m_lDay);
+							break;
+						case News_TVSta_Ex:
+							return 0; 
+						case News_Unknown_Ex:
+							return 0 ;
+						}
+					}
+					else
+					{
+						CString sTmp;
+						sTmp = m_File;
+						sTmp = m_File.Left(ab);
+						if (_access(sTmp, 0) == -1)
+						{
+							sTmp = "news\\" + sTmp;
+							_mkdir(sTmp);
+						}
+						m_FileName = sTmp;
+						m_FileName += "\\";
+						CString sFName = m_File.Mid(ab + 1);
+						m_FileName += sFName;
+					}
+
+					m_FileLong = pHeader->m_File.m_dwLen;
+					m_FileType = pHeader->m_wDataType;
+					m_dwAttrib = pHeader->m_File.m_dwAttrib;
+					if (m_dwAttrib == -1)
+						break; 
+
+					if (_access(m_FileName.GetBuffer(0), 0) != 0)
+					{
+						fp = _fsopen(m_FileName.GetBuffer(0), "w+b", SH_DENYNO);
+						fclose(fp);
+					}
+					if ((fp = fopen(m_FileName.GetBuffer(0) ,"r+b")) != NULL)
+					{
+						fseek(fp, 0, SEEK_END);
+						fwrite(pHeader->m_pData,sizeof(char), m_FileLong, fp);
+						fclose(fp);
+					}
+
+					fp = _fsopen("news\\news.log", "r+b", SH_DENYNO);
+					fseek(fp, 0, SEEK_END);
+
+					char filename[256];
+					strcpy(filename, m_File.GetBuffer(0));
+					fwrite(filename, 50, 1, fp);
+					fclose(fp);
+					m_taiShanDoc->m_NewsFileNameMap[m_File] = m_File;
+				}
+
+			default:
+				return 0;
+			}
+			break;
+		}
+	}
+	catch(...)
+	{
+		ASSERT(FALSE);
+	}
+
+
+#ifndef WIDE_NET_VERSION
+	HWND mywnd;
+	mywnd=(HWND)FindWindow(NULL,"图文卡数据接收明细");
+	if(mywnd!=NULL)
+	{
+		CDialogMYXMZ *pDlg=(CDialogMYXMZ*)mywnd;			 
+		::SendMessage(pDlg->m_hWnd,WM_MYMSG,wFileType,(LPARAM)lPara);
+	}
+
+#endif
+	return 0L;
+}
+
