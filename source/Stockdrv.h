@@ -224,10 +224,11 @@ typedef union tagRCV_POWER_STRUCTEx
 	RCV_EKE_HEADEx  m_head;
 }RCV_POWER_STRUCTEx;
 
-//////////////////////////////////////////////////////////////////////////////////
-//行情数据
-//注:
-//		某些字段可能为0,用上次的数据代替
+
+///////////////////////////////////////////////////////////////////////////////
+// 行情数据
+// 注:
+//    某些字段可能为0,用上次的数据代替
 typedef struct tagRCV_REPORT_STRUCTEx
 {
 	WORD	m_cbSize;									// 结构大小
@@ -248,13 +249,15 @@ typedef struct tagRCV_REPORT_STRUCTEx
 	float	m_fBuyVolume[3];							// 申买量1,2,3
 	float	m_fSellPrice[3];							// 申卖价1,2,3
 	float	m_fSellVolume[3];							// 申卖量1,2,3
-
 	
 	float	m_fBuyPrice4;								// 申买价4
 	float	m_fBuyVolume4;								// 申买量4
 	float	m_fSellPrice4;								// 申卖价4
 	float	m_fSellVolume4;								// 申卖量4
-
+	float	m_fBuyPrice5;								// 申买价5
+	float	m_fBuyVolume5;								// 申买量5
+	float	m_fSellPrice5;								// 申卖价5
+	float	m_fSellVolume5;								// 申卖量5
 } RCV_REPORT_STRUCTEx;
 
 
