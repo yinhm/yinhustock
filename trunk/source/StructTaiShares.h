@@ -200,55 +200,69 @@ typedef struct
     BYTE  m_btStockType[MaxStockTYpe];    
 }STOCK_TYPE_INFO_OLD;
 
+
+
 typedef struct
 {
- BYTE kind;
- BYTE  rdp;           //      用于计算大盘强弱指标
- char id[8];             //      证券代码
- char name[10];           //     证券名称 
- char Gppyjc[6];         //      证券名称拼音简称
- int sel;
- float ystc;              //      昨天收盘
- float opnp;              //      今日开盘 
- float higp;              //      今日最高
- float lowp;              //      今日最低
- float nowp;              //      最新价格
- float nowv;              //      最新成交量
- float totv;              //      总成交量
- float totp;              //      总成交金额
- float pbuy1;             //      买入价一
- float vbuy1;             //      买入量一
- float pbuy2;             //      买入价二  
- float vbuy2;             //      买入量二
- float pbuy3;             //      买入价三 
- float vbuy3;             //      买入量三      
- float psel1;             //      卖出价一
- float vsel1;             //      卖出量一
- float psel2;             //      卖出价二 
- float vsel2;             //      卖出量二   
- float psel3;             //      卖出价三
- float vsel3;             //      卖出量三 
- float accb;             
- float accs;            
- float volume5;          
- float rvol;           
- float dvol;            
- 
- short lastclmin;        
- short initdown;      
- int  InOut;
- BOOL  IsDelete;
- BOOL  IsMxTj;
- 
- float Index[10];
- Kdata1   m_Kdata1[240];
- BASEINFO *pBaseInfo;
+	BYTE header[32];
+	BYTE kind;
+	BYTE rdp;			// 用于计算大盘强弱指标
+	char id[8];			// 证券代码
+	char name[10];		// 证券名称 
+	char Gppyjc[6];		// 证券名称拼音简称
+	int sel;
+	float ystc;			// 昨天收盘
+	float opnp;			// 今日开盘 
+	float higp;			// 今日最高
+	float lowp;			// 今日最低
+	float nowp;			// 最新价格
+	float nowv;			// 最新成交量
+	float totv;			// 总成交量
+	float totp;			// 总成交金额
+	float pbuy1;		// 买入价一
+	float vbuy1;		// 买入量一
+	float pbuy2;		// 买入价二
+	float vbuy2;		// 买入量二
+	float pbuy3;		// 买入价三
+	float vbuy3;		// 买入量三
+	float pbuy4;
+	float vbuy4;
+	float pbuy5;
+	float vbuy5;
+	float psel1;		// 卖出价一
+	float vsel1;		// 卖出量一
+	float psel2;		// 卖出价二
+	float vsel2;		// 卖出量二
+	float psel3;		// 卖出价三
+	float vsel3;		// 卖出量三
+	float psel4;
+	float vsel4;
+	float psel5;
+	float vsel5;
+	float accb;
+	float accs;
+	float volume5;
+	float rvol;
+	float dvol;
+	BYTE none[40];
 
- STOCK_TYPE_INFO *pStockTypeInfo;
+	short lastclmin;
+	short initdown;
+	int InOut;
+	BOOL IsDelete;
+	BOOL IsMxTj;
 
- int	m_serialNumber;		
+	float Index[10];
+	Kdata1 m_Kdata1[244];
+	BASEINFO* pBaseInfo;
+	STOCK_TYPE_INFO* pStockTypeInfo;
+
+	int	m_serialNumber;
 } CReportData;
-typedef CReportData *PCdat1;
+typedef CReportData* PCdat1;
+
+
+
 typedef struct
 {
  	CReportData *pItem;

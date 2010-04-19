@@ -44,7 +44,7 @@
 #include <afxcmn.h>		
 #endif 
 
-const char g_realtime[64] = "Data\\ShareData";
+const char g_realtime[64] = "Data\\Report.tsk";
 const char g_baseinfo[64] = "Data\\CompanyBase";
 const char g_stocktypeinfo[64] = "Data\\BlockInfomation";
 const char g_hzpy[64] = "Data\\languagedata";

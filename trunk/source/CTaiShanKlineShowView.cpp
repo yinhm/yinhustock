@@ -2151,24 +2151,26 @@ void CTaiShanKlineShowView::DrawRightbox(CDC *pDC,bool bClearAll)
 	ft.CreateFontIndirect (&lgf );
 	pOld=pDC->SelectObject(&ft);
 
-	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*2+modify,"卖5");
-	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*3+modify,"卖4");
-	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*4+modify,"卖3");
-	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*5+modify,"卖2");
-	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*6+modify,"卖1");
-	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*7+modify,"买1");
-	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*8+modify,"买2");
-	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*9+modify,"买3");
-	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*10+modify,"买4");
-	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*11+modify,"买5");
-	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*12+modify,"最新");
+
+	pDC->TextOut(rt.right - m_rightLength + lf, RIGHTBOX_PERLINE * 2 + modify, "卖5");
+	pDC->TextOut(rt.right - m_rightLength + lf, RIGHTBOX_PERLINE * 3 + modify, "卖4");
+	pDC->TextOut(rt.right - m_rightLength + lf, RIGHTBOX_PERLINE * 4 + modify, "卖3");
+	pDC->TextOut(rt.right - m_rightLength + lf, RIGHTBOX_PERLINE * 5 + modify, "卖2");
+	pDC->TextOut(rt.right - m_rightLength + lf, RIGHTBOX_PERLINE * 6 + modify, "卖1");
+	pDC->TextOut(rt.right - m_rightLength + lf, RIGHTBOX_PERLINE * 7 + modify, "买1");
+	pDC->TextOut(rt.right - m_rightLength + lf, RIGHTBOX_PERLINE * 8 + modify, "买2");
+	pDC->TextOut(rt.right - m_rightLength + lf, RIGHTBOX_PERLINE * 9 + modify, "买3");
+	pDC->TextOut(rt.right - m_rightLength + lf, RIGHTBOX_PERLINE * 10 + modify, "买4");
+	pDC->TextOut(rt.right - m_rightLength + lf, RIGHTBOX_PERLINE * 11 + modify, "买5");
+
+	pDC->TextOut(rt.right - m_rightLength + lf,RIGHTBOX_PERLINE * 12 + modify, "最新");
 	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*13+modify,"涨跌");
 	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*14+modify,"幅度");
 	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*15+modify,"总手");
 	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*16+modify,"现手");
 	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*17+modify,"金额");
 	pDC->TextOut(rt.right-m_rightLength+lf,RIGHTBOX_PERLINE*18+modify,"外盘");
-	pDC->TextOut(rt.right-m_rightLength/2+lf,RIGHTBOX_PERLINE*12+modify,"均价");
+	pDC->TextOut(rt.right - m_rightLength / 2 + lf, RIGHTBOX_PERLINE * 12 + modify, "均价");
 	pDC->TextOut(rt.right-m_rightLength/2+lf,RIGHTBOX_PERLINE*13+modify,"昨收");
 	pDC->TextOut(rt.right-m_rightLength/2+lf,RIGHTBOX_PERLINE*14+modify,"今开");
 	pDC->TextOut(rt.right-m_rightLength/2+lf,RIGHTBOX_PERLINE*15+modify,"最高");
@@ -2222,58 +2224,98 @@ void CTaiShanKlineShowView::DrawRightbox(CDC *pDC,bool bClearAll)
 	}
 
 
-	f1=(pMin1Drawing->m_pReportData->psel3);
-	if(f1>0)
+	// 画买卖盘
+	f1 = (pMin1Drawing->m_pReportData->psel5);
+	if (f1 > 0)
 	{
-		DrawRightText(pDC,f1,rt.right-m_rightLength/2,2,0,floatBit);
+		DrawRightText(pDC, f1, rt.right - m_rightLength / 2, 2, 0, floatBit);
 	}
-	f1=(pMin1Drawing->m_pReportData->vsel3);
-	DrawRightText(pDC,f1,rt.right-lf,2,1);
-	f1=(pMin1Drawing->m_pReportData->psel2);
-	if(f1>0)
-	{
-		DrawRightText(pDC,f1,rt.right-m_rightLength/2,3,0,floatBit);
-	}
-	f1=(pMin1Drawing->m_pReportData->vsel2);
-	DrawRightText(pDC,f1,rt.right-lf,3,1);
-	f1=(pMin1Drawing->m_pReportData->psel1);
-	if(f1>0)
-	{
-		DrawRightText(pDC,f1,rt.right-m_rightLength/2,4,0,floatBit);
-	}
-	f1=(pMin1Drawing->m_pReportData->vsel1);
-	DrawRightText(pDC,f1,rt.right-lf,4,1);
-	f1=(pMin1Drawing->m_pReportData->pbuy1);
-	if(f1>0)
-	{
-		DrawRightText(pDC,f1,rt.right-m_rightLength/2,5,0,floatBit);
-	}
-	f1=(pMin1Drawing->m_pReportData->vbuy1);
-	DrawRightText(pDC,f1,rt.right-lf,5,1);
-	f1=(pMin1Drawing->m_pReportData->pbuy2);
-	if(f1>0)
-	{
-		DrawRightText(pDC,f1,rt.right-m_rightLength/2,6,0,floatBit);
-	}
-	f1=(pMin1Drawing->m_pReportData->vbuy2);
-	DrawRightText(pDC,f1,rt.right-lf,6,1);
-	f1=(pMin1Drawing->m_pReportData->pbuy3);
-	if(f1>0)
-	{
-		DrawRightText(pDC,f1,rt.right-m_rightLength/2,7,0,floatBit);
-	}
-	f1=(pMin1Drawing->m_pReportData->vbuy3);
-	DrawRightText(pDC,f1,rt.right-lf,7,1);
+	f1 = (pMin1Drawing->m_pReportData->vsel5);
+	DrawRightText(pDC, f1, rt. right - lf, 2, 1);
 
-	f1=(pMin1Drawing->m_pReportData->nowp);
-	if(f1>0)
+	f1 = (pMin1Drawing->m_pReportData->psel4);
+	if (f1 > 0)
 	{
-		DrawRightText(pDC,f1,rt.right-m_rightLength/2,8,0,floatBit);
+		DrawRightText(pDC, f1, rt.right - m_rightLength / 2, 3, 0, floatBit);
 	}
-	if(GetPriceAve(f1))
+	f1 = (pMin1Drawing->m_pReportData->vsel4);
+	DrawRightText(pDC, f1, rt. right - lf, 3, 1);
+
+	f1 = (pMin1Drawing->m_pReportData->psel3);
+	if (f1 > 0)
 	{
-		DrawRightText(pDC,f1,rt.right-lf,8,0,floatBit);
+		DrawRightText(pDC, f1, rt.right - m_rightLength / 2, 4, 0, floatBit);
 	}
+	f1 = (pMin1Drawing->m_pReportData->vsel3);
+	DrawRightText(pDC, f1, rt. right - lf, 4, 1);
+
+	f1 = (pMin1Drawing->m_pReportData->psel2);
+	if (f1 > 0)
+	{
+		DrawRightText(pDC, f1, rt.right - m_rightLength / 2, 5, 0, floatBit);
+	}
+	f1 = (pMin1Drawing->m_pReportData->vsel2);
+	DrawRightText(pDC, f1, rt.right - lf, 5, 1);
+
+	f1 = (pMin1Drawing->m_pReportData->psel1);
+	if (f1 > 0)
+	{
+		DrawRightText(pDC, f1, rt.right - m_rightLength / 2, 6, 0, floatBit);
+	}
+	f1 = (pMin1Drawing->m_pReportData->vsel1);
+	DrawRightText(pDC, f1, rt.right - lf, 6, 1);
+
+	f1 = (pMin1Drawing->m_pReportData->pbuy1);
+	if (f1 > 0)
+	{
+		DrawRightText(pDC, f1, rt.right - m_rightLength / 2, 7, 0, floatBit);
+	}
+	f1 = (pMin1Drawing->m_pReportData->vbuy1);
+	DrawRightText(pDC, f1, rt.right - lf, 7, 1);
+
+	f1 = (pMin1Drawing->m_pReportData->pbuy2);
+	if (f1 > 0)
+	{
+		DrawRightText(pDC, f1, rt.right - m_rightLength / 2, 8, 0, floatBit);
+	}
+	f1 = (pMin1Drawing->m_pReportData->vbuy2);
+	DrawRightText(pDC, f1, rt.right - lf, 8, 1);
+
+	f1 = (pMin1Drawing->m_pReportData->pbuy3);
+	if (f1 > 0)
+	{
+		DrawRightText(pDC, f1, rt.right - m_rightLength / 2, 9, 0, floatBit);
+	}
+	f1 = (pMin1Drawing->m_pReportData->vbuy3);
+	DrawRightText(pDC, f1, rt.right - lf, 9, 1);
+
+	f1 = (pMin1Drawing->m_pReportData->pbuy4);
+	if (f1 > 0)
+	{
+		DrawRightText(pDC, f1, rt.right - m_rightLength / 2, 10, 0, floatBit);
+	}
+	f1 = (pMin1Drawing->m_pReportData->vbuy4);
+	DrawRightText(pDC, f1, rt.right - lf, 10, 1);
+
+	f1 = (pMin1Drawing->m_pReportData->pbuy5);
+	if (f1 > 0)
+	{
+		DrawRightText(pDC, f1, rt.right - m_rightLength / 2, 11, 0, floatBit);
+	}
+	f1 = (pMin1Drawing->m_pReportData->vbuy5);
+	DrawRightText(pDC, f1, rt.right - lf, 11, 1);
+
+	// 最新、均价
+	f1 = (pMin1Drawing->m_pReportData->nowp);
+	if (f1 > 0)
+	{
+		DrawRightText(pDC, f1, rt.right - m_rightLength / 2, 12, 0, floatBit);
+	}
+	if (GetPriceAve(f1))
+	{
+		DrawRightText(pDC, f1, rt.right - lf, 12, 0, floatBit);
+	}
+
 	f1=(pMin1Drawing->m_pReportData->nowp-pMin1Drawing->m_pReportData->ystc);
 	s.Empty();
 	if(pMin1Drawing->m_pReportData->nowp>5)
