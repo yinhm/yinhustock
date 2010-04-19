@@ -86,6 +86,7 @@
 #define		STKNAME_LEN				32			// 股名长度
 #define     STKPINGYING_LEN          6
 
+#pragma pack(1)
 
 //----------------------------------------系统运行参数结果-----------------------------------------------
 typedef  struct  tagRCV_SYSTEMRUN_STRUCTEx
@@ -530,6 +531,8 @@ int			i;
 	return 1;
 }
 */
+
+#pragma pack()
 
 //////////////////////////////////////////////////////////////////////////////////
 //APIs

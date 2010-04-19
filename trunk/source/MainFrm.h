@@ -25,9 +25,9 @@ class CTaiKlineDlgNeuralLearn;
 
 class CDialogMYXMZ;
 
-class CMainFrame : public CMDIFrameWnd
+class CMainFrame : public CXTPMDIFrameWnd
 {
-	DECLARE_DYNAMIC(CMainFrame)
+	DECLARE_DYNCREATE(CMainFrame)
 public:
 	CMainFrame();
 
@@ -155,7 +155,6 @@ protected:
 	
 	//{{AFX_MSG(CMainFrame)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-    afx_msg long OnStkDataOK( UINT wFileType, LONG lPara)	;
     afx_msg long OnExtService(UINT wFileType, LONG lPara)	;
 	afx_msg void OnDestroy();
 	afx_msg void OnTimer(UINT nIDEvent);
@@ -228,6 +227,8 @@ protected:
 public:
 	void ShowMYXMZ();
 
+protected:
+	afx_msg long OnStkDataOK(UINT wFileType, LONG lPara);
 	DECLARE_MESSAGE_MAP()
 };
 

@@ -73,4 +73,12 @@ enum {	SZEBPAGE=102};//STKINDEXPAGE =100,STKTYPEPAGE=101,
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
+
+
+// Codejock Software Components
+#define _XTP_STATICLINK
+#include <XTToolkitPro.h>
+
+
+
 #endif // !defined(AFX_STDAFX_H__61A31CEB_9707_11D1_ACAB_0000E823DBFD__INCLUDED_)
