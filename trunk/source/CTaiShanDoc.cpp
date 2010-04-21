@@ -2268,40 +2268,45 @@ void CTaiShanDoc::InitFiveDaysVolumnForStock(PCdat1 &pCdat)
 	if(pKline)
 	delete []pKline;
 }
+
+// 保存股票代码表
 void CTaiShanDoc::WriteStockInfoToFile()
 {
 	int StockCount[STOCKTYPE];
-	memset(StockCount,0,sizeof(int)*STOCKTYPE);
-	FILE *fp=_fsopen("StockName.dat","w+b",SH_DENYNO);
-	fclose(fp);
-	fp=_fsopen("StockName.dat","r+b",SH_DENYNO);
-	for(int i=0;i<STOCKTYPE;i++)
-	{
-        StockCount[i]=this->m_sharesInformation.GetStockTypeCount(i);
-	}
-	fseek(fp,0,SEEK_SET);                               
-	fwrite(&StockCount[0],4,STOCKTYPE, fp);
-	for(int i=0;i<STOCKTYPE;i++)
-	{
-		int temp=this->m_sharesInformation.GetStockTypeCount(i);
-		for(int j=0;j<temp;j++)
-		{
-			CReportData * Cdat;
-			this->m_sharesInformation.GetStockItem(i,j, Cdat);  
-			if(Cdat==NULL)
-				continue;
-			fwrite(&Cdat->kind,1,1,fp);
-			fwrite(Cdat->id,1,6,fp);
-			fwrite(Cdat->name,1,8,fp);
-			fwrite(Cdat->Gppyjc,1,4,fp);
-			fwrite(&Cdat->sel,1,4,fp);
+	memset(StockCount, 0, sizeof(int) * STOCKTYPE);
 
-		
+	FILE* fp= _fsopen("StockName.dat", "w+b", SH_DENYNO);
+	fclose(fp);
+
+	fp = _fsopen("StockName.dat", "r+b", SH_DENYNO);
+	for (int i = 0; i < STOCKTYPE; i++)
+	{
+		StockCount[i] = m_sharesInformation.GetStockTypeCount(i);
+	}
+	fseek(fp, 0, SEEK_SET);
+	fwrite(&StockCount[0], 4, STOCKTYPE, fp);
+
+	for (int i = 0; i < STOCKTYPE; i++)
+	{
+		int temp = m_sharesInformation.GetStockTypeCount(i);
+		for (int j = 0; j < temp; j++)
+		{
+			CReportData* Cdat;
+			m_sharesInformation.GetStockItem(i, j, Cdat);
+			if (Cdat == NULL)
+				continue;
+
+			fwrite(&Cdat->kind, 1, 1 ,fp);
+			fwrite(Cdat->id, 1, 6 ,fp);
+			fwrite(Cdat->name, 1, 8, fp);
+			fwrite(Cdat->Gppyjc, 1, 4, fp);
+			fwrite(&Cdat->sel, 1, 4, fp);
 			char ch1 = ' ';
-			fwrite(&ch1,1,1,fp);
+			fwrite(&ch1, 1, 1, fp);
 		}
 	}
-    fclose(fp);
+
+	fclose(fp);
 }
 
 int CTaiShanDoc::GetStockKind(CString strKind)
