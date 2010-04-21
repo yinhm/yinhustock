@@ -1046,73 +1046,80 @@ BOOL CSharesInformation::DeleteAllStockFromStockType()
        RemoveKey(m_pData[STKTYPE][i].StockId ,STKTYPE);   
 	return TRUE;
 }
+
+// 读取股票代码表
 BOOL CSharesInformation::InitEmptyDatabase()
 {
 	typedef struct 
 	{
-		 char kind;           
-		 char id[7];            
-		 char name[9];          
-		 char Gppyjc[5];         
-		 char group;        
-		 long sel;
-	}TempCdat;
+		char kind;
+		char id[7];
+		char name[9];
+		char Gppyjc[5];
+		char group;
+		long sel;
+	} TempCdat;
 
-	FILE *fp;
-    CReportData *pCdat;
+	FILE* fp;
+	CReportData* pCdat;
 	TempCdat Cdat;
-	int StockCount[STOCKTYPE];
-	if(_access("stockname.dat",0)==-1)   
-       return FALSE;
-	if((fp=_fsopen("stockname.dat","rb",SH_DENYNO))!=NULL)
-	{
-		fseek(fp,0,SEEK_SET);
-		fread(&StockCount[0],4,STOCKTYPE, fp);
-        while(!feof(fp)&&!ferror(fp))
-		{
-	        CString Zqdm;
-			long Serl=0;
-			char group=0;
-			memset(&Cdat,0,sizeof(TempCdat));
-			fread(&Cdat.kind,1,1,fp);    
-			fread(Cdat.id ,1,6,fp);      
-            Cdat.id[6]='\0';
-			fread(Cdat.name,1,8,fp);      
-            Cdat.name[8]='\0';
-			fread(Cdat.Gppyjc ,1,4,fp);   
-            Cdat.Gppyjc[4]='\0'; 
-			fread(&Cdat.sel,1,4,fp);    
-			char ch123 ;
-			fread(&ch123,1,1,fp);
 
-			if (Lookup(Cdat.id, pCdat,Cdat.kind) != TRUE)   
+	int StockCount[STOCKTYPE];
+
+	if (_access("stockname.dat", 0) == -1)
+		return FALSE;
+
+	if ((fp = _fsopen("stockname.dat", "rb", SH_DENYNO)) != NULL)
+	{
+		fseek(fp, 0, SEEK_SET);
+		fread(&StockCount[0], 4, STOCKTYPE, fp);
+		while (!feof(fp) && !ferror(fp))
+		{
+			CString Zqdm;
+			long Serl = 0;
+			char group = 0;
+			memset(&Cdat, 0, sizeof(TempCdat));
+			fread(&Cdat.kind, 1, 1, fp);
+			fread(Cdat.id, 1, 6, fp);
+			Cdat.id[6] = '\0';
+			fread(Cdat.name, 1, 8, fp);
+			Cdat.name[8] = '\0';
+			fread(Cdat.Gppyjc, 1, 4, fp);
+			Cdat.Gppyjc[4] = '\0';
+			fread(&Cdat.sel, 1, 4, fp);
+			char ch123;
+			fread(&ch123, 1, 1, fp);
+
+			if (Lookup(Cdat.id, pCdat, Cdat.kind) != TRUE)
 			{
-				if(strlen(Cdat.id)==6||strlen(Cdat.id)==4)
+				if (strlen(Cdat.id) == 6 || strlen(Cdat.id) == 4)
 				{
-					int stocktype=Cdat.kind;
-					if(stocktype>=0&&stocktype<=10)
+					int stocktype = Cdat.kind;
+					if (stocktype >= 0 && stocktype <= 10)
 					{
-						if(!InsertItem(Cdat.id,pCdat,Cdat.kind))
+						if (!InsertItem(Cdat.id, pCdat, Cdat.kind))
 							continue;
-						strcpy(pCdat->name , Cdat.name);
-						strcpy(pCdat->id ,Cdat.id );
-						pCdat->kind=Cdat.kind;
-						strcpy(pCdat->Gppyjc ,Cdat.Gppyjc );
+
+						strcpy(pCdat->name, Cdat.name);
+						strcpy(pCdat->id, Cdat.id);
+						pCdat->kind = Cdat.kind;
+						strcpy(pCdat->Gppyjc, Cdat.Gppyjc);
 					}
 				}
 			} 
 			else
 			{
-				if(strcmp(pCdat->name,Cdat.name)!=0)
+				if (strcmp(pCdat->name, Cdat.name) != 0)
 				{
-					strcpy(pCdat->name,Cdat.name);
-					strcpy(pCdat->Gppyjc,Cdat.Gppyjc);
+					strcpy(pCdat->name, Cdat.name);
+					strcpy(pCdat->Gppyjc, Cdat.Gppyjc);
 				}
 			}
-//*************************************************
 		}
+
 		fclose(fp);
 	}
+
 	return TRUE;
 }
 
@@ -1167,31 +1174,39 @@ BOOL CSharesInformation::ClearAllRealTimeMarketData()
 
 #endif
 
-DWORD CSharesInformation::GetStockKind(int MarketType,char *strLabel)
+DWORD CSharesInformation::GetStockKind(int MarketType, char* strLabel)
 {
-	char *StockId;
-	StockId=strLabel;
-	if(MarketType==SH_MARKET_EX)
+	char* StockId;
+	StockId = strLabel;
+
+	if (MarketType == SH_MARKET_EX)
 	{
-		
-		if ( StockId[0]<'5' || StockId[0]=='7' )
+		if (StockId[0] < '5' || StockId[0] == '7')
 		{
-			if((StockId[1]=='A') ||(StockId[1]=='B' )||(StockId[1]=='C'))   
+			if ((StockId[1] == 'A') || (StockId[1] == 'B' ) || (StockId[1] == 'C'))
+			{
 				return SHZS;
-			else                                            
+			}
+			else
+			{
 				return SHZQ;
+			}
 		}
-		else if( StockId[0] == '5' ) 
-		{                                                                   
-            return SHJIJIN; 
-		}			
+		else if (StockId[0] == '5')
+		{
+			return SHJIJIN; 
+		}
 		else
-		{                                                                  
-			if ( StockId[0] < '9' )           
-                return SHAG; 
-			else  if(StockId[0] == '9')                  
+		{
+			if (StockId[0] < '9')
+			{
+				return SHAG;
+			}
+			else if (StockId[0] == '9')
+			{
 				return SHBG;
-		}			
+			}
+		}
 	}
 	else if(MarketType==SZ_MARKET_EX)
 	{
@@ -1220,7 +1235,7 @@ DWORD CSharesInformation::GetStockKind(int MarketType,char *strLabel)
 				else
 					return EBAG; 
 			}
-			
+
 		}
 		else if(strlen(StockId)==4)
 		{
