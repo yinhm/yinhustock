@@ -58,52 +58,6 @@ CSharesInformation::~CSharesInformation()
    if(m_hFile)
 	 CloseHandle(m_hFile);
 }
-BOOL CSharesInformation::SetMemroyALLOCSize(DWORD StockType,unsigned int nSize)
-{
-	STOCKDATASHOW *tempData;
-	int temp=0;
-	HGLOBAL	hMem;
-	LPVOID hp;
-	if(!m_pData[StockType])
-	{
-		hMem = GlobalAlloc( GPTR, (nSize + ADDCOUNT )* sizeof( STOCKDATASHOW ) );
-		hp=GlobalLock(hMem);
-		if( hp )
-		{
-			m_pData[StockType]= (STOCKDATASHOW *)hp;
-		}
-		else
-		{
-			AfxMessageBox("分配内存出错",MB_ICONSTOP);
-			return FALSE;
-		}
-	    m_dwStockMaxCount[StockType] =nSize + ADDCOUNT;            
-	    m_pdwStockCurrentCount[StockType] =0;
-	}
-	else
-	{
-		if(m_dwStockMaxCount[StockType] <= nSize)
-		{
-			hMem = GlobalAlloc( GPTR, (nSize + ADDCOUNT )* sizeof( STOCKDATASHOW ) );
-			hp=GlobalLock(hMem);
-			if( hp )
-			{
-				tempData= (STOCKDATASHOW *)hp;
-			}
-			else
-			{
-				AfxMessageBox("分配内存出错",MB_ICONSTOP);
-				return FALSE;
-			}
-            memcpy(tempData,m_pData[StockType],sizeof(STOCKDATASHOW)*m_pdwStockCurrentCount[StockType]);
-		    GlobalUnlock((HGLOBAL)m_pData[StockType]);     
-		    GlobalFree( (HGLOBAL)m_pData[StockType]);
-		    m_pData[StockType]=tempData;
-	        m_dwStockMaxCount[StockType] =nSize + ADDCOUNT;             
-	   }
-	}
-	return TRUE;
-}
 BOOL  CSharesInformation::RecvStockDataForType(PSTOCKDATASHOW &p,BYTE StockType) 
 {
 	if(m_hFile==NULL||m_hFileMap==NULL)
@@ -112,26 +66,6 @@ BOOL  CSharesInformation::RecvStockDataForType(PSTOCKDATASHOW &p,BYTE StockType)
 	return TRUE;
 }
 
-BOOL CSharesInformation::Lookup(char *StockId,PCdat1 &pStockData,int nKind)  
-{
-	int low=0;
-	int high=m_pdwStockCurrentCount[nKind] -1;
-	int mid=0;
-    while(low <= high)
-	{
-		 mid=(low+high)/2;
-		 if(strcmp(m_pData[nKind][mid].StockId , StockId)>0) high=mid -1;
-         else if(strcmp(m_pData[nKind][mid].StockId , StockId)< 0 ) low=mid +1;
-		 else 
-		 {
-			 pStockData=m_pData[nKind][mid].pItem ;
-			 return TRUE ;
-		 }
-	}
-    pStockData=NULL;
-	
-	return FALSE;
-}
 void CSharesInformation::SavePosToFile(int StockType)
 {
 	 for(int j=0;j<m_pdwStockCurrentCount[StockType];j++)
@@ -274,169 +208,6 @@ BOOL  CSharesInformation::RemoveKey(char *StockId ,DWORD StockType)
     m_pdwStockCurrentCount[StockType]--;
 	SavePosToFile(StockType);
     SaveRealDataToFile(m_RealFileHead,0); 
-	return TRUE;
-}
-BOOL CSharesInformation::InitRealTimeDataExist()
-{
-     BYTE *temp;
-	 BOOL IsCorrect=FALSE;
-	 m_hFile=CreateFile(g_realtime,GENERIC_READ|GENERIC_WRITE,
-		FILE_SHARE_READ|FILE_SHARE_WRITE,
-		NULL,
-		OPEN_ALWAYS,
-		FILE_ATTRIBUTE_NORMAL,
-		NULL);
-	if (m_hFile == INVALID_HANDLE_VALUE)
-	{
-		AfxMessageBox("打开实时行情数据出错");
-		return FALSE; 
-	}
-	m_hFileMap=CreateFileMapping(m_hFile,
-		NULL,
-		PAGE_READWRITE,
-		0,
-		0,
-		NULL);
-	if(m_hFileMap==NULL)
-	{
-		AfxMessageBox("创立文件映射内核时出错");
-		CloseHandle(m_hFile);
-		m_hFile=NULL;
-		m_hFileMap=NULL;
-		return FALSE;
-	}
-	m_pbData=(PBYTE)MapViewOfFile(m_hFileMap,
-		FILE_MAP_WRITE,
-		0,0,0);
-	if(m_pbData==NULL)
-	{
-		AfxMessageBox("将文件数据映射入内存时出错");
-		CloseHandle(m_hFile);
-		CloseHandle(m_hFileMap);
-		m_hFile=NULL;
-		m_hFileMap=NULL;
-		return FALSE;
-	}
- 	m_RealFileHead=(REALDATA *)m_pbData;
-	if(m_RealFileHead->filetitle!=12345678)
-	{
-	   UnmapViewOfFile(m_pbData);
-	   CloseHandle(m_hFile);
-	   CloseHandle(m_hFileMap);
-       return InitRealTimeDataEmpty();
-	}
-	if(m_RealFileHead->StockCount+100 >m_RealFileHead->MaxStockCount)
-	{
-		 int StockTotalCount;
-		 long FileLength=0;
-         m_RealFileHead->MaxStockCount+=100;
-         StockTotalCount=m_RealFileHead->MaxStockCount;
-         SaveRealDataToFile(m_RealFileHead,sizeof(REALDATA)); 
-	     UnmapViewOfFile(m_pbData);
-	     CloseHandle(m_hFileMap);
-         m_hFileMap=NULL;
-         m_pbData=NULL;
-         FileLength=sizeof(REALDATA)+STOCKTYPE*4+240*4*3+240*8*3+sizeof(CReportData)*StockTotalCount;
-		m_hFileMap=CreateFileMapping(m_hFile,
-			NULL,
-			PAGE_READWRITE,
-		    0,
-			FileLength,
-			NULL);
-		if(m_hFileMap==NULL)
-		{
-			AfxMessageBox("创立文件映射内核时出错");
-			CloseHandle(m_hFile);
-			m_hFile=NULL;
-			m_hFileMap=NULL;
-			return FALSE;
-		}
-		m_pbData=(PBYTE)MapViewOfFile(m_hFileMap,
-			FILE_MAP_WRITE,
-			0,0,0);
-		if(m_pbData==NULL)
-		{
-			AfxMessageBox("将文件数据映射入内存时出错");
-			CloseHandle(m_hFile);
-			CloseHandle(m_hFileMap);
-			m_hFile=NULL;
-			m_hFileMap=NULL;
-			return FALSE;
-		}
- 		m_RealFileHead=(REALDATA *)m_pbData;
-	}
-	if(m_RealFileHead->FileExitDone!=12345678)
-	{
-		if(m_RealFileHead->FileExitDone!=88888888)
-		{
-			int rtn = 5;
-			if(rtn==6)
-			{
-			   UnmapViewOfFile(m_pbData);
-			   CloseHandle(m_hFile);
-			   CloseHandle(m_hFileMap);
-			   return InitRealTimeDataEmpty();
-			}
-		}
-	    IsCorrect=TRUE;
-	}
-    m_RealFileHead->FileExitDone=87654321;
-    temp=m_pbData+sizeof(REALDATA);
-	m_pdwStockCurrentCount=(DWORD *)temp;
-	temp +=sizeof(int)*STOCKTYPE;
-
-	Nidx[0]=(Rsdn1 *)temp;		          
-	temp +=sizeof(Rsdn1)*240;
-	Nidx[1]=(Rsdn1 *)temp;		           
- 	temp +=sizeof(Rsdn1)*240;
-	Nidx[2]=(Rsdn1 *)temp;		             
- 	temp +=sizeof(Rsdn1)*240;
-
-    Tidx[0]=(Tidxd *)temp;                        
- 	temp +=sizeof(Tidxd)*240;
-    Tidx[1]=(Tidxd *)temp;                      
- 	temp +=sizeof(Tidxd)*240;
-    Tidx[2]=(Tidxd *)temp;                        
- 	temp +=sizeof(Tidxd)*240;
-
-	m_pMapData=(CReportData *)temp;	
-    for( int j=0;j<STOCKTYPE;j++)
-	{
-         if(!SetMemroyALLOCSize(j,m_pdwStockCurrentCount[j]))
-		{
-			AfxMessageBox("初始化数据变量出错");
-			return FALSE;
-		} 
-	}
-	if(!IsCorrect)
-	{
-		for(int j=0;j<m_RealFileHead->StockCount;j++)
-		{
-
-			m_pMapData[j].pBaseInfo =NULL; 
-			m_pMapData[j].pStockTypeInfo=NULL;
-			this->InsertItemPoint(m_pMapData+j);
-		}
-	}
-	else
-	{
-		int temp=m_RealFileHead->StockCount;
-		m_RealFileHead->StockCount=0;
-		for(int j=0;j<temp;j++)
-		{
-			if(strlen((m_pMapData+j)->id)==6||strlen((m_pMapData+j)->id)==4)
-			{
-                int stocktype=(m_pMapData+j)->kind;
-				if(stocktype>=0&&stocktype<=10&&(m_pMapData+j)->IsDelete==FALSE)
-			      InsertItemCorrect((m_pMapData+j)->id,m_pMapData+j,(m_pMapData+j)->kind);
-				else
-                  (m_pMapData+j)->IsDelete=TRUE;
-			}
-			else
-                  (m_pMapData+j)->IsDelete=TRUE;
-		} 
-	}
-    SaveRealDataToFile(m_RealFileHead,sizeof(REALDATA)); 
 	return TRUE;
 }
 BOOL CSharesInformation::InitRealTimeDataEmpty()
@@ -1174,6 +945,7 @@ BOOL CSharesInformation::ClearAllRealTimeMarketData()
 
 #endif
 
+
 DWORD CSharesInformation::GetStockKind(int MarketType, char* strLabel)
 {
 	char* StockId;
@@ -1181,6 +953,7 @@ DWORD CSharesInformation::GetStockKind(int MarketType, char* strLabel)
 
 	if (MarketType == SH_MARKET_EX)
 	{
+		return SHAG;
 		if (StockId[0] < '5' || StockId[0] == '7')
 		{
 			if ((StockId[1] == 'A') || (StockId[1] == 'B' ) || (StockId[1] == 'C'))
@@ -1208,58 +981,81 @@ DWORD CSharesInformation::GetStockKind(int MarketType, char* strLabel)
 			}
 		}
 	}
-	else if(MarketType==SZ_MARKET_EX)
+	else if (MarketType == SZ_MARKET_EX)
 	{
-		if(strlen(StockId)==6)
+		return SZAG;
+		if (strlen(StockId) == 6)
 		{
-			if ( StockId[0]=='0' )
+			if (StockId[0] == '0')
 			{
 				return SZAG;
 			}
 
-			if (StockId[0]=='1' )
+			if (StockId[0] == '1')
 			{
-				if ( StockId[1]=='7'/*原有投资基金*/ || StockId[1]=='8'/*证券投资基金*/ )
+				if (StockId[1] == '7' || StockId[1] == '8')
+				{
 					return SZJIJIN;
+				}
 				else
-					return SZZQ; 
+				{
+					return SZZQ;
+				}
 			}
 
-			if (StockId[0]=='2')
+			if (StockId[0] == '2')
+			{
 				return SZBG;
-
-			if (StockId[0]=='3')
-			{
-				if (StockId[1]=='9')
-					return SZZS;
-				else
-					return EBAG; 
 			}
 
-		}
-		else if(strlen(StockId)==4)
-		{
-			if(StockId[0]=='9'&&StockId[1]=='9')
-				return SZZS;
-			if ( StockId[0]=='0' ||  StockId[0]=='4' )        
-				return SZAG;
-			else if (StockId[0]=='6')
-				return EBAG;
-			else if(StockId[0]=='2')                         
+			if (StockId[0] == '3')
 			{
-				if( StockId[1]=='A'||StockId[1]=='B'||StockId[1]=='C' )  
+				if (StockId[1] == '9')
+				{
 					return SZZS;
-				else if(StockId[1]=='D')			
+				}
+				else
+				{
+					return EBAG;
+				}
+			}
+		}
+		else if (strlen(StockId) == 4)
+		{
+			if (StockId[0] == '9' && StockId[1] == '9')
+			{
+				return SZZS;
+			}
+			if (StockId[0] == '0' || StockId[0] == '4')
+			{
+				return SZAG;
+			}
+			else if (StockId[0] == '6')
+			{
+				return EBAG;
+			}
+			else if (StockId[0] == '2')
+			{
+				if (StockId[1] == 'A' || StockId[1] == 'B' || StockId[1] == 'C')
+				{
+					return SZZS;
+				}
+				else if (StockId[1] == 'D')
 				{
 					return EBZS;
 				}
 				else
+				{
 					return SZBG;
+				}
 			}
-			else                                                           
+			else
+			{
 				return SZZQ;
+			}
 		}
 	}
+
 	return -1;
 }
 
@@ -1438,4 +1234,248 @@ float CSharesInformation::GetValueUpDown(int isDown, int whick_stk, int nKind)
 		return m_indexAmount[whick_stk][nKind];
 	}
 
+}
+
+
+
+BOOL CSharesInformation::SetMemroyALLOCSize(DWORD StockType, unsigned int nSize)
+{
+	STOCKDATASHOW* tempData;
+	int temp = 0;
+	HGLOBAL	hMem;
+	LPVOID hp;
+
+	if (!m_pData[StockType])
+	{
+		hMem = GlobalAlloc(GPTR, (nSize + ADDCOUNT) * sizeof(STOCKDATASHOW));
+		hp = GlobalLock(hMem);
+		if (hp)
+		{
+			m_pData[StockType] = (STOCKDATASHOW*)hp;
+		}
+		else
+		{
+			AfxMessageBox("分配内存出错", MB_ICONSTOP);
+			return FALSE;
+		}
+		m_dwStockMaxCount[StockType] = nSize + ADDCOUNT;
+		m_pdwStockCurrentCount[StockType] = 0;
+	}
+	else
+	{
+		if (m_dwStockMaxCount[StockType] <= nSize)
+		{
+			hMem = GlobalAlloc(GPTR, (nSize + ADDCOUNT) * sizeof(STOCKDATASHOW));
+			hp = GlobalLock(hMem);
+			if (hp)
+			{
+				tempData = (STOCKDATASHOW*)hp;
+			}
+			else
+			{
+				AfxMessageBox("分配内存出错", MB_ICONSTOP);
+				return FALSE;
+			}
+			memcpy(tempData, m_pData[StockType], sizeof(STOCKDATASHOW) * m_pdwStockCurrentCount[StockType]);
+			GlobalUnlock((HGLOBAL)m_pData[StockType]);
+			GlobalFree((HGLOBAL)m_pData[StockType]);
+			m_pData[StockType] = tempData;
+			m_dwStockMaxCount[StockType] = nSize + ADDCOUNT;
+		}
+	}
+
+	return TRUE;
+}
+
+
+
+BOOL CSharesInformation::InitRealTimeDataExist()
+{
+	BYTE* temp;
+	BOOL IsCorrect = FALSE;
+
+	m_hFile = CreateFile(g_realtime, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
+		NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (m_hFile == INVALID_HANDLE_VALUE)
+	{
+		AfxMessageBox("打开实时行情数据出错");
+		return FALSE;
+	}
+
+	m_hFileMap = CreateFileMapping(m_hFile, NULL, PAGE_READWRITE, 0, 0, NULL);
+	if (m_hFileMap == NULL)
+	{
+		AfxMessageBox("创立文件映射内核时出错");
+		CloseHandle(m_hFile);
+		m_hFile = NULL;
+		return FALSE;
+	}
+
+	m_pbData = (PBYTE)MapViewOfFile(m_hFileMap, FILE_MAP_WRITE, 0, 0, 0);
+	if (m_pbData == NULL)
+	{
+		AfxMessageBox("将文件数据映射入内存时出错");
+		CloseHandle(m_hFileMap);
+		CloseHandle(m_hFile);
+		m_hFile = NULL;
+		m_hFileMap = NULL;
+		return FALSE;
+	}
+
+	m_RealFileHead = (REALDATA*)m_pbData;
+	if (m_RealFileHead->filetitle != 12345678)
+	{
+		UnmapViewOfFile(m_pbData);
+		CloseHandle(m_hFileMap);
+		CloseHandle(m_hFile);
+		return InitRealTimeDataEmpty();
+	}
+
+	if (m_RealFileHead->StockCount + 100 > m_RealFileHead->MaxStockCount)
+	{
+		int StockTotalCount;
+		m_RealFileHead->MaxStockCount += 100;
+		StockTotalCount = m_RealFileHead->MaxStockCount;
+		SaveRealDataToFile(m_RealFileHead, sizeof(REALDATA));
+		UnmapViewOfFile(m_pbData);
+		CloseHandle(m_hFileMap);
+		m_hFileMap = NULL;
+		m_pbData = NULL;
+
+		long FileLength = 0;
+		FileLength = sizeof(REALDATA) + STOCKTYPE * 4 + 240 * 4 * 3 + 240 * 8 * 3 + sizeof(CReportData) * StockTotalCount;
+		m_hFileMap = CreateFileMapping(m_hFile, NULL, PAGE_READWRITE, 0, FileLength, NULL);
+		if (m_hFileMap == NULL)
+		{
+			AfxMessageBox("创立文件映射内核时出错");
+			CloseHandle(m_hFile);
+			m_hFile = NULL;
+			return FALSE;
+		}
+
+		m_pbData = (PBYTE)MapViewOfFile(m_hFileMap, FILE_MAP_WRITE, 0, 0, 0);
+		if (m_pbData == NULL)
+		{
+			AfxMessageBox("将文件数据映射入内存时出错");
+			CloseHandle(m_hFileMap);
+			CloseHandle(m_hFile);
+			m_hFile = NULL;
+			m_hFileMap = NULL;
+			return FALSE;
+		}
+
+		m_RealFileHead = (REALDATA*)m_pbData;
+	}
+
+	if (m_RealFileHead->FileExitDone != 12345678)
+	{
+		if (m_RealFileHead->FileExitDone != 88888888)
+		{
+			int rtn = 5;
+			if (rtn == 6)
+			{
+				UnmapViewOfFile(m_pbData);
+				CloseHandle(m_hFileMap);
+				CloseHandle(m_hFile);
+				return InitRealTimeDataEmpty();
+			}
+		}
+
+		IsCorrect = TRUE;
+	}
+
+	m_RealFileHead->FileExitDone = 87654321;
+	temp = m_pbData + sizeof(REALDATA);
+
+	m_pdwStockCurrentCount=(DWORD*)temp;
+	temp += sizeof(int) * STOCKTYPE;
+
+	Nidx[0] = (Rsdn1*)temp;
+	temp += sizeof(Rsdn1) * 240;
+	Nidx[1] = (Rsdn1*)temp;
+	temp += sizeof(Rsdn1) * 240;
+	Nidx[2] = (Rsdn1*)temp;
+	temp += sizeof(Rsdn1) * 240;
+
+	Tidx[0] = (Tidxd*)temp;
+	temp += sizeof(Tidxd) * 240;
+	Tidx[1] = (Tidxd*)temp;
+	temp += sizeof(Tidxd) * 240;
+	Tidx[2] = (Tidxd*)temp;
+	temp += sizeof(Tidxd) * 240;
+
+	m_pMapData = (CReportData*)temp;
+
+	for (int j = 0; j < STOCKTYPE; j++)
+	{
+		if (!SetMemroyALLOCSize(j, m_pdwStockCurrentCount[j]))
+		{
+			AfxMessageBox("初始化数据变量出错");
+			return FALSE;
+		} 
+	}
+
+	if (!IsCorrect)
+	{
+		for (int j = 0; j < m_RealFileHead->StockCount; j++)
+		{
+			m_pMapData[j].pBaseInfo = NULL;
+			m_pMapData[j].pStockTypeInfo = NULL;
+			InsertItemPoint(m_pMapData + j);
+		}
+	}
+	else
+	{
+		int temp = m_RealFileHead->StockCount;
+		m_RealFileHead->StockCount = 0;
+		for (int j = 0; j < temp; j++)
+		{
+			if (strlen((m_pMapData + j)->id) == 6 || strlen((m_pMapData + j)->id) == 4)
+			{
+				int stocktype = (m_pMapData + j)->kind;
+				if (stocktype >= 0 && stocktype <= 10 && (m_pMapData + j)->IsDelete == FALSE)
+				{
+					InsertItemCorrect((m_pMapData + j)->id, m_pMapData + j, (m_pMapData + j)->kind);
+				}
+				else
+				{
+					(m_pMapData+j)->IsDelete = TRUE;
+				}
+			}
+			else
+			{
+				(m_pMapData + j)->IsDelete = TRUE;
+			}
+		} 
+	}
+
+	SaveRealDataToFile(m_RealFileHead, sizeof(REALDATA));
+	return TRUE;
+}
+
+BOOL CSharesInformation::Lookup(char* StockId, PCdat1& pStockData, int nKind)
+{
+	int low = 0;
+	int high = m_pdwStockCurrentCount[nKind] - 1;
+	int mid = 0;
+	while (low <= high)
+	{
+		mid =(low + high) / 2;
+		if (strcmp(m_pData[nKind][mid].StockId, StockId) > 0)
+		{
+			high = mid - 1;
+		}
+		else if (strcmp(m_pData[nKind][mid].StockId, StockId) < 0)
+		{
+			low = mid + 1;
+		}
+		else
+		{
+			pStockData = m_pData[nKind][mid].pItem;
+			return TRUE;
+		}
+	}
+
+	pStockData = NULL;
+	return FALSE;
 }

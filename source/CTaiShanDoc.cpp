@@ -878,86 +878,6 @@ int CTaiShanDoc::GetStocktime(int mode)
 }
 
 
-void CTaiShanDoc::Init_EveryDay()                                    
-{
-	int tmp;
-	STOCKTYPEHEAD *pStockTypeHead;
-	tmp=GetStocktime(0) ;       
-	try
-	{
-
-    if(m_week.tm_wday==0||m_week.tm_wday==6)
-	{
-         Init_StockData(2);                                          
-	
-		((CMainFrame *)(AfxGetApp()->m_pMainWnd))->HqStock_Init();
-	}
-	else if(m_nHave_Olddata==1)                                              
-	{
-         Init_StockData(1);                                    
-	}
-	
-	else if (tmp >= this->m_lStartMinA[0]|| tmp >= this->m_lStartMinA [1])   //
-	{
-		ClearRealData();
-	}
-
-    else if ((tmp >= this->m_lStartMinA [0] - 5 ) || (tmp >=this->m_lStartMinA [1]  - 5 ) )
-	{
-		ClearRealData();
-	}
-	
-	else if(tmp < this->m_lStartMinA[0] - 5 || tmp < this->m_lStartMinA[1] - 5 )   //
-	{
-		int rtn = MessageBox(NULL,"清除昨天分时数据吗？","警告",MB_YESNO|MB_ICONWARNING);
-		if(rtn==6)
-		{
-			ClearRealData();
-		}
-		else
-		{
-		   Init_StockData(2);                
-		}
-	}
-	}
-	catch(...)
-	{
-	}
-
-	CheckKind();
-	this->m_sharesInformation .AddStocksIfEmpty ();
-}
-
-
-void CTaiShanDoc::Init_StockData(int mode)                                           
-{
-
-    LoadStockData(mode) ;                            
-
-	if(mode == 2) 	
-	{
-		m_nANT[0]=m_nOldANT[0];
-		m_nANT[1]=m_nOldANT[1];
-		m_nANT[2]=m_nOldANT[2];
-		this->m_bInitDone =FALSE;
-        return ;
-	}
-	for(int i =0 ;i<3;i++)                         
-	{
-		m_nANT[i]=GetStocktime(i + 1 ) ;
-		if(m_nANT[i] <0 )
-			m_nANT[i]=0;
-	}
-
-
-	if(!m_bCloseReceiver)
-	{
-      ((CMainFrame *)(AfxGetApp()->m_pMainWnd))->HqStock_Init();
-	}
-
-	this->m_bInitDone =TRUE;
-}
-
 
 void CTaiShanDoc::GetStockCount()
 {
@@ -966,130 +886,269 @@ void CTaiShanDoc::GetStockCount()
 
 
 
-void CTaiShanDoc::LoadStockData(int mode){
+long CTaiShanDoc::GetStockDay(time_t time)
+{
+	if (time <= 0)
+		return 0;
+
+	int tmp;
+	CTime m_Time = time;
+	tmp = ((long)m_Time.GetYear()) * 10000L + (long)(m_Time.GetMonth()) * 100 + (long)(m_Time.GetDay());
+
+	return (tmp);
+}
+
+void CTaiShanDoc::Init_EveryDay()
+{
+	int tmp;
+	tmp = GetStocktime(0);
+
+	try
+	{
+		if (m_week.tm_wday == 0 || m_week.tm_wday == 6)
+		{
+			Init_StockData(2);
+
+			((CMainFrame *)(AfxGetApp()->m_pMainWnd))->HqStock_Init();
+		}
+		else if (m_nHave_Olddata == 1)
+		{
+			Init_StockData(1);
+		}
+		else if (tmp >= m_lStartMinA[0] || tmp >= m_lStartMinA[1])
+		{
+			int rtn = MessageBox(NULL, "清除昨天分时数据吗？", "警告", MB_YESNO | MB_ICONWARNING);
+			if (rtn == 6)
+			{
+				ClearRealData();
+			}
+			else
+			{
+				Init_StockData(2);
+			}
+		}
+		else if ((tmp >= m_lStartMinA[0] - 5 ) || (tmp >= m_lStartMinA[1] - 5))
+		{
+			int rtn = MessageBox(NULL, "清除昨天分时数据吗？", "警告", MB_YESNO | MB_ICONWARNING);
+			if (rtn == 6)
+			{
+				ClearRealData();
+			}
+			else
+			{
+				Init_StockData(2);
+			}
+		}
+		else if (tmp < m_lStartMinA[0] - 5 || tmp < m_lStartMinA[1] - 5)
+		{
+			int rtn = MessageBox(NULL, "清除昨天分时数据吗？", "警告", MB_YESNO | MB_ICONWARNING);
+			if (rtn == 6)
+			{
+				ClearRealData();
+			}
+			else
+			{
+				Init_StockData(2);
+			}
+		}
+	}
+	catch(...)
+	{
+	}
+
+	CheckKind();
+	m_sharesInformation.AddStocksIfEmpty();
+}
+
+void CTaiShanDoc::Init_StockData(int mode)
+{
+	LoadStockData(mode);
+
+	if (mode == 2)
+	{
+		m_nANT[0] = m_nOldANT[0];
+		m_nANT[1] = m_nOldANT[1];
+		m_nANT[2] = m_nOldANT[2];
+		m_bInitDone = FALSE;
+		return;
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_nANT[i] = GetStocktime(i + 1);
+		if (m_nANT[i] < 0)
+		{
+			m_nANT[i] = 0;
+		}
+	}
+
+	//if (!m_bCloseReceiver)
+	//{
+	//	((CMainFrame*)(AfxGetApp()->m_pMainWnd))->HqStock_Init();
+	//}
+
+	m_bInitDone = TRUE;
+}
+
+void CTaiShanDoc::LoadStockData(int mode)
+{
 	CString path;
-	::GetCurrentDirectory(MAX_PATH,path.GetBuffer(MAX_PATH));
+	GetCurrentDirectory(MAX_PATH, path.GetBuffer(MAX_PATH));
 	path.ReleaseBuffer();
 
-	if(mode != 3) 	
+	if (mode != 3)
 	{
 		m_sharesInformation.InitRealTimeData(path);
 		m_ManagerStockTypeData.InitStockTypeData(path);
-        InitChooseAndStockType();
+		InitChooseAndStockType();
 	}
+
 	switch(mode)
 	{
-	case 0:                                    
+	case 0:
 	case 3:
-            CreateFileData(mode); 
-			m_sharesInformation.ClearRealDataMinute();
-
-			
-			CTaiKlineFileHS::m_fileHsSh->ZeroHsCountEach();
-			CTaiKlineFileHS::m_fileHsSz->ZeroHsCountEach();
-			CTaiTestTreeView::CheckNewsInfomationFileTime();
+		CreateFileData(mode); 
+		m_sharesInformation.ClearRealDataMinute();
+		CTaiKlineFileHS::m_fileHsSh->ZeroHsCountEach();
+		CTaiKlineFileHS::m_fileHsSz->ZeroHsCountEach();
+		CTaiTestTreeView::CheckNewsInfomationFileTime();
 		break;
-	case 1:                               
-		    LoadFileData(mode);         
+	case 1:
+		LoadFileData(mode);
 		break;
-	case 2:                            
-            LoadFileData(mode);            
+	case 2:
+		LoadFileData(mode);
 		break;
 	}
-
-
 }
 
-
-
-
-long CTaiShanDoc::GetStockDay(time_t time )                     
+void CTaiShanDoc::CreateFileData(int mode)
 {
-  int tmp;
-  if(time<=0)
-	  return 0;
-  CTime m_Time = time;
-  tmp=((long)m_Time.GetYear())*10000L+(long)(m_Time.GetDay())+(long)(m_Time.GetMonth())*100;
-  return(tmp);
-}
+	FILE* fp;
+	fp = _fsopen("news\\news.log", "w+b", SH_DENYNO);
+	fclose(fp);
 
-
-void CTaiShanDoc::CreateFileData(int mode)                                       
-{
-
-	FILE * fp;
-    fp=_fsopen("news\\news.log","w+b",SH_DENYNO);
-    fclose(fp);
 	CString FileName;
-	FileName.Format ("news\\shanghai\\%d.dat",m_lDay);
-	fp=_fsopen(FileName.GetBuffer(0),"w+b",SH_DENYNO);
-	fclose(fp);
-	FileName.Format ("news\\shenzhen\\%d.dat",m_lDay);
-	fp=_fsopen(FileName.GetBuffer(0),"w+b",SH_DENYNO);
+	FileName.Format("news\\shanghai\\%d.dat", m_lDay);
+	fp = _fsopen(FileName.GetBuffer(0), "w+b", SH_DENYNO);
 	fclose(fp);
 
-	FileName.Format ("news\\cj\\%d.dat",m_lDay);
-	fp=_fsopen(FileName.GetBuffer(0),"w+b",SH_DENYNO);
+	FileName.Format("news\\shenzhen\\%d.dat", m_lDay);
+	fp = _fsopen(FileName.GetBuffer(0), "w+b", SH_DENYNO);
 	fclose(fp);
 
-	REALDATA *RealFileHead;             
-    this->m_sharesInformation.SetRealDataHead(RealFileHead);
-	RealFileHead->Day =m_lDay;
-	RealFileHead->OldANT[0]=m_nANT[0]; 
-	RealFileHead->OldANT[1]=m_nANT[1];
-	RealFileHead->OldANT[2]=m_nANT[2];
-	RealFileHead->CloseWorkDone= m_bCloseWorkDone=FALSE;
+	FileName.Format("news\\cj\\%d.dat", m_lDay);
+	fp = _fsopen(FileName.GetBuffer(0), "w+b", SH_DENYNO);
+	fclose(fp);
+
+	REALDATA* RealFileHead;
+	m_sharesInformation.SetRealDataHead(RealFileHead);
+	RealFileHead->Day = m_lDay;
+	RealFileHead->OldANT[0] = m_nANT[0];
+	RealFileHead->OldANT[1] = m_nANT[1];
+	RealFileHead->OldANT[2] = m_nANT[2];
+	RealFileHead->CloseWorkDone = m_bCloseWorkDone = FALSE;
 }
 
+void CTaiShanDoc::LoadFileData(int mode)
+{
+	REALDATA* RealFileHead;
+	RealFileHead = m_sharesInformation.GetRealDataHead();
+
+	m_lDay = RealFileHead->Day;
+	m_nOldANT[0] = RealFileHead->OldANT[0];
+	m_nOldANT[1] = RealFileHead->OldANT[1];
+	m_nOldANT[2] = RealFileHead->OldANT[2];
+	m_bCloseWorkDone = RealFileHead->CloseWorkDone;
+
+	if (m_week.tm_wday == 0 || m_week.tm_wday == 6)
+	{
+		m_nANT[0] = m_nOldANT[0];
+		m_nANT[1] = m_nOldANT[1];
+		m_nANT[2] = m_nOldANT[2];
+	}
+
+	CFile fl;
+	if (fl.Open ("news\\news.log", CFile::modeCreate | CFile::modeNoTruncate))
+	{
+		fl.Close();
+	}
+
+	FILE* fp;
+	fp = _fsopen("news\\news.log", "r+b", SH_DENYNO);
+	fseek(fp, 0, SEEK_SET);
+	while (!feof(fp) && !ferror(fp))
+	{
+		CString FileName;
+		char str[50] = "";
+		fread(str, 50, 1, fp);
+		FileName = str;
+		if (strlen(str) > 0)
+		{
+			m_NewsFileNameMap[FileName] = FileName;
+		}
+	}
+
+	fclose(fp);
+}
 
 void CTaiShanDoc::SaveFileData()
 {
-	REALDATA *RealFileHead;                
+	REALDATA* RealFileHead;
+
 	chk_date();
-    this->m_sharesInformation.SetRealDataHead(RealFileHead);
-	RealFileHead->Day =m_lDay;
-	RealFileHead->OldANT[0]=m_nOldANT[0]; 
-	RealFileHead->OldANT[1]=m_nOldANT[1];
-	RealFileHead->CloseWorkDone= m_bCloseWorkDone;
-    RealFileHead->FileExitDone=12345678;  
+	m_sharesInformation.SetRealDataHead(RealFileHead);
+	RealFileHead->Day = m_lDay;
+	RealFileHead->OldANT[0] = m_nOldANT[0];
+	RealFileHead->OldANT[1] = m_nOldANT[1];
+	RealFileHead->CloseWorkDone = m_bCloseWorkDone;
+	RealFileHead->FileExitDone = 12345678;
 }
 
-
-
-void CTaiShanDoc::LoadFileData(int mode)                                         
+void CTaiShanDoc::ClearRealData()
 {
-	REALDATA *RealFileHead;              
-    RealFileHead=this->m_sharesInformation.GetRealDataHead();
-	m_lDay=RealFileHead->Day ;
-	m_nOldANT[0]=RealFileHead->OldANT[0];
-	m_nOldANT[1]=RealFileHead->OldANT[1];
-	m_nOldANT[2]=RealFileHead->OldANT[2];
-	m_bCloseWorkDone=RealFileHead->CloseWorkDone;
-	
-	if(m_week.tm_wday==0||m_week.tm_wday==6)
-	{
-		m_nANT[0]=m_nOldANT[0];
-		m_nANT[1]=m_nOldANT[1];
-		m_nANT[2]=m_nOldANT[2];
-	}		
+	STOCKTYPEHEAD* pStockTypeHead;
+	Init_StockData(0);
+	m_ManagerStockTypeData.GetStockTypeHeadPoint(pStockTypeHead);
+	pStockTypeHead->m_lLastTime = 0;
+}
 
-	CFile fl;
-	if(fl.Open ("news\\news.log",CFile::modeCreate|CFile::modeNoTruncate))
-		fl.Close();
-    FILE * fp;
+void CTaiShanDoc::CheckKind()
+{
+	//for (int i = 0; i < STOCKTYPE; i++)
+	//{
+	//	int temp = m_sharesInformation.GetStockTypeCount(i);
+	//	for (int j = 0; j < temp; j++)
+	//	{
+	//		CReportData* Cdat;
+	//		CString StockId;
+	//		m_sharesInformation.GetStockItem(i, j, Cdat);
+	//		if (Cdat == NULL)
+	//			continue;
 
-	fp=_fsopen("news\\news.log","r+b",SH_DENYNO);
-	fseek(fp,0,SEEK_SET);
-    while(!feof(fp)&&!ferror(fp))
-	{
-        CString FileName;
-		char str[50]="";
-		fread(str,50,1,fp);
-		FileName=str;
-        if(strlen(str)>0)  
-		this->m_NewsFileNameMap[FileName]=FileName;
-	}
-    fclose(fp);
+	//		StockId = Cdat->id;
+	//		if (StockId.GetLength() < 4)
+	//			continue;
+
+	//		if (Cdat->kind == SHAG)
+	//		{
+	//			if (StockId[0] == '5')
+	//			{
+	//				Cdat->kind = SHJIJIN;
+	//			}
+	//		}
+	//		if (Cdat->kind == SZAG)
+	//		{
+	//			if (StockId[0] == '1')
+	//			{
+	//				if (StockId[1] == '7' || StockId[1] == '8')
+	//				{
+	//					Cdat->kind = SZJIJIN;
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 }
 
 
@@ -2545,45 +2604,3 @@ void CTaiShanDoc::WideNetInitMarketBargainingData2(RCV_STKLABEL2_STRUCTEx *pStkL
 	}
 }
 #endif
-
-void CTaiShanDoc::ClearRealData()
-{
-	STOCKTYPEHEAD *pStockTypeHead;
-   Init_StockData(0);                                
-   this->m_ManagerStockTypeData.GetStockTypeHeadPoint(pStockTypeHead);
-   pStockTypeHead->m_lLastTime=0;
-
-}
-
-void CTaiShanDoc::CheckKind()
-{
-    for(int i=0;i<STOCKTYPE;i++)
-	{
-		int temp=m_sharesInformation.GetStockTypeCount(i);
-		for(int j=0;j<temp;j++)
-		{
-			CReportData *Cdat;
-			CString StockId ; 
-			m_sharesInformation.GetStockItem(i,j,Cdat);
-			if(Cdat==NULL)
-				continue;
-			StockId =Cdat->id ;
-			if(StockId.GetLength ()<4)
-				continue;
-
-			if(Cdat->kind == SHAG)
-			{
-				 if(StockId[0] == '5')
-					 Cdat->kind = SHJIJIN;
-			}
-			if(Cdat->kind == SZAG)
-			{
-				 if(StockId[0] == '1')
-				 {
-					 if(StockId[1] == '7' || StockId[1] == '8')
-						 Cdat->kind = SZJIJIN;
-				 }
-			}
-		}
-	}
-}

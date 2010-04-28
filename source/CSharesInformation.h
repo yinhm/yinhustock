@@ -12,13 +12,21 @@ class CSharesInformation
 public:
 	CSharesInformation();
 	virtual ~CSharesInformation();
-private:
-    HANDLE m_hFile,m_hFileMap;              
-	REALDATA *m_RealFileHead;            
-	BYTE  *m_pbData;                     
-	CReportData *m_pMapData;                      
-	Rsdn1 *Nidx[3];                      
-    Tidxd *Tidx[3];                      
+
+protected:
+	HANDLE m_hFile;
+	HANDLE m_hFileMap;
+
+	BYTE* m_pbData;
+
+	REALDATA* m_RealFileHead;
+	CReportData* m_pMapData;
+	STOCKDATASHOW* m_pData[STOCKTYPE];
+	DWORD m_dwStockMaxCount[STOCKTYPE];
+	DWORD* m_pdwStockCurrentCount;
+
+	Rsdn1* Nidx[3];
+	Tidxd* Tidx[3];
 
 	int m_countUp[4][6];
 	int m_countDown[4][6];
@@ -30,9 +38,10 @@ private:
 
 
 
-	STOCKDATASHOW *m_pData[STOCKTYPE];        
-	DWORD m_dwStockMaxCount[STOCKTYPE];        
-	DWORD *m_pdwStockCurrentCount;                    
+protected:
+	BOOL SetMemroyALLOCSize(DWORD StockType, unsigned int nSize);
+
+
 public:
     long  GetTotalStockTypeCount() { return STOCKTYPE;}  
     long  GetStockTypeCount(DWORD StockType) { return m_pdwStockCurrentCount[StockType];}  
@@ -44,7 +53,6 @@ public:
 	BOOL InsertItem(char *StockId ,PCdat1 &pStockData,DWORD StockType); 
 	BOOL Lookup(char *StockId,PCdat1 &pStockData,int nKind);  
 	BOOL  RecvStockDataForType(PSTOCKDATASHOW &p,BYTE StockType); 
-	BOOL  SetMemroyALLOCSize(DWORD StockType,unsigned int nSize);  
  	int   GetStockPos(int StockType,char *StockId); 
 
 public:

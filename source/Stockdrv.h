@@ -405,26 +405,29 @@ typedef struct RCV_COMMINTERFACE_STRUCTEx
 	DWORD m_dwTransEnvironment;                 //行情传送环境数据 
 } RCV_COMMINTERFACE_STRUCTEx;
 
-////////////////////////////////////////////////////////
-//客户端应用层数据请求部分
+
+///////////////////////////////////////////////////////////////////////////////
+// 客户端应用层数据请求部分
 //
-typedef enum {
-	SHZS=0,                           //上证指数 
-    SHAG=1,                             //上证A股 
-	SHBG=2,                             //上证B股 
-	SZZS=3,                              //深圳指数
-	SZAG=4,                              //深圳A股
-	SZBG=5,                              //深圳B股
-	SHZQ=6,                              //上证债券
-	SZZQ=7,                              //深圳债券
-	SHJIJIN=8,                              //上证jijin 
-	SZJIJIN=9,                              //深证jijin 
-	EBZS=10,                              //二板指数   
-	EBAG=11,                              //二板股票
-	STKTYPE=12,                          //板块指数  
-	CHOOSESTK=20,                           //自选股 
-	QBGP=30                              //全部股票
+typedef enum
+{
+	SHZS = 0,							// 上证指数 
+    SHAG = 1,							// 上证A股 
+	SHBG = 2,							// 上证B股 
+	SZZS = 3,							// 深圳指数
+	SZAG = 4,							// 深圳A股
+	SZBG = 5,							// 深圳B股
+	SHZQ = 6,							// 上证债券
+	SZZQ = 7,							// 深圳债券
+	SHJIJIN = 8,						// 上证基金 
+	SZJIJIN = 9,						// 深证基金 
+	EBZS = 10,							// 二板指数   
+	EBAG = 11,							// 二板股票
+	STKTYPE = 12,						// 板块指数  
+	CHOOSESTK = 20,						// 自选股 
+	QBGP = 30							// 全部股票
 };
+
 //---------------------------------------------------------------------------
 typedef enum ClientTransmitAttributes{
 	LoginAuthorization=0,            //登入授权 
