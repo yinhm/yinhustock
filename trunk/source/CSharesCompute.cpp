@@ -596,6 +596,7 @@ void CSharesCompute::StockDataUpdate(RCV_REPORT_STRUCTEx* m_GpHqReport)
 		strcpy(Cdat->name ,m_GpHqReport->m_szName );
 		strcpy(Cdat->id ,m_GpHqReport->m_szLabel );
 		Cdat->kind=nKind;
+		Cdat->wMarket = m_GpHqReport->m_wMarket;
 		if(strlen(Cdat->name)>0)
 		{
 			m_MainDocument->StockNameConvert(Cdat->name,Cdat->Gppyjc) ;

@@ -127,8 +127,6 @@ public:
 	void ReViewInfo(void);	
 	WINDOWPLACEMENT m_wpPrev;      
 	int CreateToolDrawLine();
-	void HqStock_Init();     
-	void HqStock_Quit();     
 
 
 	static CTaiScreen *dialogtjxg;
@@ -226,6 +224,12 @@ protected:
 
 public:
 	void ShowMYXMZ();
+
+
+
+public:
+	void HqStock_Init();
+	void HqStock_Quit();
 
 protected:
 	afx_msg long OnStkDataOK(UINT wFileType, LONG lPara);

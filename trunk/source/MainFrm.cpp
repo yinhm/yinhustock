@@ -330,20 +330,20 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	// Get a pointer to the command bars object.
-	CXTPCommandBars* pCommandBars = GetCommandBars();
-	if (pCommandBars == NULL)
-	{
-		TRACE0("Failed to create command bars object.\n");
-		return -1;      // fail to create
-	}
+	//CXTPCommandBars* pCommandBars = GetCommandBars();
+	//if (pCommandBars == NULL)
+	//{
+	//	TRACE0("Failed to create command bars object.\n");
+	//	return -1;      // fail to create
+	//}
 
 	// Add the menu bar
-	CXTPToolBar* pMenuBar = pCommandBars->SetMenu(_T("Menu Bar"), IDR_MAINFRAME);
-	if (pMenuBar == NULL)
-	{
-		TRACE0("Failed to create menu bar.\n");
-		return -1;      // fail to create
-	}
+	//CXTPToolBar* pMenuBar = pCommandBars->SetMenu(_T("Menu Bar"), IDR_MAINFRAME);
+	//if (pMenuBar == NULL)
+	//{
+	//	TRACE0("Failed to create menu bar.\n");
+	//	return -1;      // fail to create
+	//}
 
 	return 0;
 }
@@ -370,48 +370,6 @@ void CMainFrame::Dump(CDumpContext& dc) const
 }
 
 #endif 
-
-
-
-void CMainFrame::HqStock_Init()    
-{
-
-#ifndef WIDE_NET_VERSION
-	if(!CTaiShanApp::m_gbDoInitate)
-	{
-
-		CTaiShanApp::m_gbDoInitate = true;
-		return;
-	}
-
-	int ok;
-	if(this->m_taiShanDoc->m_4or6==0)
-		ok = gSTOCKDLL.Stock_Init(m_hWnd,Gp_Msg_StkData,RCV_WORK_MEMSHARE);	
-	else
-	{	char a[MAX_PATH];	
-		ok = gSTOCKDLL.Stock_Init(m_hWnd,Gp_Msg_StkData,RCV_WORK_SENDMSG);	
-		gSTOCKDLL.GetStockDrvInfo(RI_SUPPORTEXTHQ,(void *)a);
-	}	
-	if(ok>0)
-		m_bRunFlag =TRUE;
-
-	gSTOCKDLL.SetExtMsg(DA_SERVICE_MSG_EXT);
-
-	m_taiShanDoc->m_bCloseReceiver=TRUE;
-	SetTimer(1007,2000,NULL);
-#endif
-}
-void CMainFrame::HqStock_Quit()   
-{
-#ifndef WIDE_NET_VERSION
-	if(m_bRunFlag==TRUE)
-	{
-	   gSTOCKDLL.Stock_Quit(m_hWnd);    
-    }
-	m_bRunFlag=FALSE;
-	m_taiShanDoc->m_bCloseReceiver=FALSE;
-#endif
-}
 
 void CMainFrame::OnDestroy() 
 {
@@ -1815,11 +1773,6 @@ bool CMainFrame::CanUseIndicatorProtected()
 	return true;
 }
 
-
-
-
-
-
 void CMainFrame::ShowMYXMZ()
 {
 	if (m_pViewMYXMZ == NULL)
@@ -1832,6 +1785,54 @@ void CMainFrame::ShowMYXMZ()
 	m_pViewMYXMZ->UpdateWindow();
 }
 
+
+
+
+void CMainFrame::HqStock_Init()    
+{
+#ifndef WIDE_NET_VERSION
+	if (!CTaiShanApp::m_gbDoInitate)
+	{
+		CTaiShanApp::m_gbDoInitate = TRUE;
+		return;
+	}
+
+	int ok;
+	if (m_taiShanDoc->m_4or6 == 0)
+	{
+		ok = gSTOCKDLL.Stock_Init(m_hWnd, Gp_Msg_StkData, RCV_WORK_MEMSHARE);
+	}
+	else
+	{
+		char a[MAX_PATH];
+		ok = gSTOCKDLL.Stock_Init(m_hWnd, Gp_Msg_StkData, RCV_WORK_SENDMSG);
+		gSTOCKDLL.GetStockDrvInfo(RI_SUPPORTEXTHQ, (void*)a);
+	}
+
+	if (ok > 0)
+	{
+		m_bRunFlag = TRUE;
+	}
+
+	gSTOCKDLL.SetExtMsg(DA_SERVICE_MSG_EXT);
+	m_taiShanDoc->m_bCloseReceiver = TRUE;
+
+	SetTimer(1007, 2000, NULL);
+#endif
+}
+
+void CMainFrame::HqStock_Quit()
+{
+#ifndef WIDE_NET_VERSION
+	if (m_bRunFlag == TRUE)
+	{
+		gSTOCKDLL.Stock_Quit(m_hWnd);
+	}
+
+	m_bRunFlag = FALSE;
+	m_taiShanDoc->m_bCloseReceiver = FALSE;
+#endif
+}
 
 LONG CMainFrame::OnStkDataOK(UINT wFileType, LONG lPara)
 {
@@ -1886,8 +1887,8 @@ LONG CMainFrame::OnStkDataOK(UINT wFileType, LONG lPara)
 		{
 		case RCV_REPORT:		// 行情报表
 			{
-				BYTE* pBuffBase = (BYTE*)&pHeader->m_pReport[0];
-				int nBuffSize = pHeader->m_pReport[0].m_cbSize;
+				//BYTE* pBuffBase = (BYTE*)&pHeader->m_pReport[0];
+				//int nBuffSize = pHeader->m_pReport[0].m_cbSize;
 
 				for (i = 0; i < pHeader->m_nPacketNum; i++)
 				{
@@ -1895,8 +1896,10 @@ LONG CMainFrame::OnStkDataOK(UINT wFileType, LONG lPara)
 					RCV_WIDOFEREPORT_STRUCTEx report = pHeader->m_pWideReport[i];
 					m_taiShanDoc->m_sharesCompute.WideStockDataUpdate(&report);
 #else
-					RCV_REPORT_STRUCTEx* pReport = (RCV_REPORT_STRUCTEx*)(pBuffBase + nBuffSize * i);
-					m_taiShanDoc->m_sharesCompute.StockDataUpdate(pReport);
+					//RCV_REPORT_STRUCTEx* pReport = (RCV_REPORT_STRUCTEx*)(pBuffBase + nBuffSize * i);
+					//m_taiShanDoc->m_sharesCompute.StockDataUpdate(pReport);
+					RCV_REPORT_STRUCTEx report = pHeader->m_pReport[i];
+					m_taiShanDoc->m_sharesCompute.StockDataUpdate(&report);
 #endif
 				}
 

@@ -207,6 +207,7 @@ typedef struct
 	BYTE header[32];
 	BYTE kind;
 	BYTE rdp;			// 用于计算大盘强弱指标
+	WORD wMarket;		// 证券市场
 	char id[8];			// 证券代码
 	char name[10];		// 证券名称 
 	char Gppyjc[6];		// 证券名称拼音简称
@@ -262,14 +263,14 @@ typedef struct
 typedef CReportData* PCdat1;
 
 
-
-typedef struct
+typedef struct _tagSTOCKDATASHOW
 {
- 	CReportData *pItem;
-	char StockId[7]; 
+	CReportData* pItem;
+	WORD wMarket;
+	char StockId[7];
 	float ItemData;
-}STOCKDATASHOW;
-typedef STOCKDATASHOW *PSTOCKDATASHOW; 
+} STOCKDATASHOW;
+typedef STOCKDATASHOW* PSTOCKDATASHOW;
 
 
 typedef struct
@@ -338,7 +339,7 @@ typedef Tidxd **PTidxd;
 
 
 
-typedef struct
+typedef struct _tagREALDATA
 {
 	long filetitle;
 	long Day;
@@ -348,8 +349,10 @@ typedef struct
 	long MaxStockCount;
 	long FileExitDone;
 	BYTE Res[12];
-}REALDATA;
-typedef REALDATA *PREALDATA;
+} REALDATA;
+typedef REALDATA* PREALDATA;
+
+
 
 typedef struct
 {
