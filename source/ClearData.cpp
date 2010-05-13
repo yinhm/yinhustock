@@ -689,5 +689,5 @@ BOOL CClearData::OnHelpInfo(HELPINFO* pHelpInfo)
 void CClearData::OnButton4To6() 
 {
 	
-	CTaiKlineFileKLine::Transfer4To6(false);
+	//CTaiKlineFileKLine::Transfer4To6(false);
 }

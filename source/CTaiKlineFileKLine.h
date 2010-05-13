@@ -25,11 +25,8 @@ class CTaiShanDoc;
 class CTaiKlineFileKLine : public CTaiKlineMemFile  
 {
 public:
-	static bool ConvertStockTypeInfo();
-	static bool ConvertBaseInfoFile();
 	static int GetKlineCount(CString symbol,int stkKind,bool bDayKline);
-	static bool Transfer4To6(bool bFirst = true);
-	static void ChooseReceiveDataForm();
+	//static bool Transfer4To6(bool bFirst = true);
 	static int ReadKLineS(CString symbol,int stkKind,Kline*& pKline,int nRead=-1,int nAddBlank = 0,bool bDay = true);
 	static bool WriteKLineS(CString symbol,int stkKind,Kline* pKline,int nWrite,int nType = 0,bool bDay = true);
 	static void CloseAll();
@@ -53,7 +50,6 @@ public:
 	static bool OutputCloseVal(SymbolKindArr &strSymbolArray, int& nDays,CTime& tmStart,CTime &tmEnd,double*& pdbl,Kline*& pKlineIndex);
 	static int ReadKlineTimeSpan(CString symbol,int stkKind,Kline*& pKline,CTime &timeB, CTime &timeE, int nKlineType,CBuySellList* pBuySellList = NULL,int nAddBlank=48);
 	static void ReorgnizeFile(bool bSh ,bool bSz,bool bDayKline = true);
-	void LookUpIndexFromMap(CString symbol,int& nIndex);
 	CString GetSymbol(int nIndex);
 	int ReadKlinePeriod(int nIndex, Kline *&kline, CTime& timeStart, CTime& timeEnd,int nAddBlank=0 );
 	int ReadKLine(int nIndex,Kline*& pKline,int nRead);
@@ -62,7 +58,6 @@ public:
 //	CTaiShanDoc * pDoc;
 
 	bool WriteKLineToRepair(CString symbol,Kline* pKline,int nWrite);
-	virtual BOOL Open(LPCTSTR lpszFileName, UINT nOpenFlags,int nAddToFileEnd =0 ,CFileException* pException = NULL);
 	static int LookTwoPath(time_t& tmt ,Kline* pKline,int nMax,bool& bAdd,bool bDay);
 	int TimeToFoot(KLINE_SMALLHEAD* pKlineSmallHead,CTime& tm,bool& bAdd/*[in]*/);
 	enum InstallMode {
@@ -74,14 +69,9 @@ public:
 	int ReadKlinePeriod(CString symbol, Kline *&kline, CTime& timeStart, CTime& timeEnd,bool istotaldata = false,int nAddBlank = 0);//读取一段时间的K线数据
 	bool WriteKLine(CString symbol,Kline* pKline,int nWrite,int nType);	
 	bool WriteKlinePeriod(CString symbol, Kline *pKline,int nKline, CTime& timeStart, CTime& timeEnd);//写一段时间的K线数据
-	void InitMapOfDoc();
-	void CreateSmallBlock();
 
 
 	static int RegularTime(int time,bool bDay);
-	int GetKlineSmallHeader(CString symbol,KLINE_SMALLHEAD* pKlineSmallHead);
-									
-	bool SetKlineSmallHeader(int nIndex,KLINE_SMALLHEAD* pKlineSmallHead);
 	CTaiKlineFileKLine();
 	CTaiKlineFileKLine(int nKind,int nMarket);
 	virtual ~CTaiKlineFileKLine();
@@ -93,16 +83,31 @@ protected:
 
 private:
 	void AddSmallHeadBlock();
-	void DeleteMap();
 
-	static bool CheckSymbol(CString symbol);
-	void AddIndexToMap();
-	int AddNewStockToFile(CString symbol,KLINE_SMALLHEAD*& pKlineSmallHead);
-	void WriteHeaderInfo();
 	int CreateOrMoveSmallBlock(KLINE_SMALLHEAD* pKlineSmallHead,int& nBlock);
-	int CalcMaxCountBlock();
 	int m_kindKline;
 	int m_nMarket;
+
+public:
+	virtual BOOL Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFileEnd = 0, CFileException* pException = NULL);
+
+public:
+	void AddIndexToMap();
+	void DeleteMap();
+	void LookUpIndexFromMap(CString symbol, int& nIndex);
+
+protected:
+	void WriteHeaderInfo();
+
+	/*	计算存储KLine所需要的块数
+	*	DayKline / FixedKlinePerBlock + 1
+	*/
+	int CalcMaxCountBlock();
+	int AddNewStockToFile(CString symbol, KLINE_SMALLHEAD*& pKlineSmallHead);
+
+public:
+	int GetKlineSmallHeader(CString symbol, KLINE_SMALLHEAD* pKlineSmallHead);
+	BOOL SetKlineSmallHeader(int nIndex, KLINE_SMALLHEAD* pKlineSmallHead);
 };
 
 #endif // !defined(AFX_LMBFILEKLINE_H__8E7B3BE7_C684_11D3_96E4_0080C8E1242B__INCLUDED_)
