@@ -350,7 +350,7 @@ BOOL CTaiShanDoc::OnNewDocument()
 	{
 		if(_access("transfered.dat",0)==-1)
 		{	m_4or6=1;
-			CTaiKlineFileKLine::Transfer4To6();
+			//CTaiKlineFileKLine::Transfer4To6();
 			CFile f;
 			int nt=1112;
 			f.Open("transfered.dat",CFile::modeCreate|CFile::modeReadWrite|CFile::typeBinary);
@@ -363,7 +363,7 @@ BOOL CTaiShanDoc::OnNewDocument()
 	else
 	{
 		m_4or6=0;
-		CTaiKlineFileKLine::Transfer4To6();		
+		//CTaiKlineFileKLine::Transfer4To6();		
 	}
 		
 
@@ -1159,40 +1159,40 @@ void CTaiShanDoc::OnCalcHqDataProgress()
 	int tmp;
 	int i;
 
-    this->m_sharesInformation.CalcIndexBuyAndSell();
-    float rd_sh=0,rd_sz=0,rd_eb=0;
+	this->m_sharesInformation.CalcIndexBuyAndSell();
+	float rd_sh=0,rd_sz=0,rd_eb=0;
 	if (m_nANT[0]>=0)
-        rd_sh=OnCalcDpTidxdData(0) ;                       
+		rd_sh=OnCalcDpTidxdData(0) ;                       
 	if (m_nANT[1]>=0)
-        rd_sz=OnCalcDpTidxdData(1) ;                          
+		rd_sz=OnCalcDpTidxdData(1) ;                          
 	if (m_nANT[2]>=0)
-        rd_eb=OnCalcDpTidxdData(2) ;                      
+		rd_eb=OnCalcDpTidxdData(2) ;                      
 
-    if(!m_bOpenStockTypeDlg&&m_BlockCalcTime%this->m_SystemInitData.BlockTime==0)
+	if(!m_bOpenStockTypeDlg&&m_BlockCalcTime%this->m_SystemInitData.BlockTime==0)
 	{
 		if(InitSetp>3) 
 		{
-           int temp=GetStocktime(1);
-		   if(temp<0) temp=0;
+			int temp=GetStocktime(1);
+			if(temp<0) temp=0;
 
-          if(this->m_bInitDone&&m_CalcBlockCounts!=0&&temp!=this->m_nANT[0])
-		  {
-			 m_ManagerStockTypeData.CalcMinuteRealTimeIndex(); 
- 			 m_ManagerStockTypeData.CalcAllStockTypeData();  
-             m_CalcBlockCounts--; 
-		  }
-		  else
-		     m_ManagerStockTypeData.CalcRealTimeStockTypeIndex();
+			if(this->m_bInitDone&&m_CalcBlockCounts!=0&&temp!=this->m_nANT[0])
+			{
+				m_ManagerStockTypeData.CalcMinuteRealTimeIndex(); 
+				m_ManagerStockTypeData.CalcAllStockTypeData();  
+				m_CalcBlockCounts--; 
+			}
+			else
+				m_ManagerStockTypeData.CalcRealTimeStockTypeIndex();
 		}
 	}
 	m_BlockCalcTime++;
 	if(m_BlockCalcTime>=100)
 		m_BlockCalcTime=0;
 	CReportData *p1A0001,*p2A01,*p2D01;
-    m_sharesInformation.Lookup((CSharesCompute::GetIndexSymbol(0)).GetBuffer(0),p1A0001,SHZS);
-    m_sharesInformation.Lookup((CSharesCompute::GetIndexSymbol(1)).GetBuffer(0),p2A01,SZZS);
+	m_sharesInformation.Lookup((CSharesCompute::GetIndexSymbol(0)).GetBuffer(0),p1A0001,SHZS);
+	m_sharesInformation.Lookup((CSharesCompute::GetIndexSymbol(1)).GetBuffer(0),p2A01,SZZS);
 	CString seb = CSharesCompute::GetIndexSymbol(2);
-    m_sharesInformation.Lookup(seb.GetBuffer (0),p2D01,2);
+	m_sharesInformation.Lookup(seb.GetBuffer (0),p2D01,2);
 	if(p1A0001!=NULL&&p2A01!=NULL)
 	{
 		if(p1A0001->nowp==0)
@@ -1204,25 +1204,25 @@ void CTaiShanDoc::OnCalcHqDataProgress()
 		else if(p2D01!=NULL)
 		{
 			((CMainFrame *)(AfxGetApp()->m_pMainWnd))->DisplayBargain(
-			p1A0001->nowp ,p1A0001->nowp - p1A0001->ystc ,p1A0001->totv,p1A0001->totp/10000,
-			p2A01->nowp ,p2A01->nowp - p2A01->ystc,p2A01->totv ,p2A01->totp/100000000,
-			p2D01->nowp ,p2D01->nowp - p2D01->ystc,p2D01->totv ,p2D01->totp/100000000,
-			rd_sh/100,rd_sz/100,rd_eb/100);
+				p1A0001->nowp ,p1A0001->nowp - p1A0001->ystc ,p1A0001->totv,p1A0001->totp/10000,
+				p2A01->nowp ,p2A01->nowp - p2A01->ystc,p2A01->totv ,p2A01->totp/100000000,
+				p2D01->nowp ,p2D01->nowp - p2D01->ystc,p2D01->totv ,p2D01->totp/100000000,
+				rd_sh/100,rd_sz/100,rd_eb/100);
 		}else
 		{
 			((CMainFrame *)(AfxGetApp()->m_pMainWnd))->DisplayBargain(
-			p1A0001->nowp ,p1A0001->nowp - p1A0001->ystc ,p1A0001->totv,p1A0001->totp/100000000,
-			p2A01->nowp ,p2A01->nowp - p2A01->ystc,p2A01->totv ,p2A01->totp/100000000,
-			0,0,0,0,
-			rd_sh/100,rd_sz/100,rd_eb/100);
+				p1A0001->nowp ,p1A0001->nowp - p1A0001->ystc ,p1A0001->totv,p1A0001->totp/100000000,
+				p2A01->nowp ,p2A01->nowp - p2A01->ystc,p2A01->totv ,p2A01->totp/100000000,
+				0,0,0,0,
+				rd_sh/100,rd_sz/100,rd_eb/100);
 		}
 	}
 
 
-    CTime m_Time = CTime::GetCurrentTime();
+	CTime m_Time = CTime::GetCurrentTime();
 	if(m_Time.GetDayOfWeek()==1||m_Time.GetDayOfWeek()==7   )
 		return;
-    long temp=((long)m_Time.GetYear())*10000L+(long)(m_Time.GetDay())+(long)(m_Time.GetMonth())*100;
+	long temp=((long)m_Time.GetYear())*10000L+(long)(m_Time.GetDay())+(long)(m_Time.GetMonth())*100;
 	if(!this->m_bInitDone||m_lDay<temp)     
 	{
 		tmp=GetStocktime(0) ;      
@@ -1234,7 +1234,7 @@ void CTaiShanDoc::OnCalcHqDataProgress()
 			Init_StockData(3);                         
 			this->m_ManagerStockTypeData.GetStockTypeHeadPoint(pStockTypeHead);
 
-            m_nOldANT[0]=0;
+			m_nOldANT[0]=0;
 			m_nOldANT[1]=0;
 			m_nOldANT[2]=0;
 			chk_date();
@@ -1246,29 +1246,31 @@ void CTaiShanDoc::OnCalcHqDataProgress()
 			return ;
 		}
 	}
-	if(!m_bCloseWorkDone&&m_systemOption.autoclose)                                        
+
+	// ◊‘∂Ø ’≈Ã
+	if (!m_bCloseWorkDone && m_systemOption.autoclose)
 	{
-		tmp=GetStocktime(0) ;            
-		if(tmp == 920 )                      
+		tmp = GetStocktime(0);
+		if (tmp == 920)
 		{
-			m_bCloseWorkDone=TRUE;
-			StockCloseWork();              
+			m_bCloseWorkDone = TRUE;
+			StockCloseWork();
 		}
 	}
+
 	for(i =0 ;i<3;i++)                    
 	{
 		m_nANT[i]=GetStocktime(i+1) ;
 		if(m_nANT[i] <0 )
 			m_nANT[i]=0;
- 		if(m_nANT[i]==m_nOldANT[i])
+		if(m_nANT[i]==m_nOldANT[i])
 			return;
 		else
 		{                                            
-           m_nOldANT[i]=m_nANT[i]; 
+			m_nOldANT[i]=m_nANT[i]; 
 		}
 	}
 #endif
-
 }
 
 float CTaiShanDoc::OnCalcDpTidxdData(int which_stk)                      

@@ -12,7 +12,6 @@
 #include "CTaiKlineFileHS.h"
 #include "CTaiKlineTransferKline.h"
 #include "GetSetReg.h"
-#include "ChooseReceiveDataForm.h"
 #include <io.h>
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -581,85 +580,6 @@ bool CTaiKlineFileKLine::WriteKlinePeriod(CString symbol, Kline *pKline,int nKli
 
 	return true;
 }
-bool CTaiKlineFileKLine::SetKlineSmallHeader(int nIndex, KLINE_SMALLHEAD *pKlineSmallHead)
-{
-	int nStock = this->GetStockNumber ();
-	ASSERT(nIndex<nStock);
-	if(nIndex>=nStock)
-		return false;
-
-	int addr = 16+nIndex*64;
-	this->Seek(addr,this->begin);
-	CString s(pKlineSmallHead->StockSign );
-	KLINE_SMALLHEAD *pKlineSmallHead2 = (KLINE_SMALLHEAD *)this->GetFileCurrentPointer ();
-	CString s2(pKlineSmallHead2->StockSign );
-	if(s!=s2)
-	{
-		ASSERT(FALSE);
-
-	}
-	this->Write (pKlineSmallHead,sizeof(KLINE_SMALLHEAD));
-	return true;
-}
-int CTaiKlineFileKLine::GetKlineSmallHeader(CString symbol,KLINE_SMALLHEAD* pKlineSmallHead)//get the small header pointer of a stock
-{
-	if(m_pSymbolToPos == NULL)
-		AddIndexToMap();
-
-	KLINE_SMALLHEAD* pKlineSmallHead3 = NULL;
-
-	int i;
-	LookUpIndexFromMap( symbol,i);
-
-
-
-	if(i==-1)
-	{
-	
-		i = AddNewStockToFile(symbol,pKlineSmallHead3);
-		if(i<0)
-			ASSERT(FALSE);
-	}
-	else
-	{
-		int addr = 16;
-		this->Seek(addr+i*64,this->begin);
-		pKlineSmallHead3 = (KLINE_SMALLHEAD*)this->GetFileCurrentPointer();
-	}
-
-	memcpy(pKlineSmallHead,pKlineSmallHead3,sizeof(KLINE_SMALLHEAD));
-	ASSERT(pKlineSmallHead3!=NULL);
-
-	return i;
-}
-
-
-
-int CTaiKlineFileKLine::CalcMaxCountBlock()
-{
-	int rtn = 5 ;
-	switch(this->m_kindKline )
-	{
-	case DAY_KLINE:
-		if(CMainFrame::m_taiShanDoc ->m_propertyInitiate.daysOfDayKline<0)
-			rtn = MAX_BLOCK_USE;
-		else
-			rtn = CMainFrame::m_taiShanDoc ->m_propertyInitiate.daysOfDayKline/FixedKlinePerBlock+1;//((CMainFrame::m_taiShanDoc ->m_propertyInitiate.daysOfDayKline%FixedKlinePerBlock==0)?2:1);
-		break;
-	case MIN5_KLINE:
-		if(CMainFrame::m_taiShanDoc ->m_propertyInitiate.daysOfMin5Kline<0)
-			rtn = MAX_BLOCK_USE;
-		else
-			rtn = 48*CMainFrame::m_taiShanDoc ->m_propertyInitiate.daysOfMin5Kline/FixedKlinePerBlock+1;//((48*CMainFrame::m_taiShanDoc ->m_propertyInitiate.daysOfMin5Kline%FixedKlinePerBlock==0)?2:1);
-		break;
-	}
-	if(rtn<2) rtn = 2;
-
-	if(rtn>MAX_BLOCK_USE)
-		rtn = MAX_BLOCK_USE;
-	return rtn;
-
-}
 
 int CTaiKlineFileKLine::CreateOrMoveSmallBlock(KLINE_SMALLHEAD *pKlineSmallHead,int& nBlock)//to create a new block,or move
 
@@ -753,180 +673,6 @@ int CTaiKlineFileKLine::CreateOrMoveSmallBlock(KLINE_SMALLHEAD *pKlineSmallHead,
 	return 0;
 
 }
-BOOL CTaiKlineFileKLine::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFileEnd,CFileException* pException)
-{	
-	BOOL bOk = TRUE;
-	bOk = CTaiKlineMemFile::Open( lpszFileName,  nOpenFlags,  0,
-	 pException);
-	if(bOk == FALSE) return bOk;
-
-
-	DWORD dwLen = this->GetLength ();
-	if(dwLen<=KLINESMALLHEAD || bOk == FALSE)
-	{
-		this->ReMapFromBegin (KLINESMALLHEAD+500* KlineByteEach *  FixedKlinePerBlock);
-
-
-		WriteHeaderInfo();
-
-	}
-	else
-	{
-		//
-		int nAdd;
-		switch(this->m_kindKline )
-		{
-		case DAY_KLINE:
-			nAdd = 10;
-			break;
-		case MIN5_KLINE:
-			nAdd = 100;
-			break;
-		}
-		int bID = 1;
-		if(this->m_kindKline==MIN5_KLINE && GetID()!=65798809) bID =0;
-		int nBlock = this->GetSmallBlockCount();
-		if(this->GetStockNumber ()>4096 || nBlock>4096*MAX_BLOCK_USE 
-			|| this->GetStockNumber ()<0 
-			|| nBlock<0
-			|| bID ==0)
-			WriteHeaderInfo();
-		else
-		{
-			int nLen = this->GetLength ();
-			nLen -= KLINESMALLHEAD;
-			if(nLen>0)
-			{
-				nLen = nLen/( KlineByteEach *  FixedKlinePerBlock);
-				if(nLen%( KlineByteEach *  FixedKlinePerBlock)!=0)
-					nLen++;
-				if(nBlock>nLen)
-				{
-					ASSERT(FALSE);
-					this->SetSmallBlockCount (nLen);
-
-					int nStock = GetStockNumber ();
-					for(int i=0;i<nStock;i++)
-					{
-						int addr = 16+i*64;
-						Seek(addr,CTaiKlineFileKLine::begin);
-						KLINE_SMALLHEAD klineSmallHead ;
-						KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-						Read(pKlineSmallHead,sizeof(KLINE_SMALLHEAD));
-						CString symbol (pKlineSmallHead->StockSign);
-						for(int j=0;j<26;j++)
-						{
-							if(pKlineSmallHead->symBlock [j] == 0xffff) break;
-							int iData = -1;
-							int iIn = pKlineSmallHead->symBlock [j] ;
-							if(iIn>=nLen)
-							{
-								pKlineSmallHead->numKln = (j)*FixedKlinePerBlock;
-								for(;j<26;j++)
-									pKlineSmallHead->symBlock [j] = 0xffff;
-								this->SetKlineSmallHeader (i,pKlineSmallHead);
-								break;
-							}
-						}
-					}
-				}
-			}
-
-		}
-
-	}
-
-	MaxNumStock = GetMaxNumStock();
-	ASSERT(MaxNumStock == 4096);
-
-	return TRUE;
-}
-
-void CTaiKlineFileKLine::WriteHeaderInfo()
-{
-	this->SeekToBegin();
-	int nStock=0;
-	Write(&nStock,4);
-	Write(&nStock,4);
-	nStock=65798809;
-	Write(&nStock,4);
-	WORD wd = 240;
-	Write(&wd,2);
-	wd=4096;
-	Write(&wd,2);
-
-	char buff[4096];
-	memset(buff,255,4096);
-	for(int i=0;i<64;i++)
-		Write(buff,4096);
-
-
-
-}
-
-int CTaiKlineFileKLine::AddNewStockToFile(CString symbol,KLINE_SMALLHEAD *&pKlineSmallHead)//add new stock to kline file
-{
-	int nStock = this->GetStockNumber ();
-	int nLen = 6;
-	if(nStock>=MaxNumStock)
-	{
-		bool bNeedMove = true;
-		if(MaxNumStock == 4096)
-		{
-			bool bSh = false, bSz = true;
-			if(m_nMarket == SH_MARKET_EX)
-			{
-				bSh = true;
-				bSz = false;
-			}
-
-			ReorgnizeFile( bSh,  bSz,true);
-			ReorgnizeFile( bSh,  bSz,false);
-			nStock = this->GetStockNumber ();
-			if(nStock<4096) bNeedMove = false;
-		}
-		if(MaxNumStock > 4096 || bNeedMove == true)
-		{
-			AddSmallHeadBlock();
-			nStock = this->GetStockNumber ();
-		}
-
-	}
-
-	int addr = 16+nStock*64;
-	this->Seek(addr,this->begin);
-	if(!(symbol.GetLength ()==4||symbol.GetLength ()==6))
-	{
-		symbol = symbol.Left (nLen);
-	}
-	symbol = CheckSymbolValid(symbol);
-
-	int rValue = 0;
-	if(m_pSymbolToPos->Lookup (symbol,(void*&)rValue))
-	{
-		addr = 16+(int)(rValue)*64;
-		this->Seek(addr,this->begin);
-		pKlineSmallHead = (KLINE_SMALLHEAD*)this->GetFileCurrentPointer();
-		return rValue;
-	}
-	
-	Write(symbol.GetBuffer (8),8);
-
-	int nKline = 0;
-	Write(&nKline,4);
-
-	this->Seek(addr,this->begin);
-	pKlineSmallHead = (KLINE_SMALLHEAD*)this->GetFileCurrentPointer();
-
-	//
-	m_pSymbolToPos->SetAt(symbol,(CObject*)nStock);
-	nStock++;
-	this->SetStockNumber (nStock);
-
-	return nStock-1;
-
-}
-
 
 bool CTaiKlineFileKLine::WriteKLineToRepair(CString symbol, Kline *pKline, int nWrite)//to repair day kline in real time
 {
@@ -959,41 +705,6 @@ bool CTaiKlineFileKLine::WriteKLineToRepair(CString symbol, Kline *pKline, int n
 
 	return true;
 
-}
-
-bool CTaiKlineFileKLine::CheckSymbol(CString symbol)
-{
-	return true;
-}
-void CTaiKlineFileKLine::InitMapOfDoc()
-{
-}
-void CTaiKlineFileKLine::CreateSmallBlock()
-{
-}
-void CTaiKlineFileKLine::AddIndexToMap()
-{
-	int nStock = this->GetStockNumber();
-	m_pSymbolToPos = new CMapStringToPtr((int)(nStock*1.25)+1);
-	ASSERT(nStock<=MaxNumStock);
-	for(int i=0;i<nStock;i++)
-	{
-		int addr = 16+i*64;
-		this->Seek(addr,this->begin);
-		KLINE_SMALLHEAD* pKlineSmallHead = (KLINE_SMALLHEAD*)this->GetFileCurrentPointer();
-		CString symbol (pKlineSmallHead->StockSign);
-		m_pSymbolToPos->SetAt(symbol,(CObject*)i);
-
-	}
-}
-
-void CTaiKlineFileKLine::LookUpIndexFromMap(CString symbol,int& nIndex)
-{
-	nIndex = -1;
-	if(m_pSymbolToPos==NULL)
-		AddIndexToMap();
-	if(!m_pSymbolToPos->Lookup(symbol,(void*&)nIndex))
-		nIndex = -1;
 }
 
 
@@ -1483,17 +1194,6 @@ void CTaiKlineFileKLine::DeleteKlineData(CString symbol, int nFoot, int nCount)
 		delete [] pKline;
 }
 
-void CTaiKlineFileKLine::DeleteMap()
-{
-	if(m_pSymbolToPos!=NULL)
-	{
-		m_pSymbolToPos->RemoveAll ();
-		delete m_pSymbolToPos;
-		m_pSymbolToPos = NULL;
-	}
-
-}
-
 void CTaiKlineFileKLine::ZeroKlineData(CString symbol,int stkKind,bool bDay)
 {
 	CTaiShanDoc* pDoc =CMainFrame::m_taiShanDoc ;
@@ -1695,7 +1395,7 @@ void CTaiKlineFileKLine::AddSmallHeadBlock()
 	int n = (MaxNumStock - 4096)/(240/2);
 	if(n<0) return;
 
-	
+
 	int nStock = GetStockNumber ();
 	KLINE_SMALLHEAD klineSmallHead;
 	int j = 0;
@@ -1725,26 +1425,26 @@ void CTaiKlineFileKLine::AddSmallHeadBlock()
 		Kline kline;
 		for(int k=0;k<FixedKlinePerBlock ;k++)
 		{
-			int blkCount= j ;	 
-			int stockCount=k  ;	  
-			int addr = KLINESMALLHEAD + klineSmallHead.symBlock[blkCount] 
-					* KlineByteEach *  FixedKlinePerBlock
-						 + stockCount * KlineByteEach;
-										 
+			int blkCount= j ;
+			int stockCount=k  ;
+			int addr = KLINESMALLHEAD + klineSmallHead.symBlock[blkCount]
+			* KlineByteEach *  FixedKlinePerBlock
+				+ stockCount * KlineByteEach;
+
 			this->Seek(addr,this->begin);
 			Read(&kline,KlineByteEach);
-			addr = KLINESMALLHEAD + klineSmallHead.symBlock[nNewBlock] 
-					* KlineByteEach *  FixedKlinePerBlock
-						 + stockCount * KlineByteEach;
+			addr = KLINESMALLHEAD + klineSmallHead.symBlock[nNewBlock]
+			* KlineByteEach *  FixedKlinePerBlock
+				+ stockCount * KlineByteEach;
 			this->Seek(addr,this->begin);
 			Write(&kline,KlineByteEach);
 		}
 
-	
+
 		klineSmallHead.symBlock [j] = (WORD)nNewBlock;
 		this->SetKlineSmallHeader(i, &klineSmallHead);
 
-	
+
 		nNewBlock++;
 		SetSmallBlockCount(nNewBlock);
 	}
@@ -1755,6 +1455,7 @@ void CTaiKlineFileKLine::AddSmallHeadBlock()
 	SetMaxNumStock(nMaxNumStock);
 }
 
+/*
 bool CTaiKlineFileKLine::Transfer4To6(bool bFirst)
 {
 
@@ -2184,6 +1885,7 @@ if(_access("baseinfo.dat",0)==-1)
 	
 	return true;
 }
+*/
 
 int CTaiKlineFileKLine::GetKlineCount(CString symbol, int stkKind,bool bDayKline)
 {
@@ -2194,162 +1896,303 @@ int CTaiKlineFileKLine::GetKlineCount(CString symbol, int stkKind,bool bDayKline
 	return klineSmallHead.numKln ;
 }
 
-void CTaiKlineFileKLine::ChooseReceiveDataForm()
+BOOL CTaiKlineFileKLine::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFileEnd, CFileException* pException)
 {
-	GetSetReg reg;
-	char ch[512];
-	int nWhich=1;
-	memset(ch,0,512);
-	DWORD ncb = sizeof(ch);
-	DWORD typ = REG_SZ;
-	if(reg.GetValue("software\\WsStock\\ReceiveDataForm","NotShow",typ,(unsigned char *)ch,ncb) == ERROR_SUCCESS)
+	BOOL bOk = TRUE;
+
+	bOk = CTaiKlineMemFile::Open(lpszFileName, nOpenFlags, 0, pException);
+	if (bOk == FALSE)
 	{
-		CString strShow = ch;
-		if(strShow=="OK")
-			return;
+		return bOk;
+	}
+
+	DWORD dwLen = GetLength();
+	if (dwLen <= KLINESMALLHEAD || bOk == FALSE)
+	{
+		ReMapFromBegin(KLINESMALLHEAD + 500 * KlineByteEach * FixedKlinePerBlock);
+		WriteHeaderInfo();
+	}
+	else
+	{
+		//
+		int nAdd;
+		switch (m_kindKline)
+		{
+		case DAY_KLINE:
+			nAdd = 10;
+			break;
+		case MIN5_KLINE:
+			nAdd = 100;
+			break;
+		}
+
+		int bID = 1;
+		if (m_kindKline == MIN5_KLINE && GetID() != 65798809)
+		{
+			bID = 0;
+		}
+
+		int nBlock = GetSmallBlockCount();
+		if (GetStockNumber() > 4096 || nBlock > 4096 * MAX_BLOCK_USE || GetStockNumber() < 0 || nBlock < 0 || bID == 0)
+		{
+			WriteHeaderInfo();
+		}
 		else
 		{
-			char mych[512];
-			memset(mych,0,512);
-			ncb = sizeof(mych);
-			if(reg.GetValue("software\\WsStock\\ReceiveDataForm","SelectForm",typ,(unsigned char *)mych,ncb) == ERROR_SUCCESS)
+			int nLen = GetLength();
+			nLen -= KLINESMALLHEAD;
+			if (nLen > 0)
 			{
-				CString s = mych;
-				if(s=="OLD")
-					nWhich=0;
-				else if(s=="NEW")
-					nWhich=1;
-				else
-					nWhich=2;
+				nLen = nLen/( KlineByteEach *  FixedKlinePerBlock);
+				if(nLen%( KlineByteEach *  FixedKlinePerBlock)!=0)
+					nLen++;
+				if(nBlock>nLen)
+				{
+					ASSERT(FALSE);
+					this->SetSmallBlockCount (nLen);
+
+					int nStock = GetStockNumber ();
+					for(int i=0;i<nStock;i++)
+					{
+						int addr = 16+i*64;
+						Seek(addr,CTaiKlineFileKLine::begin);
+						KLINE_SMALLHEAD klineSmallHead ;
+						KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
+						Read(pKlineSmallHead,sizeof(KLINE_SMALLHEAD));
+						CString symbol (pKlineSmallHead->StockSign);
+						for(int j=0;j<26;j++)
+						{
+							if(pKlineSmallHead->symBlock [j] == 0xffff) break;
+							int iData = -1;
+							int iIn = pKlineSmallHead->symBlock [j] ;
+							if(iIn>=nLen)
+							{
+								pKlineSmallHead->numKln = (j)*FixedKlinePerBlock;
+								for(;j<26;j++)
+									pKlineSmallHead->symBlock [j] = 0xffff;
+								this->SetKlineSmallHeader (i,pKlineSmallHead);
+								break;
+							}
+						}
+					}
+				}
 			}
-			CChooseReceiveDataForm mydlg;
-			mydlg.nWhich=nWhich;
-			mydlg.DoModal();
+		}
+	}
+
+	MaxNumStock = GetMaxNumStock();
+	ASSERT(MaxNumStock == 4096);
+
+	return TRUE;
+}
+
+void CTaiKlineFileKLine::AddIndexToMap()
+{
+	int nStock = GetStockNumber();
+	m_pSymbolToPos = new CMapStringToPtr((int)(nStock * 1.25) + 1);
+	ASSERT(nStock <= MaxNumStock);
+	for (int i = 0; i < nStock; i++)
+	{
+		int addr = 16 + i * 64;
+		Seek(addr, begin);
+		KLINE_SMALLHEAD* pKlineSmallHead = (KLINE_SMALLHEAD*)GetFileCurrentPointer();
+		CString symbol(pKlineSmallHead->StockSign);
+		m_pSymbolToPos->SetAt(symbol,(CObject*)i);
+	}
+}
+
+void CTaiKlineFileKLine::DeleteMap()
+{
+	if (m_pSymbolToPos != NULL)
+	{
+		m_pSymbolToPos->RemoveAll();
+		delete m_pSymbolToPos;
+		m_pSymbolToPos = NULL;
+	}
+}
+
+void CTaiKlineFileKLine::LookUpIndexFromMap(CString symbol, int& nIndex)
+{
+	nIndex = -1;
+	if (m_pSymbolToPos == NULL)
+		AddIndexToMap();
+
+	if (!m_pSymbolToPos->Lookup(symbol, (void*&)nIndex))
+		nIndex = -1;
+}
+
+void CTaiKlineFileKLine::WriteHeaderInfo()
+{
+	SeekToBegin();
+
+	int nStock = 0;
+	Write(&nStock, 4);
+	Write(&nStock, 4);
+
+	nStock = 65798809;
+	Write(&nStock, 4);
+
+	WORD wd = 240;
+	Write(&wd, 2);
+	wd = 4096;
+	Write(&wd, 2);
+
+	char buff[4096];
+	memset(buff, 255, 4096);
+	for (int i = 0; i < 64; i++)
+	{
+		Write(buff, 4096);
+	}
+}
+
+int CTaiKlineFileKLine::CalcMaxCountBlock()
+{
+	int rtn = 5;
+	switch (m_kindKline)
+	{
+	case DAY_KLINE:
+		if (CMainFrame::m_taiShanDoc->m_propertyInitiate.daysOfDayKline <= 0)
+		{
+			rtn = MAX_BLOCK_USE;
+		}
+		else
+		{
+			rtn = CMainFrame::m_taiShanDoc ->m_propertyInitiate.daysOfDayKline / FixedKlinePerBlock + 1;
+			//((CMainFrame::m_taiShanDoc ->m_propertyInitiate.daysOfDayKline % FixedKlinePerBlock == 0) ? 2 : 1);
+		}
+		break;
+	case MIN5_KLINE:
+		if (CMainFrame::m_taiShanDoc->m_propertyInitiate.daysOfMin5Kline <= 0)
+		{
+			rtn = MAX_BLOCK_USE;
+		}
+		else
+		{
+			rtn = 48 * CMainFrame::m_taiShanDoc->m_propertyInitiate.daysOfMin5Kline / FixedKlinePerBlock + 1;
+			//((48 * CMainFrame::m_taiShanDoc->m_propertyInitiate.daysOfMin5Kline % FixedKlinePerBlock == 0) ? 2 : 1);
+		}
+		break;
+	}
+
+	if (rtn < 2) rtn = 2;
+	if (rtn > MAX_BLOCK_USE) rtn = MAX_BLOCK_USE;
+
+	return rtn;
+}
+
+int CTaiKlineFileKLine::AddNewStockToFile(CString symbol, KLINE_SMALLHEAD*& pKlineSmallHead)
+{
+	int nLen = 6;
+	int nStock = GetStockNumber();
+
+	if (nStock >= MaxNumStock)
+	{
+		BOOL bNeedMove = TRUE;
+		if (MaxNumStock == 4096)
+		{
+			BOOL bSh = FALSE, bSz = TRUE;
+			if (m_nMarket == SH_MARKET_EX)
+			{
+				bSh = TRUE;
+				bSz = FALSE;
+			}
+
+			ReorgnizeFile(bSh, bSz, TRUE);
+			ReorgnizeFile(bSh, bSz, FALSE);
+
+			nStock = GetStockNumber();
+			if (nStock < 4096) bNeedMove = FALSE;
+		}
+
+		if (MaxNumStock > 4096 || bNeedMove == TRUE)
+		{
+			AddSmallHeadBlock();
+			nStock = GetStockNumber();
+		}
+	}
+
+	if (!(symbol.GetLength() == 4 || symbol.GetLength() == 6))
+	{
+		symbol = symbol.Left(nLen);
+	}
+	symbol = CheckSymbolValid(symbol);
+
+	int addr = 16 + nStock * 64;
+	Seek(addr, begin);
+
+	int rValue = 0;
+	if (m_pSymbolToPos->Lookup(symbol, (void*&)rValue))
+	{
+		addr = 16 + (int)(rValue) * 64;
+		Seek(addr, begin);
+		pKlineSmallHead = (KLINE_SMALLHEAD*)GetFileCurrentPointer();
+		return rValue;
+	}
+
+	Write(symbol.GetBuffer(8), 8);
+
+	int nKline = 0;
+	Write(&nKline, 4);
+
+	Seek(addr, begin);
+	pKlineSmallHead = (KLINE_SMALLHEAD*)GetFileCurrentPointer();
+
+	m_pSymbolToPos->SetAt(symbol, (CObject*)nStock);
+	nStock++;
+	SetStockNumber(nStock);
+
+	return nStock - 1;
+}
+
+int CTaiKlineFileKLine::GetKlineSmallHeader(CString symbol, KLINE_SMALLHEAD* pKlineSmallHead)
+{
+	if (m_pSymbolToPos == NULL)
+		AddIndexToMap();
+
+	KLINE_SMALLHEAD* pKlineSmallHead3 = NULL;
+
+	int i;
+	LookUpIndexFromMap(symbol, i);
+	if (i == -1)
+	{
+		i = AddNewStockToFile(symbol, pKlineSmallHead3);
+		if (i < 0)
+		{
+			ASSERT(FALSE);
 		}
 	}
 	else
 	{
-		CChooseReceiveDataForm mydlg;
-		mydlg.nWhich=0;
-		mydlg.DoModal();
+		int addr = 16;
+		Seek(addr + i * 64, begin);
+		pKlineSmallHead3 = (KLINE_SMALLHEAD*)GetFileCurrentPointer();
 	}
+
+	memcpy(pKlineSmallHead, pKlineSmallHead3, sizeof(KLINE_SMALLHEAD));
+	ASSERT(pKlineSmallHead3 != NULL);
+
+	return i;
 }
 
-bool CTaiKlineFileKLine::ConvertBaseInfoFile()
+BOOL CTaiKlineFileKLine::SetKlineSmallHeader(int nIndex, KLINE_SMALLHEAD* pKlineSmallHead)
 {
-	if(_access("baseinfo.dat",0)==-1)
-		return false;
-	CTaiShanDoc * pDoc = CMainFrame::m_taiShanDoc ;
-	BASEINFOHEAD *FileHead=new BASEINFOHEAD;
-	CFile f;
-	f.Open("baseinfo.dat",CFile::modeReadWrite|CFile::typeBinary);
-	f.Read(FileHead,sizeof(BASEINFOHEAD));
-	BASEINFO *pRecordSet=new BASEINFO[FileHead->StockCount];
-	BASEINFO_OLD *pRecordSetOLD=new BASEINFO_OLD;
-	for(int k=0;k<FileHead->StockCount;k++)
+	int nStock = GetStockNumber();
+	ASSERT(nIndex < nStock);
+	if (nIndex >= nStock)
+		return FALSE;
+
+	int addr = 16 + nIndex * 64;
+	Seek(addr, begin);
+	CString s(pKlineSmallHead->StockSign);
+	KLINE_SMALLHEAD* pKlineSmallHead2 = (KLINE_SMALLHEAD*)GetFileCurrentPointer();
+	CString s2(pKlineSmallHead2->StockSign);
+	if (s != s2)
 	{
-		DWORD nKind;
-		CString strSymbol;
-		CString str6;		
-		f.Read(pRecordSetOLD,sizeof(BASEINFO_OLD));
-		strSymbol=pRecordSetOLD->Symbol;
-		if(strSymbol.GetLength()==6)
-		{
-			nKind=CSharesInformation::GetStockKind(SH_MARKET_EX,strSymbol.GetBuffer(0));
-			str6=strSymbol;
-		}
-		else if(strSymbol.GetLength()==4)
-		{
-			str6=CSharesInformation::Symbol4To6(strSymbol);
-			nKind=CSharesInformation::GetStockKind(SZ_MARKET_EX,str6.GetBuffer(0));
-		}
-		else
-		{
-			f.Close();
-			delete pRecordSetOLD;
-			delete FileHead;
-			delete []pRecordSet;
-			return false;
-		}
-		CString myNeed=pDoc->GetStockKindString(nKind);
-		myNeed+=str6;
-		strcpy(pRecordSet[k].Symbol,myNeed.GetBuffer(0));
-		memcpy(&(pRecordSet[k].NumSplit),&(pRecordSetOLD->NumSplit),sizeof(BASEINFO_OLD)-8);
-		
-	}	
-	FileHead->FileExitDone=88888888;
-	f.SeekToBegin();
-	f.Write(FileHead,sizeof(BASEINFOHEAD));
-	f.Write(pRecordSet,sizeof(BASEINFO)*(FileHead->StockCount));	
-	f.Close();
-	delete pRecordSetOLD;
-	delete FileHead;
-	delete []pRecordSet;
-	return true;
-}
+		ASSERT(FALSE);
 
-bool CTaiKlineFileKLine::ConvertStockTypeInfo()
-{
-	if(_access("StockTypeInfo.dat",0)==-1)
-		return false;
-	CTaiShanDoc * pDoc = CMainFrame::m_taiShanDoc ;
-	CFile ff;
-
-
-	ff.Open("StockTypeInfo.dat",CFile::modeReadWrite|CFile::typeBinary);
-	STOCKTYPEHEAD *pStockTypeHead=new STOCKTYPEHEAD;
-	try{
-	ff.Read(pStockTypeHead,sizeof(STOCKTYPEHEAD));
 	}
-	catch(CFileException e)
-	{
-		e.ReportError();
-	}
-	int nMaxType=pStockTypeHead->m_lStockTypeMaxCount;
-	int nCurrentStock=pStockTypeHead->m_lStockCount;
-	STOCK_TYPE_INFO *pStockInfo=new STOCK_TYPE_INFO[pStockTypeHead->m_lStockCount+1000];
-	ff.Seek(sizeof(STOCKTYPEHEAD)+sizeof(STOCKTYPEINFO)*nMaxType,CFile::begin);
-	STOCK_TYPE_INFO_OLD *pMyNeed=new STOCK_TYPE_INFO_OLD;
 
-	for(int kk=0;kk<nCurrentStock;kk++)
-	{		
-		DWORD nKind;
-		CString str6;
-		ff.Read(pMyNeed,sizeof(STOCK_TYPE_INFO_OLD));
-		CString strSymbol=pMyNeed->m_szSymbol;
+	Write(pKlineSmallHead, sizeof(KLINE_SMALLHEAD));
 
-		if(strSymbol.GetLength()==6)
-		{
-			nKind=CSharesInformation::GetStockKind(SH_MARKET_EX,strSymbol.GetBuffer(0));
-			str6=strSymbol;
-		}
-		else if (strSymbol.GetLength()==4)
-		{
-			str6=CSharesInformation::Symbol4To6(strSymbol);
-			nKind=CSharesInformation::GetStockKind(SZ_MARKET_EX,str6.GetBuffer(0));
-		}
-		else
-		{
-			ff.Close();
-			delete pStockTypeHead;
-			delete pMyNeed;
-			delete []pStockInfo;
-			return false;
-		}
-		CString myNeed=pDoc->GetStockKindString(nKind);
-		myNeed+=str6;
-		strcpy(pStockInfo[kk].m_szSymbol,myNeed.GetBuffer(0));
-		memcpy(&(pStockInfo[kk].m_bDeleted),&(pMyNeed->m_bDeleted),sizeof(STOCK_TYPE_INFO_OLD)-7);
-	}	
-	pStockTypeHead->m_lFileExit =88888888;
-	ff.SeekToBegin();
-	ff.Write(pStockTypeHead,sizeof(STOCKTYPEHEAD));
-	ff.Seek(sizeof(STOCKTYPEHEAD)+sizeof(STOCKTYPEINFO)*nMaxType,CFile::begin);
-	ff.Write(pStockInfo,sizeof(STOCK_TYPE_INFO)*nCurrentStock);
-	ff.Close();
-
-	delete pStockTypeHead;
-	delete pMyNeed;
-	delete []pStockInfo;
-	return true;
+	return TRUE;
 }

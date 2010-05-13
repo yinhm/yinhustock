@@ -303,7 +303,6 @@ public:
 	long m_lDay;                                               
 	BOOL m_bInitDone;                                       
 	BOOL m_bInitCurrDone;                                   
-	BOOL m_bCloseWorkDone; 
 	SYSTEMINITDATA m_SystemInitData;
 	int m_BlockCalcTime;
 
@@ -400,7 +399,6 @@ public:
     void CreateFileData(int mode);                              
 	void LoadFileData(int mode);                             
 	void GetStockCount();                                       
-	void OnCalcHqDataProgress();                            
     float OnCalcDpTidxdData(int which_stk);                     
 	long GetStockDay(time_t time )    ;                     
     void StockCloseWork();
@@ -437,9 +435,14 @@ protected:
 	afx_msg void OnOpenDocument();
 	afx_msg void OnToolClosework();
 	//}}AFX_MSG
+
+public:
+	BOOL	m_bCloseWorkDone;		// 是否已经收盘
+
+public:
+	void OnCalcHqDataProgress();
 	DECLARE_MESSAGE_MAP()
 };
-
 
 /////////////////////////////////////////////////////////////////////////////
 
