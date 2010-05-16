@@ -5,8 +5,6 @@
 	Name="TaiShan"
 	ProjectGUID="{66847054-2652-4196-B387-B456BAA4E1D1}"
 	RootNamespace="TaiShan"
-	SccProjectName="&quot;$/TaiShan&quot;, BAAAAAAA"
-	SccLocalPath="."
 	Keyword="MFCProj"
 	>
 	<Platforms>
@@ -6548,6 +6546,74 @@
 				>
 			</File>
 			<File
+				RelativePath="CTaiKlineMoveChenben.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="CTaiKlineMoveChenben.h"
+				>
+			</File>
+			<File
+				RelativePath="CTaiKlineTreeCtl.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="CTaiKlineTreeCtl.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Receiver"
+			>
+			<File
+				RelativePath=".\StkReceiver.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\StkReceiver.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Database"
+			>
+			<File
 				RelativePath="CTaiKlineFileKLine.cpp"
 				>
 				<FileConfiguration
@@ -6600,55 +6666,11 @@
 				>
 			</File>
 			<File
-				RelativePath="CTaiKlineMoveChenben.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="CTaiKlineMoveChenben.h"
+				RelativePath=".\StkFile.cpp"
 				>
 			</File>
 			<File
-				RelativePath="CTaiKlineTreeCtl.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="CTaiKlineTreeCtl.h"
+				RelativePath=".\StkFile.h"
 				>
 			</File>
 		</Filter>

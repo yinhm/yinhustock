@@ -361,8 +361,6 @@ public:
 	STOCKDATASHOW  *m_pStockDataShow;
 	int m_nShowMaxCount;
 	CMapNewsFileName m_NewsFileNameMap;                      
-	KLINEHEAD        m_KLineHead;                           
-	MKLINEHEAD       m_MinKLineHead;                         
 
 
 
