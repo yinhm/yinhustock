@@ -455,15 +455,6 @@ struct TAI_SHAN_DATA
 
 ////////////////////////////////////////////////
 
-struct KLINEHEAD
-{
-	int	NumChuQPerBlk;	   	
-	int	numPerBlk	;		
-	int	numKline_sh	;		
-	int	numBlkAll_sh;		
-	int numKline_sz	;	       
-	int numBlkAll_sz;	     
-};
 
 struct KLINESMALLHEAD
 {
@@ -474,21 +465,6 @@ struct KLINESMALLHEAD
 	long    index;
 };
 
-
-struct MINUTEKLINEHEAD
-{
-	char    StockSign[8];
-	long    numKln	;	  
-	long    pPos;        
-	long    symBlock;    
-};
-
-struct MKLINEHEAD
-{
-	int	numPerBlk	;		
-	int	numKline_sh	;	
-	int numKline_sz	;
-};
 
 typedef struct
 {

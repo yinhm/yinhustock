@@ -4,50 +4,41 @@
 
 #include "stdafx.h"
 #include "CTaiShanApp.h"
-#include "CTaiKlineMemFile.h"
 #include "CTaiKlineFileKLine.h"
+
 #include "MainFrm.h"
 #include "CTaiShanDoc.h"
-#include "CTaiScreenParent.h"
+//#include "CTaiScreenParent.h"
 #include "CTaiKlineFileHS.h"
 #include "CTaiKlineTransferKline.h"
-#include "GetSetReg.h"
-#include <io.h>
+//#include "GetSetReg.h"
+//#include <io.h>
+
 #ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
 #define new DEBUG_NEW
 #endif
 
-#define KLINEHEAD  16
-#define KLINESMALLHEAD 4096 * 64 + 16
-#define FixedKlinePerBlock	240
-
-#define KlineByteEach	32
-#define DAY_KLINE 	0
-#define MIN5_KLINE	1
-
 CTaiKlineFileKLine*	CTaiKlineFileKLine::m_fileDaySh = NULL;
 CTaiKlineFileKLine*	CTaiKlineFileKLine::m_fileDaySz = NULL;
-CTaiKlineFileKLine*	CTaiKlineFileKLine::m_fileMin5Sh= NULL;
-CTaiKlineFileKLine*	CTaiKlineFileKLine::m_fileMin5Sz= NULL;
-
-
+CTaiKlineFileKLine*	CTaiKlineFileKLine::m_fileMin5Sh = NULL;
+CTaiKlineFileKLine*	CTaiKlineFileKLine::m_fileMin5Sz = NULL;
 
 CTaiKlineFileKLine::CTaiKlineFileKLine()
 {
-	m_nMarket = SZ_MARKET_EX;
 	m_kindKline = DAY_KLINE;
-	m_bFirstWrite = true;
+	m_nMarket = SZ_MARKET_EX;
+	m_bFirstWrite = TRUE;
 }
-CTaiKlineFileKLine::CTaiKlineFileKLine(int nKind,int nMarket)
-{
 
-	m_bFirstWrite = true;
-	m_nAddReMap = KlineByteEach *  FixedKlinePerBlock*5;
+CTaiKlineFileKLine::CTaiKlineFileKLine(int nKind, int nMarket)
+{
 	m_kindKline = nKind;
 	m_nMarket = nMarket;
+	m_bFirstWrite = TRUE;
 
+	m_nAddReMap = KlineByteEach * FixedKlinePerBlock * 5;
 }
 
 CTaiKlineFileKLine::~CTaiKlineFileKLine()
@@ -55,50 +46,110 @@ CTaiKlineFileKLine::~CTaiKlineFileKLine()
 	DeleteMap();
 }
 
-
-int CTaiKlineFileKLine::ReadKLine(CString symbol,Kline*& pKline,int nRead,int nAddBlank)
+BOOL CTaiKlineFileKLine::OpenAll()
 {
-	if(symbol.GetLength ()!=6&&symbol.GetLength ()!=4) return 0;
+	if (!m_fileDaySh)
+		m_fileDaySh = new CTaiKlineFileKLine(0, SH_MARKET_EX);
+	if (!m_fileDaySz)
+		m_fileDaySz = new CTaiKlineFileKLine(0, SZ_MARKET_EX);
+	if (!m_fileMin5Sh)
+		m_fileMin5Sh = new CTaiKlineFileKLine(1, SH_MARKET_EX);
+	if (!m_fileMin5Sz)
+		m_fileMin5Sz = new CTaiKlineFileKLine(1, SZ_MARKET_EX);
 
-	KLINE_SMALLHEAD klineSmallHead;
-	KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-	int nIndexStock = GetKlineSmallHeader(symbol,pKlineSmallHead);
-
-	int n = nRead;
-	if(n<=-1||n>pKlineSmallHead->numKln)
-		n=pKlineSmallHead->numKln ;
-	if(pKline != NULL)
-		delete [] pKline;
-	ASSERT(nAddBlank>=0);
-	pKline = new Kline[n+nAddBlank+1];
-	if(n==0)
-		return 0;
-
-	this->SeekToBegin ();
-	CString ss = pKlineSmallHead->StockSign ;
-	ASSERT(n<=0?TRUE:KLINESMALLHEAD + pKlineSmallHead->symBlock[(n-1) / FixedKlinePerBlock ] 
-				* KlineByteEach *  FixedKlinePerBlock
-					  < this->GetLength ());
-
-	
-	for(int i=pKlineSmallHead->numKln-n;i<pKlineSmallHead->numKln ;i++)
+	try
 	{
-		int blkCount= i / FixedKlinePerBlock  ;	  
-		int stockCount=i % FixedKlinePerBlock  ;	 
-		int addr = KLINESMALLHEAD + pKlineSmallHead->symBlock[blkCount] 
-				* KlineByteEach *  FixedKlinePerBlock
-					 + stockCount * KlineByteEach;
-									  
-		this->Seek(addr,this->begin);
-		Read(pKline+i-pKlineSmallHead->numKln+n,KlineByteEach);
+
+		CreateDirectory("Data\\Sh", NULL);
+		CreateDirectory("Data\\Sz", NULL);
+		CreateDirectory("Data\\Sh\\F10", NULL);
+		CreateDirectory("Data\\Sz\\F10", NULL);
+	}
+	catch(...)
+	{
 	}
 
-	if(!CTaiShanKlineShowView::IsIndexStock3(symbol))
-		TestKlineVolpositive(pKline, n);
+	BOOL bRtn = TRUE;
 
-	return n;
+	CString sPath2 = g_daysh;
+	if (!m_fileDaySh->Open(sPath2, 0, NULL))
+	{
+		delete m_fileDaySh;
+		m_fileDaySh = NULL;
+		bRtn = FALSE;
+		AfxMessageBox("打开上海日线文件时出错，请关闭程序后，删除文件 data\\sh\\daykline.dat", MB_OK | MB_ICONERROR);
+	}
 
+	sPath2 = g_daysz;
+	if (!m_fileDaySz->Open(sPath2, 0, NULL))
+	{
+		delete m_fileDaySz;
+		m_fileDaySz = NULL;
+		bRtn = FALSE;
+		AfxMessageBox("打开深圳日线文件时出错，请关闭程序后，删除文件 data\\sz\\daykline.dat", MB_OK | MB_ICONERROR);
+	}
+
+	sPath2 = g_minutesh;
+	if (!m_fileMin5Sh->Open(sPath2, 0, NULL))
+	{
+		delete m_fileMin5Sh;
+		m_fileMin5Sh = NULL;
+		bRtn = FALSE;
+		AfxMessageBox("打开上海5分钟K线文件时出错", MB_OK | MB_ICONERROR);
+	}
+
+	sPath2 = g_minutesz;
+	if (!m_fileMin5Sz->Open(sPath2, 0, NULL))
+	{
+		delete m_fileMin5Sz;
+		m_fileMin5Sz = NULL;
+		bRtn = FALSE;
+		AfxMessageBox("打开深圳5分钟K线文件时出错", MB_OK | MB_ICONERROR);
+	}
+
+	return bRtn;
 }
+
+void CTaiKlineFileKLine::CloseAll()
+{
+	if (m_fileDaySh != NULL)
+	{
+		m_fileDaySh->Close();
+	}
+	if (m_fileDaySz != NULL)
+	{
+		m_fileDaySz->Close();
+	}
+	if (m_fileMin5Sh != NULL)
+	{
+		m_fileMin5Sh->Close();
+	}
+	if (m_fileMin5Sz != NULL)
+	{
+		m_fileMin5Sz->Close();
+	}
+	if (m_fileDaySh != NULL)
+	{
+		delete m_fileDaySh;
+		m_fileDaySh = NULL;
+	}
+	if (m_fileDaySz != NULL)
+	{
+		delete m_fileDaySz;
+		m_fileDaySz = NULL;
+	}
+	if (m_fileMin5Sh != NULL)
+	{
+		delete m_fileMin5Sh;
+		m_fileMin5Sh = NULL;
+	}
+	if (m_fileMin5Sz != NULL)
+	{
+		delete m_fileMin5Sz;
+		m_fileMin5Sz = NULL;
+	}
+}
+
 
 
 int CTaiKlineFileKLine::LookTwoPath(time_t& tmt ,Kline *pKline, int nMax, bool &bAdd,bool bDay)//look up using 2 path
@@ -709,26 +760,6 @@ bool CTaiKlineFileKLine::WriteKLineToRepair(CString symbol, Kline *pKline, int n
 
 
 
-CTaiKlineFileKLine* CTaiKlineFileKLine::GetFilePointer(CString symbol,int stkKind,bool bDayKline)
-{
-	CTaiKlineFileKLine*	pFile;
-
-	if(bDayKline == true)
-		pFile=CTaiKlineFileKLine::m_fileDaySh ;
-	else
-		pFile=CTaiKlineFileKLine::m_fileMin5Sh ;
-	if(SZ_MARKET_EX == CSharesCompute::GetMarketKind(stkKind))
-	{
-		if(bDayKline == true)
-			pFile=CTaiKlineFileKLine::m_fileDaySz ;
-		else
-			pFile=CTaiKlineFileKLine::m_fileMin5Sz ;
-	}
-
-	return pFile;
-
-}
-
 int CTaiKlineFileKLine::ReadKlineAccordingTime(CString symbol, Kline *&kline, CTime &time, int nCount,int nAddBlank)
 {
 	if(symbol.GetLength ()!=6&&symbol.GetLength ()!=4) return 0;
@@ -778,28 +809,12 @@ int CTaiKlineFileKLine::ReadKlineAccordingTime(CString symbol, Kline *&kline, CT
 
 }
 
-int CTaiKlineFileKLine::ReadKLine(int nIndex, Kline *&pKline, int nRead)
-{
-	CString symbol = GetSymbol( nIndex);
-	return ReadKLine( symbol,pKline, nRead,0);
-}
-
 int CTaiKlineFileKLine::ReadKlinePeriod(int nIndex, Kline *&kline, CTime &timeStart, CTime &timeEnd,int nAddBlank)
 {
 	CString symbol = GetSymbol( nIndex);
 	if(symbol.GetLength ()!=6&&symbol.GetLength ()!=4)
 		return 0;
 	return ReadKlinePeriod( symbol, kline, timeStart, timeEnd,true, nAddBlank);
-}
-
-CString CTaiKlineFileKLine::GetSymbol(int nIndex)
-{
-	int addr = 16;
-	this->Seek(addr+nIndex*64,this->begin);
-	KLINE_SMALLHEAD * pKlineSmallHead = (KLINE_SMALLHEAD*)this->GetFileCurrentPointer();
-	CString symbol(pKlineSmallHead->StockSign );
-	return symbol;
-
 }
 
 void CTaiKlineFileKLine::ReorgnizeFile(bool bSh, bool bSz,bool bDayKline)
@@ -1173,37 +1188,6 @@ bool CTaiKlineFileKLine::IsDayKline(int nKlineType)
 
 }
 
-void CTaiKlineFileKLine::DeleteKlineData(CString symbol, int nFoot, int nCount)
-{
-	Kline* pKline = NULL;
-	int n = ReadKLine(symbol,pKline,-1,0);	
-	if(n<=0) return;
-	if(n>nFoot+1) 
-		memmove(pKline+nFoot,pKline+nFoot+1,(n-nFoot-1)*sizeof(Kline));
-	n--;
-
-	KLINE_SMALLHEAD klineSmallHead;
-	KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-	int nIndexStock = GetKlineSmallHeader(symbol,pKlineSmallHead);
-	pKlineSmallHead->numKln = 0;
-	SetKlineSmallHeader(nIndexStock,pKlineSmallHead);
-
-	if(n>0) this->WriteKLine(symbol,pKline,n,0);
-
-	if(pKline == NULL)
-		delete [] pKline;
-}
-
-void CTaiKlineFileKLine::ZeroKlineData(CString symbol,int stkKind,bool bDay)
-{
-	CTaiShanDoc* pDoc =CMainFrame::m_taiShanDoc ;
-	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(symbol,stkKind,bDay);
-	KLINE_SMALLHEAD smallHead;
-	int nIndex = pFile->GetKlineSmallHeader (symbol,&smallHead);
-	smallHead.numKln = 0;
-	pFile->SetKlineSmallHeader (nIndex,&smallHead);
-}
-
 CString CTaiKlineFileKLine::CheckSymbolValid(CString symbol)
 {
 	int nLen = symbol.GetLength ();
@@ -1226,31 +1210,6 @@ CString CTaiKlineFileKLine::CheckSymbolValid(CString symbol)
 
 }
 
-float CTaiKlineFileKLine::GetLastClose(CString symbol,int stkKind)
-{
-	CTaiShanDoc* pDoc =CMainFrame::m_taiShanDoc ;
-	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(symbol,stkKind,true);//CTaiKlineFileKLine::m_fileDaySh ;
-	KLINE_SMALLHEAD smallHead;
-	pFile->GetKlineSmallHeader (symbol,&smallHead);
-	if(smallHead.numKln <=0)
-	{
-		return -1;
-	}
-
-	Kline* pKline = NULL;
-	float f = -1;
-	int n=pFile->ReadKLine (symbol,pKline,1,0);
-	if(n>0)
-	{
-		if(pKline!=NULL)
-			f = pKline->close ;
-	}
-	if(pKline!=NULL) delete [] pKline;
-
-	return f ;
-
-}
-
 void CTaiKlineFileKLine::TestKlineVolpositive(Kline *pKline, int nCount)
 {
 	for(int i=0;i<nCount;i++)
@@ -1262,130 +1221,6 @@ void CTaiKlineFileKLine::TestKlineVolpositive(Kline *pKline, int nCount)
 		}
 	}
 
-}
-
-bool CTaiKlineFileKLine::OpenAll()
-{
-	if(!m_fileDaySh)
-	m_fileDaySh = new CTaiKlineFileKLine(0,SH_MARKET_EX);
-	if(!m_fileDaySz)
-	m_fileDaySz = new CTaiKlineFileKLine(0,SZ_MARKET_EX);
-	if(!m_fileMin5Sh)
-	m_fileMin5Sh = new CTaiKlineFileKLine(1,SH_MARKET_EX);
-	if(!m_fileMin5Sz)
-	m_fileMin5Sz = new CTaiKlineFileKLine(1,SZ_MARKET_EX);
-	try
-	{
-
-		CreateDirectory("DATA\\SH",NULL);
-		CreateDirectory("DATA\\SZ",NULL);
-		CreateDirectory("DATA\\SH\\f10",NULL);
-		CreateDirectory("DATA\\SZ\\f10",NULL);
-	}
-	catch(...)
-	{
-	}
-
-
-	CString sPath2 = g_daysh;
-	bool bRtn = true;
-	if(!m_fileDaySh->Open(sPath2, 0,NULL))
-	{
-		delete m_fileDaySh;
-		m_fileDaySh=NULL;
-		bRtn = false;
-		AfxMessageBox("打开上海日线文件时出错，请关闭程序后，删除文件 data\\sh\\daykline.dat ",MB_OK|MB_ICONERROR);
-	}
-	sPath2 = g_daysz;
-	if(!m_fileDaySz->Open(sPath2, 0,NULL))
-	{
-		delete m_fileDaySz;
-		m_fileDaySz=NULL;
-		bRtn = false;
-		AfxMessageBox("打开深圳日线文件时出错，请关闭程序后，删除文件 data\\sz\\daykline.dat ",MB_OK|MB_ICONERROR);
-	}
-
-	sPath2 = g_minutesh;
-	if(!m_fileMin5Sh->Open(sPath2, 0,NULL))
-	{
-		delete m_fileMin5Sh;
-		m_fileMin5Sh=NULL;
-		bRtn = false;
-		AfxMessageBox("打开上海5分钟K线文件时出错",MB_OK|MB_ICONERROR);
-	}
-	sPath2 = g_minutesz;
-	if(!m_fileMin5Sz->Open(sPath2, 0,NULL))
-	{
-		delete m_fileMin5Sz;
-		m_fileMin5Sz=NULL;
-		bRtn = false;
-		AfxMessageBox("打开深圳5分钟K线文件时出错 ",MB_OK|MB_ICONERROR);
-	}
-	return bRtn;
-
-}
-
-void CTaiKlineFileKLine::CloseAll()
-{
-	//  20010910
-	if(m_fileDaySh != NULL)
-	{
-		m_fileDaySh->Close();
-	}
-	if(m_fileDaySz != NULL)
-	{
-		m_fileDaySz->Close();
-	}
-	if(m_fileMin5Sh != NULL)
-	{
-		m_fileMin5Sh->Close();
-	}
-	if(m_fileMin5Sz != NULL)
-	{
-		m_fileMin5Sz->Close();
-	}
-	if(m_fileDaySh != NULL)
-	{
-
-		delete m_fileDaySh;
-		m_fileDaySh = NULL;
-	}
-	if(m_fileDaySz != NULL)
-	{
-
-		delete m_fileDaySz;
-		m_fileDaySz = NULL;
-	}
-	if(m_fileMin5Sh != NULL)
-	{
-
-		delete m_fileMin5Sh;
-		m_fileMin5Sh = NULL;
-	}
-	if(m_fileMin5Sz != NULL)
-	{
-
-		delete m_fileMin5Sz;
-		m_fileMin5Sz = NULL;
-	}
-
-}
-
-bool CTaiKlineFileKLine::WriteKLineS(CString symbol,int stkKind, Kline *pKline, int nWrite, int nType, bool bDay)
-{
-	CTaiKlineFileKLine * pFile = GetFilePointer(symbol,stkKind,bDay);
-	if(pFile)
-		pFile->WriteKLine (symbol, pKline,nWrite, nType);
-	return true;
-}
-
-int CTaiKlineFileKLine::ReadKLineS(CString symbol,int stkKind, Kline *&pKline, int nRead, int nAddBlank, bool bDay)
-{
-	int n = 0;
-	CTaiKlineFileKLine * pFile = GetFilePointer(symbol,stkKind,bDay);
-	if(pFile)
-		n = pFile->ReadKLine (symbol, pKline,nRead, nAddBlank);
-	return n;
 }
 
 void CTaiKlineFileKLine::AddSmallHeadBlock()
@@ -1455,445 +1290,96 @@ void CTaiKlineFileKLine::AddSmallHeadBlock()
 	SetMaxNumStock(nMaxNumStock);
 }
 
-/*
-bool CTaiKlineFileKLine::Transfer4To6(bool bFirst)
+
+CTaiKlineFileKLine* CTaiKlineFileKLine::GetFilePointer(CString symbol, int stkKind, BOOL bDayKline)
 {
-
-	
-	bool bRtn = false;
-	CTaiShanDoc * pDoc = CMainFrame::m_taiShanDoc ;
-	if(bFirst == true)
-	{
-		if(pDoc->m_4or6==0)
-		{
-		
-					
-			if(_access("baseinfo.dat",0)==-1)
-				return false;
-	
-			BASEINFOHEAD *FileHead=new BASEINFOHEAD;
-			CFile f;
-			f.Open("baseinfo.dat",CFile::modeReadWrite|CFile::typeBinary);
-			f.Read(FileHead,sizeof(BASEINFOHEAD));
-			if(FileHead->filetitle==55555555)
-			{
-				delete FileHead;
-				f.Close();
-			}
-			else
-			{
-			BASEINFO *pRecordSet=new BASEINFO[FileHead->StockCount+1000];
-			BASEINFO_OLD *pRecordSetOLD=new BASEINFO_OLD;
-			for(int k=0;k<FileHead->StockCount;k++)
-			{
-				DWORD nKind;
-				CString strSymbol;
-				CString str6;		
-				f.Read(pRecordSetOLD,sizeof(BASEINFO_OLD));
-				strSymbol=pRecordSetOLD->Symbol;
-				if(strSymbol.GetLength()==6)
-				{
-					nKind=CSharesInformation::GetStockKind(SH_MARKET_EX,strSymbol.GetBuffer(0));
-					str6=strSymbol;
-				}
-				else if(strSymbol.GetLength()==4)
-				{
-					str6=strSymbol;
-					nKind=CSharesInformation::GetStockKind(SZ_MARKET_EX,str6.GetBuffer(0));
-				}
-				else
-				{
-					f.Close();
-					delete pRecordSetOLD;
-					delete FileHead;
-					delete []pRecordSet;
-					return false;
-				}
-				CString myNeed=pDoc->GetStockKindString(nKind);
-				myNeed+=str6;
-				strcpy(pRecordSet[k].Symbol,myNeed.GetBuffer(0));
-				memcpy(&(pRecordSet[k].NumSplit),&(pRecordSetOLD->NumSplit),sizeof(BASEINFO_OLD)-8);
-				
-			}
-			FileHead->filetitle=55555555;
-			FileHead->FileExitDone=88888888;
-			f.SeekToBegin();
-			f.Write(FileHead,sizeof(BASEINFOHEAD));
-			f.Write(pRecordSet,sizeof(BASEINFO)*(FileHead->StockCount));	
-			f.Close();
-			delete pRecordSetOLD;
-			delete FileHead;
-			delete []pRecordSet;
-			}
-
-
-		
-			
-			if(_access("StockTypeInfo.dat",0)==-1)
-				return false;
-	
-			CFile ff;
-			
-			
-			ff.Open("StockTypeInfo.dat",CFile::modeReadWrite|CFile::typeBinary);
-			STOCKTYPEHEAD *pStockTypeHead=new STOCKTYPEHEAD;
-			
-			ff.Read(pStockTypeHead,sizeof(STOCKTYPEHEAD));
-			if(pStockTypeHead->m_lFileTitle==55555555)
-			{
-				delete pStockTypeHead;
-				ff.Close();
-			}
-			else
-			{
-			int nMaxType=pStockTypeHead->m_lStockTypeMaxCount;
-			int nCurrentStock=pStockTypeHead->m_lStockCount;
-			STOCK_TYPE_INFO *pStockInfo=new STOCK_TYPE_INFO[pStockTypeHead->m_lStockCount+1000];
-			ff.Seek(sizeof(STOCKTYPEHEAD)+sizeof(STOCKTYPEINFO)*nMaxType,CFile::begin);
-			STOCK_TYPE_INFO_OLD *pMyNeed=new STOCK_TYPE_INFO_OLD;
-			
-			for(int kk=0;kk<nCurrentStock;kk++)
-			{		
-				DWORD nKind;
-				CString str6;
-				ff.Read(pMyNeed,sizeof(STOCK_TYPE_INFO_OLD));
-				CString strSymbol=pMyNeed->m_szSymbol;
-				
-				if(strSymbol.GetLength()==6)
-				{
-					nKind=CSharesInformation::GetStockKind(SH_MARKET_EX,strSymbol.GetBuffer(0));
-					str6=strSymbol;
-				}
-				else if (strSymbol.GetLength()==4)
-				{
-					str6=strSymbol;
-					nKind=CSharesInformation::GetStockKind(SZ_MARKET_EX,str6.GetBuffer(0));
-				}
-				else
-				{
-					ff.Close();
-					delete pStockTypeHead;
-					delete pMyNeed;
-					delete []pStockInfo;
-					return false;
-				}
-				CString myNeed=pDoc->GetStockKindString(nKind);
-				myNeed+=str6;
-				strcpy(pStockInfo[kk].m_szSymbol,myNeed.GetBuffer(0));
-				memcpy(&(pStockInfo[kk].m_bDeleted),&(pMyNeed->m_bDeleted),sizeof(STOCK_TYPE_INFO_OLD)-7);
-			}	
-			pStockTypeHead->m_lFileTitle=55555555;
-			pStockTypeHead->m_lFileExit =88888888;
-			ff.SeekToBegin();
-			ff.Write(pStockTypeHead,sizeof(STOCKTYPEHEAD));
-			ff.Seek(sizeof(STOCKTYPEHEAD)+sizeof(STOCKTYPEINFO)*nMaxType,CFile::begin);
-			ff.Write(pStockInfo,sizeof(STOCK_TYPE_INFO)*nCurrentStock);
-			ff.Close();
-		
-			delete pStockTypeHead;
-			delete pMyNeed;
-			delete []pStockInfo;
-			}
-			//=============
-			
-			return false;
-		}
-	}
-
-
 	CTaiKlineFileKLine*	pFile;
 
-	pFile=CTaiKlineFileKLine::m_fileDaySz ;
-	int nStock = pFile->GetStockNumber();
-
-	
-	for(int i=0;i<nStock;i++)
+	if (bDayKline == TRUE)
 	{
-		int addr = 16+i*64;
-		pFile->Seek(addr,begin);
-		char ch[8];
-		ch[7]=0;
-		pFile->Read (ch,8);
-		CString s = ch;
-
-		//lmb11
-		for(int k = 0;k<i;k++)
-		{
-			int addr2 = 16+k*64;
-			pFile->Seek(addr2,begin);
-			char ch2[8];
-			ch2[7]=0;
-			pFile->Read (ch2,8);
-			CString s2 = ch2;
-			if(s == s2 && s2!="0Z0000")
-			{
-				s2 = "0Z0000";
-				pFile->Seek(addr,begin);
-				pFile->Write (s2.GetBuffer (8),8);
-				s2.ReleaseBuffer ();
-				break;
-			}
-		}
-	
-		if(s.GetLength () <=4) 
-		{
-
-			s = CSharesInformation::Symbol4To6(s);
-			strcpy(ch,s);
-			pFile->Seek(addr,begin);
-			pFile->Write (ch,8);
-		}
-	}
-
-
-	pFile=CTaiKlineFileKLine::m_fileMin5Sz ;
-	nStock = pFile->GetStockNumber();
-	for(int i=0;i<nStock;i++)
-	{
-		int addr = 16+i*64;
-		pFile->Seek(addr,pFile->begin);
-		char ch[8];
-		ch[7]=0;
-		pFile->Read (ch,8);
-		CString s = ch;
-		if(s.GetLength () <=4) 
-		{
-			s = CSharesInformation::Symbol4To6(s);
-			strcpy(ch,s);
-			pFile->Seek(addr,pFile->begin);
-			pFile->Write (ch,8);
-		}
-	}
-
-
-	CTaiKlineFileHS::Symbol4To6();
-	
-
-	if(bFirst == false) 
-	{
-		return true;
-	}
-	CString delFile[]={"realtime.dat","stockname.dat","realtimehs.dat","AlarmSetting.ala"};
-	CFileFind fd;
-	CString lpszFileName;
-	for(int km=0;km<4;km++)
-	{		
-		lpszFileName=delFile[km];
-		if(fd.FindFile(lpszFileName)!=0)
-		{
-			CFile::Remove(lpszFileName);
-		}		
-	}
-if(_access("baseinfo.dat",0)==-1)
-		return false;
-
-	BASEINFOHEAD *FileHead=new BASEINFOHEAD;
-	CFile f;
-	f.Open("baseinfo.dat",CFile::modeReadWrite|CFile::typeBinary);
-	f.Read(FileHead,sizeof(BASEINFOHEAD));
-	bool myflag;
-	myflag=true;
-	if(FileHead->filetitle==55555555)
-	{
-		myflag=false;
+		pFile = CTaiKlineFileKLine::m_fileDaySh;
 	}
 	else
 	{
-		myflag=true;
+		pFile = CTaiKlineFileKLine::m_fileMin5Sh;
 	}
-	BASEINFO *pRecordSet=new BASEINFO[FileHead->StockCount+1000];
-	BASEINFO_OLD *pRecordSetOLD=new BASEINFO_OLD;
-	for(int k=0;k<FileHead->StockCount;k++)
+
+	if (CSharesCompute::GetMarketKind(stkKind) == SZ_MARKET_EX)
 	{
-		DWORD nKind;
-		CString strSymbol;
-		CString str6;		
-		f.Read(pRecordSetOLD,sizeof(BASEINFO_OLD));
-	
-		if(!myflag)
+		if (bDayKline == TRUE)
 		{
-			CString strMy=pRecordSetOLD->Symbol;
-			if (strMy.GetLength()==8)
-			{
-				strSymbol=strMy.Right(6);
-			}
-			else if(strMy.GetLength()==6)
-			{
-				strSymbol=strMy.Right(4);
-			}
+			pFile = CTaiKlineFileKLine::m_fileDaySz;
 		}
 		else
 		{
-			strSymbol=pRecordSetOLD->Symbol;
-		}
-
-		if(strSymbol.GetLength()==6)
-		{
-			nKind=CSharesInformation::GetStockKind(SH_MARKET_EX,strSymbol.GetBuffer(0));
-			str6=strSymbol;
-		}
-		else if(strSymbol.GetLength()==4)
-		{
-			str6=CSharesInformation::Symbol4To6(strSymbol);
-			nKind=CSharesInformation::GetStockKind(SZ_MARKET_EX,str6.GetBuffer(0));
-		}
-		else
-		{
-			f.Close();
-			delete pRecordSetOLD;
-			delete FileHead;
-			delete []pRecordSet;
-			return false;
-		}
-		CString myNeed=pDoc->GetStockKindString(nKind);
-		myNeed+=str6;
-		strcpy(pRecordSet[k].Symbol,myNeed.GetBuffer(0));
-		memcpy(&(pRecordSet[k].NumSplit),&(pRecordSetOLD->NumSplit),sizeof(BASEINFO_OLD)-8);
-		
-	}	
-	FileHead->FileExitDone=88888888;
-	f.SeekToBegin();
-	f.Write(FileHead,sizeof(BASEINFOHEAD));
-	f.Write(pRecordSet,sizeof(BASEINFO)*(FileHead->StockCount));	
-	f.Close();
-	delete pRecordSetOLD;
-	delete FileHead;
-	delete []pRecordSet;
-
-	if(_access("StockTypeInfo.dat",0)==-1)
-		return false;
-
-	CFile ff;
-	bool bflag;
-	bflag=false;
-
-	ff.Open("StockTypeInfo.dat",CFile::modeReadWrite|CFile::typeBinary);
-	STOCKTYPEHEAD *pStockTypeHead=new STOCKTYPEHEAD;
-	
-	ff.Read(pStockTypeHead,sizeof(STOCKTYPEHEAD));
-	if(pStockTypeHead->m_lFileTitle==55555555)
-	{
-		bflag=false;
-	}
-	else
-	{
-		bflag=true;
-	}
-
-	int nMaxType=pStockTypeHead->m_lStockTypeMaxCount;
-	int nCurrentStock=pStockTypeHead->m_lStockCount;
-	STOCK_TYPE_INFO *pStockInfo=new STOCK_TYPE_INFO[pStockTypeHead->m_lStockCount+1000];
-	ff.Seek(sizeof(STOCKTYPEHEAD)+sizeof(STOCKTYPEINFO)*nMaxType,CFile::begin);
-	STOCK_TYPE_INFO_OLD *pMyNeed=new STOCK_TYPE_INFO_OLD;
-
-	for(int kk=0;kk<nCurrentStock;kk++)
-	{		
-		DWORD nKind;
-		CString str6;
-		CString strSymbol;
-		ff.Read(pMyNeed,sizeof(STOCK_TYPE_INFO_OLD));
-		if(!bflag)
-		{
-			CString strMy=pMyNeed->m_szSymbol;
-			if (strMy.GetLength()==8)
-			{
-				strSymbol=strMy.Right(6);
-			}
-			else if(strMy.GetLength()==6)
-			{
-				strSymbol=strMy.Right(4);
-			}
-		}
-		else
-		{
-			strSymbol=pMyNeed->m_szSymbol;
-		}
-		
-		
-
-		if(strSymbol.GetLength()==6)
-		{
-			nKind=CSharesInformation::GetStockKind(SH_MARKET_EX,strSymbol.GetBuffer(0));
-			str6=strSymbol;
-		}
-		else if (strSymbol.GetLength()==4)
-		{			
-			str6=CSharesInformation::Symbol4To6(strSymbol);
-			nKind=CSharesInformation::GetStockKind(SZ_MARKET_EX,str6.GetBuffer(0));
-		}
-		else
-		{
-			ff.Close();
-			delete pStockTypeHead;
-			delete pMyNeed;
-			delete []pStockInfo;
-			return false;
-		}
-		CString myNeed=pDoc->GetStockKindString(nKind);
-		myNeed+=str6;
-		strcpy(pStockInfo[kk].m_szSymbol,myNeed.GetBuffer(0));
-		memcpy(&(pStockInfo[kk].m_bDeleted),&(pMyNeed->m_bDeleted),sizeof(STOCK_TYPE_INFO_OLD)-7);
-	}
-	pStockTypeHead->m_lFileTitle=12345678;
-	pStockTypeHead->m_lFileExit =88888888;
-	ff.SeekToBegin();
-	ff.Write(pStockTypeHead,sizeof(STOCKTYPEHEAD));
-	ff.Seek(sizeof(STOCKTYPEHEAD)+sizeof(STOCKTYPEINFO)*nMaxType,CFile::begin);
-	ff.Write(pStockInfo,sizeof(STOCK_TYPE_INFO)*nCurrentStock);
-	ff.Close();
-
-	delete pStockTypeHead;
-	delete pMyNeed;
-	delete []pStockInfo;
-	
-	
-	
-	CFileFind fff;
-	CString strdir;
-	::GetCurrentDirectory(MAX_PATH,strdir.GetBuffer(MAX_PATH));
-	CString strdir1;
-
-	strdir1.Format("%s\\data\\shenzhen\\f10",strdir);
-	::SetCurrentDirectory(strdir1);
-	if(fff.FindFile("*.*")!=0)
-	{
-		while(fff.FindNextFile())
-		{
-			if(!(fff.IsDots()||fff.IsDirectory()))
-			{
-				CString strFileName=fff.GetFileName();
-				int nL=strFileName.Find(".");
-				CString str1=strFileName.Left(nL);
-				if(str1.GetLength()==4)
-				{
-					CString strExt=strFileName.Right(4);
-					CString str2=CSharesInformation::Symbol4To6(str1);
-					CString strNewFileName=str2+strExt;
-					if(_access(strNewFileName,0)==-1){
-					try{
-					CFile::Rename(strFileName,strNewFileName);
-					}
-					catch(...)
-					{
-					}
-					}
-				}
-			}
+			pFile = CTaiKlineFileKLine::m_fileMin5Sz;
 		}
 	}
-	::SetCurrentDirectory(strdir);
-	
-	return true;
+
+	return pFile;
 }
-*/
 
-int CTaiKlineFileKLine::GetKlineCount(CString symbol, int stkKind,bool bDayKline)
+int CTaiKlineFileKLine::GetKlineCount(CString symbol, int stkKind, BOOL bDayKline)
 {
-	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(symbol,stkKind,bDayKline);//CTaiKlineFileKLine::m_fileDaySh ;
+	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(symbol, stkKind, bDayKline);
 	KLINE_SMALLHEAD klineSmallHead;
 	KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-	pFile->GetKlineSmallHeader (symbol,pKlineSmallHead);
-	return klineSmallHead.numKln ;
+	pFile->GetKlineSmallHeader(symbol, pKlineSmallHead);
+
+	return klineSmallHead.numKln;
+}
+
+float CTaiKlineFileKLine::GetLastClose(CString symbol, int stkKind)
+{
+	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(symbol, stkKind, TRUE);
+	KLINE_SMALLHEAD smallHead;
+	pFile->GetKlineSmallHeader(symbol, &smallHead);
+	if (smallHead.numKln <= 0)
+	{
+		return -1;
+	}
+
+	Kline* pKline = NULL;
+	float f = -1;
+	int n = pFile->ReadKLine(symbol, pKline, 1, 0);
+	if (n > 0)
+	{
+		if (pKline != NULL)
+			f = pKline->close;
+	}
+
+	if (pKline != NULL) delete []pKline;
+
+	return f;
+}
+
+int CTaiKlineFileKLine::ReadKLineS(CString symbol, int stkKind, Kline*& pKline, int nRead, int nAddBlank, BOOL bDay)
+{
+	int nCount = 0;
+	CTaiKlineFileKLine* pFile = GetFilePointer(symbol, stkKind, bDay);
+	if (pFile)
+		nCount = pFile->ReadKLine(symbol, pKline, nRead, nAddBlank);
+
+	return nCount;
+}
+
+BOOL CTaiKlineFileKLine::WriteKLineS(CString symbol, int stkKind, Kline* pKline, int nWrite, int nType, BOOL bDay)
+{
+	BOOL bResult = FALSE;
+	CTaiKlineFileKLine* pFile = GetFilePointer(symbol, stkKind, bDay);
+	if (pFile)
+		bResult = pFile->WriteKLine(symbol, pKline, nWrite, nType);
+
+	return bResult;
+}
+
+void CTaiKlineFileKLine::ZeroKlineData(CString symbol, int stkKind, BOOL bDay)
+{
+	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(symbol, stkKind, bDay);
+	KLINE_SMALLHEAD smallHead;
+	int nIndex = pFile->GetKlineSmallHeader(symbol, &smallHead);
+	smallHead.numKln = 0;
+	pFile->SetKlineSmallHeader(nIndex, &smallHead);
 }
 
 BOOL CTaiKlineFileKLine::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFileEnd, CFileException* pException)
@@ -1914,7 +1400,6 @@ BOOL CTaiKlineFileKLine::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToF
 	}
 	else
 	{
-		//
 		int nAdd;
 		switch (m_kindKline)
 		{
@@ -1943,34 +1428,36 @@ BOOL CTaiKlineFileKLine::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToF
 			nLen -= KLINESMALLHEAD;
 			if (nLen > 0)
 			{
-				nLen = nLen/( KlineByteEach *  FixedKlinePerBlock);
-				if(nLen%( KlineByteEach *  FixedKlinePerBlock)!=0)
+				nLen = nLen / (KlineByteEach * FixedKlinePerBlock);
+				if (nLen % (KlineByteEach * FixedKlinePerBlock) != 0)
+				{
 					nLen++;
-				if(nBlock>nLen)
+				}
+				if (nBlock > nLen)
 				{
 					ASSERT(FALSE);
-					this->SetSmallBlockCount (nLen);
+					SetSmallBlockCount(nLen);
 
-					int nStock = GetStockNumber ();
-					for(int i=0;i<nStock;i++)
+					int nStock = GetStockNumber();
+					for (int i = 0; i < nStock; i++)
 					{
-						int addr = 16+i*64;
-						Seek(addr,CTaiKlineFileKLine::begin);
-						KLINE_SMALLHEAD klineSmallHead ;
+						int addr = 16 + i * 64;
+						Seek(addr, CTaiKlineFileKLine::begin);
+						KLINE_SMALLHEAD klineSmallHead;
 						KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-						Read(pKlineSmallHead,sizeof(KLINE_SMALLHEAD));
-						CString symbol (pKlineSmallHead->StockSign);
-						for(int j=0;j<26;j++)
+						Read(pKlineSmallHead, sizeof(KLINE_SMALLHEAD));
+						CString symbol(pKlineSmallHead->StockSign);
+						for (int j = 0; j < 26; j++)
 						{
-							if(pKlineSmallHead->symBlock [j] == 0xffff) break;
+							if (pKlineSmallHead->symBlock[j] == 0xFFFF) break;
 							int iData = -1;
-							int iIn = pKlineSmallHead->symBlock [j] ;
-							if(iIn>=nLen)
+							int iIn = pKlineSmallHead->symBlock[j];
+							if (iIn >= nLen)
 							{
-								pKlineSmallHead->numKln = (j)*FixedKlinePerBlock;
-								for(;j<26;j++)
-									pKlineSmallHead->symBlock [j] = 0xffff;
-								this->SetKlineSmallHeader (i,pKlineSmallHead);
+								pKlineSmallHead->numKln = (j) * FixedKlinePerBlock;
+								for ( ; j < 26; j++)
+									pKlineSmallHead->symBlock[j] = 0xFFFF;
+								SetKlineSmallHeader(i, pKlineSmallHead);
 								break;
 							}
 						}
@@ -2196,3 +1683,84 @@ BOOL CTaiKlineFileKLine::SetKlineSmallHeader(int nIndex, KLINE_SMALLHEAD* pKline
 
 	return TRUE;
 }
+
+CString CTaiKlineFileKLine::GetSymbol(int nIndex)
+{
+	int addr = 16;
+	Seek(addr + nIndex * 64, begin);
+	KLINE_SMALLHEAD* pKlineSmallHead = (KLINE_SMALLHEAD*)GetFileCurrentPointer();
+	CString symbol(pKlineSmallHead->StockSign);
+
+	return symbol;
+}
+
+int CTaiKlineFileKLine::ReadKLine(int nIndex, Kline*& pKline, int nRead)
+{
+	CString symbol = GetSymbol(nIndex);
+	return ReadKLine(symbol, pKline, nRead, 0);
+}
+
+int CTaiKlineFileKLine::ReadKLine(CString symbol, Kline*& pKline, int nRead, int nAddBlank)
+{
+	if (symbol.GetLength() != 6 && symbol.GetLength() != 4) return 0;
+
+	KLINE_SMALLHEAD klineSmallHead;
+	KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
+	int nIndexStock = GetKlineSmallHeader(symbol, pKlineSmallHead);
+
+	int nCount = nRead;
+	if (nCount <= -1 || nCount > pKlineSmallHead->numKln)
+		nCount = pKlineSmallHead->numKln;
+	if (pKline != NULL)
+		delete []pKline;
+
+	ASSERT(nAddBlank >= 0);
+	pKline = new Kline[nCount + nAddBlank + 1];
+	if (nCount == 0)
+		return 0;
+
+	//SeekToBegin();
+	//CString ss = pKlineSmallHead->StockSign;
+	ASSERT(nCount <= 0 ? TRUE : KLINESMALLHEAD + pKlineSmallHead->symBlock[(nCount - 1) / FixedKlinePerBlock] * KlineByteEach * FixedKlinePerBlock < GetLength());
+
+	for (int i = pKlineSmallHead->numKln - nCount; i < pKlineSmallHead->numKln; i++)
+	{
+		int blkCount = i / FixedKlinePerBlock;
+		int stockCount = i % FixedKlinePerBlock;
+		int addr = KLINESMALLHEAD + pKlineSmallHead->symBlock[blkCount]	* KlineByteEach * FixedKlinePerBlock + stockCount * KlineByteEach;
+
+		Seek(addr, begin);
+		Read(pKline + i - pKlineSmallHead->numKln + nCount, KlineByteEach);
+	}
+
+	if (!CTaiShanKlineShowView::IsIndexStock3(symbol))
+		TestKlineVolpositive(pKline, nCount);
+
+	return nCount;
+}
+
+void CTaiKlineFileKLine::DeleteKlineData(CString symbol, int nFoot, int nCount)
+{
+	Kline* pKline = NULL;
+	int n = ReadKLine(symbol, pKline, -1, 0);
+	if (n <= 0) return;
+	if (n > nFoot + 1) 
+		memmove(pKline + nFoot, pKline + nFoot + 1, (n - nFoot - 1) * sizeof(Kline));
+	n--;
+
+	KLINE_SMALLHEAD klineSmallHead;
+	KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
+	int nIndexStock = GetKlineSmallHeader(symbol, pKlineSmallHead);
+	pKlineSmallHead->numKln = 0;
+	SetKlineSmallHeader(nIndexStock, pKlineSmallHead);
+
+	if (n > 0) WriteKLine(symbol, pKline, n, 0);
+
+	if (pKline == NULL)
+		delete []pKline;
+}
+
+/* ============================================================================
+int nKind, int nMarket 数据类型 日线、五分、一分 市场类型 上海、深圳 枚举
+
+*/

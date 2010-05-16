@@ -76,6 +76,7 @@
 #define TJXG_ALERT  400   
 #define MaxShareMem   (1024*1024)
 
+#include "StkReceiver.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -344,6 +345,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//	TRACE0("Failed to create menu bar.\n");
 	//	return -1;      // fail to create
 	//}
+
+	//TSKReceiver()->StartEngine();
 
 	return 0;
 }
