@@ -1,6 +1,3 @@
-// CSharesCompute.cpp: implementation of the CSharesCompute class.
-//
-//////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
 #include <stdio.h>
@@ -18,6 +15,7 @@
 #include "CTaiKlineFileKLine.h"
 #include "CTaiKlineFileHS.h"
 
+#include "StkDatabase.h"
 
 CSharesCompute::CSharesCompute()
 {
@@ -155,71 +153,6 @@ short CSharesCompute::GetStockMinute(time_t time, int mode)
 	return(tmp);
 }
 
-void CSharesCompute::StockDataDayUpdate(DAY_TOTAL_STRUCTEx * m_GpDay)                          
-{
-    int index=0;
-	if(m_GpDay->m_RcvDay->m_head.m_dwHeadTag != EKE_HEAD_TAG)
-		return;
-	do
-	{
-        int  endindex=CheckStockDaytime(m_GpDay,index) ; 
-		if(endindex <= index&&index<m_GpDay->Day_Count)
-		{
-			index++;
-			continue;
-		}
-		else if(endindex <= index)
-			break;
-		int KLineCount=0;
-		Kline *pDay=NULL;
-        CString StockId;
-		int stkKind = -1;
-		HGLOBAL	hMem;
-		LPVOID hp;
-		hMem = GlobalAlloc( GPTR, (endindex - index  )* sizeof(Kline ) );
-		hp=GlobalLock(hMem);
-		if( hp )
-			pDay= (Kline *)hp;
-		else
-			AfxMessageBox("分配内存出错",MB_ICONSTOP);
-		if(m_GpDay->m_RcvDay[index].m_head.m_dwHeadTag == EKE_HEAD_TAG)
-		{
-		   StockId=m_GpDay->m_RcvDay[index].m_head.m_szLabel;
-		   stkKind=CSharesInformation::GetStockKind(m_GpDay->m_RcvDay[index].m_head.m_wMarket ,m_GpDay->m_RcvDay[index].m_head.m_szLabel);
-		}
-
-		index++;
-		do
-		{
-			pDay[KLineCount].day =m_GpDay->m_RcvDay[index].m_time ;
-			pDay[KLineCount].open =m_GpDay->m_RcvDay[index].m_fOpen ;
-			pDay[KLineCount].high=m_GpDay->m_RcvDay[index].m_fHigh  ;
-			pDay[KLineCount].low =m_GpDay->m_RcvDay[index].m_fLow  ;
-			pDay[KLineCount].close =m_GpDay->m_RcvDay[index].m_fClose ;
-			pDay[KLineCount].vol =m_GpDay->m_RcvDay[index].m_fVolume ;
-			pDay[KLineCount].amount =m_GpDay->m_RcvDay[index].m_fAmount  ;
-	        pDay[KLineCount].advance =m_GpDay->m_RcvDay[index].m_wAdvance ;
-		    pDay[KLineCount].decline =m_GpDay->m_RcvDay[index].m_wDecline ;
-			KLineCount++;
-			index++;
-		}while(m_GpDay->m_RcvDay[index].m_head.m_dwHeadTag != EKE_HEAD_TAG && index<m_GpDay->Day_Count);
-
-	   CTaiKlineFileKLine::GetFilePointer(StockId,stkKind,true)->WriteKLine(StockId,pDay,KLineCount,0);  
-
-	    GlobalUnlock((HGLOBAL)pDay);    
-		GlobalFree( (HGLOBAL)pDay);
-	}while(index<m_GpDay->Day_Count);
-}
-int CSharesCompute::CheckStockDaytime(DAY_TOTAL_STRUCTEx * m_GpDay,int index)                          
-{
-	    int ls_pos=index;
-		do
-		{
-			ls_pos++;
-		}while(m_GpDay->m_RcvDay[ls_pos].m_head.m_dwHeadTag != EKE_HEAD_TAG && ls_pos<m_GpDay->Day_Count);
-		ls_pos--;
-		return ls_pos;  
-}
 void CSharesCompute::StockDataPowerUpdate(POWER_TOTAL_STRUCTEx * m_GpPower)                               
 {
 	int index =0;
@@ -1059,4 +992,92 @@ void CSharesCompute::AddDataCdat1(CReportData *p)
 	m_dataArr[nMarket].Add(sym);
 
 
+}
+
+int CSharesCompute::CheckStockDaytime(DAY_TOTAL_STRUCTEx* m_GpDay, int index)
+{
+	int ls_pos = index;
+	do
+	{
+		ls_pos++;
+	}
+	while (m_GpDay->m_RcvDay[ls_pos].m_head.m_dwHeadTag != EKE_HEAD_TAG && ls_pos < m_GpDay->Day_Count);
+	ls_pos--;
+
+	return ls_pos;
+}
+
+void CSharesCompute::StockDataDayUpdate(DAY_TOTAL_STRUCTEx* m_GpDay)
+{
+	int index = 0;
+	if (m_GpDay->m_RcvDay->m_head.m_dwHeadTag != EKE_HEAD_TAG)
+		return;
+
+	do
+	{
+		int endindex = CheckStockDaytime(m_GpDay, index);
+		if (endindex <= index && index < m_GpDay->Day_Count)
+		{
+			index++;
+			continue;
+		}
+		else if (endindex <= index)
+		{
+			break;
+		}
+
+		int KLineCount = 0;
+		Kline* pDay = NULL;
+		WORD wMarket = 0;
+		CString StockId;
+		int stkKind = -1;
+
+		HGLOBAL	hMem;
+		LPVOID hp;
+		hMem = GlobalAlloc(GPTR, (endindex - index) * sizeof(Kline));
+		hp = GlobalLock(hMem);
+		if (hp)
+		{
+			pDay = (Kline*)hp;
+		}
+		else
+		{
+			AfxMessageBox("分配内存出错", MB_ICONSTOP);
+		}
+
+		if (m_GpDay->m_RcvDay[index].m_head.m_dwHeadTag == EKE_HEAD_TAG)
+		{
+			wMarket = m_GpDay->m_RcvDay[index].m_head.m_wMarket;
+			StockId = m_GpDay->m_RcvDay[index].m_head.m_szLabel;
+			stkKind = CSharesInformation::GetStockKind(m_GpDay->m_RcvDay[index].m_head.m_wMarket, m_GpDay->m_RcvDay[index].m_head.m_szLabel);
+		}
+
+		index++;
+
+		do
+		{
+			pDay[KLineCount].day = m_GpDay->m_RcvDay[index].m_time;
+			pDay[KLineCount].open = m_GpDay->m_RcvDay[index].m_fOpen;
+			pDay[KLineCount].high = m_GpDay->m_RcvDay[index].m_fHigh;
+			pDay[KLineCount].low = m_GpDay->m_RcvDay[index].m_fLow;
+			pDay[KLineCount].close = m_GpDay->m_RcvDay[index].m_fClose;
+			pDay[KLineCount].vol = m_GpDay->m_RcvDay[index].m_fVolume;
+			pDay[KLineCount].amount = m_GpDay->m_RcvDay[index].m_fAmount;
+			pDay[KLineCount].advance = m_GpDay->m_RcvDay[index].m_wAdvance;
+			pDay[KLineCount].decline = m_GpDay->m_RcvDay[index].m_wDecline;
+			KLineCount++;
+			index++;
+		}
+		while (m_GpDay->m_RcvDay[index].m_head.m_dwHeadTag != EKE_HEAD_TAG && index < m_GpDay->Day_Count);
+
+		//CTaiKlineFileKLine::GetFilePointer(StockId, stkKind, TRUE)->WriteKLine(StockId, pDay, KLineCount, 0);
+		CTaiKlineFileKLine* pFile = TSKDatabase()->GetKLineFile(wMarket);
+		ASSERT(pFile);
+		if (pFile)
+			pFile->WriteKLine(StockId, pDay, KLineCount, 0);
+
+		GlobalUnlock((HGLOBAL)pDay);
+		GlobalFree((HGLOBAL)pDay);
+	}
+	while (index < m_GpDay->Day_Count);
 }

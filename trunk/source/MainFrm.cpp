@@ -6,7 +6,7 @@
 #include "CTaiShanApp.h"
 #include "CTaiShanDoc.h"
 #include "managerstocktype.h"
-#include "vwbase.h"
+//#include "vwbase.h"
 #include "CTaiShanKlineShowView.h"
 #include "ChildFrm.h"
 #include <stdio.h>

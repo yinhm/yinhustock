@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "vwbase.h"
+//#include "vwbase.h"
 #include "DIGEDITTJXG.h"
 #include "CTaiShanDoc.h"
 #include "MainFrm.h"
