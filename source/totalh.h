@@ -9,7 +9,7 @@
 #include Sheet5.h
 #include SHEETC.h
 #include Stdafx.h
-#include vwbase.h
+//#include vwbase.h
 //#include vwbaseDoc.h
 #include "CTaiShanDoc.h"
 #include CTaiShanKlineShowView.h

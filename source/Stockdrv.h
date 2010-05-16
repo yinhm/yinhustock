@@ -36,25 +36,26 @@
 
 
 // 证券市场
-#define		SH_MARKET_EX			'HS'		// 上海
-#define		SZ_MARKET_EX			'ZS'		// 深圳
-#define     HK_MARKET_EX            'KH'        //香港市场
-#define     EB_MARKET_EX            'BE'        //深圳二板市场
+#define SH_MARKET_EX			'HS'		// 上海
+#define SZ_MARKET_EX			'ZS'		// 深圳
+#define HK_MARKET_EX            'KH'		// 香港市场
+#define EB_MARKET_EX            'BE'		// 深圳二板市场
 
 
 // 文件数据类型
 // 结构数组形式的文件数据
-#define		FILE_HISTORY_EX			2			// 补日线数据
-#define		FILE_MINUTE_EX			4			// 补分钟线数据
-#define     FILE_POWER_EX           6
-#define     FILE_HISTORY_MINUTE_EX        8          //补历史五分钟数据
-#define     FILE_BASEINFO_EX             10          //补充全部股票财务数据
-#define     FILE_DISPARTBARGAINING_EX    12          //补分笔交易明细数据
-#define     FILE_STOCKLABELLIST_EX       14          //接收全部股票代码表
-#define     FILE_SYSTEMRUN_EX            16          //接收系统运行参数
-#define     FILE_INDEXATTRIBUTE_EX       18          //大盘红绿军 
-#define     FILE_LOGINAUTH_EX            20          //客户登入授权
-#define     FILE_TECHNICINDEX            22          //客户端技术指标
+
+#define FILE_HISTORY_EX				2			// 补日线数据
+#define FILE_MINUTE_EX				4			// 补分钟线数据
+#define FILE_POWER_EX				6
+#define FILE_HISTORY_MINUTE_EX		8          //补历史五分钟数据
+#define FILE_BASEINFO_EX			10          //补充全部股票财务数据
+#define FILE_DISPARTBARGAINING_EX	12          //补分笔交易明细数据
+#define FILE_STOCKLABELLIST_EX		14          //接收全部股票代码表
+#define FILE_SYSTEMRUN_EX			16          //接收系统运行参数
+#define FILE_INDEXATTRIBUTE_EX		18          //大盘红绿军 
+#define FILE_LOGINAUTH_EX			20          //客户登入授权
+#define FILE_TECHNICINDEX			22          //客户端技术指标
 
 #define		FILE_BASE_EX			0x1000		// 钱龙兼容基本资料文件,m_szFileName仅包含文件名
 #define		FILE_NEWS_EX			0x1002		// 新闻类,其类型由m_szFileName中子目录名来定
@@ -236,7 +237,7 @@ typedef struct tagRCV_REPORT_STRUCTEx
 	WORD	m_wMarket;									// 股票市场类型
 	char	m_szLabel[STKLABEL_LEN];					// 股票代码,以'\0'结尾
 	char	m_szName[STKNAME_LEN];						// 股票名称,以'\0'结尾
-	
+
 	float	m_fLastClose;								// 昨收
 	float	m_fOpen;									// 今开
 	float	m_fHigh;									// 最高
@@ -249,7 +250,7 @@ typedef struct tagRCV_REPORT_STRUCTEx
 	float	m_fBuyVolume[3];							// 申买量1,2,3
 	float	m_fSellPrice[3];							// 申卖价1,2,3
 	float	m_fSellVolume[3];							// 申卖量1,2,3
-	
+
 	float	m_fBuyPrice4;								// 申买价4
 	float	m_fBuyVolume4;								// 申买量4
 	float	m_fSellPrice4;								// 申卖价4
@@ -398,6 +399,15 @@ typedef struct tagRCV_DATA
 	};
 } RCV_DATA;
 
+// ===================== 飞狐交易师 ===========================================
+
+typedef struct tagFOX_DATA
+{
+	DWORD	m_dwFlag;
+	DWORD	m_dwType;
+	int		m_nCount;
+} FOX_DATA;
+
 //==================同网络通讯层接口总数据到达结构=====================
 typedef struct RCV_COMMINTERFACE_STRUCTEx
 {
@@ -540,13 +550,17 @@ int			i;
 
 #pragma pack()
 
-//////////////////////////////////////////////////////////////////////////////////
-//APIs
+
+
+///////////////////////////////////////////////////////////////////////////////
+// APIs
+
 #ifdef __cplusplus
-extern "C"{
+extern "C"
+{
 #endif
 
-//////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // 注册函数
 
 // 股票初始化
@@ -560,42 +574,42 @@ extern "C"{
 // 注:
 //		注册后,驱动程序会向处理窗口发送消息; 若不注册,通过查询方式亦可取得数据
 //		若股票接收没启动,则启动股票接收程序
-int WINAPI	Stock_Init(HWND hWnd,UINT Msg,int nWorkMode);
+int WINAPI Stock_Init(HWND hWnd, UINT Msg, int nWorkMode);
 
 // 退出,停止发送消息
 // 入口参数:
 //		hWnd			处理消息的窗口句柄,同 Stock_Init 的调用入口参数
 //	返回参数:
-//		 1				成功	
+//		 1				成功
 //		-1				失败
-int WINAPI 	Stock_Quit(HWND hWnd);
+int WINAPI Stock_Quit(HWND hWnd);
 
-//////////////////////////////////////////////////////////////////////////////////
-// 行情接口       
-      
+///////////////////////////////////////////////////////////////////////////////
+// 行情接口
+
 // 取已接收到的股票总数
-int WINAPI 	GetTotalNumber();													
+int WINAPI GetTotalNumber();
 
 // 由序号取股票数据(扩展)
-// 入口参数:	
+// 入口参数:
 //			nNo			序号
 //			pBuf		存放股票数据的缓冲区
 // 返回参数:
-//		    NoStockData	无股票数据	
+//		    NoStockData	无股票数据
 // 注:
 //			该函数提供股票数据的主要数据;分析软件刚运行时,可以快速建立数据框架
-int WINAPI 	GetStockByNoEx(int nNo,RCV_REPORT_STRUCTEx * pBuf);			
+int WINAPI GetStockByNoEx(int nNo, RCV_REPORT_STRUCTEx* pBuf);
 
 // 由股号取股票数据(扩展)
 // 入口参数:	
-//			pszStockCode股票代号	
+//			pszStockCode股票代号
 //			nMarket		证券市场
 //			pBuf		存放股票数据的缓冲区
 // 返回参数:
-//		    NoStockData	无股票数据	
+//		    NoStockData	无股票数据
 // 注:
 //			该函数提供股票数据的主要数据;分析软件刚运行时,可以快速建立数据框架
-int WINAPI 	GetStockByCodeEx(char * pszStockCode,int nMarket,RCV_REPORT_STRUCTEx * pBuf);
+int WINAPI GetStockByCodeEx(char* pszStockCode, int nMarket, RCV_REPORT_STRUCTEx* pBuf);
 
 // 激活接收程序,进行设置
 // 入口参数:
@@ -603,7 +617,7 @@ int WINAPI 	GetStockByCodeEx(char * pszStockCode,int nMarket,RCV_REPORT_STRUCTEx
 // 返回参数:
 //			 1			成功
 //			-1			失败
-int	WINAPI  SetupReceiver(BOOL bSetup);
+int	WINAPI SetupReceiver(BOOL bSetup);
 
 //	取得股票驱动信息
 //	入口参数:
@@ -615,14 +629,16 @@ int	WINAPI  SetupReceiver(BOOL bSetup);
 //			nInfo == RI_IDCODE,		返回信息卡 ID 号, pBuf 为字符串形式的 ID 号
 //									如:	0x78001234	  "78001234"
 //			nInfo == RI_VERSION,	返回信息卡版本号, pBuf 为字符串版本
-//									如:  1.00		  "1.00"		
+//									如:  1.00		  "1.00"
 //			nInfo == RI_ERRRATE,	取信道误码,
 //			nInfo == RI_STKNUM,		取上市股票总家数
-DWORD WINAPI  GetStockDrvInfo(int nInfo,void * pBuf);
+DWORD WINAPI GetStockDrvInfo(int nInfo, void* pBuf);
 
 #ifdef __cplusplus
 }
 #endif
+
+
 
 #endif // __STOCKDRV_100_H__
 
