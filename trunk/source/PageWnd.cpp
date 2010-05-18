@@ -93,17 +93,10 @@ END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
 
-
-BOOL CPageWnd::Create(LPCTSTR szTitle, LONG style, const RECT& rect, CWnd* parent) 
+BOOL CPageWnd::Create(LPCTSTR szTitle, LONG style, const RECT& rect, CWnd* parent)
 {
-
-	LPCTSTR lpszBounceClass =
-		AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW,//°æ¿é
-			LoadCursor(NULL, IDC_ARROW),
-			(HBRUSH)(COLOR_WINDOW+1),
-			NULL);
-	return CWnd::Create(lpszBounceClass, szTitle, style, 
-		rect, parent, IDC_WNDIDNO);
+	LPCTSTR lpszBounceClass = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW, LoadCursor(NULL, IDC_ARROW), (HBRUSH)(COLOR_WINDOW + 1), NULL);
+	return CWnd::Create(lpszBounceClass, szTitle, style, rect, parent, IDC_WNDIDNO);
 }
 
 int CPageWnd::OnCreate(LPCREATESTRUCT lpCreateStruct) 
@@ -205,15 +198,6 @@ void CPageWnd::OnPaint()
 		ShowAllPage(&dc);
 	}
 	ReleaseDC(&dc);
-
-}
-
-void CPageWnd::OnLButtonDown(UINT nFlags, CPoint points) 
-{	
-
-	if(!DoLButtonDown( nFlags,  points))
-		DoRButtonDown( nFlags,  points);
-
 
 }
 
@@ -518,12 +502,6 @@ void CPageWnd::ReplacePage(int nPage,CString ReplaceTitle)
 }
 
 
-void CPageWnd::OnRButtonDown(UINT nFlags, CPoint point) 
-{
-	DoRButtonDown( nFlags,  point);
-	CWnd::OnRButtonDown(nFlags, point);
-}
-
 
 void CPageWnd::OnMouseMove(UINT nFlags, CPoint point) 
 {
@@ -581,14 +559,6 @@ void CPageWnd::OnMouseMove(UINT nFlags, CPoint point)
 	 }
    }
    CWnd::OnMouseMove(nFlags, point);
-}
-
-void CPageWnd::OnLButtonUp(UINT nFlags, CPoint point) 
-{
-
-	m_nMovebar = 0;
-	ReleaseCapture();
-	CWnd::OnLButtonUp(nFlags, point);
 }
 void CPageWnd::InitTypeMenu(int mode) 
 {
@@ -799,44 +769,70 @@ void CPageWnd::DoRButtonDown(UINT nFlags, CPoint point)
 	}
 }
 
-bool CPageWnd::DoLButtonDown(UINT nFlags, CPoint points)
+BOOL CPageWnd::DoLButtonDown(UINT nFlags, CPoint points)
 {
-    CTaiShanReportView* pView = (CTaiShanReportView*)GetParent();
-	CClientDC   dc(this);
+	CTaiShanReportView* pView = (CTaiShanReportView*)GetParent();
+	CClientDC dc(this);
 
-    if(points.x > m_barstartplace.x - 5)
+	if (points.x > m_barstartplace.x - 5)
 	{
-	   SetCursor(::LoadCursor(NULL,IDC_SIZEWE));
-       m_nMovebar = 1;
-    }
+		SetCursor(LoadCursor(NULL, IDC_SIZEWE));
+		m_nMovebar = 1;
+	}
 	else
 	{
-	  m_nMovebar = 0;
-      int nSplitx=m_nBeginX;
-	  for(int i=m_nFirstPage;i<m_nEndPage;i++)
-	  {
-	
-		if((points.x >nSplitx) && (points.x <nSplitx+PageWidth[i]))
+		m_nMovebar = 0;
+		int nSplitx = m_nBeginX;
+		for (int i = m_nFirstPage; i < m_nEndPage; i++)
 		{
-			if(i!=m_nActivePage)
+			if ((points.x > nSplitx) && (points.x < nSplitx + PageWidth[i]))
 			{
-			
-                if((nSplitx+PageWidth[i])>m_barstartplace.x)
-					m_bMove=TRUE;
-				else
-					m_bMove=FALSE;
+				if (i != m_nActivePage)
+				{
+					if ((nSplitx + PageWidth[i]) > m_barstartplace.x)
+					{
+						m_bMove = TRUE;
+					}
+					else
+					{
+						m_bMove = FALSE;
+					}
 
+					m_nActivePage = i;
+					ShowAllPage((CDC*)&dc);
 
-				m_nActivePage=i; 
-                ShowAllPage((CDC*)&dc);				
-                
- 				pView->PostMessage(WM_SHOWTYPE,0,0);
-				pView->ChangeToPage(m_nActivePage);
- 				return true; 
+					pView->PostMessage(WM_SHOWTYPE, 0, 0);
+					pView->ChangeToPage(m_nActivePage);
+
+					return TRUE; 
+				}
 			}
+
+			nSplitx += PageWidth[i]; 
 		}
-		nSplitx+=PageWidth[i]; 
-	  }
 	}
-	return false;
+
+	return FALSE;
+}
+
+void CPageWnd::OnLButtonDown(UINT nFlags, CPoint points)
+{
+	if (!DoLButtonDown(nFlags, points))
+	{
+		DoRButtonDown(nFlags, points);
+	}
+}
+
+void CPageWnd::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	m_nMovebar = 0;
+	ReleaseCapture();
+
+	CWnd::OnLButtonUp(nFlags, point);
+}
+
+void CPageWnd::OnRButtonDown(UINT nFlags, CPoint point)
+{
+	DoRButtonDown(nFlags,  point);
+	CWnd::OnRButtonDown(nFlags, point);
 }

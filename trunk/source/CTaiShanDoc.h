@@ -337,7 +337,6 @@ public:
 	int m_nSharesSzEb;
 	int m_CalcBlockCounts;
 
-	int m_nCurrentPage;                        
 
 	CArray<SharesSymbol,SharesSymbol&> m_ScreenList;
 	struct tm m_week;
@@ -358,7 +357,6 @@ public:
 	BOOL m_bCloseReceiver;
 	BOOL m_bOpenStockTypeDlg;
 
-	STOCKDATASHOW  *m_pStockDataShow;
 	int m_nShowMaxCount;
 	CMapNewsFileName m_NewsFileNameMap;                      
 
@@ -374,7 +372,6 @@ public:
     Aidx1 *Adat[2];   
 	int InitSetp;
 
-	int m_nPreDisplayRow;  
 
 
 	CTaiShanReportView *m_WsStock2000View;
@@ -396,7 +393,6 @@ public:
 	void LoadStockData(int mode);                              
     void CreateFileData(int mode);                              
 	void LoadFileData(int mode);                             
-	void GetStockCount();                                       
     float OnCalcDpTidxdData(int which_stk);                     
 	long GetStockDay(time_t time )    ;                     
     void StockCloseWork();
@@ -428,14 +424,22 @@ protected:
 	void InitializeKeyBoardAngle(BOOL IsAddStock);
 
 protected:
-	void CheckKind();
 	//{{AFX_MSG(CTaiShanDoc)
 	afx_msg void OnOpenDocument();
 	afx_msg void OnToolClosework();
 	//}}AFX_MSG
 
 public:
-	BOOL	m_bCloseWorkDone;		// 是否已经收盘
+	int		m_nPreDisplayRow;			// 列表显示行数
+	int		m_nCurrentPage;				// 当前显示页
+
+	STOCKDATASHOW*	m_pStockDataShow;	// 列表显示数据
+
+public:
+	BOOL	m_bCloseWorkDone;			// 是否已经收盘
+
+protected:
+	void CheckKind();
 
 public:
 	void OnCalcHqDataProgress();

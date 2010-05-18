@@ -1,5 +1,3 @@
-// Stock2000View.cpp : implementation of the CTaiShanReportView class
-
 
 #include "stdafx.h"
 #include "afxwin.h"
@@ -1509,70 +1507,6 @@ void CTaiShanReportView::LoadShowData(int nKind)
 
 }
 
-
-void CTaiShanReportView::ChangeToPage(int nPage,BOOL NewTjxg)
-{
-	if(nPage>TJXGPAGE) 
-	{
-		ASSERT(FALSE);
-		nPage = TJXGPAGE;
-	}
-
-	m_LoopDisplay=FALSE;
-	CTaiShanDoc* pDoc = GetDocument();
-	int tempPage;
-    m_pGrid->SetSortColumn(-1 ,TRUE);
-
-	m_pGrid->ClearSortColumn();
-    m_pGrid->SetFocus();
-
-    m_pGrid->SetFocusRow(1); 
-   	m_pGrid->SetMouseState(MOUSE_NOTHINGS);
-    pDoc->m_nCurrentPage=nPage;
-    m_PageWnd->m_nActivePage=nPage;
-
-
-
-	int nType;
-	nType = GetStockTypeFromPageWnd(nPage);
-	if(nType>=0)
-	{
-        SetShowData(pDoc,pDoc->m_sharesInformation.GetStockTypeCount(nType));
-	}
-
-	if(nPage==CHOOSEPAGE)                    
-	{
-       ChangeToChoose(pDoc);
-	   return ;
-	}
-	if(nPage==STKTYPEPAGE)                    
-	{
-       ChangeToStockType(pDoc,pDoc->m_SystemInitData.StockTypeName);
-	   return;
-	}
-	if(nPage==TJXGPAGE)
-	{
-	   if(NewTjxg)
-          ChangeToTjxg(pDoc);
-       else if(strcmp(pDoc->m_SystemInitData.ScreenStockName,"条件选股")==0)
-		   ChangeToTjxg(pDoc,TRUE);
-	   else
-          ChangeToTjxg(pDoc,pDoc->m_SystemInitData.ScreenStockName);
-	   return;
-	}
-
-
-
-	m_pGrid->SetRealRow(pDoc->m_sharesInformation.GetStockTypeCount(nType)+1); 
-    m_pGrid->SetScrollPos32(SB_VERT, 0, TRUE);
-
-	pDoc->m_sharesInformation.RecvStockDataForType(pDoc->m_pStockDataShow,nType);
-
-	CHistoryDlg::DoHistory(pDoc->m_pStockDataShow, pDoc->m_sharesInformation.GetStockTypeCount(nType),this);
-
-    m_pGrid->Invalidate();                         
-	pDoc->m_nPreDisplayRow=pDoc->m_sharesInformation.GetStockTypeCount(nType);       
-}
 BOOL CTaiShanReportView::ChangeToTjxg(CTaiShanDoc* pDoc,CString m_StockType)
 {
 	BLOCKSTOCK * blocknow;
@@ -1771,57 +1705,6 @@ void CTaiShanReportView::ChangeToTjxg(CTaiShanDoc* pDoc,BOOL IsNewTjxg)
     pDoc->m_nPreDisplayRow=DisplayCount;       
 }
 
-
-
-void CTaiShanReportView::ChangeToChoose(CTaiShanDoc* pDoc)
-{
-	SymbolKindArr l_StockArray;
-	pDoc->m_ManagerStockTypeData.GetChooseStockCode(l_StockArray);
-	int DisplayCount=l_StockArray.GetSize();
-
-    SetShowData(pDoc,DisplayCount);
-	pDoc->m_StockTypeMap[0].RemoveAll();
-
-    
-	int index=0;
-	for(int row=0 ;row <  (int)DisplayCount  ;row++)       
-	{
-		 CReportData *Cdat;
-         SymbolKind l_SymbolKind=l_StockArray.GetAt(row);
-	 	 if (pDoc->m_sharesInformation.Lookup(l_SymbolKind.m_chSymbol , Cdat,l_SymbolKind.m_nSymbolKind) == TRUE)     //检测该股票是否已记录在内存模板中
-		 {
-			 CString Code=Cdat->id;
-			 CString zqdmkind=pDoc->GetStockKindString(l_SymbolKind.m_nSymbolKind);
-			 zqdmkind+=Code;
-		
-             pDoc->m_pStockDataShow[index ].pItem=Cdat;
-
-             strcpy(pDoc->m_pStockDataShow[index ].StockId,Cdat->id); 
-             pDoc->m_StockTypeMap[0][zqdmkind]=Code;
-			 index++;
-		 }
-	}
-	CHistoryDlg::DoHistory(pDoc->m_pStockDataShow, index,this);
-
-	m_pGrid->SetRealRow(index+1); 
-    m_pGrid->SetScrollPos32(SB_VERT, 0, TRUE);
-    m_pGrid->Invalidate();                           
-
-	UINT TotRow=0;
-    if(DisplayCount > m_nRows)
-	{
-		TotRow=DisplayCount +5;
- 		try { m_pGrid->SetRowCount(TotRow); }
-		catch (CMemoryException* e)
-		{
-			e->ReportError();
-			e->Delete();
-			return;
-		}
-		m_nRows=TotRow;
-	}
-	pDoc->m_nPreDisplayRow=DisplayCount;
-}
 
 
 BOOL CTaiShanReportView::ChangeToStockType(CTaiShanDoc* pDoc,CString m_StockType) 
@@ -7480,4 +7363,128 @@ void CTaiShanReportView::SetColumnWidth()
 			pDoc->m_nColumnWidth[i]=m_pGrid->GetColumnWidth(i);
 	}
 
+}
+
+void CTaiShanReportView::ChangeToChoose(CTaiShanDoc* pDoc)
+{
+	SymbolKindArr l_StockArray;
+	pDoc->m_ManagerStockTypeData.GetChooseStockCode(l_StockArray);
+	int DisplayCount = l_StockArray.GetSize();
+
+	SetShowData(pDoc, DisplayCount);
+	pDoc->m_StockTypeMap[0].RemoveAll();
+
+
+	int index = 0;
+	for (int row = 0; row < (int)DisplayCount; row++)
+	{
+		CReportData* Cdat;
+		SymbolKind l_SymbolKind = l_StockArray.GetAt(row);
+		if (pDoc->m_sharesInformation.Lookup(l_SymbolKind.m_chSymbol, Cdat, l_SymbolKind.m_nSymbolKind) == TRUE)
+		{
+			CString Code = Cdat->id;
+			CString zqdmkind = pDoc->GetStockKindString(l_SymbolKind.m_nSymbolKind);
+			zqdmkind += Code;
+			pDoc->m_pStockDataShow[index].pItem = Cdat;
+			strcpy(pDoc->m_pStockDataShow[index].StockId, Cdat->id);
+			pDoc->m_StockTypeMap[0][zqdmkind] = Code;
+			index++;
+		}
+	}
+
+	CHistoryDlg::DoHistory(pDoc->m_pStockDataShow, index, this);
+
+	m_pGrid->SetRealRow(index + 1);
+	m_pGrid->SetScrollPos32(SB_VERT, 0, TRUE);
+	m_pGrid->Invalidate();
+
+	UINT TotRow = 0;
+	if (DisplayCount > m_nRows)
+	{
+		TotRow = DisplayCount + 5;
+
+		try
+		{
+			m_pGrid->SetRowCount(TotRow);
+		}
+		catch (CMemoryException* e)
+		{
+			e->ReportError();
+			e->Delete();
+			return;
+		}
+
+		m_nRows = TotRow;
+	}
+
+	pDoc->m_nPreDisplayRow = DisplayCount;
+}
+
+void CTaiShanReportView::ChangeToPage(int nPage,BOOL NewTjxg)
+{
+	if (nPage > TJXGPAGE)
+	{
+		ASSERT(FALSE);
+		nPage = TJXGPAGE;
+	}
+
+	m_LoopDisplay = FALSE;
+	CTaiShanDoc* pDoc = GetDocument();
+
+	m_pGrid->SetSortColumn(-1 ,TRUE);
+	m_pGrid->ClearSortColumn();
+	m_pGrid->SetFocus();
+	m_pGrid->SetFocusRow(1); 
+	m_pGrid->SetMouseState(MOUSE_NOTHINGS);
+
+	pDoc->m_nCurrentPage = nPage;
+	m_PageWnd->m_nActivePage = nPage;
+
+
+	int nType;
+	nType = GetStockTypeFromPageWnd(nPage);
+	if (nType >= 0)
+	{
+		SetShowData(pDoc, pDoc->m_sharesInformation.GetStockTypeCount(nType));
+	}
+
+	if (nPage == CHOOSEPAGE)
+	{
+		ChangeToChoose(pDoc);
+		return;
+	}
+
+	if (nPage == STKTYPEPAGE)
+	{
+		ChangeToStockType(pDoc, pDoc->m_SystemInitData.StockTypeName);
+		return;
+	}
+
+	if (nPage == TJXGPAGE)
+	{
+		if (NewTjxg)
+		{
+			ChangeToTjxg(pDoc);
+		}
+		else if (strcmp(pDoc->m_SystemInitData.ScreenStockName, "条件选股") == 0)
+		{
+			ChangeToTjxg(pDoc, TRUE);
+		}
+		else
+		{
+			ChangeToTjxg(pDoc, pDoc->m_SystemInitData.ScreenStockName);
+		}
+		return;
+	}
+
+
+	m_pGrid->SetRealRow(pDoc->m_sharesInformation.GetStockTypeCount(nType) + 1);
+	m_pGrid->SetScrollPos32(SB_VERT, 0, TRUE);
+
+	pDoc->m_sharesInformation.RecvStockDataForType(pDoc->m_pStockDataShow, nType);
+
+	CHistoryDlg::DoHistory(pDoc->m_pStockDataShow, pDoc->m_sharesInformation.GetStockTypeCount(nType), this);
+
+	m_pGrid->Invalidate();
+	pDoc->m_nPreDisplayRow = pDoc->m_sharesInformation.GetStockTypeCount(nType);
 }

@@ -176,11 +176,8 @@ CTaiShanDoc::CTaiShanDoc()
 	m_stkKind=0;
 	m_NineShowView = NULL;
 	m_nCurrentPage=0;
-	m_nPreDisplayRow=0;
 	m_nIsClose=FALSE;
 
-	m_pStockDataShow=NULL;
-	m_nShowMaxCount=0;
 	m_sharesCompute.SetMainDocument(this);
 	InitSetp=0;
 	m_taiViewF9 = NULL;
@@ -201,21 +198,22 @@ CTaiShanDoc::CTaiShanDoc()
 	{
 		m_nColumnWidth[j]=60;
 	}
+
+	m_nPreDisplayRow = 0;
+	m_pStockDataShow = NULL;
 }
 
 CTaiShanDoc::~CTaiShanDoc()
 {
-    ((CMainFrame *)(AfxGetApp()->m_pMainWnd))->m_taiShanDoc=NULL; 
-    ((CMainFrame *)(AfxGetApp()->m_pMainWnd))->m_MDIChildWnd =NULL; 
-#ifndef OEM
-
-#endif
+	((CMainFrame *)(AfxGetApp()->m_pMainWnd))->m_taiShanDoc = NULL;
+	((CMainFrame *)(AfxGetApp()->m_pMainWnd))->m_MDIChildWnd = NULL;
 	m_NineShowView = NULL;
-     if(m_pStockDataShow)
-	 {
-		 GlobalUnlock((HGLOBAL)m_pStockDataShow);       
-		 GlobalFree((HGLOBAL)m_pStockDataShow);
-	 }
+
+	if (m_pStockDataShow)
+	{
+		GlobalUnlock((HGLOBAL)m_pStockDataShow);
+		GlobalFree((HGLOBAL)m_pStockDataShow);
+	}
 }
 
 
@@ -879,11 +877,6 @@ int CTaiShanDoc::GetStocktime(int mode)
 
 
 
-void CTaiShanDoc::GetStockCount()
-{
-
-}
-
 
 
 long CTaiShanDoc::GetStockDay(time_t time)
@@ -1115,43 +1108,48 @@ void CTaiShanDoc::ClearRealData()
 
 void CTaiShanDoc::CheckKind()
 {
-	//for (int i = 0; i < STOCKTYPE; i++)
-	//{
-	//	int temp = m_sharesInformation.GetStockTypeCount(i);
-	//	for (int j = 0; j < temp; j++)
-	//	{
-	//		CReportData* Cdat;
-	//		CString StockId;
-	//		m_sharesInformation.GetStockItem(i, j, Cdat);
-	//		if (Cdat == NULL)
-	//			continue;
+	for (int i = 0; i < STOCKTYPE; i++)
+	{
+		int temp = m_sharesInformation.GetStockTypeCount(i);
+		for (int j = 0; j < temp; j++)
+		{
+			CReportData* Cdat;
+			CString StockId;
+			m_sharesInformation.GetStockItem(i, j, Cdat);
+			if (Cdat == NULL)
+				continue;
 
-	//		StockId = Cdat->id;
-	//		if (StockId.GetLength() < 4)
-	//			continue;
+			StockId = Cdat->id;
+			if (StockId.GetLength() < 4)
+				continue;
 
-	//		if (Cdat->kind == SHAG)
-	//		{
-	//			if (StockId[0] == '5')
-	//			{
-	//				Cdat->kind = SHJIJIN;
-	//			}
-	//		}
-	//		if (Cdat->kind == SZAG)
-	//		{
-	//			if (StockId[0] == '1')
-	//			{
-	//				if (StockId[1] == '7' || StockId[1] == '8')
-	//				{
-	//					Cdat->kind = SZJIJIN;
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+			int nKind = m_sharesInformation.GetStockKind(Cdat->wMarket, Cdat->id);
+			if (nKind != Cdat->kind)
+			{
+				m_sharesInformation.MoveStock(Cdat->id, Cdat->kind, nKind);
+				j--;
+			}
+
+			//if (Cdat->kind == SHAG)
+			//{
+			//	if (StockId[0] == '5')
+			//	{
+			//		Cdat->kind = SHJIJIN;
+			//	}
+			//}
+			//if (Cdat->kind == SZAG)
+			//{
+			//	if (StockId[0] == '1')
+			//	{
+			//		if (StockId[1] == '7' || StockId[1] == '8')
+			//		{
+			//			Cdat->kind = SZJIJIN;
+			//		}
+			//	}
+			//}
+		}
+	}
 }
-
-
 
 void CTaiShanDoc::OnCalcHqDataProgress()
 {
@@ -1188,33 +1186,40 @@ void CTaiShanDoc::OnCalcHqDataProgress()
 	m_BlockCalcTime++;
 	if(m_BlockCalcTime>=100)
 		m_BlockCalcTime=0;
-	CReportData *p1A0001,*p2A01,*p2D01;
-	m_sharesInformation.Lookup((CSharesCompute::GetIndexSymbol(0)).GetBuffer(0),p1A0001,SHZS);
-	m_sharesInformation.Lookup((CSharesCompute::GetIndexSymbol(1)).GetBuffer(0),p2A01,SZZS);
+
+
+	// ×´Ì¬À¸ÏÔÊ¾Ö¸Êý
+	CReportData *p1A0001, *p2A01, *p2D01;
+	m_sharesInformation.Lookup((CSharesCompute::GetIndexSymbol(0)).GetBuffer(0), p1A0001, SHZS);
+	m_sharesInformation.Lookup((CSharesCompute::GetIndexSymbol(1)).GetBuffer(0), p2A01, SZZS);
 	CString seb = CSharesCompute::GetIndexSymbol(2);
-	m_sharesInformation.Lookup(seb.GetBuffer (0),p2D01,2);
-	if(p1A0001!=NULL&&p2A01!=NULL)
+	m_sharesInformation.Lookup(seb.GetBuffer(0), p2D01, 2);
+
+	if (p1A0001 != NULL && p2A01 != NULL)
 	{
-		if(p1A0001->nowp==0)
-			((CMainFrame *)(AfxGetApp()->m_pMainWnd))->DisplayBargain(
-			0,0,0,0,
-			0,0,0,0,
-			0,0,0,0,
-			0.5 ,0.5 ,0);
-		else if(p2D01!=NULL)
+		if (p1A0001->nowp == 0)
 		{
-			((CMainFrame *)(AfxGetApp()->m_pMainWnd))->DisplayBargain(
-				p1A0001->nowp ,p1A0001->nowp - p1A0001->ystc ,p1A0001->totv,p1A0001->totp/10000,
-				p2A01->nowp ,p2A01->nowp - p2A01->ystc,p2A01->totv ,p2A01->totp/100000000,
-				p2D01->nowp ,p2D01->nowp - p2D01->ystc,p2D01->totv ,p2D01->totp/100000000,
-				rd_sh/100,rd_sz/100,rd_eb/100);
-		}else
+			((CMainFrame*)(AfxGetApp()->m_pMainWnd))->DisplayBargain(
+				0, 0, 0, 0,
+				0, 0, 0, 0,
+				0, 0, 0, 0,
+				0.5, 0.5, 0);
+		}
+		else if (p2D01 != NULL)
 		{
-			((CMainFrame *)(AfxGetApp()->m_pMainWnd))->DisplayBargain(
-				p1A0001->nowp ,p1A0001->nowp - p1A0001->ystc ,p1A0001->totv,p1A0001->totp/100000000,
-				p2A01->nowp ,p2A01->nowp - p2A01->ystc,p2A01->totv ,p2A01->totp/100000000,
-				0,0,0,0,
-				rd_sh/100,rd_sz/100,rd_eb/100);
+			((CMainFrame*)(AfxGetApp()->m_pMainWnd))->DisplayBargain(
+				p1A0001->nowp, p1A0001->nowp - p1A0001->ystc, p1A0001->totv, p1A0001->totp / 10000,
+				p2A01->nowp, p2A01->nowp - p2A01->ystc, p2A01->totv, p2A01->totp / 100000000,
+				p2D01->nowp, p2D01->nowp - p2D01->ystc, p2D01->totv, p2D01->totp / 100000000,
+				rd_sh / 100, rd_sz / 100, rd_eb / 100);
+		}
+		else
+		{
+			((CMainFrame*)(AfxGetApp()->m_pMainWnd))->DisplayBargain(
+				p1A0001->nowp, p1A0001->nowp - p1A0001->ystc, p1A0001->totv, p1A0001->totp / 100000000,
+				p2A01->nowp, p2A01->nowp - p2A01->ystc, p2A01->totv, p2A01->totp / 100000000,
+				0, 0, 0, 0,
+				rd_sh / 100, rd_sz / 100, rd_eb / 100);
 		}
 	}
 

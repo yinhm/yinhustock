@@ -1,6 +1,3 @@
-// CTaiKlineFileKLine.h: interface for the CTaiKlineFileKLine class.
-//
-//////////////////////////////////////////////////////////////////////
 
 #if !defined(AFX_LMBFILEKLINE_H__8E7B3BE7_C684_11D3_96E4_0080C8E1242B__INCLUDED_)
 #define AFX_LMBFILEKLINE_H__8E7B3BE7_C684_11D3_96E4_0080C8E1242B__INCLUDED_
@@ -46,9 +43,8 @@ public:
 	int ReadKlinePeriod(int nIndex, Kline *&kline, CTime& timeStart, CTime& timeEnd,int nAddBlank=0 );
 	int ReadKlineAccordingTime(CString symbol, Kline *&kline, CTime& time,int nCount = 2,int nAddBlank = 48);
 
-	bool WriteKLineToRepair(CString symbol,Kline* pKline,int nWrite);
 	static int LookTwoPath(time_t& tmt ,Kline* pKline,int nMax,bool& bAdd,bool bDay);
-	int TimeToFoot(KLINE_SMALLHEAD* pKlineSmallHead,CTime& tm,bool& bAdd/*[in]*/);
+	int TimeToFoot(KLINE_SMALLHEAD* pKlineSmallHead,CTime& tm,BOOL& bAdd/*[in]*/);
 	enum InstallMode {
 		overWriteAll =    0x00,
 		insert =  0x01,
@@ -56,7 +52,6 @@ public:
 		};
 	int ReadKlinePeriod(CString symbol, Kline *&kline, CTime& timeStart, CTime& timeEnd,bool istotaldata = false,int nAddBlank = 0);//读取一段时间的K线数据
 	bool WriteKLine(CString symbol,Kline* pKline,int nWrite,int nType);	
-	bool WriteKlinePeriod(CString symbol, Kline *pKline,int nKline, CTime& timeStart, CTime& timeEnd);//写一段时间的K线数据
 
 
 	static int RegularTime(int time,bool bDay);
@@ -83,7 +78,7 @@ public:
 	static CTaiKlineFileKLine* m_fileMin5Sh;
 	static CTaiKlineFileKLine* m_fileMin5Sz;
 
-public:
+protected:
 	int m_kindKline;
 	int m_nMarket;
 	BOOL m_bFirstWrite;
@@ -127,6 +122,9 @@ public:
 	int ReadKLine(int nIndex, Kline*& pKline, int nRead);
 	int ReadKLine(CString symbol, Kline*& pKline, int nRead = -1, int nAddBlank = 0);
 	void DeleteKlineData(CString symbol, int nFoot, int nCount = 1);
+
+	BOOL WriteKlinePeriod(CString symbol, Kline* pKline, int nKline, CTime& timeStart, CTime& timeEnd);
+	BOOL WriteKLineToRepair(CString symbol, Kline* pKline, int nWrite);
 };
 
 #endif // !defined(AFX_LMBFILEKLINE_H__8E7B3BE7_C684_11D3_96E4_0080C8E1242B__INCLUDED_)

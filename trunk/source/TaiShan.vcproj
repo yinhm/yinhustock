@@ -60,8 +60,7 @@
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"
-				BrowseInformation="2"
-				BrowseInformationFile=".\Debug/"
+				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
@@ -161,8 +160,7 @@
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
-				BrowseInformation="2"
-				BrowseInformationFile=".\Release/"
+				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 			/>
@@ -884,28 +882,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="CSharesCompute.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="CSharesDetailDays.cpp"
 				>
 				<FileConfiguration
@@ -951,28 +927,6 @@
 			</File>
 			<File
 				RelativePath="CSharesDetailList.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="CSharesInformation.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2077,28 +2031,6 @@
 			</File>
 			<File
 				RelativePath="LBsInfoRS.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="ldao.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -3811,10 +3743,6 @@
 				>
 			</File>
 			<File
-				RelativePath="CSharesCompute.h"
-				>
-			</File>
-			<File
 				RelativePath="CSharesDetailDays.h"
 				>
 			</File>
@@ -3824,10 +3752,6 @@
 			</File>
 			<File
 				RelativePath="CSharesDetailList.h"
-				>
-			</File>
-			<File
-				RelativePath="CSharesInformation.h"
 				>
 			</File>
 			<File
@@ -4036,10 +3960,6 @@
 			</File>
 			<File
 				RelativePath="LBsInfoRS.h"
-				>
-			</File>
-			<File
-				RelativePath="ldao.h"
 				>
 			</File>
 			<File
@@ -4328,10 +4248,6 @@
 			</File>
 			<File
 				RelativePath="ToolBarEx.h"
-				>
-			</File>
-			<File
-				RelativePath="totalh.h"
 				>
 			</File>
 			<File
@@ -6520,32 +6436,6 @@
 				>
 			</File>
 			<File
-				RelativePath="CTaiKlineFileHS.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="CTaiKlineFileHS.h"
-				>
-			</File>
-			<File
 				RelativePath="CTaiKlineMoveChenben.cpp"
 				>
 				<FileConfiguration
@@ -6602,6 +6492,32 @@
 			Name="Receiver"
 			>
 			<File
+				RelativePath="CSharesCompute.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="CSharesCompute.h"
+				>
+			</File>
+			<File
 				RelativePath=".\StkReceiver.cpp"
 				>
 			</File>
@@ -6613,6 +6529,58 @@
 		<Filter
 			Name="Database"
 			>
+			<File
+				RelativePath="CSharesInformation.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="CSharesInformation.h"
+				>
+			</File>
+			<File
+				RelativePath="CTaiKlineFileHS.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="CTaiKlineFileHS.h"
+				>
+			</File>
 			<File
 				RelativePath="CTaiKlineFileKLine.cpp"
 				>
@@ -6663,6 +6631,14 @@
 			</File>
 			<File
 				RelativePath="CTaiKlineMemFile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StkDatabase.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\StkDatabase.h"
 				>
 			</File>
 			<File
