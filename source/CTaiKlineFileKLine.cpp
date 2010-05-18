@@ -1,6 +1,3 @@
-// CTaiKlineFileKLine.cpp: implementation of the CTaiKlineFileKLine class.
-//
-//////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
 #include "CTaiShanApp.h"
@@ -8,11 +5,8 @@
 
 #include "MainFrm.h"
 #include "CTaiShanDoc.h"
-//#include "CTaiScreenParent.h"
 #include "CTaiKlineFileHS.h"
 #include "CTaiKlineTransferKline.h"
-//#include "GetSetReg.h"
-//#include <io.h>
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -216,7 +210,7 @@ int CTaiKlineFileKLine::LookTwoPath(time_t& tmt ,Kline *pKline, int nMax, bool &
 
 
 }
-int CTaiKlineFileKLine::TimeToFoot(KLINE_SMALLHEAD* pKlineSmallHead,CTime &tm,bool& bAdd)//according the time ,to compute the foot of kline in file.
+int CTaiKlineFileKLine::TimeToFoot(KLINE_SMALLHEAD* pKlineSmallHead,CTime &tm,BOOL& bAdd)//according the time ,to compute the foot of kline in file.
 {
 	int nCount = pKlineSmallHead->numKln ;
 	bAdd = false;
@@ -272,7 +266,7 @@ int CTaiKlineFileKLine::TimeToFoot(KLINE_SMALLHEAD* pKlineSmallHead,CTime &tm,bo
 		else nMax =(nCount)%FixedKlinePerBlock;
 
 
-		rtn = LookTwoPath(tmt ,pKline,  nMax, bAdd,(m_kindKline+1)%2);
+		rtn = LookTwoPath(tmt ,pKline,  nMax, (bool&)bAdd,(m_kindKline+1)%2);
 		if(i<(nCount-1)/FixedKlinePerBlock)
 		{
 			if(rtn ==  -1&&bAdd == true)
@@ -315,7 +309,7 @@ int CTaiKlineFileKLine::TimeToFoot(KLINE_SMALLHEAD* pKlineSmallHead,CTime &tm,bo
 			else nMax =nCount;
 			//end
 
-			rtn = LookTwoPath(tmt ,pKline,  nMax, bAdd,(m_kindKline+1)%2);
+			rtn = LookTwoPath(tmt ,pKline,  nMax, (bool&)bAdd,(m_kindKline+1)%2);
 			if(rtn ==  -1&&bAdd == true) rtn = nMax;
 
 		}
@@ -342,7 +336,7 @@ int CTaiKlineFileKLine::ReadKlinePeriod(CString symbol, Kline *&kline, CTime& ti
 
 	if(kline != NULL)
 		delete [] kline ;
-	bool bAdd;
+	BOOL bAdd;
 
 	int nFootB = TimeToFoot(pKlineSmallHead,timeStart, bAdd);
 	if(nFootB ==  -1&&bAdd == true)
@@ -481,7 +475,7 @@ bool CTaiKlineFileKLine::WriteKLine(CString symbol,Kline* pKline,int nWrite,int 
 
 
 	CTime timeStart((time_t)pKline[0].day );
-	bool bAdd;
+	BOOL bAdd;
 	int nFootB = TimeToFoot(pKlineSmallHead,timeStart, bAdd);
 	if(nFootB == -1 )
 	{
@@ -626,12 +620,6 @@ bool CTaiKlineFileKLine::WriteKLine(CString symbol,Kline* pKline,int nWrite,int 
 
 }
 
-bool CTaiKlineFileKLine::WriteKlinePeriod(CString symbol, Kline *pKline,int nKline, CTime& timeStart, CTime& timeEnd)//写一段时间的K线数据
-{
-
-	return true;
-}
-
 int CTaiKlineFileKLine::CreateOrMoveSmallBlock(KLINE_SMALLHEAD *pKlineSmallHead,int& nBlock)//to create a new block,or move
 
 {
@@ -722,39 +710,6 @@ int CTaiKlineFileKLine::CreateOrMoveSmallBlock(KLINE_SMALLHEAD *pKlineSmallHead,
 		m_bFirstWrite = false;
 	}
 	return 0;
-
-}
-
-bool CTaiKlineFileKLine::WriteKLineToRepair(CString symbol, Kline *pKline, int nWrite)//to repair day kline in real time
-{
-	ASSERT(nWrite>0);
-	if(nWrite<=0)
-		return false;
-
-	bool bAdd;
-
-	CTime timeStart((time_t)pKline[0].day );
-
-	KLINE_SMALLHEAD klineSmallHead;
-	KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-	int nIndexStock = GetKlineSmallHeader(symbol,pKlineSmallHead);
-
-	int nFootB = TimeToFoot(pKlineSmallHead,timeStart, bAdd);
-
-	if(nFootB != -1 && bAdd == false)
-	{
-		timeStart = CTime((time_t)pKline[nWrite-1].day );
-		int nFootE = TimeToFoot(pKlineSmallHead,timeStart, bAdd);
-		if(nFootE!= -1 && bAdd == false)
-		{
-			if(nFootE-nFootB+1==nWrite)
-				return false;
-		}
-	}
-
-	WriteKLine( symbol, pKline,nWrite,0);
-
-	return true;
 
 }
 
@@ -1758,6 +1713,43 @@ void CTaiKlineFileKLine::DeleteKlineData(CString symbol, int nFoot, int nCount)
 
 	if (pKline == NULL)
 		delete []pKline;
+}
+
+BOOL CTaiKlineFileKLine::WriteKlinePeriod(CString symbol, Kline* pKline, int nKline, CTime& timeStart, CTime& timeEnd)
+{
+	return TRUE;
+}
+
+BOOL CTaiKlineFileKLine::WriteKLineToRepair(CString symbol, Kline* pKline, int nWrite)
+{
+	ASSERT(nWrite > 0);
+	if (nWrite <= 0)
+	{
+		return FALSE;
+	}
+
+	BOOL bAdd;
+	CTime timeStart((time_t)pKline[0].day);
+
+	KLINE_SMALLHEAD klineSmallHead;
+	KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
+	int nIndexStock = GetKlineSmallHeader(symbol, pKlineSmallHead);
+
+	int nFootB = TimeToFoot(pKlineSmallHead, timeStart, bAdd);
+	if (nFootB != -1 && bAdd == FALSE)
+	{
+		timeStart = CTime((time_t)pKline[nWrite - 1].day);
+		int nFootE = TimeToFoot(pKlineSmallHead, timeStart, bAdd);
+		if (nFootE != -1 && bAdd == FALSE)
+		{
+			if (nFootE - nFootB + 1 == nWrite)
+				return FALSE;
+		}
+	}
+
+	WriteKLine(symbol, pKline, nWrite, 0);
+
+	return TRUE;
 }
 
 /* ============================================================================

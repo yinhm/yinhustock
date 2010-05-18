@@ -76,8 +76,8 @@ enum {	SZEBPAGE=102};//STKINDEXPAGE =100,STKTYPEPAGE=101,
 
 
 // Codejock Software Components
-#define _XTP_STATICLINK
-#include <XTToolkitPro.h>
+//#define _XTP_STATICLINK
+//#include <XTToolkitPro.h>
 
 
 

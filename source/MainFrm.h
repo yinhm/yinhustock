@@ -25,7 +25,7 @@ class CTaiKlineDlgNeuralLearn;
 
 class CDialogMYXMZ;
 
-class CMainFrame : public CXTPMDIFrameWnd
+class CMainFrame : public CMDIFrameWnd
 {
 	DECLARE_DYNCREATE(CMainFrame)
 public:

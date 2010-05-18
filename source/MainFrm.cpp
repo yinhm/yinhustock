@@ -327,8 +327,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 	// Initialize the command bars
-	if (!InitCommandBars())
-		return -1;
+	//if (!InitCommandBars())
+	//	return -1;
 
 	// Get a pointer to the command bars object.
 	//CXTPCommandBars* pCommandBars = GetCommandBars();
@@ -346,7 +346,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//	return -1;      // fail to create
 	//}
 
-	//TSKReceiver()->StartEngine();
+	TSKReceiver()->StartEngine();
 
 	return 0;
 }

@@ -1,6 +1,3 @@
-// CSharesInformation.cpp: implementation of the CSharesInformation class.
-// by 俞明录
-//////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
 #include <share.h>
@@ -9,6 +6,7 @@
 #include "mainfrm.h"
 #include "CTaiShanDoc.h"
 #include "CSharesInformation.h"
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -58,13 +56,6 @@ CSharesInformation::~CSharesInformation()
    if(m_hFile)
 	 CloseHandle(m_hFile);
 }
-BOOL  CSharesInformation::RecvStockDataForType(PSTOCKDATASHOW &p,BYTE StockType) 
-{
-	if(m_hFile==NULL||m_hFileMap==NULL)
-		return FALSE;
-	memcpy(p,m_pData[StockType],m_pdwStockCurrentCount[StockType]*sizeof(STOCKDATASHOW));
-	return TRUE;
-}
 
 void CSharesInformation::SavePosToFile(int StockType)
 {
@@ -90,142 +81,133 @@ BOOL CSharesInformation::SavePosToFile()
 	 }
 	  return TRUE;
 }
-BOOL  CSharesInformation::InsertItem(char *StockId ,PCdat1 &pStockData, DWORD StockType)
+
+BOOL CSharesInformation::InsertItem(char* StockId, PCdat1& pStockData, DWORD StockType)
 {
-	int low=0;
-	int high=m_pdwStockCurrentCount[StockType] -1 ;
-	int mid=0;
-	int InsertPose=-1;
-    while(low <= high)
+	int low = 0;
+	int high = m_pdwStockCurrentCount[StockType] - 1;
+	int mid = 0;
+	int InsertPose = -1;
+	while (low <= high)
 	{
-		 mid=(low+high)/2;
-	     if(low==high)
-		    if(strcmp(StockId , m_pData[StockType][mid].StockId )>0)
+		mid = (low + high) / 2;
+		if (low == high)
+		{
+			if (strcmp(StockId, m_pData[StockType][mid].StockId) > 0)
 			{
-               if(m_pdwStockCurrentCount[StockType]==0||m_pdwStockCurrentCount[StockType]==mid)
-                  InsertPose=mid ;
-			   else
-                  InsertPose=mid +1;   
-			   break;
+				if (m_pdwStockCurrentCount[StockType] == 0 || m_pdwStockCurrentCount[StockType] == mid)
+				{
+					InsertPose = mid;
+				}
+				else
+				{
+					InsertPose = mid + 1;
+				}
+				break;
 			}
-		    else if(strcmp(StockId , m_pData[StockType][mid].StockId)<0)
+			else if (strcmp(StockId, m_pData[StockType][mid].StockId) < 0)
 			{
-			   InsertPose=mid ;
-			   break;
+				InsertPose = mid;
+				break;
 			}
 			else
 			{
-             pStockData=m_pData[StockType][mid].pItem ;
-			 return TRUE ;
+				pStockData = m_pData[StockType][mid].pItem;
+				return TRUE;
 			}
- 		 if(strcmp(m_pData[StockType][mid].StockId , StockId)>0) high=mid -1;
-         else if(strcmp(m_pData[StockType][mid].StockId , StockId)< 0 ) low=mid +1;
-		 else 
-		 {
-             pStockData=m_pData[StockType][mid].pItem ;
-			 return TRUE ;
-		 }
-	}
-	if(high<low)
-		InsertPose=low;
+		}
 
-	if(m_RealFileHead->StockCount+1>m_RealFileHead->MaxStockCount)
+		if (strcmp(m_pData[StockType][mid].StockId, StockId) > 0)
+		{
+			high = mid - 1;
+		}
+		else if (strcmp(m_pData[StockType][mid].StockId, StockId) < 0)
+		{
+			low = mid + 1;
+		}
+		else 
+		{
+			pStockData = m_pData[StockType][mid].pItem;
+			return TRUE;
+		}
+	}
+
+	if (high < low)
+	{
+		InsertPose = low;
+	}
+
+	if (m_RealFileHead->StockCount + 1 > m_RealFileHead->MaxStockCount)
 	{
 		return FALSE;
 	}
 
 
-	if(m_pdwStockCurrentCount[StockType] + 1 > m_dwStockMaxCount[StockType]) 
+	if (m_pdwStockCurrentCount[StockType] + 1 > m_dwStockMaxCount[StockType])
 	{
-        SetMemroyALLOCSize(StockType,m_pdwStockCurrentCount[StockType]);
+		SetMemroyALLOCSize(StockType, m_pdwStockCurrentCount[StockType]);
 	}
-	if(m_pdwStockCurrentCount[StockType] > InsertPose)
+
+	if (m_pdwStockCurrentCount[StockType] > InsertPose)
 	{
-       STOCKDATASHOW *ptemp;
-	   HGLOBAL	hMem;
-	   LPVOID hp;
-	   hMem = GlobalAlloc( GPTR, (m_pdwStockCurrentCount[StockType] - InsertPose )* sizeof( STOCKDATASHOW) );
-	   hp=GlobalLock(hMem);
-	   if(hp)
-	   {
-			ptemp= (STOCKDATASHOW *)hp;
-	   }
-	   else
-	   {
-			AfxMessageBox("分配内存出错",MB_ICONSTOP);
+		STOCKDATASHOW* ptemp;
+		HGLOBAL	hMem;
+		LPVOID hp;
+		hMem = GlobalAlloc(GPTR, (m_pdwStockCurrentCount[StockType] - InsertPose) * sizeof(STOCKDATASHOW));
+		hp = GlobalLock(hMem);
+		if (hp)
+		{
+			ptemp = (STOCKDATASHOW*)hp;
+		}
+		else
+		{
+			AfxMessageBox("分配内存出错", MB_ICONSTOP);
 			return FALSE;
-	   }
-	   memcpy(ptemp,&m_pData[StockType][InsertPose],(m_pdwStockCurrentCount[StockType] - InsertPose)*sizeof(STOCKDATASHOW));
-	   memcpy(&m_pData[StockType][InsertPose+1],ptemp,(m_pdwStockCurrentCount[StockType] - InsertPose)*sizeof(STOCKDATASHOW));
-       GlobalUnlock((HGLOBAL)ptemp);        
-	   GlobalFree( (HGLOBAL)ptemp);
-    }
-    m_pData[StockType][InsertPose].pItem=m_pMapData+m_RealFileHead->StockCount;
-	strcpy(m_pData[StockType][InsertPose].StockId,StockId);
-	m_RealFileHead->StockCount++;	
-    
-	memset(m_pData[StockType][InsertPose].pItem  ,0,sizeof(CReportData));
+		}
 
-	m_pData[StockType][InsertPose].pItem->pBaseInfo =NULL;
-	m_pData[StockType][InsertPose].pItem->pStockTypeInfo =NULL;
-	
-	m_pData[StockType][InsertPose].pItem->IsDelete=0;
+		memcpy(ptemp, &m_pData[StockType][InsertPose], (m_pdwStockCurrentCount[StockType] - InsertPose) * sizeof(STOCKDATASHOW));
+		memcpy(&m_pData[StockType][InsertPose + 1], ptemp, (m_pdwStockCurrentCount[StockType] - InsertPose) * sizeof(STOCKDATASHOW));
+		GlobalUnlock((HGLOBAL)ptemp);
+		GlobalFree((HGLOBAL)ptemp);
+	}
 
-    strcpy(m_pData[StockType][InsertPose].pItem->id  ,StockId);
-    m_pData[StockType][InsertPose].pItem->kind=StockType;
-	
-    pStockData=m_pData[StockType][InsertPose].pItem ;
-    m_pdwStockCurrentCount[StockType]++;
-//    SavePosToFile(StockType);
-    SaveRealDataToFile(m_RealFileHead,sizeof(REALDATA)+sizeof(long)*STOCKTYPE); 
-    SaveRealDataToFile(m_pData[StockType][InsertPose].pItem,sizeof(CReportData)); 
+	m_pData[StockType][InsertPose].pItem = m_pMapData + m_RealFileHead->StockCount;
+	strcpy(m_pData[StockType][InsertPose].StockId, StockId);
+	m_RealFileHead->StockCount++;
+
+	memset(m_pData[StockType][InsertPose].pItem, 0, sizeof(CReportData));
+
+	m_pData[StockType][InsertPose].pItem->pBaseInfo = NULL;
+	m_pData[StockType][InsertPose].pItem->pStockTypeInfo = NULL;
+
+	m_pData[StockType][InsertPose].pItem->IsDelete = 0;
+
+	strcpy(m_pData[StockType][InsertPose].pItem->id, StockId);
+	m_pData[StockType][InsertPose].pItem->kind = StockType;
+
+	pStockData = m_pData[StockType][InsertPose].pItem;
+	m_pdwStockCurrentCount[StockType]++;
+	//SavePosToFile(StockType);
+	SaveRealDataToFile(m_RealFileHead, sizeof(REALDATA) + sizeof(long) * STOCKTYPE);
+	SaveRealDataToFile(m_pData[StockType][InsertPose].pItem, sizeof(CReportData));
 
 	return TRUE;
 }
-BOOL  CSharesInformation::RemoveKey(char *StockId ,DWORD StockType) 
-{
-	int low=0;
-	int high=m_pdwStockCurrentCount[StockType] -1 ;
-	int mid=0;
-	int DeletePos=-1;
-    while(low <= high)
-	{
-		 mid=(low+high)/2;
-		 if(strcmp(m_pData[StockType][mid].StockId , StockId)>0) high=mid -1;
-         else if(strcmp(m_pData[StockType][mid].StockId  , StockId)< 0 ) low=mid +1;
-		 else 
-		 {
-			 DeletePos=mid;
-			 break;
-		 }
-	}
-    if(DeletePos==-1)
-	{
-		return FALSE;
-	}
-	m_pData[StockType][DeletePos].pItem->IsDelete=TRUE;
-	memmove(&m_pData[StockType][DeletePos],&m_pData[StockType][DeletePos +1],(m_pdwStockCurrentCount[StockType] - DeletePos -1 )*sizeof(STOCKDATASHOW));
-    m_pdwStockCurrentCount[StockType]--;
-	SavePosToFile(StockType);
-    SaveRealDataToFile(m_RealFileHead,0); 
-	return TRUE;
-}
+
 BOOL CSharesInformation::InitRealTimeDataEmpty()
 {
 	BYTE *temp;
 
-    long m_FileLength=sizeof(REALDATA)+STOCKTYPE*4+240*4*3+240*8*3+sizeof(CReportData)*2000;
-	m_hFile=CreateFile(g_realtime,GENERIC_READ|GENERIC_WRITE,
-		FILE_SHARE_READ|FILE_SHARE_WRITE,
-		NULL,
-		OPEN_ALWAYS,
-		FILE_ATTRIBUTE_NORMAL,
-		NULL);
+	long m_FileLength = sizeof(REALDATA) + STOCKTYPE * 4 + 240 * 4 * 3 + 240 * 8 * 3 + sizeof(CReportData) * 2000;
+
+	m_hFile = CreateFile(g_realtime, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+		OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (m_hFile == INVALID_HANDLE_VALUE)
 	{
 		AfxMessageBox("打开实时行情数据出错");
 		return FALSE; 
 	}
+
 	m_hFileMap=CreateFileMapping(m_hFile,
 		NULL,
 		PAGE_READWRITE,
@@ -252,25 +234,25 @@ BOOL CSharesInformation::InitRealTimeDataEmpty()
 		m_hFileMap=NULL;
 		return FALSE;
 	}
-    CTime m_Time = CTime::GetCurrentTime();
-    long currDay=((long)m_Time.GetYear())*10000L+(long)(m_Time.GetDay())+(long)(m_Time.GetMonth())*100;
+	CTime m_Time = CTime::GetCurrentTime();
+	long currDay=((long)m_Time.GetYear())*10000L+(long)(m_Time.GetDay())+(long)(m_Time.GetMonth())*100;
 
 	m_RealFileHead=(REALDATA *)m_pbData;
-    m_RealFileHead->filetitle =12345678;
+	m_RealFileHead->filetitle =12345678;
 	m_RealFileHead->MaxStockCount=2000; 
 	m_RealFileHead->StockCount =0;
 	m_RealFileHead->FileExitDone=87654321;
 	m_RealFileHead->Day=currDay;
-    m_RealFileHead->CloseWorkDone=FALSE;
+	m_RealFileHead->CloseWorkDone=FALSE;
 	m_RealFileHead->OldANT[0]=0;
 	m_RealFileHead->OldANT[1]=0;
 	m_RealFileHead->OldANT[2]=0;
 
-    temp=m_pbData+sizeof(REALDATA);
+	temp=m_pbData+sizeof(REALDATA);
 	m_pdwStockCurrentCount=(DWORD *)temp;
 	temp +=sizeof(int)*STOCKTYPE;
 	for(int j=0;j<STOCKTYPE;j++)
-        m_pdwStockCurrentCount[0]=0;
+		m_pdwStockCurrentCount[0]=0;
 
 	Nidx[0]=(Rsdn1 *)temp;		             
 	memset(Nidx[0],0,240*sizeof(Rsdn1));
@@ -278,41 +260,42 @@ BOOL CSharesInformation::InitRealTimeDataEmpty()
 
 	Nidx[1]=(Rsdn1 *)temp;		         
 	memset(Nidx[1],0,240*sizeof(Rsdn1));
- 	temp +=sizeof(Rsdn1)*240;
-	
+	temp +=sizeof(Rsdn1)*240;
+
 	Nidx[2]=(Rsdn1 *)temp;		               
 	memset(Nidx[1],0,240*sizeof(Rsdn1));
- 	temp +=sizeof(Rsdn1)*240;
+	temp +=sizeof(Rsdn1)*240;
 
-    Tidx[0]=(Tidxd *)temp;                       
- 	temp +=sizeof(Tidxd)*240;
+	Tidx[0]=(Tidxd *)temp;                       
+	temp +=sizeof(Tidxd)*240;
 	memset(Tidx[0],0,240*sizeof(Tidxd));
 
-    Tidx[1]=(Tidxd *)temp;                       
- 	temp +=sizeof(Tidxd)*240;
+	Tidx[1]=(Tidxd *)temp;                       
+	temp +=sizeof(Tidxd)*240;
 	memset(Tidx[1],0,240*sizeof(Tidxd));
 
-    Tidx[2]=(Tidxd *)temp;                       
- 	temp +=sizeof(Tidxd)*240;
+	Tidx[2]=(Tidxd *)temp;                       
+	temp +=sizeof(Tidxd)*240;
 	memset(Tidx[2],0,240*sizeof(Tidxd));
 
-    for (int j=0; j<240; j++)
+	for (int j=0; j<240; j++)
 	{
-       Tidx[0][j].sec5=Tidx[1][j].sec5=Tidx[2][j].sec5=9911;
+		Tidx[0][j].sec5=Tidx[1][j].sec5=Tidx[2][j].sec5=9911;
 	}
 	m_pMapData=(CReportData *)temp;	
-    for(int j=0;j<STOCKTYPE;j++)
+	for(int j=0;j<STOCKTYPE;j++)
 	{
-        if(!SetMemroyALLOCSize(j,5))
+		if(!SetMemroyALLOCSize(j,5))
 		{
 			AfxMessageBox("初始化数据变量出错");
 			return FALSE;
 		} 
 	}
 	InitEmptyDatabase();
-    SaveRealDataToFile(m_RealFileHead,sizeof(REALDATA)); 
+	SaveRealDataToFile(m_RealFileHead,sizeof(REALDATA)); 
 	return TRUE;
 }
+
 BOOL CSharesInformation::InitRealTimeData(CString path)
 {
     strcpy(m_sPath,path.GetBuffer(0)); 
@@ -520,10 +503,6 @@ BOOL CSharesInformation::MOdifyOneStockInfo(CString strStockCode,CString strStoc
 		 return TRUE;
 	}
 	return FALSE;
-}
-BOOL CSharesInformation::DeleteOneStockInfo(CString strStockCode,int nKind)
-{
-    return RemoveKey(strStockCode.GetBuffer(0),nKind );   	
 }
 
 int CSharesInformation::GetChuQuanInfo(CString strStockCode,int nKind,PSplit &pSplit)
@@ -953,36 +932,39 @@ DWORD CSharesInformation::GetStockKind(int MarketType, char* strLabel)
 
 	if (MarketType == SH_MARKET_EX)
 	{
-		return SHAG;
-		if (StockId[0] < '5' || StockId[0] == '7')
+		if ((StockId[1] == 'A') || (StockId[1] == 'B' ) || (StockId[1] == 'C') || (StockId[0] == '0' && StockId[1] == '0' && StockId[2] == '0'))
 		{
-			if ((StockId[1] == 'A') || (StockId[1] == 'B' ) || (StockId[1] == 'C'))
-			{
-				return SHZS;
-			}
-			else
-			{
-				return SHZQ;
-			}
+			return SHZS;
 		}
-		else if (StockId[0] == '5')
+
+		if (StockId[0] == '9' && StockId[1] == '0' && StockId[2] == '0')
+		{
+			return SHBG;
+		}
+
+		if (StockId[0] == '5')
 		{
 			return SHJIJIN; 
 		}
-		else
+
+		if ((StockId[0] == '0' && StockId[1] == '1') ||
+			(StockId[0] == '1' && StockId[1] == '1') ||
+			(StockId[0] == '1' && StockId[1] == '2') ||
+			(StockId[0] == '1' && StockId[1] == '3') ||
+			(StockId[0] == '2'))
 		{
-			if (StockId[0] < '9')
-			{
-				return SHAG;
-			}
-			else if (StockId[0] == '9')
-			{
-				return SHBG;
-			}
+			return SHZQ;
 		}
+
+		return SHAG;
 	}
 	else if (MarketType == SZ_MARKET_EX)
 	{
+		if (StockId[0] == '2' && StockId[1] == '0' && StockId[2] == '0')
+		{
+			return SZBG;
+		}
+
 		return SZAG;
 		if (strlen(StockId) == 6)
 		{
@@ -1003,11 +985,6 @@ DWORD CSharesInformation::GetStockKind(int MarketType, char* strLabel)
 				}
 			}
 
-			if (StockId[0] == '2')
-			{
-				return SZBG;
-			}
-
 			if (StockId[0] == '3')
 			{
 				if (StockId[1] == '9')
@@ -1018,40 +995,6 @@ DWORD CSharesInformation::GetStockKind(int MarketType, char* strLabel)
 				{
 					return EBAG;
 				}
-			}
-		}
-		else if (strlen(StockId) == 4)
-		{
-			if (StockId[0] == '9' && StockId[1] == '9')
-			{
-				return SZZS;
-			}
-			if (StockId[0] == '0' || StockId[0] == '4')
-			{
-				return SZAG;
-			}
-			else if (StockId[0] == '6')
-			{
-				return EBAG;
-			}
-			else if (StockId[0] == '2')
-			{
-				if (StockId[1] == 'A' || StockId[1] == 'B' || StockId[1] == 'C')
-				{
-					return SZZS;
-				}
-				else if (StockId[1] == 'D')
-				{
-					return EBZS;
-				}
-				else
-				{
-					return SZBG;
-				}
-			}
-			else
-			{
-				return SZZQ;
 			}
 		}
 	}
@@ -1478,4 +1421,183 @@ BOOL CSharesInformation::Lookup(char* StockId, PCdat1& pStockData, int nKind)
 
 	pStockData = NULL;
 	return FALSE;
+}
+
+BOOL CSharesInformation::DeleteOneStockInfo(CString strStockCode, int nKind)
+{
+    return RemoveKey(strStockCode.GetBuffer(0), nKind);
+}
+
+BOOL CSharesInformation::RemoveKey(char* StockId, DWORD StockType)
+{
+	int low = 0;
+	int high = m_pdwStockCurrentCount[StockType] - 1;
+	int mid = 0;
+	int nPos = -1;
+	while (low <= high)
+	{
+		mid = (low + high) / 2;
+		if (strcmp(m_pData[StockType][mid].StockId, StockId) > 0)
+		{
+			high = mid - 1;
+		}
+		else if (strcmp(m_pData[StockType][mid].StockId, StockId) < 0)
+		{
+			low = mid + 1;
+		}
+		else
+		{
+			nPos = mid;
+			break;
+		}
+	}
+
+	if (nPos == -1)
+	{
+		return FALSE;
+	}
+
+	m_pData[StockType][nPos].pItem->IsDelete = TRUE;
+	memmove(&m_pData[StockType][nPos], &m_pData[StockType][nPos + 1], (m_pdwStockCurrentCount[StockType] - nPos - 1) * sizeof(STOCKDATASHOW));
+	m_pdwStockCurrentCount[StockType]--;
+	SavePosToFile(StockType);
+	SaveRealDataToFile(m_RealFileHead, 0);
+
+	return TRUE;
+}
+
+void CSharesInformation::MoveStock(CString strStockCode, int nKind, int nNewKind)
+{
+	char* StockId = strStockCode.GetBuffer(0);
+
+	int low = 0;
+	int high = m_pdwStockCurrentCount[nKind] - 1;
+	int mid = 0;
+	int nPos = -1;
+	while (low <= high)
+	{
+		mid = (low + high) / 2;
+		if (strcmp(m_pData[nKind][mid].StockId, StockId) > 0)
+		{
+			high = mid - 1;
+		}
+		else if (strcmp(m_pData[nKind][mid].StockId, StockId) < 0)
+		{
+			low = mid + 1;
+		}
+		else
+		{
+			nPos = mid;
+			break;
+		}
+	}
+
+	if (nPos == -1)
+	{
+		return;
+	}
+
+	//m_pData[nKind][nPos].pItem->IsDelete = TRUE;
+	CReportData* p = m_pData[nKind][nPos].pItem;
+	memmove(&m_pData[nKind][nPos], &m_pData[nKind][nPos + 1], (m_pdwStockCurrentCount[nKind] - nPos - 1) * sizeof(STOCKDATASHOW));
+	m_pdwStockCurrentCount[nKind]--;
+	SavePosToFile(nKind);
+
+	low = 0;
+	high = m_pdwStockCurrentCount[nNewKind] - 1;
+	mid = 0;
+	int InsertPose = -1;
+	while (low <= high)
+	{
+		mid = (low + high) / 2;
+		if (low == high)
+		{
+			if (strcmp(StockId, m_pData[nNewKind][mid].StockId) > 0)
+			{
+				if (m_pdwStockCurrentCount[nNewKind] == 0 || m_pdwStockCurrentCount[nNewKind] == mid)
+				{
+					InsertPose = mid;
+				}
+				else
+				{
+					InsertPose = mid + 1;
+				}
+				break;
+			}
+			else if (strcmp(StockId, m_pData[nNewKind][mid].StockId) < 0)
+			{
+				InsertPose = mid;
+				break;
+			}
+			else
+			{
+				//pStockData = m_pData[StockType][mid].pItem;
+				return;
+			}
+		}
+
+		if (strcmp(m_pData[nNewKind][mid].StockId, StockId) > 0)
+		{
+			high = mid - 1;
+		}
+		else if (strcmp(m_pData[nNewKind][mid].StockId, StockId) < 0)
+		{
+			low = mid + 1;
+		}
+		else 
+		{
+			//pStockData = m_pData[StockType][mid].pItem;
+			return;
+		}
+	}
+
+	if (high < low)
+	{
+		InsertPose = low;
+	}
+
+	if (m_pdwStockCurrentCount[nNewKind] + 1 > m_dwStockMaxCount[nNewKind])
+	{
+		SetMemroyALLOCSize(nNewKind, m_pdwStockCurrentCount[nNewKind]);
+	}
+
+	if (m_pdwStockCurrentCount[nNewKind] > InsertPose)
+	{
+		STOCKDATASHOW* ptemp;
+		HGLOBAL	hMem;
+		LPVOID hp;
+		hMem = GlobalAlloc(GPTR, (m_pdwStockCurrentCount[nNewKind] - InsertPose) * sizeof(STOCKDATASHOW));
+		hp = GlobalLock(hMem);
+		if (hp)
+		{
+			ptemp = (STOCKDATASHOW*)hp;
+		}
+		else
+		{
+			AfxMessageBox("分配内存出错", MB_ICONSTOP);
+			return;
+		}
+
+		memcpy(ptemp, &m_pData[nNewKind][InsertPose], (m_pdwStockCurrentCount[nNewKind] - InsertPose) * sizeof(STOCKDATASHOW));
+		memcpy(&m_pData[nNewKind][InsertPose + 1], ptemp, (m_pdwStockCurrentCount[nNewKind] - InsertPose) * sizeof(STOCKDATASHOW));
+		GlobalUnlock((HGLOBAL)ptemp);
+		GlobalFree((HGLOBAL)ptemp);
+	}
+
+	p->kind = nNewKind;
+	m_pData[nNewKind][InsertPose].pItem = p;
+	m_pdwStockCurrentCount[nNewKind]++;
+	//SavePosToFile(nNewKind);
+	SaveRealDataToFile(m_RealFileHead, sizeof(REALDATA) + sizeof(long) * STOCKTYPE);
+	SaveRealDataToFile(m_pData[nNewKind][InsertPose].pItem, sizeof(CReportData));
+}
+
+BOOL CSharesInformation::RecvStockDataForType(PSTOCKDATASHOW& p, BYTE StockType)
+{
+	if (m_hFile == NULL || m_hFileMap == NULL)
+		return FALSE;
+
+	memcpy(p, m_pData[StockType], m_pdwStockCurrentCount[StockType] * sizeof(STOCKDATASHOW));
+
+	return TRUE;
 }

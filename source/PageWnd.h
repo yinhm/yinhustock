@@ -47,12 +47,10 @@ public:
 
 	//{{AFX_VIRTUAL(CPageWnd)
 	public:
-	virtual BOOL Create(LPCTSTR szTitle, LONG style, const RECT& rect, CWnd* parent);
 	//}}AFX_VIRTUAL
 
 
 public:	
-	bool DoLButtonDown(UINT nFlags, CPoint points);
 	void DoRButtonDown(UINT nFlags, CPoint point);
 	
 	void ReplacePage(int nPage,CString ReplaceTitle);
@@ -71,14 +69,11 @@ protected:
 
 	//{{AFX_MSG(CPageWnd)
 	afx_msg void OnPaint();
-	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
-	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 private:
@@ -102,9 +97,17 @@ private:
 	void ExecuteMenu(int mode);
     BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra,
 					AFX_CMDHANDLERINFO* pHandlerInfo);
-	void ShowRedrawPage(CDC * dc );
 
+public:
+	virtual BOOL Create(LPCTSTR szTitle, LONG style, const RECT& rect, CWnd* parent);
 
+protected:
+	BOOL DoLButtonDown(UINT nFlags, CPoint points);
+
+protected:
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 }; 
 
 /////////////////////////////////////////////////////////////////////////////

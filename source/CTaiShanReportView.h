@@ -1,6 +1,3 @@
-// Stock2000View.h : interface of the CTaiShanReportView class
-//
-/////////////////////////////////////////////////////////////////////////////
 
 #if !defined(AFX_STOCK2000VIEW_H__13C4E5B0_D3B4_11D1_BF39_0000E86564F7__INCLUDED_)
 #define AFX_STOCK2000VIEW_H__13C4E5B0_D3B4_11D1_BF39_0000E86564F7__INCLUDED_
@@ -52,7 +49,6 @@ public:
 
 
 public:
-	void ChangeToPage(int nPage,BOOL NewTjxg=FALSE);
 	void InitAllTitle();
 	void OnF6();	
 	virtual ~CTaiShanReportView();
@@ -170,7 +166,6 @@ public:
 	void AddColumn(UINT m_Column,UINT nID);
     void UpdateColumnData(CTaiShanDoc* pDoc,int m_Column,int FirstRow,int EndRow);
     void UpdateColumn(UINT m_Column,UINT nID);
-	void ChangeToChoose(CTaiShanDoc* pDoc);
 	BOOL ChangeToStockType(CTaiShanDoc* pDoc,CString m_StockType) ;
     void PopMenuItemInit(CMenu *pMenuContext,UINT nRow);
 	UINT GetActivePage();
@@ -210,11 +205,14 @@ public:
     void SendRecvDataInfomation(ClientTransmitAttributes  TransmitType);
     BOOL SetSendStockCodeData(int SendStockCount);
 #endif
-	
+
+public:
+	void ChangeToChoose(CTaiShanDoc* pDoc);
+	void ChangeToPage(int nPage, BOOL NewTjxg = FALSE);
 };
-#ifndef _DEBUG  
-inline CTaiShanDoc* CTaiShanReportView::GetDocument()
-   { return (CTaiShanDoc*)m_pDocument; }
+
+#ifndef _DEBUG
+inline CTaiShanDoc* CTaiShanReportView::GetDocument() { return (CTaiShanDoc*)m_pDocument; }
 #endif
 
 /////////////////////////////////////////////////////////////////////////////

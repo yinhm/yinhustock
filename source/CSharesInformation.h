@@ -39,7 +39,6 @@ protected:
 
 
 protected:
-	BOOL SetMemroyALLOCSize(DWORD StockType, unsigned int nSize);
 
 
 public:
@@ -47,12 +46,10 @@ public:
     long  GetStockTypeCount(DWORD StockType) { return m_pdwStockCurrentCount[StockType];}  
     BOOL  GetStockTypeMaxCount(DWORD StockType) { return m_dwStockMaxCount[StockType];}   
 	long  GetCount();   
-	BOOL RemoveKey(char *StockId ,DWORD StockType);
 	BOOL  GetStockItem(DWORD StockType,DWORD nPos,PCdat1 &pStockData);   
 
 	BOOL InsertItem(char *StockId ,PCdat1 &pStockData,DWORD StockType); 
 	BOOL Lookup(char *StockId,PCdat1 &pStockData,int nKind);  
-	BOOL  RecvStockDataForType(PSTOCKDATASHOW &p,BYTE StockType); 
  	int   GetStockPos(int StockType,char *StockId); 
 
 public:
@@ -76,8 +73,6 @@ private:
 private:
     
     BOOL InsertItemPoint(CReportData *pStockData );            
-	BOOL InitRealTimeDataExist();  
-    BOOL InitRealTimeDataEmpty();  
 
 public:
 	float GetValueUpDown(int isDown,int whick_stk,int nKind);
@@ -90,7 +85,6 @@ public:
 		            CString strStockPyjc,int nKind);               
 	BOOL MOdifyOneStockInfo(CString strStockCode,CString strStockName,
 		            CString strStockPyjc,int nKind);               
-	BOOL DeleteOneStockInfo(CString strStockCode,int nKind);      
 	BOOL RemoveAllStockCjmxTj();                   
 
 
@@ -122,7 +116,21 @@ public:
 
 protected:
 	void ClearUpDown(int nMarket);
+
+protected:
+	BOOL InitRealTimeDataEmpty();
+	BOOL InitRealTimeDataExist();
+	BOOL SetMemroyALLOCSize(DWORD StockType, unsigned int nSize);
+
+public:
+	BOOL DeleteOneStockInfo(CString strStockCode, int nKind);
+	BOOL RemoveKey(char* StockId, DWORD StockType);
+	void MoveStock(CString strStockCode, int nKind, int nNewKind);
+
+public:
+	BOOL RecvStockDataForType(PSTOCKDATASHOW& p, BYTE StockType);
 };
+
 inline BOOL CSharesInformation::LookupBase(char *m_szStockId,int nKind,PBASEINFO &m_pStock)
 {
 	return m_StockBaseInfo.Lookup(m_szStockId,nKind,m_pStock);       
