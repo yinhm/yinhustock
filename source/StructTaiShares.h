@@ -27,110 +27,77 @@ typedef struct
 		float   dif_accb;  
 		float   dif_accs;   
 }DpKdata1;
-typedef struct 
+
+typedef struct tagSPLIT
 {
-	int   nFlags;
-	int	  nTime;
-	float Give;
-	float Allocate;
-	float AllocatePrice;
-	float Bonus;
-	BYTE Free[4];
-}Split ,*PSplit;
+	int		nFlags;
+	int		nTime;
+	float	Give;
+	float	Allocate;
+	float	AllocatePrice;
+	float	Bonus;
+	BYTE	Free[4];
+} Split;
+typedef Split* PSplit;
 
-
-typedef struct
+typedef struct tagBASEINFO
 {
-	char Symbol[10];  //股票代码
-	int  NumSplit;   //已经除权次数
-	float zgb;     //总股本(万股)
-	float gjg;     //国家股(万股)
-	float fqrfrg;  //发起人法人股(万股)
-	float frg;     //法人股(万股)
-	float zgg;     //职工股(万股)
-	float gzAg;    //公众A股(万股)    5
-	float ltAg;    //流通A股(万股)
-	float Hg;      //Ｈ股(万股)
-	float Bg;      //B股(万股)
-	float zpg;     //转配股(万股)
+	char	Symbol[10];		// 股票代码
+	int		NumSplit;		// 已经除权次数
+	float	zgb;			// 总股本(万股)
+	float	gjg;			// 国家股(万股)
+	float	fqrfrg;			// 发起人法人股(万股)
+	float	frg;			// 法人股(万股)
+	float	zgg;			// 职工股(万股)
+	float	gzAg;			// 公众A股(万股)    5
+	float	ltAg;			// 流通A股(万股)
+	float	Hg;				// Ｈ股(万股)
+	float	Bg;				// B股(万股)
+	float	zpg;			// 转配股(万股)
 
-	float zzc;     //总资产(万元)    10
-	float ldzc;    //流动资产(万元)
-	float cqtz;    //长期投资(万元)
-	float gdzc;    //固定资产(万元)
-	float wxzc;    //无形资产(万元)
-	float ldfz;    //流动负债(万元)   15
-	float cqfz;    //长期负债(万元)
-	float ggqy;    //股东权益(万元)
-	float zbgjj;   //资本公积金(万元)
-	float yygjj;   //盈余公积金(万元)
-	float mgjz;    //每股净值(元)    20
-	float gdqybl;  //股东权益比率(%)
-	float mggjj;   //每股公积金(元)
+	float	zzc;			// 总资产(万元)    10
+	float	ldzc;			// 流动资产(万元)
+	float	cqtz;			// 长期投资(万元)
+	float	gdzc;			// 固定资产(万元)
+	float	wxzc;			// 无形资产(万元)
+	float	ldfz;			// 流动负债(万元)   15
+	float	cqfz;			// 长期负债(万元)
+	float	ggqy;			// 股东权益(万元)
+	float	zbgjj;			// 资本公积金(万元)
+	float	yygjj;			// 盈余公积金(万元)
+	float	mgjz;			// 每股净值(元)    20
+	float	gdqybl;			// 股东权益比率(%)
+	float	mggjj;			// 每股公积金(元)
 
-	float zyywsr;  //主营业务收入(万元)
-	float zyywlr;  //主营业务利润(万元)
-	float qtywlr;  //其它业务利润(万元)25
-	float lrze;    //利润总额(万元)
-	float jlr;     //净利润(万元)
-	float wfplr;   //未分配利润(万元)
-	float mgsy;    //每股收益(元)
-	float jzcsyl;  //净资产收益率(%)  30
-	float mgwfplr; //每股未分配利润(元)
+	float	zyywsr;			// 主营业务收入(万元)
+	float	zyywlr;			// 主营业务利润(万元)
+	float	qtywlr;			// 其它业务利润(万元)25
+	float	lrze;			// 利润总额(万元)
+	float	jlr;			// 净利润(万元)
+	float	wfplr;			// 未分配利润(万元)
+	float	mgsy;			// 每股收益(元)
+	float	jzcsyl;			// 净资产收益率(%)  30
+	float	mgwfplr;		// 每股未分配利润(元)
 
-	float mgjzc;   //每股净资产(元)
+	float	mgjzc;			// 每股净资产(元)
 
-	int m_iPos;
-	BYTE  free[8];
-	Split m_Split[80];
-}BASEINFO;
-typedef BASEINFO *PBASEINFO;
-typedef struct
+	int		m_iPos;
+	BYTE	free[8];
+	Split	m_Split[80];
+} BASEINFO;
+typedef BASEINFO* PBASEINFO;
+
+typedef struct tagBASEINFOHEAD
 {
-	char Symbol[8];  //股票代码
-	int  NumSplit;   //已经除权次数
-	float zgb;     //总股本(万股)
-	float gjg;     //国家股(万股)
-	float fqrfrg;  //发起人法人股(万股)
-	float frg;     //法人股(万股)
-	float zgg;     //职工股(万股)
-	float gzAg;    //公众A股(万股)
-	float ltAg;    //流通A股(万股)
-	float Hg;      //Ｈ股(万股)
-	float Bg;      //B股(万股)
-	float zpg;     //转配股(万股)
+	long filetitle;
+	long FileExitDone;
+	long StockCount;
+	long MaxStockCount;
+    long FixedNumSplit;
+	BYTE Res[20];
+} BASEINFOHEAD;
+typedef BASEINFOHEAD* PBASEINFOHEAD;
 
-	float zzc;     //总资产(万元)
-	float ldzc;    //流动资产(万元)
-	float cqtz;    //长期投资(万元)
-	float gdzc;    //固定资产(万元)
-	float wxzc;    //无形资产(万元)
-	float ldfz;    //流动负债(万元)
-	float cqfz;    //长期负债(万元)
-	float ggqy;    //股东权益(万元)
-	float zbgjj;   //资本公积金(万元)
-	float yygjj;   //盈余公积金(万元)
-	float mgjz;    //每股净值(元)
-	float gdqybl;  //股东权益比率(%)
-	float mggjj;   //每股公积金(元)
-
-	float zyywsr;  //主营业务收入(万元)
-	float zyywlr;  //主营业务利润(万元)
-	float qtywlr;  //其它业务利润(万元)
-	float lrze;    //利润总额(万元)
-	float jlr;     //净利润(万元)
-	float wfplr;   //未分配利润(万元)
-	float mgsy;    //每股收益(元)
-	float jzcsyl;  //净资产收益率(%)
-	float mgwfplr; //每股未分配利润(元)
-
-	float mgjzc;   //每股净资产(元)
-
-	int m_iPos;
-	BYTE  free[8];
-	Split m_Split[80];
-}BASEINFO_OLD;
-typedef BASEINFO_OLD *PBASEINFO_OLD;
 typedef struct
 {
 	int DayAddr;
@@ -353,17 +320,6 @@ typedef struct _tagREALDATA
 typedef REALDATA* PREALDATA;
 
 
-
-typedef struct
-{
-	long filetitle;            
-	long FileExitDone;
-	long StockCount;
-	long MaxStockCount;
-    long FixedNumSplit;
-	BYTE Res[20];
-}BASEINFOHEAD;
-typedef BASEINFOHEAD *PBASEINFOHEAD;
 
 typedef struct _BIG_LIST
 {

@@ -816,28 +816,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="CSharesBaseInfo.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="CSharesBigBillData.cpp"
 				>
 				<FileConfiguration
@@ -3731,10 +3709,6 @@
 				>
 			</File>
 			<File
-				RelativePath="CSharesBaseInfo.h"
-				>
-			</File>
-			<File
 				RelativePath="CSharesBigBillData.h"
 				>
 			</File>
@@ -6529,6 +6503,32 @@
 		<Filter
 			Name="Database"
 			>
+			<File
+				RelativePath="CSharesBaseInfo.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="CSharesBaseInfo.h"
+				>
+			</File>
 			<File
 				RelativePath="CSharesInformation.cpp"
 				>

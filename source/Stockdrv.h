@@ -129,44 +129,46 @@ typedef struct tagRCV_INDEXATTRIBUTE_STRUCTEx
 	short rsn;             
 	short dnn;
 }RCV_INDEXATTRIBUTE_STRUCTEx;
-//---------------------------------------------------------------------------------------
+
+//------------------------------------- 账务信息 ------------------------------
 typedef  struct tagRCV_BASEINFO_STRUCTEx
 {
-	char m_szLabel[STKLABEL_LEN];  //股票代码
-	float m_fZgb;                    //总股本(万股)
-	float m_fGjg;                    //国家股(万股)
-	float m_fFqrfrg;                  //发起人法人股(万股)
-	float m_fFrg;                    //法人股(万股)
-	float m_fZgg;                   //职工股(万股)
-	float m_fGzAg;                  //公众A股(万股)
-	float m_fLtAg;                  //流通A股(万股)
-	float m_fHg;                    //Ｈ股(万股)
-	float m_fBg;                    //B股(万股)
-	float m_fZpg;                   //转配股(万股)
-	float m_fZzc;                   //总资产(万元)
-	float m_fLdzc;                  //流动资产(万元)
-	float m_fCqtz;                  //长期投资(万元)
-	float m_fGdzc;                  //固定资产(万元)
-	float m_fWxzc;                 //无形资产(万元)
-	float m_fLdfz;                  //流动负债(万元)
-	float m_fCqfz;                 //长期负债(万元)
-	float m_fGgqy;                 //股东权益(万元)
-	float m_fZbgjj;                 //资本公积金(万元)
-	float m_fYygjj;                 //盈余公积金(万元)
-	float m_fMgjz;                 //每股净值(元)
-	float m_fGdqybl;               //股东权益比率(%)
-	float m_fMggjj;                //每股公积金(元)
-	float m_fZyywsr;               //主营业务收入(万元)
-	float m_fZyywlr;               //主营业务利润(万元)
-	float m_fQtywlr;               //其它业务利润(万元)
-	float m_fLrze;                 //利润总额(万元)
-	float m_fJlr;                  //净利润(万元)
-	float m_fWfplr;               //未分配利润(万元)
-	float m_fMgsy;                //每股收益(元)
-	float m_fJzcsyl;                //净资产收益率(%)
-	float m_fMgwfplr;              //每股未分配利润(元)
-	float m_fMgjzc;                //每股净资产(元)
-}RCV_BASEINFO_STRUCTEx;
+	char m_szLabel[STKLABEL_LEN];	// 股票代码
+	float m_fZgb;					// 总股本(万股)
+	float m_fGjg;					// 国家股(万股)
+	float m_fFqrfrg;				// 发起人法人股(万股)
+	float m_fFrg;					// 法人股(万股)
+	float m_fZgg;					// 职工股(万股)
+	float m_fGzAg;					// 公众A股(万股)
+	float m_fLtAg;					// 流通A股(万股)
+	float m_fHg;					// H股(万股)
+	float m_fBg;					// B股(万股)
+	float m_fZpg;					// 转配股(万股)
+	float m_fZzc;					// 总资产(万元)
+	float m_fLdzc;					// 流动资产(万元)
+	float m_fCqtz;					// 长期投资(万元)
+	float m_fGdzc;					// 固定资产(万元)
+	float m_fWxzc;					// 无形资产(万元)
+	float m_fLdfz;					// 流动负债(万元)
+	float m_fCqfz;					// 长期负债(万元)
+	float m_fGgqy;					// 股东权益(万元)
+	float m_fZbgjj;					// 资本公积金(万元)
+	float m_fYygjj;					// 盈余公积金(万元)
+	float m_fMgjz;					// 每股净值(元)
+	float m_fGdqybl;				// 股东权益比率(%)
+	float m_fMggjj;					// 每股公积金(元)
+	float m_fZyywsr;				// 主营业务收入(万元)
+	float m_fZyywlr;				// 主营业务利润(万元)
+	float m_fQtywlr;				// 其它业务利润(万元)
+	float m_fLrze;					// 利润总额(万元)
+	float m_fJlr;					// 净利润(万元)
+	float m_fWfplr;					// 未分配利润(万元)
+	float m_fMgsy;					// 每股收益(元)
+	float m_fJzcsyl;				// 净资产收益率(%)
+	float m_fMgwfplr;				// 每股未分配利润(元)
+	float m_fMgjzc;					// 每股净资产(元)
+} RCV_BASEINFO_STRUCTEx;
+
 //////////////////////////////////////////////////////////////////////////////////
 //补充数据头
 //数据头 m_dwHeadTag == EKE_HEAD_TAG 
@@ -211,19 +213,21 @@ typedef  union  tagRCV_DISPBARGAINING_STRUCTEx
 	};
 	RCV_EKE_HEADEx  m_head;
 }RCV_DISPBARGAINING_STRUCTEx;
-//-----------------------------补充除权数据结构---------------------------------------------------------
+
+
+//------------------------------------- 除权数据 ------------------------------
 typedef union tagRCV_POWER_STRUCTEx
 {
 	struct
 	{
-		time_t m_time;             //UCT
-		float m_fGive;             //每股送  
-		float m_fPei;              //每股配   
-		float m_fPeiPrice;          //配股价   
-		float m_fProfit;            //每股红利 
+		time_t m_time;				// UCT
+		float m_fGive;				// 每股送  
+		float m_fPei;				// 每股配   
+		float m_fPeiPrice;			// 配股价   
+		float m_fProfit;			// 每股红利 
 	};
-	RCV_EKE_HEADEx  m_head;
-}RCV_POWER_STRUCTEx;
+	RCV_EKE_HEADEx m_head;
+} RCV_POWER_STRUCTEx;
 
 
 ///////////////////////////////////////////////////////////////////////////////
