@@ -1,6 +1,6 @@
 #if !defined(AFX_LJISHU_H__A3E1ADE5_B7F2_11D1_83EC_0000E8593F1A__INCLUDED_)
 #define AFX_LJISHU_H__A3E1ADE5_B7F2_11D1_83EC_0000E8593F1A__INCLUDED_
-// by ÓáÃ÷Â¼
+
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
@@ -38,21 +38,21 @@ struct ADDITIONAL_BUYSELL
 	ADDITIONAL_BUYSELL()
 	{
 		for(int i=0;i<4;i++)
-		nEnterPoint[i]=5;
-	nColorPoint[0]=0x00ff0000;
-	nColorPoint[1]=0x0000ff00;
-	nColorPoint[2]=0x00ff0000;
-	nColorPoint[3]=0x0000ff00;
-	bLose =0;
-	bWin =0;
-	bMaxDays =0;
-	bSubstractFee =0;
-	bAddPreProfit =0;
-	bUseInitFinace =0;
-	fMaxLose = -0.2f;
-	fMaxWin = 0.5;
-	fMaxDays = 20;
-	fInitFinace = 10000;
+			nEnterPoint[i]=5;
+		nColorPoint[0]=0x00ff0000;
+		nColorPoint[1]=0x0000ff00;
+		nColorPoint[2]=0x00ff0000;
+		nColorPoint[3]=0x0000ff00;
+		bLose =0;
+		bWin =0;
+		bMaxDays =0;
+		bSubstractFee =0;
+		bAddPreProfit =0;
+		bUseInitFinace =0;
+		fMaxLose = -0.2f;
+		fMaxWin = 0.5;
+		fMaxDays = 20;
+		fInitFinace = 10000;
 	};
 };
 
@@ -62,70 +62,70 @@ class CFormularContent : public CObject
 {
 
 
-	
-	     
+
+
 public:
-		CFormularContent();
-		union
+	CFormularContent();
+	union
+	{
+		struct
 		{
-			struct
-			{
-				float		max[8]		;	
-				float		min[8]	;	
-				float		defaultVal[8];	
+			float		max[8]		;	
+			float		min[8]	;	
+			float		defaultVal[8];	
 
 
-				float		stepLen[8]	;
-				float	posX[8] ;	
-				float	fReserved ;	
+			float		stepLen[8]	;
+			float	posX[8] ;	
+			float	fReserved ;	
 
-				int nKindPeriod;	
-				
-				BYTE	nPeriodsUsed[16];	
+			int nKindPeriod;	
 
-				BOOL	isSystem;		
-				BOOL	isOfen	;		
-				BOOL	isProtected;		
+			BYTE	nPeriodsUsed[16];	
 
-				BYTE	isMainFiguer;	
-				BYTE	numPara		;
-				BYTE 	posFlag	;	
-				BYTE 	isAdditionalCond	;	
+			BOOL	isSystem;		
+			BOOL	isOfen	;		
+			BOOL	isProtected;		
 
-				BYTE	bYHParam[8];
-				BYTE	bYH;
-				BYTE	bRightBox;
+			BYTE	isMainFiguer;	
+			BYTE	numPara		;
+			BYTE 	posFlag	;	
+			BYTE 	isAdditionalCond	;	
 
-			
-				int		m_nIsFromServer;
+			BYTE	bYHParam[8];
+			BYTE	bYH;
+			BYTE	bRightBox;
 
-			};
-			BYTE btMemData[LEN_BYTE];
+
+			int		m_nIsFromServer;
+
 		};
-		ADDITIONAL_BUYSELL * pAdditionalBS;
-		CArray<FLOAT11,FLOAT11&>	defaultValArray;	
+		BYTE btMemData[LEN_BYTE];
+	};
+	ADDITIONAL_BUYSELL * pAdditionalBS;
+	CArray<FLOAT11,FLOAT11&>	defaultValArray;	
 
-		CString		name;	
-		CString	password	;
-		CString	explainBrief;
-		CString	explainParam;	
+	CString		name;	
+	CString	password	;
+	CString	explainBrief;
+	CString	explainParam;	
 
-		CString	namePara[8]	;
-		CString	fomular	;	
-		CString	help	;	
+	CString	namePara[8]	;
+	CString	fomular	;	
+	CString	help	;	
 
-		CString buyStr  ;      
-		CString sellStr ;       
-		CString buyStrKong  ;      
-		CString sellStrKong ;     
+	CString buyStr  ;      
+	CString sellStr ;       
+	CString buyStrKong  ;      
+	CString sellStrKong ;     
 
-		CString		subKindIndex;	
-		CString		subKindIndexTime;	
-		CString		strReserved;	
+	CString		subKindIndex;	
+	CString		subKindIndexTime;	
+	CString		strReserved;	
 
-		static bool m_bVer20;
-		static CStringArray m_strArrayKind[4];
-		float		defaultValYH[8];	
+	static bool m_bVer20;
+	static CStringArray m_strArrayKind[4];
+	float		defaultValYH[8];	
 
 
 
@@ -141,10 +141,9 @@ public:
 	static void  DeleteKindName(CString s, int nKind);
 	void InitDefaultValArray();
 	static void AddKindName(CString s,int nKind = 0 );
-	static void ReadWriteIndex(CTaiShanDoc *pDoc,int nKind=0,bool bRead=true);
 	void SerializeData(CArchive& ar);
 	void SetData(CFormularContent * data);
-	
+
 
 
 	virtual ~CFormularContent();
@@ -154,16 +153,18 @@ public:
 
 
 protected:
-	
+
 	virtual void Serialize(CArchive& ar);
 	DECLARE_SERIAL(CFormularContent)
 
 
 	//{{AFX_MSG(CFormularContent)
-	
+
 	//}}AFX_MSG
 
-
+public:
+	static void ReadWriteIndex(CTaiShanDoc* pDoc, int nKind = 0, BOOL bRead = TRUE);
+	static void ClearIndex(CTaiShanDoc* pDoc, int nKind = 0);
 };
 
 /////////////////////////////////////////////////////////////////////////////

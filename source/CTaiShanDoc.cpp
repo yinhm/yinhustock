@@ -467,9 +467,11 @@ BOOL CTaiShanDoc::OnNewDocument()
 
 	long length=0;
 
-	CFormularContent::ReadWriteIndex(this, 0, true);
-	CFormularContent::ReadWriteIndex(this, 1, true);
-	CFormularContent::ReadWriteIndex(this, 2, true);
+
+
+	CFormularContent::ReadWriteIndex(this, 0, TRUE);
+	CFormularContent::ReadWriteIndex(this, 1, TRUE);
+	CFormularContent::ReadWriteIndex(this, 2, TRUE);
 
 
 
@@ -486,36 +488,6 @@ BOOL CTaiShanDoc::OnNewDocument()
 	  }
 	}   
 
-
-
-	CString strKey = "SOFTWARE\\WsStock\\Ver2.0";
-	HKEY hResult;
-	if(ERROR_SUCCESS == RegOpenKey(HKEY_LOCAL_MACHINE,(LPCTSTR)strKey,&hResult))
-	{
-		char User[40];
-		char Company[40];
-		char Serial[40];
-		char Credit[40];
-
-		User[0] = 0;
-		Company[0] = 0;
-		Serial[0]=0;
-		Credit[0]=0;
-
-		DWORD dwCount = 40;
-		RegQueryValueEx(hResult,(LPCTSTR)"User",0,0,(unsigned char *)User,&dwCount);
-		dwCount = 40;
-		RegQueryValueEx(hResult,(LPCTSTR)"Company",0,0,(unsigned char *)Company,&dwCount);
-		dwCount=40;
-		RegQueryValueEx(hResult,(LPCTSTR)"Serial",0,0,(unsigned char *)Serial,&dwCount);
-		dwCount=40;
-		RegQueryValueEx(hResult,(LPCTSTR)"Credit",0,0,(unsigned char *)Credit,&dwCount);
-		m_strUser=User;
-		m_strCompany=Company;
-		m_strSerial=Serial;
-		m_strCredit=Credit;
-	}
-	RegCloseKey(hResult);
 
 	CAlertSystem::StartAlarm();
 
@@ -690,6 +662,12 @@ void CTaiShanDoc::OnCloseDocument()
 
 
     SysFile.Close();
+
+
+
+	CFormularContent::ClearIndex(this, 0);
+	CFormularContent::ClearIndex(this, 1);
+	CFormularContent::ClearIndex(this, 2);
 	
 
 

@@ -1,9 +1,8 @@
-// CFormularContent.cpp : implementation file
-// Tel:13366898744
 
 #include "stdafx.h"
-#include "CFormularContent.h"
 #include "CTaiShanApp.h"
+#include "CFormularContent.h"
+
 #include "MainFrm.h"
 #include "CTaiShanDoc.h"
 #include "CTaiScreenParent.h"
@@ -19,7 +18,7 @@ static char THIS_FILE[] = __FILE__;
 
 CStringArray CFormularContent::m_strArrayKind[4];
 bool CFormularContent::m_bVer20 = false;
- 
+
 /////////////////////////////////////////////////////////////////////////////
 // CFormularContent
 IMPLEMENT_SERIAL(CFormularContent,CObject,1)
@@ -243,12 +242,12 @@ void CFormularContent::SerializeData(CArchive &ar)
 				ar<<pf11[j];
 			}
 		}
-	
+
 		{
 			ar<<name ;		
 			CString s2 = password;
 
-		
+
 			SecretForm(s2,false);
 			ar<<s2	 ;
 			ar<<explainBrief ;	
@@ -257,7 +256,7 @@ void CFormularContent::SerializeData(CArchive &ar)
 			for(i=0;i<8;i++)
 				ar<<namePara[i]	 ;
 
-		
+
 			s2 = fomular;
 			SecretForm(s2,false);
 
@@ -313,21 +312,21 @@ void CFormularContent::SerializeData(CArchive &ar)
 			AddDefaultValToArray();
 		}
 
-	
+
 		for(int iIndex = 0;iIndex< numPara ;iIndex++)
 		{
 			if( defaultValYH [iIndex]> max [iIndex]||
-				 defaultValYH [iIndex]< min [iIndex])
-				 defaultValYH [iIndex] =  defaultVal [iIndex];
+				defaultValYH [iIndex]< min [iIndex])
+				defaultValYH [iIndex] =  defaultVal [iIndex];
 		}
 
-	
+
 
 		{
 			ar>>name ;	
 
 			ar>>password	 ;
-	
+
 			CString s2 = password;
 			SecretForm(s2,true);
 			password = s2;
@@ -354,106 +353,10 @@ void CFormularContent::SerializeData(CArchive &ar)
 			ar>>strReserved ;	
 
 
-		
+
 
 		}
 	}
-
-}
-void CFormularContent::ReadWriteIndex(CTaiShanDoc *pDoc, int nKind, bool bRead)
-{
-	if(pDoc==NULL)
-		return;
-	m_bVer20 = false;
-	CString sName = g_zbgs_hz;// NOTE: the ClassWizard will add member functions here
-	Formu_Array1* pArray = &(pDoc->m_formuar_index );
-	if(nKind==1)
-	{
-		sName = g_tixg_hz;
-		pArray = &(pDoc->m_formuar_choose) ;
-	}
-	else if(nKind==2)
-	{
-		sName = g_kxzh_hz;
-		pArray = &(pDoc->m_formuar_kline );
-	}
-
-	try
-	{
-		if(bRead == false)
-		{
-			CFile gsfile;
-
-			m_bVer20 = true;
-			gsfile.Open(sName+"备份",CFile::modeCreate|CFile::modeWrite);
-			CArchive ar(&gsfile,CArchive::store);
-			int length = -1;
-			ar<<length;
-			length=pArray->GetSize();
-			int ii = 0;
-
-			
-			for(int i = 0;i<length;i++)
-			{
-				if(pArray->GetAt (i)->m_nIsFromServer != 33134999)
-					ii++;
-			}
-			ar<<ii;
-			for(int i=0;i<length;i++)
-			{
-				CFormularContent * jishu;
-				jishu=pArray->GetAt(i);
-
-			
-
-				if(jishu->m_nIsFromServer != 33134999)
-					ar<<jishu;
-			}
-  
-			ar.Close();
-			gsfile.Close();
-
-			::DeleteFile (sName);
-
-			CFile::Rename(sName+ "备份", sName);
-		}
-		else
-		{
-			CFile gsfile;
-			gsfile.Open(sName,CFile::modeRead);
-			int length;
-
-			CArchive ar(&gsfile,CArchive::load);
-			ar>>length;
-			if(length==-1)
-			{
-				m_bVer20 = true;
-				ar>>length;
-			}
-
-			m_strArrayKind[nKind].RemoveAll();
-
-			m_strArrayKind[nKind].Add("其它");
-			for(int i=0;i<length;i++)
-			{
-				CFormularContent * jishu;
-				ar>>jishu;
-				pArray->Add(jishu);
-
-				AddKindName(jishu->subKindIndex , nKind);
-			}
-  
-			ar.Close();
-			gsfile.Close();
-
-		}
-
-	}
-	catch(...)
-	{
-	}
-
-	m_bVer20 = false;
 
 }
 
@@ -495,19 +398,19 @@ void CFormularContent::AddKindName(CString s, int nKind)
 
 void CFormularContent::InitDefaultValArray()
 {// standard constructor
-	 if(defaultValArray.GetSize()!=numPara)
-	 {
-		 defaultValArray.RemoveAll();
-		 for(int j=0;j<numPara;j++)
-		 {
-			 FLOAT11 f11;
-			 for(int i=0;i<11;i++)
-			 {
-				 f11.fValue [i] = defaultVal [j];
-			 }
-			 defaultValArray.Add(f11);
-		 }
-	 }
+	if(defaultValArray.GetSize()!=numPara)
+	{
+		defaultValArray.RemoveAll();
+		for(int j=0;j<numPara;j++)
+		{
+			FLOAT11 f11;
+			for(int i=0;i<11;i++)
+			{
+				f11.fValue [i] = defaultVal [j];
+			}
+			defaultValArray.Add(f11);
+		}
+	}
 
 }
 
@@ -533,7 +436,7 @@ float CFormularContent::GetParamDataEach(int iIndex, int nKlineType, CFormularCo
 	}
 	float f = pJishu->defaultVal[iIndex];
 
-	
+
 
 	if(((CTaiShanDoc*)(CMainFrame::m_taiShanDoc))->m_propertyInitiate.bSaveParam == TRUE)
 	{
@@ -649,10 +552,10 @@ bool CFormularContent::InstallIndicator(CString sFilePathName,bool bPromp,bool b
 	{
 		if(bPromp == true)
 			AfxMessageBox(filename+"文件不存在");
-	
+
 		return false;
 	}
-	
+
 	CArchive ar(&file,CArchive::load);
 	int selectcount,ncurtab;
 	ar>>selectcount;
@@ -663,7 +566,7 @@ bool CFormularContent::InstallIndicator(CString sFilePathName,bool bPromp,bool b
 		CFormularContent::m_bVer20 = true;
 		ar>>selectcount;
 	}
-	
+
 	ar>>ncurtab;
 	int readpos=0;
 	Formu_Array1* pArray[] = {&(pDoc->m_formuar_index ),&(pDoc->m_formuar_choose ),&(pDoc->m_formuar_kline )};
@@ -672,11 +575,11 @@ bool CFormularContent::InstallIndicator(CString sFilePathName,bool bPromp,bool b
 	{
 		BOOL isoverwrite=TRUE;
 		BOOL isfind=FALSE;
-	
+
 		CFormularContent *jishu=NULL;
 		ar>>jishu;
 
-		
+
 		if(bFromServer == true)// serious allocation failure checking
 		{
 			jishu->subKindIndex = "服务端特色指标";
@@ -689,7 +592,7 @@ bool CFormularContent::InstallIndicator(CString sFilePathName,bool bPromp,bool b
 		}
 		AddKindName(jishu->subKindIndex, ncurtab);
 
-	
+
 		if(jishu->buyStr .GetLength () >0)
 		{
 			int nLen2 = jishu->buyStr.GetLength ();
@@ -707,7 +610,7 @@ bool CFormularContent::InstallIndicator(CString sFilePathName,bool bPromp,bool b
 					jishu ->isProtected = FALSE;
 			}
 		}
-		
+
 		CString name=jishu->name;
 		int k,length;
 		length=pArray[ncurtab]->GetSize();
@@ -725,7 +628,7 @@ bool CFormularContent::InstallIndicator(CString sFilePathName,bool bPromp,bool b
 						if(AfxMessageBox(name+"公式已存在，是否要覆盖？",MB_YESNO|MB_ICONQUESTION)==IDNO)
 							isoverwrite=FALSE;
 					}
-					
+
 					break;
 				}
 				else
@@ -748,14 +651,14 @@ bool CFormularContent::InstallIndicator(CString sFilePathName,bool bPromp,bool b
 
 			if(ncurtab == 0)
 			{
-						                   
+
 				CString name=jishu->name;
 				CTaiKeyBoardAngelDlg dlg;
 				dlg.AddIndicatorName(name);
 
 			}
 		}
-	 readpos=k;            
+		readpos=k;            
 	}
 	ar.Close();
 	file.Close();
@@ -823,7 +726,7 @@ bool CFormularContent::InstallIndicatorCwd(CString sFilePathName,bool bPromp,boo
 		ar>>selectcount;
 		ar>>ncurtab;
 	}
-	
+
 	Formu_Array1* pArray[] = {&(pDoc->m_formuar_index ),&(pDoc->m_formuar_choose ),&(pDoc->m_formuar_kline )};
 
 	int isoverwrite=0;
@@ -835,11 +738,11 @@ bool CFormularContent::InstallIndicatorCwd(CString sFilePathName,bool bPromp,boo
 			if(isoverwrite == 0)
 				isoverwrite=1;
 			BOOL isfind=FALSE;
-		
+
 			CFormularContent *jishu=NULL;
 			ar>>jishu;
 
-		
+
 			if(bFromServer == true)
 			{
 				jishu->subKindIndex = "服务端特色指标";
@@ -852,7 +755,7 @@ bool CFormularContent::InstallIndicatorCwd(CString sFilePathName,bool bPromp,boo
 			}
 			AddKindName(jishu->subKindIndex, ncurtab);
 
-			
+
 			if(jishu->buyStr .GetLength () >0)
 			{
 				int nLen2 = jishu->buyStr.GetLength ();
@@ -892,7 +795,7 @@ bool CFormularContent::InstallIndicatorCwd(CString sFilePathName,bool bPromp,boo
 							isoverwrite = dlg.m_nResponse ;
 
 						}
-						
+
 						break;
 					}
 					else
@@ -915,17 +818,17 @@ bool CFormularContent::InstallIndicatorCwd(CString sFilePathName,bool bPromp,boo
 
 				if(ncurtab == 0)
 				{
-											   
+
 					CString name=jishu->name;
 					CTaiKeyBoardAngelDlg dlg;
 					dlg.AddIndicatorName(name);
 				}
 			}
-		 readpos=k;           
+			readpos=k;           
 		}
 
 		if(k == nTotalKind-1) break;
-//Do not modify the contents of this file.
+		//Do not modify the contents of this file.
 		ar>>selectcount;
 		ar>>ncurtab;
 	}
@@ -941,7 +844,7 @@ bool CFormularContent::InstallIndicatorCwd(CString sFilePathName,bool bPromp,boo
 
 bool CFormularContent::ExportFormular(Formu_Array1 *pArr, int nArr,CString fileName,BOOL bCompleteSecret, BOOL bPassword, CString strPassword)
 {
-//Do not modify the contents of this file.
+	//Do not modify the contents of this file.
 	int nTotal = 0;
 	for(int i = 0;i<nArr;i++)
 	{
@@ -951,7 +854,7 @@ bool CFormularContent::ExportFormular(Formu_Array1 *pArr, int nArr,CString fileN
 		return false;
 	CTaiShanDoc*   pDoc=((CMainFrame*)(AfxGetApp()->m_pMainWnd))->m_taiShanDoc ;
 
-    CString     defaultname="";              
+	CString     defaultname="";              
 
 	int ncurtab=0;
 	CString sArray="*.fnc";       
@@ -960,9 +863,9 @@ bool CFormularContent::ExportFormular(Formu_Array1 *pArr, int nArr,CString fileN
 		CString filename=fileName;
 		if(filename.Find('.') == -1)
 		{
-	      CString temp = sArray;
-		  temp.TrimLeft ("*");
-		  filename+=temp;
+			CString temp = sArray;
+			temp.TrimLeft ("*");
+			filename+=temp;
 		}
 
 		CFile   file;
@@ -971,7 +874,7 @@ bool CFormularContent::ExportFormular(Formu_Array1 *pArr, int nArr,CString fileN
 			if(AfxMessageBox(filename+"文件已存在，要覆盖吗？",MB_YESNO|MB_ICONQUESTION)==IDNO)
 			{
 				file.Close();
-			
+
 				return false;
 			}
 			file.Close();
@@ -1032,7 +935,7 @@ bool CFormularContent::ExportFormular(Formu_Array1 *pArr, int nArr,CString fileN
 							{
 								char ch = (char)((rand()+128)%255+1);
 								CString s(ch);
-								
+
 								jishu->password += s;
 							}
 						}
@@ -1052,7 +955,7 @@ bool CFormularContent::ExportFormular(Formu_Array1 *pArr, int nArr,CString fileN
 			AfxMessageBox("部分完全加密的公式不允许导出！");
 		AfxMessageBox("一共在文件里写了"+lengthstr+"个公式");
 		ar.Close();
-                   //Do not modify the contents of this file.
+		//Do not modify the contents of this file.
 		file.Close();
 		CFormularContent::m_bVer20 = false;
 
@@ -1094,7 +997,7 @@ bool CFormularContent::ExportFormular(Formu_Array1 *pArr, int nArr,CString fileN
 
 CString CFormularContent::GetFormular()
 {//为该类的对象
-//Do not modify the contents of this file.
+	//Do not modify the contents of this file.
 	CString sFormular;
 	if( buyStr != "")
 		sFormular = "";
@@ -1106,4 +1009,129 @@ CString CFormularContent::GetFormular()
 		sFormular  = fomular  ;
 	return sFormular;
 
+}
+
+void CFormularContent::ReadWriteIndex(CTaiShanDoc* pDoc, int nKind, BOOL bRead)
+{
+	if (pDoc == NULL)
+		return;
+
+	m_bVer20 = FALSE;
+
+	CString sName = g_zbgs_hz;
+	Formu_Array1* pArray = &(pDoc->m_formuar_index);
+	if (nKind == 1)
+	{
+		sName = g_tixg_hz;
+		pArray = &(pDoc->m_formuar_choose);
+	}
+	else if (nKind == 2)
+	{
+		sName = g_kxzh_hz;
+		pArray = &(pDoc->m_formuar_kline);
+	}
+
+	try
+	{
+		if (bRead == FALSE)
+		{
+			m_bVer20 = TRUE;
+
+			CFile gsfile;
+			gsfile.Open(sName + ".tst", CFile::modeCreate | CFile::modeWrite);
+			CArchive ar(&gsfile, CArchive::store);
+
+			int length = -1;
+			ar << length;
+			length = pArray->GetSize();
+
+			int ii = 0;
+			for (int i = 0; i < length; i++)
+			{
+				if (pArray->GetAt(i)->m_nIsFromServer != 33134999)
+					ii++;
+			}
+			ar << ii;
+
+			for (int i = 0; i < length; i++)
+			{
+				CFormularContent* jishu;
+				jishu = pArray->GetAt(i);
+
+				if (jishu->m_nIsFromServer != 33134999)
+					ar << jishu;
+			}
+
+			ar.Close();
+			gsfile.Close();
+
+			DeleteFile(sName);
+
+			CFile::Rename(sName + "tst", sName);
+		}
+		else
+		{
+			CFile gsfile;
+			gsfile.Open(sName, CFile::modeRead);
+			CArchive ar(&gsfile, CArchive::load);
+
+			int length;
+			ar >> length;
+			if (length == -1)
+			{
+				m_bVer20 = TRUE;
+				ar >> length;
+			}
+
+			m_strArrayKind[nKind].RemoveAll();
+			m_strArrayKind[nKind].Add("其它");
+
+			for (int i = 0; i < length; i++)
+			{
+				CFormularContent* jishu;
+				ar >> jishu;
+				pArray->Add(jishu);
+
+				AddKindName(jishu->subKindIndex, nKind);
+			}
+
+			ar.Close();
+			gsfile.Close();
+		}
+	}
+	catch (...)
+	{
+	}
+
+	m_bVer20 = FALSE;
+}
+
+void CFormularContent::ClearIndex(CTaiShanDoc *pDoc, int nKind)
+{
+	if (pDoc == NULL)
+		return;
+
+	Formu_Array1* pArray = &(pDoc->m_formuar_index);
+	if (nKind == 1)
+	{
+		pArray = &(pDoc->m_formuar_choose);
+	}
+	else if (nKind == 2)
+	{
+		pArray = &(pDoc->m_formuar_kline);
+	}
+
+	int nIndex = pArray->GetSize();
+	for (int i = 0; i < nIndex; i++)
+	{
+		CFormularContent* jishu = NULL;
+		jishu = pArray->GetAt(i);
+
+		if (jishu)
+		{
+			delete jishu;
+		}
+	}
+
+	pArray->RemoveAll();
 }
