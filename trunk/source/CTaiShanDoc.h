@@ -6,11 +6,12 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "CFormularContent.h"
+
 #include "StructKlineView.h"
 #include <afxmt.h>
 #include "CFormularCompute.h"
 #include <afxdao.h>
-#include "CFormularContent.h"
 #include "NineShowView.h"
 #include "MyTreeView.h"
 #include "InfoView.h"
@@ -267,11 +268,6 @@ public:
 	CImageList  *m_imagelist;          
 	CBitmap       m_bitmap;            
 
-    Formu_Array1         m_formuar_index;        
-	Formu_Array1         m_formuar_choose;  
-	Formu_Array1         m_formuar_master;     
-	Formu_Array1         m_formuar_kline;        
-
 	bool ChooseFileExist;        
 	bool m_bAddKline;
 	
@@ -428,6 +424,12 @@ protected:
 	afx_msg void OnOpenDocument();
 	afx_msg void OnToolClosework();
 	//}}AFX_MSG
+
+public:
+    Formu_Array1	m_formuar_index;	
+	Formu_Array1	m_formuar_choose;	
+	Formu_Array1	m_formuar_master;	
+	Formu_Array1	m_formuar_kline;	
 
 public:
 	int		m_nPreDisplayRow;			// 列表显示行数
