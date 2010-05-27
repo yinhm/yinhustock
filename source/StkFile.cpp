@@ -9,7 +9,7 @@ CStkFile::CStkFile()
 	m_bShareMem = FALSE;
 	m_sNameShareMem = _T("");
 
-	m_hFile = (UINT)hFileNull;
+	m_hFile = (HANDLE)hFileNull;
 	m_hFileMap = NULL;
 	m_lpvFileBegin = NULL;
 	m_lpvFileEnd = NULL;
@@ -25,7 +25,7 @@ CStkFile::CStkFile()
 
 CStkFile::~CStkFile()
 {
-	if (m_hFile != (UINT)hFileNull && m_bCloseOnDelete)
+	if (m_hFile != (HANDLE)hFileNull && m_bCloseOnDelete)
 		Close();
 
 	if (m_pSymbolToPos != NULL)
@@ -34,7 +34,7 @@ CStkFile::~CStkFile()
 
 void CStkFile::SeekToBegin()
 {
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return;
@@ -50,7 +50,7 @@ void CStkFile::SeekToBegin()
 
 DWORD CStkFile::SeekToEnd()
 {
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return 0;
@@ -75,13 +75,13 @@ DWORD CStkFile::SeekToEnd()
 
 LONG CStkFile::Seek(LONG lOff, UINT nFrom)
 {
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return 0;
 	}
 
-	ASSERT(m_bShareMem == TRUE || m_hFile != (UINT)hFileNull);
+	ASSERT(m_bShareMem == TRUE || m_hFile != (HANDLE)hFileNull);
 	ASSERT(nFrom == begin || nFrom == end || nFrom == current);
 	ASSERT(begin == FILE_BEGIN && end == FILE_END && current == FILE_CURRENT);
 
@@ -112,7 +112,7 @@ LONG CStkFile::Seek(LONG lOff, UINT nFrom)
 
 BYTE* CStkFile::GetFileBeginPointer()
 {
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return 0;
@@ -123,7 +123,7 @@ BYTE* CStkFile::GetFileBeginPointer()
 
 BYTE* CStkFile::GetFileCurrentPointer()
 {
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return 0;
@@ -136,6 +136,43 @@ BYTE* CStkFile::GetFileCurrentPointer()
 extern BOOL AFXAPI AfxFullPath(LPTSTR lpszPathOut, LPCTSTR lpszFileIn);
 extern void AFXAPI AfxGetRoot(LPCTSTR lpszPath, CString& strRoot);
 
+BOOL CStkFile::Open(LPCTSTR lpszFileName, UINT nFileLength, CString strShareName)
+{
+	if (lpszFileName == NULL)
+		return FALSE;
+
+	m_hFile = CreateFile(lpszFileName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+		OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (m_hFile == INVALID_HANDLE_VALUE)
+	{
+		ASSERT(FALSE);
+		return FALSE;
+	}
+
+	m_hFileMap = CreateFileMapping(m_hFile, NULL, PAGE_READWRITE, 0, nFileLength, NULL);
+	if (m_hFileMap == NULL)
+	{
+		ASSERT(FALSE);
+		CloseHandle(m_hFile);
+		m_hFile = NULL;
+		m_hFileMap = NULL;
+		return FALSE;
+	}
+
+	m_lpvFileBegin = (PBYTE)MapViewOfFile(m_hFileMap, FILE_MAP_WRITE, 0, 0, 0);
+	if (m_lpvFileBegin == NULL)
+	{
+		ASSERT(FALSE);
+		CloseHandle(m_hFileMap);
+		CloseHandle(m_hFile);
+		m_hFile = NULL;
+		m_hFileMap = NULL;
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
 BOOL CStkFile::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFileEnd, CFileException* pException)
 {
 	ASSERT(AfxIsValidString(lpszFileName));
@@ -144,7 +181,7 @@ BOOL CStkFile::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFileEnd, CF
 	nOpenFlags &= ~(UINT)typeBinary;
 
 	m_bCloseOnDelete = FALSE;
-	m_hFile = (UINT)hFileNull;
+	m_hFile = (HANDLE)hFileNull;
 	m_strFileName.Empty();
 
 	TCHAR szTemp[_MAX_PATH];
@@ -178,7 +215,7 @@ BOOL CStkFile::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFileEnd, CF
 		return FALSE;
 	}
 
-	m_hFile = (HFILE)hFile;
+	m_hFile = (HANDLE)hFile;
 	m_bCloseOnDelete = TRUE;
 	m_nLenFile = GetFileSize((HANDLE)m_hFile, NULL);
 
@@ -237,7 +274,7 @@ BOOL CStkFile::OpenShare(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFileEn
 	nOpenFlags &= ~(UINT)typeBinary;
 
 	m_bCloseOnDelete = FALSE;
-	m_hFile = (UINT)hFileNull;
+	m_hFile = (HANDLE)hFileNull;
 	m_strFileName.Empty();
 
 	TCHAR szTemp[_MAX_PATH];
@@ -316,8 +353,8 @@ BOOL CStkFile::OpenShare(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFileEn
 
 UINT CStkFile::Read(void* lpBuf, UINT nCount)
 {
-	ASSERT(m_bShareMem == TRUE || m_hFile != (UINT)hFileNull);
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	ASSERT(m_bShareMem == TRUE || m_hFile != (HANDLE)hFileNull);
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return 0;
@@ -346,8 +383,8 @@ UINT CStkFile::Read(void* lpBuf, UINT nCount)
 
 void CStkFile::Write(const void* lpBuf, UINT nCount)
 {
-	ASSERT(m_bShareMem == TRUE || m_hFile != (UINT)hFileNull);
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	ASSERT(m_bShareMem == TRUE || m_hFile != (HANDLE)hFileNull);
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return;
@@ -377,14 +414,14 @@ DWORD CStkFile::GetLength() const
 
 void CStkFile::Close()
 {
-	if (m_hFile == (UINT)hFileNull)
+	if (m_hFile == (HANDLE)hFileNull)
 		return;
 
 	BOOL bError = FALSE;
-	if (m_hFile != (UINT)hFileNull)
+	if (m_hFile != (HANDLE)hFileNull)
 		bError = !CloseHandle((HANDLE)m_hFile);
 
-	m_hFile = (UINT)hFileNull;
+	m_hFile = (HANDLE)hFileNull;
 	m_bCloseOnDelete = FALSE;
 	m_strFileName.Empty();
 
@@ -403,7 +440,7 @@ void CStkFile::Flush()
 
 int CStkFile::GetStockNumber()
 {
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return 0;
@@ -418,7 +455,7 @@ int CStkFile::GetStockNumber()
 
 void CStkFile::SetStockNumber(int nStock)
 {
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return ;
@@ -430,7 +467,7 @@ void CStkFile::SetStockNumber(int nStock)
 
 WORD CStkFile::GetMaxNumStock()
 {
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return 0;
@@ -453,7 +490,7 @@ WORD CStkFile::GetMaxNumStock()
 
 void CStkFile::SetMaxNumStock(WORD nMaxNumStock)
 {
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return ;
@@ -465,7 +502,7 @@ void CStkFile::SetMaxNumStock(WORD nMaxNumStock)
 
 int CStkFile::GetSmallBlockCount()
 {
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return 0;
@@ -480,7 +517,7 @@ int CStkFile::GetSmallBlockCount()
 
 void CStkFile::SetSmallBlockCount(int nBlock)
 {
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return;
@@ -492,7 +529,7 @@ void CStkFile::SetSmallBlockCount(int nBlock)
 
 int CStkFile::GetID()
 {
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return 0;
@@ -509,7 +546,7 @@ int CStkFile::GetID()
 
 void CStkFile::ReMapFromBegin(int nCount)
 {
-	if (m_bShareMem == FALSE && m_hFile == (UINT)hFileNull || m_hFileMap == NULL)
+	if (m_bShareMem == FALSE && m_hFile == (HANDLE)hFileNull || m_hFileMap == NULL)
 	{
 		ASSERT(FALSE);
 		return;
@@ -533,7 +570,7 @@ BOOL CStkFile::ReMap(int nAdd)
 	if (nLenFile < 0)
 		return FALSE;
 
-	ASSERT(m_bShareMem == TRUE || m_hFile != (UINT)hFileNull);
+	ASSERT(m_bShareMem == TRUE || m_hFile != (HANDLE)hFileNull);
 
 	if (m_lpvFileBegin != NULL)
 	{

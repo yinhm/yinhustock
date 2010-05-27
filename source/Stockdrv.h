@@ -221,10 +221,10 @@ typedef union tagRCV_POWER_STRUCTEx
 	struct
 	{
 		time_t m_time;				// UCT
-		float m_fGive;				// 每股送  
-		float m_fPei;				// 每股配   
-		float m_fPeiPrice;			// 配股价   
-		float m_fProfit;			// 每股红利 
+		float m_fGive;				// 每股送
+		float m_fPei;				// 每股配
+		float m_fPeiPrice;			// 配股价
+		float m_fProfit;			// 每股红利
 	};
 	RCV_EKE_HEADEx m_head;
 } RCV_POWER_STRUCTEx;

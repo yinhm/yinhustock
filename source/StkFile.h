@@ -47,7 +47,7 @@ protected:
 	CString	m_sNameShareMem;
 	CString m_strFileName;
 
-	UINT	m_hFile;
+	HANDLE	m_hFile;
 	HANDLE	m_hFileMap;
 	BYTE*	m_lpvFileBegin;
 	BYTE*	m_lpvFileEnd;
@@ -62,6 +62,7 @@ public:
 	BYTE* GetFileCurrentPointer();
 
 public:
+	virtual BOOL Open(LPCTSTR lpszFileName, UINT nFileLength = 0, CString strShareName = _T(""));
 	virtual BOOL Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFileEnd = 0, CFileException* pException = NULL);
 	virtual BOOL OpenShare(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFileEnd = 0, CString sShareName = "", CFileException* pException = NULL);
 	virtual UINT Read(void* lpBuf, UINT nCount);

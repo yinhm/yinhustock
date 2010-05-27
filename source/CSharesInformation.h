@@ -5,17 +5,20 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "StkFile.h"
+
 #define STOCKTYPE  13
 #define ADDCOUNT   10 
-class CSharesInformation  
+
+class CSharesInformation : public CStkFile
 {
 public:
 	CSharesInformation();
 	virtual ~CSharesInformation();
 
 protected:
-	HANDLE m_hFile;
-	HANDLE m_hFileMap;
+	//HANDLE m_hFile;
+	//HANDLE m_hFileMap;
 
 	BYTE* m_pbData;
 
@@ -42,37 +45,34 @@ protected:
 
 
 public:
-    long  GetTotalStockTypeCount() { return STOCKTYPE;}  
-    long  GetStockTypeCount(DWORD StockType) { return m_pdwStockCurrentCount[StockType];}  
-    BOOL  GetStockTypeMaxCount(DWORD StockType) { return m_dwStockMaxCount[StockType];}   
+	long  GetTotalStockTypeCount() { return STOCKTYPE;}  
+	long  GetStockTypeCount(DWORD StockType) { return m_pdwStockCurrentCount[StockType];}  
+	BOOL  GetStockTypeMaxCount(DWORD StockType) { return m_dwStockMaxCount[StockType];}   
 	long  GetCount();   
 	BOOL  GetStockItem(DWORD StockType,DWORD nPos,PCdat1 &pStockData);   
 
 	BOOL InsertItem(char *StockId ,PCdat1 &pStockData,DWORD StockType); 
 	BOOL Lookup(char *StockId,PCdat1 &pStockData,int nKind);  
- 	int   GetStockPos(int StockType,char *StockId); 
+	int   GetStockPos(int StockType,char *StockId); 
 
 public:
-    BOOL InitRealTimeData(CString path);   
+	BOOL InitRealTimeData(CString path);   
 	void CalcIndexBuyAndSell();  
 	void GetIndexRsdn(PRsdn1 &pNidx) { pNidx=&Nidx[0]; }                          
-    void GetIndexTidxd(PTidxd &pTidx ){ pTidx=&Tidx[0]; }                        
+	void GetIndexTidxd(PTidxd &pTidx ){ pTidx=&Tidx[0]; }                        
 	REALDATA *GetRealDataHead() {return m_RealFileHead ;}   
-    BOOL SetRealDataHead(PREALDATA &pRealData);              
+	BOOL SetRealDataHead(PREALDATA &pRealData);              
 	BOOL ClearRealDataMinute();                                 
 	void SaveRealDataToFile(LPCVOID lpBaseAddress,DWORD dwNumberOfBytesToFlush);                                                                
 public:
-	void ReadBaseInfoData(PCdat1 &pStockData);       
-	void InitBaseInfoData();   
 	BOOL SavePosToFile();         
 	void SavePosToFile(int StockType); 
 
 private:
-	void ReadAllBaseInfo();             
 
 private:
-    
-    BOOL InsertItemPoint(CReportData *pStockData );            
+
+	BOOL InsertItemPoint(CReportData *pStockData );            
 
 public:
 	float GetValueUpDown(int isDown,int whick_stk,int nKind);
@@ -82,34 +82,40 @@ public:
 	static CString Symbol4To6(CString sIn);
 	static DWORD GetStockKind(int MarketType,char *strLabel);
 	BOOL AddOneStockInfo(CString strStockCode,CString strStockName,
-		            CString strStockPyjc,int nKind);               
+		CString strStockPyjc,int nKind);               
 	BOOL MOdifyOneStockInfo(CString strStockCode,CString strStockName,
-		            CString strStockPyjc,int nKind);               
+		CString strStockPyjc,int nKind);               
 	BOOL RemoveAllStockCjmxTj();                   
 
 
-	int GetChuQuanInfo(CString strStockCode,int nKind,PSplit &pSplit); 
-	BOOL AddChuQuanInfo(CString strStockCode,int nKind,Split *pSplit);  
-	BOOL ModifyChuQuanInfo(CString strStockCode,int nWhichItem,Split *pSplit,int nKind); 
-	BOOL DeleteChuQuanInfo(CString strStockCode,int nWhichItem,int nKind); 
+
+public:
+	void InitBaseInfoData();
+	void ReadAllBaseInfo();             
+
+	void ReadBaseInfoData(PCdat1 &pStockData);       
+public:
+	int GetChuQuanInfo(CString strStockCode, int nKind, PSplit& pSplit);
+	BOOL AddBaseinfoPoint(CString strStockCode, int nKind, PBASEINFO& pBaseinfo);
+	BOOL LookupBase(char* m_szStockId, int nKind, PBASEINFO& m_pStock);
+	BOOL AddChuQuanInfo(CString strStockCode, int nKind, Split* pSplit);
+	BOOL ModifyChuQuanInfo(CString strStockCode, int nWhichItem, Split* pSplit, int nKind);
+	BOOL DeleteChuQuanInfo(CString strStockCode, int nWhichItem, int nKind);
 
 	BOOL ExportChuQuanInfo(CString strStockCode,PSplit &pSplit,  
 		int& nChuquanTotalTimes,int nKind); 
 	BOOL ImportChuQuanInfo(CString strStockCode,Split *pSplit,  
 		int nChuquanTotalTimes,int nKind);
-    BOOL ImportCaiwuInfo(BASEINFO *pBaseinfo);
+	BOOL ImportCaiwuInfo(BASEINFO *pBaseinfo);
 
 	BOOL RemoveStockInfo();                                  
 	BOOL RemoveStockCjmxTj(char *code,int nKind,BOOL IsAdd);            
-	BOOL LookupBase(char *m_szStockId,int nKind,PBASEINFO &m_pStock);      
-    BOOL InsertItemCorrect(char *StockId ,PCdat1 pStockData, DWORD StockType); 
-	
+	BOOL InsertItemCorrect(char *StockId ,PCdat1 pStockData, DWORD StockType); 
 
 
-    BOOL DeleteAllStockFromStockType();
-    BOOL InitEmptyDatabase();
 
-    BOOL AddBaseinfoPoint(CString strStockCode,int nKind,PBASEINFO & pBaseinfo);
+	BOOL DeleteAllStockFromStockType();
+
 #ifdef WIDE_NET_VERSION
 	BOOL ClearAllRealTimeMarketData();
 #endif
@@ -120,6 +126,7 @@ protected:
 protected:
 	BOOL InitRealTimeDataEmpty();
 	BOOL InitRealTimeDataExist();
+	BOOL InitEmptyDatabase();
 	BOOL SetMemroyALLOCSize(DWORD StockType, unsigned int nSize);
 
 public:
@@ -131,9 +138,9 @@ public:
 	BOOL RecvStockDataForType(PSTOCKDATASHOW& p, BYTE StockType);
 };
 
-inline BOOL CSharesInformation::LookupBase(char *m_szStockId,int nKind,PBASEINFO &m_pStock)
+inline BOOL CSharesInformation::LookupBase(char* m_szStockId, int nKind, PBASEINFO& m_pStock)
 {
-	return m_StockBaseInfo.Lookup(m_szStockId,nKind,m_pStock);       
+	return m_StockBaseInfo.Lookup(m_szStockId,nKind,m_pStock);
 }
 
 inline void CSharesInformation::SaveRealDataToFile(LPCVOID lpBaseAddress,DWORD dwNumberOfBytesToFlush)
@@ -145,7 +152,7 @@ inline BOOL CSharesInformation::SetRealDataHead(PREALDATA &pRealData)
 	if(m_RealFileHead==NULL)
 		return FALSE;
 	pRealData=m_RealFileHead;
-    SaveRealDataToFile(m_RealFileHead,sizeof(REALDATA)+sizeof(long)*STOCKTYPE); 
+	SaveRealDataToFile(m_RealFileHead,sizeof(REALDATA)+sizeof(long)*STOCKTYPE); 
 	return TRUE;
 }
 
@@ -153,20 +160,20 @@ inline long  CSharesInformation::GetCount()
 {
 	long temp=0;
 	for(int i=0;i<STOCKTYPE;i++)
-       temp+=m_pdwStockCurrentCount[i];
+		temp+=m_pdwStockCurrentCount[i];
 	return temp;
 }
 inline BOOL CSharesInformation::GetStockItem(DWORD StockType,DWORD nPos,PCdat1 &pStockData)
 {
 	if(nPos < m_dwStockMaxCount[StockType])
 	{
-	   pStockData=m_pData[StockType][nPos].pItem; 
-	   return TRUE;
+		pStockData=m_pData[StockType][nPos].pItem; 
+		return TRUE;
 	}
 	else
 	{
-       pStockData=NULL;
-	   return FALSE;
+		pStockData=NULL;
+		return FALSE;
 	}
 }  
 

@@ -38,7 +38,7 @@
 #include	"ImportData.h"       
 #include	"ExportData.h"       
 #include	"ClearData.h"        
-         
+
 #include	"SymbolContrast.h"   
 #include	"ManageInvest.h"
 #include	"CaiwuData.h"
@@ -84,9 +84,9 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 #ifdef WIDE_NET_VERSION
-	CClientTransmitManageWnd* CMainFrame::m_pClientTransmitManageWnd;
+CClientTransmitManageWnd* CMainFrame::m_pClientTransmitManageWnd;
 
-	BOOL CMainFrame::m_bLogonSuccess;
+BOOL CMainFrame::m_bLogonSuccess;
 #endif
 CTaiShanDoc * CMainFrame::m_taiShanDoc = NULL;
 CTaiScreen *CMainFrame::dialogtjxg;
@@ -191,44 +191,44 @@ static UINT palette[] =
 LRESULT CMainFrame::OnTjxg(WPARAM wParam, LPARAM lParam)
 {
 
-	   if(!m_taiShanDoc)
-			return 0;
-		int length=dialogtjxg->m_resultarray.GetSize();
-        m_taiShanDoc->m_StockTypeMap[2].RemoveAll();
-        m_taiShanDoc->m_ScreenList.RemoveAll();
-		if(length>0)
-		{
-			for(int i=0;i<length;i++)
-			{
-				SymbolKind m_SymbolKind;
-				CString m_zqdm,m_zqdmkind;
-				m_SymbolKind = dialogtjxg->m_resultarray.GetAt(i);
-                m_zqdm=m_SymbolKind.m_chSymbol;
-                m_zqdmkind=m_taiShanDoc->GetStockKindString(m_SymbolKind.m_nSymbolKind);
-                m_zqdmkind+=m_zqdm;
-		        m_taiShanDoc->m_StockTypeMap[2][m_zqdmkind]=m_zqdm;
-				SharesSymbol m_StockSymbol;
-				strcpy(m_StockSymbol.sharesymbol,m_SymbolKind.m_chSymbol);
-                m_StockSymbol.nKind=m_SymbolKind.m_nSymbolKind;  
-				m_taiShanDoc->m_ScreenList.Add(m_StockSymbol);
-			}
-		}
-		
-		POSITION pos = m_taiShanDoc->GetFirstViewPosition(); 
-		while (pos != NULL) 
-		{
-		  CView* pView = m_taiShanDoc->GetNextView(pos);
-		  if(pView->IsKindOf( RUNTIME_CLASS(CTaiShanReportView)))
-		  {
-				CTaiShanReportView *m_View;
-				m_View=(CTaiShanReportView *)pView;
-				m_View->GetParent()->ShowWindow(SW_SHOWMAXIMIZED);
-				m_View->ChangeToPage(TJXGPAGE,TRUE); 
-
-		  }
-		} 
-
+	if(!m_taiShanDoc)
 		return 0;
+	int length=dialogtjxg->m_resultarray.GetSize();
+	m_taiShanDoc->m_StockTypeMap[2].RemoveAll();
+	m_taiShanDoc->m_ScreenList.RemoveAll();
+	if(length>0)
+	{
+		for(int i=0;i<length;i++)
+		{
+			SymbolKind m_SymbolKind;
+			CString m_zqdm,m_zqdmkind;
+			m_SymbolKind = dialogtjxg->m_resultarray.GetAt(i);
+			m_zqdm=m_SymbolKind.m_chSymbol;
+			m_zqdmkind=m_taiShanDoc->GetStockKindString(m_SymbolKind.m_nSymbolKind);
+			m_zqdmkind+=m_zqdm;
+			m_taiShanDoc->m_StockTypeMap[2][m_zqdmkind]=m_zqdm;
+			SharesSymbol m_StockSymbol;
+			strcpy(m_StockSymbol.sharesymbol,m_SymbolKind.m_chSymbol);
+			m_StockSymbol.nKind=m_SymbolKind.m_nSymbolKind;  
+			m_taiShanDoc->m_ScreenList.Add(m_StockSymbol);
+		}
+	}
+
+	POSITION pos = m_taiShanDoc->GetFirstViewPosition(); 
+	while (pos != NULL) 
+	{
+		CView* pView = m_taiShanDoc->GetNextView(pos);
+		if(pView->IsKindOf( RUNTIME_CLASS(CTaiShanReportView)))
+		{
+			CTaiShanReportView *m_View;
+			m_View=(CTaiShanReportView *)pView;
+			m_View->GetParent()->ShowWindow(SW_SHOWMAXIMIZED);
+			m_View->ChangeToPage(TJXGPAGE,TRUE); 
+
+		}
+	} 
+
+	return 0;
 }
 
 CMainFrame::CMainFrame():m_dlgLeftPop(this)
@@ -241,14 +241,14 @@ CMainFrame::CMainFrame():m_dlgLeftPop(this)
 	m_pDlgAlarm = NULL;
 	m_bAlarmExec = false;
 	m_taiShanDoc=NULL;
-    m_MDIChildWnd=NULL;
+	m_MDIChildWnd=NULL;
 
-    m_bRunFlag=FALSE;	
-    m_EnableF10 = true;
+	m_bRunFlag=FALSE;	
+	m_EnableF10 = true;
 	m_EnableF9 = true;
-    m_bFullScreen = FALSE;
+	m_bFullScreen = FALSE;
 	m_BaseInfo = true;
-	
+
 	InformationLoop=0;
 	m_drawLineToolBar = new CToolBar;
 	m_F9ORF10 = FALSE;
@@ -315,11 +315,11 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;   
 	}
 
-    CRect Rect;
+	CRect Rect;
 	GetClientRect(&Rect);
-    m_TestDialogbar.SetWindowPos(NULL,1,0,Rect.Width( )-4,55,SWP_NOMOVE);
+	m_TestDialogbar.SetWindowPos(NULL,1,0,Rect.Width( )-4,55,SWP_NOMOVE);
 
-	
+
 	if (!m_wndStatusBar.Create(this))
 	{
 		TRACE0("Failed to create status bar\n");
@@ -355,7 +355,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
 	if( !CMDIFrameWnd::PreCreateWindow(cs) )
 		return FALSE;
-	
+
 	return TRUE;
 }
 
@@ -415,7 +415,7 @@ void CMainFrame::OnTimer(UINT nIDEvent)
 
 	CMDIFrameWnd::OnTimer(nIDEvent);
 
-    if(nIDEvent == TJXG_ALERT)
+	if(nIDEvent == TJXG_ALERT)
 		CAlertSystem::CaclAlarm(this); 
 
 }
@@ -439,11 +439,11 @@ void CMainFrame::Drawline()
 	{
 		flagmy=0; 
 		BOOL bVisible = ((m_drawLineToolBar->GetStyle() & WS_VISIBLE) != 0);
-        ShowControlBar(m_drawLineToolBar, TRUE, FALSE);
+		ShowControlBar(m_drawLineToolBar, TRUE, FALSE);
 		RecalcLayout();
 	}
 
-	
+
 }
 
 int CMainFrame::CreateToolDrawLine()
@@ -480,7 +480,7 @@ int CMainFrame::CreateToolDrawLine()
 	EnableDocking(CBRS_ALIGN_ANY);
 	m_drawLineToolBar->SetWindowText(_T("画线工具"));
 	ShowControlBar(m_drawLineToolBar, FALSE, TRUE);
-    first = 1;
+	first = 1;
 	return 1;
 }
 
@@ -488,14 +488,14 @@ int CMainFrame::CreateToolDrawLine()
 void CMainFrame::OnSize(UINT nType, int cx, int cy) 
 {
 	CMDIFrameWnd::OnSize(nType, cx, cy);
-	
+
 	if(cx == 0 && cy == 0)
 		return;
-	
+
 	CRect rc;
 	CMDIFrameWnd::GetWindowRect(&rc);
 
-    m_TestDialogbar.SetWindowPos(NULL,1,0,cx - 4,46,SWP_NOMOVE|SWP_DRAWFRAME);
+	m_TestDialogbar.SetWindowPos(NULL,1,0,cx - 4,46,SWP_NOMOVE|SWP_DRAWFRAME);
 
 
 	CRect rPop;
@@ -509,75 +509,75 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 
 LRESULT CMainFrame::OnNcHitTest(CPoint point) 
 {
-	
+
 	UINT nWhere =CMDIFrameWnd::OnNcHitTest(point);
 	CView *pView;
 	switch(nWhere)
 	{
-    case HTTOP:
-    case HTCAPTION:
+	case HTTOP:
+	case HTCAPTION:
 
-		 pView = GetActiveView();
-		 if(pView == 0)
-		 {
-		 }
-		 else if(pView->IsKindOf(RUNTIME_CLASS(CPreviewView)))
-		     return 0;
+		pView = GetActiveView();
+		if(pView == 0)
+		{
+		}
+		else if(pView->IsKindOf(RUNTIME_CLASS(CPreviewView)))
+			return 0;
 
-		 delete pView;
-		 if(!m_dlgLeftPop.IsWindowVisible ())
+		delete pView;
+		if(!m_dlgLeftPop.IsWindowVisible ())
 			m_TestDialogbar.ShowWindow(SW_SHOW);
-		 else
+		else
 			m_TestDialogbar.ShowWindow(SW_HIDE);
-		 break;
-    case HTLEFT:
-	
-		 pView = GetActiveView();
-		 if(pView == 0)
-		 {
-		 }
-		 else if(pView->IsKindOf(RUNTIME_CLASS(CPreviewView)))
-		     return 0;
+		break;
+	case HTLEFT:
 
-		 m_TestDialogbar.ShowWindow(SW_HIDE);
-		 break;
+		pView = GetActiveView();
+		if(pView == 0)
+		{
+		}
+		else if(pView->IsKindOf(RUNTIME_CLASS(CPreviewView)))
+			return 0;
+
+		m_TestDialogbar.ShowWindow(SW_HIDE);
+		break;
 	case HTMENU:
-         if(m_bFullScreen)
-		 {
-			 CView *pView;
-			 pView = GetActiveView();
-			 if(pView == 0)
-				 ;
-			 else if(pView->IsKindOf(RUNTIME_CLASS(CPreviewView)))
-				 return 0;
+		if(m_bFullScreen)
+		{
+			CView *pView;
+			pView = GetActiveView();
+			if(pView == 0)
+				;
+			else if(pView->IsKindOf(RUNTIME_CLASS(CPreviewView)))
+				return 0;
 
-			 delete pView;
-			 if(!m_dlgLeftPop.IsWindowVisible ())
+			delete pView;
+			if(!m_dlgLeftPop.IsWindowVisible ())
 				m_TestDialogbar.ShowWindow(SW_SHOW);
-			 else
+			else
 				m_TestDialogbar.ShowWindow(SW_HIDE);
-		 }
-		 break;
+		}
+		break;
 	}
-     return  CMDIFrameWnd::OnNcHitTest(point);
+	return  CMDIFrameWnd::OnNcHitTest(point);
 }
 
 BOOL CMainFrame::PreTranslateMessage(MSG* pMsg) 
 {
 
-    if(pMsg-> message==WM_MOUSEMOVE)
+	if(pMsg-> message==WM_MOUSEMOVE)
 	{
-      int y = HIWORD(pMsg->lParam);
-	  if(y > 65)
-	    m_TestDialogbar.ShowWindow(SW_HIDE );
+		int y = HIWORD(pMsg->lParam);
+		if(y > 65)
+			m_TestDialogbar.ShowWindow(SW_HIDE );
 	}
-    if(pMsg-> message==WM_MOUSEMOVE)
+	if(pMsg-> message==WM_MOUSEMOVE)
 	{
-      int x = LOWORD(pMsg->lParam);
-	  CRect r ;
-	  m_dlgLeftPop.GetWindowRect(r);
-	  if(x > r.Width ()+30 )
-	    m_dlgLeftPop.ShowWindow(SW_HIDE );
+		int x = LOWORD(pMsg->lParam);
+		CRect r ;
+		m_dlgLeftPop.GetWindowRect(r);
+		if(x > r.Width ()+30 )
+			m_dlgLeftPop.ShowWindow(SW_HIDE );
 	}
 
 	if( pMsg->message == WM_LBUTTONDOWN )
@@ -598,7 +598,7 @@ void CMainFrame::OnViewCompanyinfo()
 
 void CMainFrame::OnCompanyinfo()
 {
-    m_F9ORF10 = FALSE;
+	m_F9ORF10 = FALSE;
 	if(m_EnableF10 == false)
 	{
 		CWnd * pMainWnd = AfxGetApp()->m_pMainWnd;
@@ -615,14 +615,14 @@ void CMainFrame::OnCompanyinfo()
 	}
 	CWnd* pMainWnd=AfxGetApp()->m_pMainWnd;
 	CFrameWnd * pActiveWnd=((CFrameWnd*)pMainWnd)->GetActiveFrame();
-    CTaiShanDoc* pDoc=((CMainFrame *)pMainWnd)->m_taiShanDoc;
+	CTaiShanDoc* pDoc=((CMainFrame *)pMainWnd)->m_taiShanDoc;
 
 	if( pActiveWnd ==NULL || pDoc == NULL)
 	{
 		AfxMessageBox("请选择股票！",MB_ICONSTOP);
 		return;
 	}
-    if(pActiveWnd->IsKindOf(RUNTIME_CLASS(CNineShowFrame)))
+	if(pActiveWnd->IsKindOf(RUNTIME_CLASS(CNineShowFrame)))
 	{
 		m_taiShanDoc->m_NineShowView->SetStockCodeForDisplayF10();
 	}
@@ -647,80 +647,80 @@ void CMainFrame::OnViewGgxx()
 
 void CMainFrame::ReViewInfo()
 {
-    m_EnableF10 = 2;
+	m_EnableF10 = 2;
 	OnCompanyinfo(); 
 }
 
 void CMainFrame::OnMenuFullscreen()
 {
 
-    RECT rectDesktop;
-    WINDOWPLACEMENT wpNew;
+	RECT rectDesktop;
+	WINDOWPLACEMENT wpNew;
 
-    if (m_bFullScreen)
+	if (m_bFullScreen)
 	{
-	
-		GetWindowPlacement (&m_wpPrev);
-        m_wpPrev.length = sizeof m_wpPrev;
 
-     
-        DWORD winstyle,style1;
+		GetWindowPlacement (&m_wpPrev);
+		m_wpPrev.length = sizeof m_wpPrev;
+
+
+		DWORD winstyle,style1;
 		winstyle = GetExStyle() | WS_EX_TOPMOST ;
 		style1 = GetStyle() | WS_MAXIMIZE;   
 		::GetWindowRect ( ::GetDesktopWindow(), &rectDesktop );
 		rectDesktop.top = rectDesktop.top + 1;
 		::AdjustWindowRectEx(&rectDesktop, style1,TRUE, winstyle);
-        
-	
+
+
 		m_FullScreenWindowRect = rectDesktop;
 
-        wpNew = m_wpPrev;
-        wpNew.showCmd = SW_SHOWNORMAL;
-        wpNew.rcNormalPosition = rectDesktop;
+		wpNew = m_wpPrev;
+		wpNew.showCmd = SW_SHOWNORMAL;
+		wpNew.rcNormalPosition = rectDesktop;
 
-        m_bFullScreen=TRUE;
-    }
-    else
-    {
-       
-        ReleaseCapture();
-        m_bFullScreen=FALSE;
+		m_bFullScreen=TRUE;
+	}
+	else
+	{
 
-        wpNew = m_wpPrev;
-    }
+		ReleaseCapture();
+		m_bFullScreen=FALSE;
 
-  
-    SetWindowPlacement ( &wpNew );
+		wpNew = m_wpPrev;
+	}
+
+
+	SetWindowPlacement ( &wpNew );
 
 }
 
 void CMainFrame::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
 {
 	if (m_bFullScreen == TRUE)
-		{
-			lpMMI->ptMaxSize.y = m_FullScreenWindowRect.Height();
-			lpMMI->ptMaxTrackSize.y = lpMMI->ptMaxSize.y - 1;
-			lpMMI->ptMaxSize.x = m_FullScreenWindowRect.Width();
-			lpMMI->ptMaxTrackSize.x = lpMMI->ptMaxSize.x;
-			CMDIFrameWnd::OnGetMinMaxInfo(lpMMI);
-		}
-   else
-   {
-	   lpMMI->ptMaxSize.y = GetSystemMetrics(SM_CYSCREEN);
-	   lpMMI->ptMaxSize.x = GetSystemMetrics(SM_CXSCREEN);
-	   CMDIFrameWnd::OnGetMinMaxInfo(lpMMI);
-   }
+	{
+		lpMMI->ptMaxSize.y = m_FullScreenWindowRect.Height();
+		lpMMI->ptMaxTrackSize.y = lpMMI->ptMaxSize.y - 1;
+		lpMMI->ptMaxSize.x = m_FullScreenWindowRect.Width();
+		lpMMI->ptMaxTrackSize.x = lpMMI->ptMaxSize.x;
+		CMDIFrameWnd::OnGetMinMaxInfo(lpMMI);
+	}
+	else
+	{
+		lpMMI->ptMaxSize.y = GetSystemMetrics(SM_CYSCREEN);
+		lpMMI->ptMaxSize.x = GetSystemMetrics(SM_CXSCREEN);
+		CMDIFrameWnd::OnGetMinMaxInfo(lpMMI);
+	}
 }
 
 void CMainFrame::OnUpdateViewFullScreen(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable();
-    pCmdUI->SetCheck(m_bFullScreen);
+	pCmdUI->SetCheck(m_bFullScreen);
 }
 
 void CMainFrame::OnFullscreen() 
 {
-	
+
 	m_bFullScreen = !m_bFullScreen;
 	OnMenuFullscreen();
 }
@@ -731,7 +731,7 @@ void CMainFrame::OnNomalscreen()
 
 void CMainFrame::OnUpdateNomalscreen(CCmdUI* pCmdUI) 
 {
-   pCmdUI->Enable(m_bFullScreen);
+	pCmdUI->Enable(m_bFullScreen);
 }
 
 
@@ -739,13 +739,13 @@ void CMainFrame::OnNcPaint()
 {
 	CMDIFrameWnd::OnNcPaint();
 	return;
-	
+
 }
 
 
 void CMainFrame::OnToolGsgl() 
 { 
-	
+
 #ifdef OEM
 	return;
 #endif
@@ -787,17 +787,17 @@ void CMainFrame::OnToolRiskIndex()
 
 
 void CMainFrame::DisplayBargain(
-	float Index_sh,float UpDown_sh,float Vol_sh,float Amount_sh,
-	float Index_sz,float UpDown_sz,float Vol_sz,float Amount_sz,
-	float Index_cy,float UpDown_cy,float Vol_cy,float Amount_cy,
-	float percent_sh, float percent_sz ,float percent_cy )
+								float Index_sh,float UpDown_sh,float Vol_sh,float Amount_sh,
+								float Index_sz,float UpDown_sz,float Vol_sz,float Amount_sz,
+								float Index_cy,float UpDown_cy,float Vol_cy,float Amount_cy,
+								float percent_sh, float percent_sz ,float percent_cy )
 
 {   
 	m_wndStatusBar.SetIndex_sh(Index_sh,FALSE);
 	m_wndStatusBar.SetIndex_sz(Index_sz,FALSE);
 	m_wndStatusBar.SetIndex_cy(Index_cy,FALSE);
 	m_wndStatusBar.SetAD_sh(UpDown_sh,FALSE);
-    m_wndStatusBar.SetAD_sz(UpDown_sz,FALSE);
+	m_wndStatusBar.SetAD_sz(UpDown_sz,FALSE);
 	m_wndStatusBar.SetAD_cy(UpDown_cy,FALSE);
 	m_wndStatusBar.SetVol_sh(Vol_sh,FALSE);
 	m_wndStatusBar.SetVol_sz(Vol_sz,FALSE);
@@ -807,7 +807,7 @@ void CMainFrame::DisplayBargain(
 	m_wndStatusBar.SetAmount_cy(Amount_cy,FALSE);
 	m_wndStatusBar.SetRedGreen_sh(percent_sh);
 	m_wndStatusBar.SetRedGreen_cy(percent_cy);
-    m_wndStatusBar.SetRedGreen_sz(percent_sz);
+	m_wndStatusBar.SetRedGreen_sz(percent_sz);
 }
 
 
@@ -819,7 +819,7 @@ void CMainFrame::OnTjxgTjxg()
 
 void CMainFrame::OnViewXx() 
 {
-	
+
 	COPTION Option(_T("属性设置"));
 	Option.AddNewPage();
 	CTaiShanDoc *pDoc = this->m_taiShanDoc ;
@@ -832,73 +832,73 @@ void CMainFrame::OnViewXx()
 		for(int i=0;i<fontstructlength;i++)
 			pDoc->m_fontstr[i]=Option.m_syswg.fr[i];
 
-	pDoc->m_systemOption.autoclose=Option.m_syssetup.m_autoclose;
-	pDoc->m_systemOption.autominute=Option.m_syssetup.m_autominute;
-	pDoc->m_systemOption.autoday=Option.m_syssetup.m_autoday;
-	pDoc->m_systemOption.showxline=Option.m_syssetup.m_showxline;
-	pDoc->m_systemOption.showyline=Option.m_syssetup.m_showyline;
-	pDoc->m_systemOption.alarmsound=Option.m_syssetup.m_AlarmSound;
-	pDoc->m_systemOption.organizedata=Option.m_syssetup.m_AutoOrganizeData;
-	pDoc->m_propertyInitiate.bDoPowerSelectingStock=Option.m_syssetup.m_tjxgpower;
-	pDoc->m_propertyInitiate.bDoVolPowering=Option.m_syssetup.m_volpower;
-	pDoc->m_propertyInitiate.bDoPowerAfter=Option.m_syssetup.m_backpower;
-	pDoc->m_propertyInitiate.bSaveParam=Option.m_syssetup.m_autosavezb;
-	pDoc->m_propertyInitiate.bShowCrossDlg=Option.m_syssetup.m_showinfohq;
-	pDoc->m_propertyInitiate.bRunAlarmBegin=Option.m_syssetup.m_startalert;
-	pDoc->m_propertyInitiate.bUseMin5ChenBen=Option.m_syssetup.m_cjmxyester;
-	pDoc->m_systemOption.kline=Option.m_syssetup.m_kline;
-	pDoc->m_systemOption.fourgraph=Option.m_syssetup.m_fourgraph;
+		pDoc->m_systemOption.autoclose=Option.m_syssetup.m_autoclose;
+		pDoc->m_systemOption.autominute=Option.m_syssetup.m_autominute;
+		pDoc->m_systemOption.autoday=Option.m_syssetup.m_autoday;
+		pDoc->m_systemOption.showxline=Option.m_syssetup.m_showxline;
+		pDoc->m_systemOption.showyline=Option.m_syssetup.m_showyline;
+		pDoc->m_systemOption.alarmsound=Option.m_syssetup.m_AlarmSound;
+		pDoc->m_systemOption.organizedata=Option.m_syssetup.m_AutoOrganizeData;
+		pDoc->m_propertyInitiate.bDoPowerSelectingStock=Option.m_syssetup.m_tjxgpower;
+		pDoc->m_propertyInitiate.bDoVolPowering=Option.m_syssetup.m_volpower;
+		pDoc->m_propertyInitiate.bDoPowerAfter=Option.m_syssetup.m_backpower;
+		pDoc->m_propertyInitiate.bSaveParam=Option.m_syssetup.m_autosavezb;
+		pDoc->m_propertyInitiate.bShowCrossDlg=Option.m_syssetup.m_showinfohq;
+		pDoc->m_propertyInitiate.bRunAlarmBegin=Option.m_syssetup.m_startalert;
+		pDoc->m_propertyInitiate.bUseMin5ChenBen=Option.m_syssetup.m_cjmxyester;
+		pDoc->m_systemOption.kline=Option.m_syssetup.m_kline;
+		pDoc->m_systemOption.fourgraph=Option.m_syssetup.m_fourgraph;
 
-	pDoc->m_propertyInitiate.daysOfManyKline=Option.m_syspara.m_nDaysOfManyKline;
-	pDoc->m_propertyInitiate.daysOfDayKline=Option.m_syspara.m_nDaysOfDayKline;
-	pDoc->m_propertyInitiate.countOfHistoryFile=Option.m_syspara.m_nCountOfHistoryFile;
-    pDoc->m_propertyInitiate.daysOfMin5Kline=Option.m_syspara.m_nDaysOfMin5Kline;
-    pDoc->m_systemdata.noticesave=Option.m_syspara.m_noticesave;
+		pDoc->m_propertyInitiate.daysOfManyKline=Option.m_syspara.m_nDaysOfManyKline;
+		pDoc->m_propertyInitiate.daysOfDayKline=Option.m_syspara.m_nDaysOfDayKline;
+		pDoc->m_propertyInitiate.countOfHistoryFile=Option.m_syspara.m_nCountOfHistoryFile;
+		pDoc->m_propertyInitiate.daysOfMin5Kline=Option.m_syspara.m_nDaysOfMin5Kline;
+		pDoc->m_systemdata.noticesave=Option.m_syspara.m_noticesave;
 
-	pDoc->m_propertyInitiate.LTP_rate=Option.m_syspara.m_ltp_rateV;
-	pDoc->m_propertyInitiate.CJL_rate=Option.m_syspara.m_cjl_rateV;
-	
-    pDoc->m_syshqset.capital=Option.m_syspara.m_nCapitalTime;
-	pDoc->m_syshqset.quangtity=Option.m_syspara.m_nQuantityTime;
-	pDoc->m_syshqset.swing=Option.m_syspara.m_nSwingTime;
-	pDoc->m_syshqset.upspeed=Option.m_syspara.m_nUpSpeedTime;
-	pDoc->m_syshqset.changehand=Option.m_syspara.m_nChangeHandTime;
+		pDoc->m_propertyInitiate.LTP_rate=Option.m_syspara.m_ltp_rateV;
+		pDoc->m_propertyInitiate.CJL_rate=Option.m_syspara.m_cjl_rateV;
 
-    pDoc->m_propertyInitiate.nTestUnfinished=Option.m_syspara.m_nNoFinishedTest;
-	pDoc->m_systemdata.middleprice=Option.m_syspara.m_nMidWay;
+		pDoc->m_syshqset.capital=Option.m_syspara.m_nCapitalTime;
+		pDoc->m_syshqset.quangtity=Option.m_syspara.m_nQuantityTime;
+		pDoc->m_syshqset.swing=Option.m_syspara.m_nSwingTime;
+		pDoc->m_syshqset.upspeed=Option.m_syspara.m_nUpSpeedTime;
+		pDoc->m_syshqset.changehand=Option.m_syspara.m_nChangeHandTime;
 
-    pDoc->m_propertyInitiate.nSecondsAlarm=Option.m_syspara.m_nTimespanAlert;
-    pDoc->m_systemdata.changepage=Option.m_syspara.m_nChangPageTime;
+		pDoc->m_propertyInitiate.nTestUnfinished=Option.m_syspara.m_nNoFinishedTest;
+		pDoc->m_systemdata.middleprice=Option.m_syspara.m_nMidWay;
 
-	pDoc->m_dadanchoice.Vol=Option.m_syspara.m_nVol;
-	pDoc->m_dadanchoice.Per=Option.m_syspara.m_nPer;
-	pDoc->m_dadanchoice.Acount=Option.m_syspara.m_nAcount;
-	pDoc->m_dadanchoice.Format=Option.m_syspara.m_nFormat;
-	pDoc->m_SystemInitData.RealTime=Option.m_syspara.m_nRealTime;
-	pDoc->m_SystemInitData.BlockTime=Option.m_syspara.m_nBlockTime;
+		pDoc->m_propertyInitiate.nSecondsAlarm=Option.m_syspara.m_nTimespanAlert;
+		pDoc->m_systemdata.changepage=Option.m_syspara.m_nChangPageTime;
 
-	strcpy(pDoc->m_SystemInitData.NetAddr,Option.m_syspara.m_nAddress.GetBuffer(0));
-    
-	strcpy(pDoc->m_SystemInitData.KswtAddr,Option.m_syspara.m_nKswtAddr.GetBuffer(0));
-	CTaiShanKlineShowView::OnDataChangAll(200);
-	::SendMessage(pDoc->m_WsStock2000View->m_hWnd,WM_USER_CHANGECOLOR,0,0);
+		pDoc->m_dadanchoice.Vol=Option.m_syspara.m_nVol;
+		pDoc->m_dadanchoice.Per=Option.m_syspara.m_nPer;
+		pDoc->m_dadanchoice.Acount=Option.m_syspara.m_nAcount;
+		pDoc->m_dadanchoice.Format=Option.m_syspara.m_nFormat;
+		pDoc->m_SystemInitData.RealTime=Option.m_syspara.m_nRealTime;
+		pDoc->m_SystemInitData.BlockTime=Option.m_syspara.m_nBlockTime;
 
-	if(pDoc->m_pStockCjMxTj)
-	   ::SendMessage(pDoc->m_pStockCjMxTj->m_hWnd,WM_USER_CHANGECOLOR,0,0);
-	
-	if(pDoc->m_NineShowView)
-	  ::SendMessage(pDoc->m_NineShowView->m_hWnd,WM_USER_CHANGECOLOR,0,0);
-	
+		strcpy(pDoc->m_SystemInitData.NetAddr,Option.m_syspara.m_nAddress.GetBuffer(0));
+
+		strcpy(pDoc->m_SystemInitData.KswtAddr,Option.m_syspara.m_nKswtAddr.GetBuffer(0));
+		CTaiShanKlineShowView::OnDataChangAll(200);
+		::SendMessage(pDoc->m_WsStock2000View->m_hWnd,WM_USER_CHANGECOLOR,0,0);
+
+		if(pDoc->m_pStockCjMxTj)
+			::SendMessage(pDoc->m_pStockCjMxTj->m_hWnd,WM_USER_CHANGECOLOR,0,0);
+
+		if(pDoc->m_NineShowView)
+			::SendMessage(pDoc->m_NineShowView->m_hWnd,WM_USER_CHANGECOLOR,0,0);
+
 	}
 }
 
 void CMainFrame::OnStopCuohe() 
 {
-	
-    if(m_StopCuoHe==TRUE)
-	  m_StopCuoHe=FALSE;
+
+	if(m_StopCuoHe==TRUE)
+		m_StopCuoHe=FALSE;
 	else
-	  m_StopCuoHe=TRUE;
+		m_StopCuoHe=TRUE;
 }
 
 void CMainFrame::OnToolTzgl() 
@@ -935,7 +935,7 @@ void CMainFrame::OnOpenBigBill()
 	}
 	else
 	{
-        m_taiShanDoc->m_pStockCjMxTj->ShowWindow(SW_RESTORE);
+		m_taiShanDoc->m_pStockCjMxTj->ShowWindow(SW_RESTORE);
 
 	}
 
@@ -944,22 +944,22 @@ void CMainFrame::OnOpenBigBill()
 
 void CMainFrame::OnF3() 
 {
- 
-   CMDIChildWnd* pchildfram= ((CMainFrame*)(AfxGetApp()->m_pMainWnd))->MDIGetActive();
-   CTaiShanDoc*	pDoc=this->m_taiShanDoc ;
-   if(pDoc == NULL)
-	  return;
-   CView *pView = pchildfram->GetActiveView();
-   if(pView == NULL)
-   {
-     ::SendMessage(pDoc->m_WsStock2000View->m_hWnd,WM_USER_FROM_KLINE,0,5);
-     return;
-   }
-   if(pView->IsKindOf(RUNTIME_CLASS(CNineShowView)))
-   {
-     ((CNineShowView *)pView)->IsQuit = 1;
-   }
-   ::SendMessage(pDoc->m_WsStock2000View->m_hWnd,WM_USER_FROM_KLINE,0,5);
+
+	CMDIChildWnd* pchildfram= ((CMainFrame*)(AfxGetApp()->m_pMainWnd))->MDIGetActive();
+	CTaiShanDoc*	pDoc=this->m_taiShanDoc ;
+	if(pDoc == NULL)
+		return;
+	CView *pView = pchildfram->GetActiveView();
+	if(pView == NULL)
+	{
+		::SendMessage(pDoc->m_WsStock2000View->m_hWnd,WM_USER_FROM_KLINE,0,5);
+		return;
+	}
+	if(pView->IsKindOf(RUNTIME_CLASS(CNineShowView)))
+	{
+		((CNineShowView *)pView)->IsQuit = 1;
+	}
+	::SendMessage(pDoc->m_WsStock2000View->m_hWnd,WM_USER_FROM_KLINE,0,5);
 }
 
 void CMainFrame::OnF4() 
@@ -971,7 +971,7 @@ void CMainFrame::OnClose()
 {	
 	if(AfxMessageBox("是否要退出系统？",MB_YESNO|MB_ICONQUESTION) == IDNO)
 		return;
-    HqStock_Quit();
+	HqStock_Quit();
 	CTaiShanDoc *pDoc = this->m_taiShanDoc ; 
 	POSITION pos = pDoc->GetFirstViewPosition();
 	CView *pView;
@@ -998,7 +998,7 @@ void CMainFrame::OnUpdateToolGsgl(CCmdUI* pCmdUI)
 #ifndef OEM
 	pCmdUI->Enable(TRUE);
 #else
-    pCmdUI->Enable(FALSE);
+	pCmdUI->Enable(FALSE);
 #endif
 
 }
@@ -1009,16 +1009,16 @@ void CMainFrame::OnUpdateBaseinfoGrid(CCmdUI* pCmdUI)
 #ifdef OEM
 	pCmdUI->Enable(FALSE);
 #else
-    pCmdUI->Enable(TRUE);
+	pCmdUI->Enable(TRUE);
 #endif	
 }
 
 void CMainFrame::OnUpdateCuoheOpen(CCmdUI* pCmdUI) 
 {
-	
+
 #ifdef OEM
 	pCmdUI->Enable(FALSE);
-    return;    
+	return;    
 #endif	
 }
 
@@ -1030,16 +1030,16 @@ void CMainFrame::OnGrid()
 
 void CMainFrame::OnUpdateGrid(CCmdUI* pCmdUI) 
 {
-  CView *pView = this->GetActiveFrame()->GetActiveView();
-  if(pView == NULL)
-  {
-   pCmdUI->Enable(TRUE);
-   return;
-  }
-  if(pView->IsKindOf(RUNTIME_CLASS(CTaiShanReportView)))
-  {
-    pCmdUI->Enable(FALSE);  
-  }
+	CView *pView = this->GetActiveFrame()->GetActiveView();
+	if(pView == NULL)
+	{
+		pCmdUI->Enable(TRUE);
+		return;
+	}
+	if(pView->IsKindOf(RUNTIME_CLASS(CTaiShanReportView)))
+	{
+		pCmdUI->Enable(FALSE);  
+	}
 }
 
 void CMainFrame::OnUpdateF3(CCmdUI* pCmdUI) 
@@ -1057,13 +1057,13 @@ void CMainFrame::OnWindowNew()
 	CTaiShanDoc* pDoc=this->m_taiShanDoc;
 
 	CDocTemplate* pTemplate= ((CTaiShanApp*)AfxGetApp())->pDrawTemplate;
-	
+
 
 	CFrameWnd* pFrame = pTemplate->CreateNewFrame(pDoc,pFrameWnd);
 	pTemplate->InitialUpdateFrame(pFrame,pDoc);
-			
+
 	pFrameWnd =(CMDIChildWnd*)GetActiveFrame();
-	
+
 }
 
 void CMainFrame::OnUpdateWindowNew(CCmdUI* pCmdUI) 
@@ -1072,7 +1072,7 @@ void CMainFrame::OnUpdateWindowNew(CCmdUI* pCmdUI)
 	CTaiShanDoc* pDoc=this->m_taiShanDoc;
 	if(pDoc->m_lmbViewArray .GetSize()>=6)
 		pCmdUI->Enable(FALSE);
-	
+
 }
 
 LRESULT CMainFrame::DrawKlineWindow(WPARAM wParam, LPARAM lParam)
@@ -1083,10 +1083,10 @@ LRESULT CMainFrame::DrawKlineWindow(WPARAM wParam, LPARAM lParam)
 	if(pDoc->m_lmbViewArray.GetSize() == 0)
 	{ 
 		CFrameWnd* pFrameWnd=GetActiveFrame();
-        pDoc->m_GetFocus = true;
+		pDoc->m_GetFocus = true;
 
 		CDocTemplate* pTemplate= ((CTaiShanApp*)AfxGetApp())->pDrawTemplate;
-		
+
 
 		pDoc->m_sharesSymbol = symbol;
 		pDoc->m_stkKind=nKind;
@@ -1096,13 +1096,13 @@ LRESULT CMainFrame::DrawKlineWindow(WPARAM wParam, LPARAM lParam)
 		else if(lParam%10 == 2) 
 			((CTaiShanApp*)AfxGetApp())->Line_mode = 5;
 
-	
+
 		CFrameWnd* pFrame = pTemplate->CreateNewFrame(pDoc,pFrameWnd);
 		pTemplate->InitialUpdateFrame(pFrame,pDoc);
 
 		return 0;
 	}
-    else
+	else
 	{
 		CTaiShanKlineShowView *pView = pDoc->m_lmbViewArray[0];
 		pView->m_sharesSymbol = symbol;
@@ -1132,7 +1132,7 @@ void CMainFrame::OnTjxgAlarm()
 void CMainFrame::OnToolBlockMana() 
 {
 
-    CSuperviseSharesBlock l_Dlg;
+	CSuperviseSharesBlock l_Dlg;
 	l_Dlg.DoModal();
 }
 
@@ -1151,7 +1151,7 @@ void CMainFrame::OnDownload20()
 	}
 	else
 	{
-        m_taiShanDoc->m_pDownLoadDlg->ShowWindow(SW_RESTORE);
+		m_taiShanDoc->m_pDownLoadDlg->ShowWindow(SW_RESTORE);
 	}
 }
 
@@ -1161,18 +1161,18 @@ void CMainFrame::OnCloseReceiver()
 #ifndef WIDE_NET_VERSION
 	if(!m_taiShanDoc->m_bCloseReceiver)
 	{
-      HqStock_Init();
+		HqStock_Init();
 	}
 	else
 	{
-      HqStock_Quit();
+		HqStock_Quit();
 	}
 #endif
 }
 
 void CMainFrame::OnUpdateCloseReceiver(CCmdUI* pCmdUI) 
 {
-	
+
 	if(m_taiShanDoc->m_bCloseReceiver)
 	{
 		pCmdUI->SetText("关闭行情接收系统"); 
@@ -1242,7 +1242,7 @@ void CMainFrame::OnMin1Line()
 	CString stock_code,stock_name;
 	CTaiShanDoc *pDoc = this->m_taiShanDoc;		
 	if(pDoc == NULL)
-	  return;	
+		return;	
 	CFrameWnd* pFrameWnd=(CFrameWnd*)GetActiveFrame();
 	CView *pView = pFrameWnd->GetActiveView();
 	if(pView == NULL)
@@ -1257,8 +1257,8 @@ void CMainFrame::OnMin1Line()
 			stock_code = pDoc->m_WsStock2000View ->GetCurrentSymbol();
 		if(stock_code.Compare("") == 0)
 		{
-		   MessageBox("请选择某一股票进入","操作提示",MB_OK);
-		   return ;
+			MessageBox("请选择某一股票进入","操作提示",MB_OK);
+			return ;
 		}
 	}
 	else
@@ -1269,7 +1269,7 @@ void CMainFrame::OnMin1Line()
 		pView2->ShowAll (pView2->m_sharesSymbol ,false);
 		return;
 	}
-	
+
 	pDoc->m_sharesSymbol = stock_code;
 	pDoc->m_GetFocus = true;
 	SendMessage (WM_USER_DrawKlineWindow,(WPARAM)stock_code.GetBuffer (0),(LPARAM)(1+pDoc->m_stkKind *10));
@@ -1280,7 +1280,7 @@ void CMainFrame::OnDayLine()
 	CString stock_code,stock_name;
 	CTaiShanDoc *pDoc = this->m_taiShanDoc;		
 	if(pDoc == NULL)
-	  return;	
+		return;	
 	CFrameWnd* pFrameWnd=(CFrameWnd*)GetActiveFrame();
 	CView *pView = pFrameWnd->GetActiveView();
 	if(pView == NULL)
@@ -1295,8 +1295,8 @@ void CMainFrame::OnDayLine()
 			stock_code = pDoc->m_WsStock2000View ->GetCurrentSymbol();
 		if(stock_code.Compare("") == 0)
 		{
-		   MessageBox("请选择某一股票进入K线","操作提示",MB_OK);
-		   return ;
+			MessageBox("请选择某一股票进入K线","操作提示",MB_OK);
+			return ;
 		}
 	}
 	else
@@ -1307,11 +1307,11 @@ void CMainFrame::OnDayLine()
 		pView2->ShowAll (pView2->m_sharesSymbol ,false);
 		return;
 	}
-	
+
 	pDoc->m_sharesSymbol = stock_code;
 	pDoc->m_GetFocus = true;
 	SendMessage (WM_USER_DrawKlineWindow,(WPARAM)stock_code.GetBuffer (0),(LPARAM)(2+pDoc->m_stkKind *10));
-	
+
 }
 
 int CMainFrame::StaticDrawKlineWindow(WPARAM wParam, LPARAM lParam)
@@ -1323,7 +1323,7 @@ void CMainFrame::ActiveVwbase(CTaiShanKlineShowView *pView)
 {
 	__try
 	{
-	pView->GetParentFrame()->ActivateFrame();
+		pView->GetParentFrame()->ActivateFrame();
 	}
 	__except(1)
 	{
@@ -1337,9 +1337,9 @@ void CMainFrame::OnUpdateStockBig(CCmdUI* pCmdUI)
 #ifdef OEM
 	pCmdUI->Enable(FALSE);
 #else
-    pCmdUI->Enable(TRUE);
+	pCmdUI->Enable(TRUE);
 #endif	
-	
+
 }
 
 void CMainFrame::OnUpdateTjxgAlarm(CCmdUI* pCmdUI) 
@@ -1348,29 +1348,29 @@ void CMainFrame::OnUpdateTjxgAlarm(CCmdUI* pCmdUI)
 #ifdef OEM
 	pCmdUI->Enable(FALSE);
 #else
-    pCmdUI->Enable(TRUE);
+	pCmdUI->Enable(TRUE);
 #endif	
-	
+
 }
 
 void CMainFrame::OnF6()		
 {
-   CMDIChildWnd* pchildfram= ((CMainFrame*)(AfxGetApp()->m_pMainWnd))->MDIGetActive();
-   CTaiShanDoc*	pDoc=this->m_taiShanDoc ;
-   if(pDoc == NULL)
-	  return;
+	CMDIChildWnd* pchildfram= ((CMainFrame*)(AfxGetApp()->m_pMainWnd))->MDIGetActive();
+	CTaiShanDoc*	pDoc=this->m_taiShanDoc ;
+	if(pDoc == NULL)
+		return;
 
-   CView *pView = pchildfram->GetActiveView();
-   if(pView == NULL)
-   {
+	CView *pView = pchildfram->GetActiveView();
+	if(pView == NULL)
+	{
+		(pDoc->m_WsStock2000View)->OnF6();
+		return;
+	}
+	if(pView->IsKindOf(RUNTIME_CLASS(CNineShowView)))
+	{
+		((CNineShowView *)pView)->IsQuit = 1;
+	}
 	(pDoc->m_WsStock2000View)->OnF6();
-     return;
-   }
-   if(pView->IsKindOf(RUNTIME_CLASS(CNineShowView)))
-   {
-     ((CNineShowView *)pView)->IsQuit = 1;
-   }
-   (pDoc->m_WsStock2000View)->OnF6();
 }
 
 LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
@@ -1405,8 +1405,8 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 void CMainFrame::OnPaint() 
 {
 	CPaintDC dc(this); 
-	
-	
+
+
 #ifdef WIDE_NET_VERSION
 	if(!m_bLogonInterface)
 	{
@@ -1461,12 +1461,12 @@ void CMainFrame::TestHQ()
 			strcpy(strName,"APEC");
 			break;
 		default :return;
-			
+
 		}
 		CString a;
 		a.Format("000%d",nSymbol);
 		strcpy(strSymbol,a);
-		
+
 		strcpy(pReport[i].m_szLabel,strSymbol);
 		strcpy(pReport[i].m_szName,strName);
 		pReport[i].m_wMarket=SZ_MARKET_EX;
@@ -1490,7 +1490,7 @@ void CMainFrame::TestHQ()
 		pReport[i].m_fSellVolume[2]=123+i;
 		pReport[i].m_fVolume=988+i;
 		pReport[i].m_cbSize=100;
-	
+
 		nSymbol++;
 	}	
 	pHeader->m_nPacketNum=10;
@@ -1533,7 +1533,7 @@ void CMainFrame::OnXgnExtData()
 {
 	XgnExtDataDlg dlg;
 	dlg.DoModal();
-	
+
 }
 
 void CMainFrame::OnClearRealdata() 
@@ -1547,9 +1547,9 @@ CTaiScreen* CMainFrame::ShowTjxg()
 		dialogtjxg->ShowWindow (SW_RESTORE);
 	else
 	{
-	dialogtjxg = new CTaiScreen(this);
-	dialogtjxg->Create(IDD_TJXGNEW,this);
-	dialogtjxg->ShowWindow(SW_SHOW);
+		dialogtjxg = new CTaiScreen(this);
+		dialogtjxg->Create(IDD_TJXGNEW,this);
+		dialogtjxg->ShowWindow(SW_SHOW);
 	}
 	return dialogtjxg;
 
@@ -1560,7 +1560,7 @@ CString CMainFrame::GetCurrentSelectStockCode(WORD &wMarket)
 	CString stock_code,stock_name;
 	CTaiShanDoc *pDoc = this->m_taiShanDoc;		
 	if(pDoc == NULL)
-	  return stock_code;
+		return stock_code;
 	CFrameWnd* pFrameWnd=(CFrameWnd*)GetActiveFrame();
 	CView *pView = pFrameWnd->GetActiveView();
 	if(pView == NULL)
@@ -1593,38 +1593,38 @@ CString CMainFrame::GetCurrentSelectStockCode(WORD &wMarket)
 	default:
 		wMarket = SZ_MARKET_EX;
 	}
-	
+
 	return stock_code;
 }
 
 void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point) 
 {
-	
-	
+
+
 	CMDIFrameWnd::OnLButtonDown(nFlags, point);
 }
 
 void CMainFrame::OnNcLButtonDown(UINT nHitTest, CPoint point) 
 {
 
-	
+
 	CMDIFrameWnd::OnNcLButtonDown(nHitTest, point);
 }
 
 int CMainFrame::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message) 
 {
 
-	
-		CPoint point;
-		GetCursorPos(&point);
-		ScreenToClient(&point);
-		CView *pView;
-		if(point.x<=1)
-		{
 
-			 m_dlgLeftPop.ShowWindow(SW_SHOW);
-			 m_TestDialogbar.ShowWindow(SW_HIDE);
-		}
+	CPoint point;
+	GetCursorPos(&point);
+	ScreenToClient(&point);
+	CView *pView;
+	if(point.x<=1)
+	{
+
+		m_dlgLeftPop.ShowWindow(SW_SHOW);
+		m_TestDialogbar.ShowWindow(SW_HIDE);
+	}
 	return CMDIFrameWnd::OnMouseActivate(pDesktopWnd, nHitTest, message);
 }
 
@@ -1639,41 +1639,41 @@ void CMainFrame::RefreshFormu()
 }
 long CMainFrame::OnExtService(UINT wFileType, LONG lPara)
 {
-    STRUCT_REXT_HEAD *pHead = (STRUCT_REXT_HEAD*)lPara ;
-    ASSERT(wFileType == pHead->m_Service);
-    CString msg ;
-    if ( wFileType == RCV_EXT_TRADEDATA)
-    {
-        msg.Format("%.6s %.8s %d 分笔" , pHead->m_Code, pHead->m_Name, pHead->m_num);
-        STCP_QBD_STRUCT *pk = (STCP_QBD_STRUCT *) (lPara + sizeof(STRUCT_REXT_HEAD));
+	STRUCT_REXT_HEAD *pHead = (STRUCT_REXT_HEAD*)lPara ;
+	ASSERT(wFileType == pHead->m_Service);
+	CString msg ;
+	if ( wFileType == RCV_EXT_TRADEDATA)
+	{
+		msg.Format("%.6s %.8s %d 分笔" , pHead->m_Code, pHead->m_Name, pHead->m_num);
+		STCP_QBD_STRUCT *pk = (STCP_QBD_STRUCT *) (lPara + sizeof(STRUCT_REXT_HEAD));
 
-    }
+	}
 	if ( wFileType == RCV_EXT_TRADEDATAV2){
-        msg.Format("新%.6s %.8s %d 分笔" , pHead->m_Code, pHead->m_Name, pHead->m_num);
-        STCP_QBD6_STRUCT *pk = (STCP_QBD6_STRUCT *) (lPara + sizeof(STRUCT_REXT_HEAD));
-    }
+		msg.Format("新%.6s %.8s %d 分笔" , pHead->m_Code, pHead->m_Name, pHead->m_num);
+		STCP_QBD6_STRUCT *pk = (STCP_QBD6_STRUCT *) (lPara + sizeof(STRUCT_REXT_HEAD));
+	}
 	if ( wFileType == RCV_EXT_KDATA)
-    {
-        msg.Format("%.6s %.8s %d K线" , pHead->m_Code, pHead->m_Name, pHead->m_num);
-        RITK_STRUCT *pk = (RITK_STRUCT *) (lPara + sizeof(STRUCT_REXT_HEAD));
-    }
+	{
+		msg.Format("%.6s %.8s %d K线" , pHead->m_Code, pHead->m_Name, pHead->m_num);
+		RITK_STRUCT *pk = (RITK_STRUCT *) (lPara + sizeof(STRUCT_REXT_HEAD));
+	}
 	if (wFileType == RCV_EXT_STOCKTABLE)
-    {
-        msg.Format("股票代码表" );
-        RCV_STOCK_CELLEx *pk = (RCV_STOCK_CELLEx *) (lPara + sizeof(STRUCT_REXT_HEAD));
-    }
+	{
+		msg.Format("股票代码表" );
+		RCV_STOCK_CELLEx *pk = (RCV_STOCK_CELLEx *) (lPara + sizeof(STRUCT_REXT_HEAD));
+	}
 	return 0;
 }
 
 void CMainFrame::OnCalc() 
 {
 	::ShellExecute( m_hWnd, "open", "calc.exe", NULL, NULL, SW_SHOWNORMAL);
-	
+
 }
 
 void CMainFrame::ViewGgxx(int nID)
 {
-    m_F9ORF10 = TRUE;
+	m_F9ORF10 = TRUE;
 	if(m_EnableF9 == false)
 	{
 		CWnd * pMainWnd = AfxGetApp()->m_pMainWnd;
@@ -1935,12 +1935,12 @@ LONG CMainFrame::OnStkDataOK(UINT wFileType, LONG lPara)
 				}
 				break;
 
-			case FILE_POWER_EX:
+			case FILE_POWER_EX:					// 除权信息
 #ifndef WIDE_NET_VERSION
 				POWER_TOTAL_STRUCTEx m_PowerData;
-				m_PowerData.Power_Count=pHeader->m_nPacketNum;
-				m_PowerData.m_RcvPower=pHeader->m_pPower;
-				m_taiShanDoc->m_sharesCompute.StockDataPowerUpdate(& m_PowerData);                             
+				m_PowerData.Power_Count = pHeader->m_nPacketNum;
+				m_PowerData.m_RcvPower = pHeader->m_pPower;
+				m_taiShanDoc->m_sharesCompute.StockDataPowerUpdate(&m_PowerData);
 #endif
 				break;
 

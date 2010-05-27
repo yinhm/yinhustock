@@ -1,14 +1,16 @@
 
 #include "stdafx.h"
-#include "StructTaiShares.h"
 #include "CSharesBaseInfo.h"
 
-#include <share.h>
-#include  <io.h>
-
-#include "StockDrv.h"
 #include "mainfrm.h"
 #include "CTaiShanDoc.h"
+
+#include <share.h>
+#include <io.h>
+
+#include "StockDrv.h"
+
+CString g_strFinance = _T("Data\\Finance.tsk");
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -18,13 +20,17 @@ CSharesBaseInfo::CSharesBaseInfo()
 {
 	m_hFile = NULL;
 	m_hFileMap = NULL;
-	m_pbData = NULL;
+	m_lpvFileBegin = NULL;
+
+	m_BaseFileHead = NULL;
+	m_pBaseInfo = NULL;
 	m_pBaseInfoPoint = NULL;
 }
 
 CSharesBaseInfo::~CSharesBaseInfo()
 {
 	BOOL result = TRUE;
+
 	if (m_hFile)
 	{
 		result = SavePosToFile();
@@ -38,9 +44,9 @@ CSharesBaseInfo::~CSharesBaseInfo()
 		m_BaseFileHead->FileExitDone = 87654321;
 	}
 
-	if (m_pbData)
+	if (m_lpvFileBegin)
 	{
-		UnmapViewOfFile(m_pbData);
+		UnmapViewOfFile(m_lpvFileBegin);
 	}
 	if (m_hFileMap)
 	{
@@ -52,65 +58,29 @@ CSharesBaseInfo::~CSharesBaseInfo()
 	}
 }
 
-BOOL CSharesBaseInfo::InitBaseInfoData(CString Path)
-{
-	strcpy(m_sFilePath, Path.GetBuffer(0));
-	if (_access(g_baseinfo, 0) == -1)
-	{
-		return InitBaseInfoDataEmpty();
-	}
-	else
-	{
-		return InitBaseInfoDataExist();
-	}
-}
-
 BOOL CSharesBaseInfo::InitBaseInfoDataEmpty()
 {
 	BYTE* temp;
-	long m_filelength = sizeof(BASEINFOHEAD) + (sizeof(BASEINFO)) * 2000;
+	long m_filelength = sizeof(BASEINFOHEAD) + (sizeof(BASEINFO)) * 4096;
 
-	m_hFile = CreateFile(g_baseinfo, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-		OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (m_hFile == INVALID_HANDLE_VALUE)
+	if (CStkFile::Open(g_strFinance, m_filelength, _T("")) == FALSE)
 	{
-		AfxMessageBox("打开基本资料数据文件出错");
+		ASSERT(FALSE);
 		return FALSE;
 	}
 
-	m_hFileMap = CreateFileMapping(m_hFile, NULL, PAGE_READWRITE, 0, m_filelength, NULL);
-	if (m_hFileMap == NULL)
-	{
-		AfxMessageBox("创立基本资料文件映射内核时出错");
-		CloseHandle(m_hFile);
-		m_hFileMap = NULL;
-		m_hFile = NULL;
-		return FALSE;
-	}
-
-	m_pbData = (PBYTE)MapViewOfFile(m_hFileMap, FILE_MAP_WRITE, 0, 0, 0);
-	if (m_pbData == NULL)
-	{
-		AfxMessageBox("将基本资料文件数据映射入内存时出错");
-		CloseHandle(m_hFileMap);
-		CloseHandle(m_hFile);
-		m_hFileMap = NULL;
-		m_hFile = NULL;
-		return FALSE;
-	}
-
-	m_BaseFileHead = (BASEINFOHEAD*)m_pbData;
+	m_BaseFileHead = (BASEINFOHEAD*)m_lpvFileBegin;
 	m_BaseFileHead->filetitle = 12345678;
-	m_BaseFileHead->MaxStockCount = 2000;
+	m_BaseFileHead->MaxStockCount = 4096;
 	m_BaseFileHead->StockCount = 0;
 	m_BaseFileHead->FileExitDone = 87654321;
 	m_BaseFileHead->FixedNumSplit = 80;
 
-	temp = m_pbData + sizeof(BASEINFOHEAD);
+	temp = m_lpvFileBegin + sizeof(BASEINFOHEAD);
 	m_pBaseInfo = (BASEINFO*)temp;
 	if (!SetMemroyALLOCSize(m_BaseFileHead->MaxStockCount))
 	{
-		AfxMessageBox("初始化数据变量出错");
+		ASSERT(FALSE);
 		return FALSE;
 	}
 
@@ -123,39 +93,16 @@ BOOL CSharesBaseInfo::InitBaseInfoDataExist()
 {
 	BYTE* temp;
 
-	m_hFile = CreateFile(g_baseinfo, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-		OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (m_hFile == INVALID_HANDLE_VALUE)
+	if (CStkFile::Open(g_strFinance, 0, _T("")) == FALSE)
 	{
-		AfxMessageBox("打开基本资料数据文件出错");
-		return FALSE; 
-	}
-
-	m_hFileMap = CreateFileMapping(m_hFile, NULL, PAGE_READWRITE, 0, 0, NULL);
-	if (m_hFileMap == NULL)
-	{
-		AfxMessageBox("创立基本资料文件映射内核时出错");
-		CloseHandle(m_hFile);
-		m_hFileMap = NULL;
-		m_hFile = NULL;
+		ASSERT(FALSE);
 		return FALSE;
 	}
 
-	m_pbData = (PBYTE)MapViewOfFile(m_hFileMap, FILE_MAP_WRITE, 0, 0, 0);
-	if (m_pbData == NULL)
-	{
-		AfxMessageBox("将基本资料文件数据映射入内存时出错");
-		CloseHandle(m_hFileMap);
-		CloseHandle(m_hFile);
-		m_hFileMap = NULL;
-		m_hFile = NULL;
-		return FALSE;
-	}
-
-	m_BaseFileHead = (BASEINFOHEAD*)m_pbData;
+	m_BaseFileHead = (BASEINFOHEAD*)m_lpvFileBegin;
 	if (m_BaseFileHead->filetitle != 12345678 && m_BaseFileHead->filetitle != 55555555)
 	{
-		UnmapViewOfFile(m_pbData);
+		UnmapViewOfFile(m_lpvFileBegin);
 		CloseHandle(m_hFileMap);
 		CloseHandle(m_hFile);
 		return InitBaseInfoDataEmpty();
@@ -163,47 +110,46 @@ BOOL CSharesBaseInfo::InitBaseInfoDataExist()
 
 	if (m_BaseFileHead->StockCount + 100 > m_BaseFileHead->MaxStockCount)
 	{
-		int StockTotalCount = 0;
-		long FileLength = 0;
 		m_BaseFileHead->MaxStockCount += 100;
-		StockTotalCount = m_BaseFileHead->MaxStockCount;
-		FileLength = sizeof(BASEINFOHEAD) + (sizeof(BASEINFO)) * StockTotalCount;
+
+		int StockTotalCount = m_BaseFileHead->MaxStockCount;
+		int FileLength = sizeof(BASEINFOHEAD) + (sizeof(BASEINFO)) * StockTotalCount;
 
 		SaveBaseInfoToFile(m_BaseFileHead, sizeof(BASEINFOHEAD));
-		UnmapViewOfFile(m_pbData);
+		UnmapViewOfFile(m_lpvFileBegin);
 		CloseHandle(m_hFileMap);
 		m_hFileMap = NULL;
-		m_pbData = NULL;
+		m_lpvFileBegin = NULL;
 
 		m_hFileMap = CreateFileMapping(m_hFile, NULL, PAGE_READWRITE, 0, FileLength, NULL);
 		if (m_hFileMap == NULL)
 		{
 			AfxMessageBox("创立基本资料文件映射内核时出错");
 			CloseHandle(m_hFile);
-			m_hFileMap = NULL;
 			m_hFile = NULL;
+			m_hFileMap = NULL;
 			return FALSE;
 		}
 
-		m_pbData = (PBYTE)MapViewOfFile(m_hFileMap, FILE_MAP_WRITE, 0, 0, 0);
-		if (m_pbData == NULL)
+		m_lpvFileBegin = (PBYTE)MapViewOfFile(m_hFileMap, FILE_MAP_WRITE, 0, 0, 0);
+		if (m_lpvFileBegin == NULL)
 		{
 			AfxMessageBox("将基本资料文件数据映射入内存时出错");
 			CloseHandle(m_hFileMap);
 			CloseHandle(m_hFile);
-			m_hFileMap = NULL;
 			m_hFile = NULL;
+			m_hFileMap = NULL;
 			return FALSE;
 		}
 
-		m_BaseFileHead = (BASEINFOHEAD*)m_pbData;
+		m_BaseFileHead = (BASEINFOHEAD*)m_lpvFileBegin;
 	}
 
-	temp = m_pbData + sizeof(BASEINFOHEAD);
+	temp = m_lpvFileBegin + sizeof(BASEINFOHEAD);
 	m_pBaseInfo = (BASEINFO*)temp;
 	if (!SetMemroyALLOCSize(m_BaseFileHead->MaxStockCount))
 	{
-		AfxMessageBox("初始化数据变量出错");
+		ASSERT(FALSE);
 		return FALSE;
 	} 
 
@@ -248,7 +194,6 @@ BOOL CSharesBaseInfo::SavePosToFile()
 BOOL CSharesBaseInfo::SetMemroyALLOCSize(unsigned int nSize)
 {
 	PBASEINFO* tempData;
-	int temp = 0;
 	HGLOBAL	hMem;
 	LPVOID hp;
 
@@ -262,7 +207,7 @@ BOOL CSharesBaseInfo::SetMemroyALLOCSize(unsigned int nSize)
 		}
 		else
 		{
-			AfxMessageBox("分配内存出错", MB_ICONSTOP);
+			ASSERT(FALSE);
 			return FALSE;
 		}
 	}
@@ -276,7 +221,7 @@ BOOL CSharesBaseInfo::SetMemroyALLOCSize(unsigned int nSize)
 		}
 		else
 		{
-			AfxMessageBox("分配内存出错", MB_ICONSTOP);
+			ASSERT(FALSE);
 			return FALSE;
 		}
 
@@ -295,10 +240,11 @@ BOOL CSharesBaseInfo::AddStockTypeDataSize()
 
 	m_BaseFileHead->MaxStockCount += 100;
 	long m_filelength = sizeof(BASEINFOHEAD) + (sizeof(BASEINFO)) * m_BaseFileHead->MaxStockCount;
+
 	SavePosToFile();
 
-	if (m_pbData)
-		UnmapViewOfFile(m_pbData);
+	if (m_lpvFileBegin)
+		UnmapViewOfFile(m_lpvFileBegin);
 	if (m_hFileMap)
 		CloseHandle(m_hFileMap);
 
@@ -307,25 +253,25 @@ BOOL CSharesBaseInfo::AddStockTypeDataSize()
 	{
 		AfxMessageBox("创立基本资料文件映射内核时出错");
 		CloseHandle(m_hFile);
-		m_hFileMap = NULL;
 		m_hFile = NULL;
+		m_hFileMap = NULL;
 		return FALSE;
 	}
 
-	m_pbData = (PBYTE)MapViewOfFile(m_hFileMap, FILE_MAP_WRITE, 0, 0, 0);
-	if (m_pbData == NULL)
+	m_lpvFileBegin = (PBYTE)MapViewOfFile(m_hFileMap, FILE_MAP_WRITE, 0, 0, 0);
+	if (m_lpvFileBegin == NULL)
 	{
 		AfxMessageBox("将基本资料文件数据映射入内存时出错");
 		CloseHandle(m_hFileMap);
 		CloseHandle(m_hFile);
-		m_hFileMap = NULL;
 		m_hFile = NULL;
+		m_hFileMap = NULL;
 		return FALSE;
 	}
 
-	m_BaseFileHead = (BASEINFOHEAD*)m_pbData;
+	m_BaseFileHead = (BASEINFOHEAD*)m_lpvFileBegin;
 
-	temp = m_pbData + sizeof(BASEINFOHEAD);
+	temp = m_lpvFileBegin + sizeof(BASEINFOHEAD);
 	m_pBaseInfo = (BASEINFO*)temp;
 
 	if (!SetMemroyALLOCSize(m_BaseFileHead->MaxStockCount))
@@ -355,102 +301,326 @@ BOOL CSharesBaseInfo::InsertItemPoint(BASEINFO* m_pStk)
 	return TRUE;
 }
 
-//BOOL CSharesBaseInfo::ReadBaseInfoData(char *StockCode,int nKind,PBASEINFO & pBaseItem)//读入数据
-//{
-//	HANDLE hFileBase,hFileMapBase;              
-//	DWORD nlength=0;
-//	BYTE  *pbDataBase;                          
-//	char  *pFileData;
-//	char ls_path[255];
-//	char temp[100];
-//	if(nKind==SHZS||nKind==SHAG||nKind==SHBG||nKind==SHZQ)
-//	{
-//		strcpy(ls_path,this->m_sFilePath);
-//		strcat(ls_path,"\\");
-//		strcat(ls_path,g_sF10sh);
-//		strcat(ls_path,StockCode);
-//		strcat(ls_path,".TXT");
-//	}
-//	else if(nKind==SZZS||nKind==SZAG||nKind==SZBG||nKind==SZZQ)
-//	{
-//		strcpy(ls_path,this->m_sFilePath);
-//		strcat(ls_path,"\\");
-//		strcat(ls_path,g_sF10sz);
-//		strcat(ls_path,StockCode);
-//		strcat(ls_path,".TXT");
-//	}
-//	if(_access(ls_path,0)==-1)   
-//	{
-//		return FALSE;
-//	}
-//	hFileBase=CreateFile(ls_path,GENERIC_READ|GENERIC_WRITE,
-//		FILE_SHARE_READ|FILE_SHARE_WRITE,
-//		NULL,
-//		OPEN_ALWAYS,
-//		FILE_ATTRIBUTE_NORMAL,
-//		NULL);
-//	if (hFileBase == INVALID_HANDLE_VALUE)
-//	{
-//		AfxMessageBox("打开股票基本资料数据文件出错");
-//		return FALSE; 
-//	}
-//	nlength=GetFileSize(hFileBase,NULL);
-//	hFileMapBase=CreateFileMapping(hFileBase,
-//		NULL,
-//		PAGE_READWRITE,
-//		0,
-//		nlength,
-//		NULL);
-//	if(hFileMapBase==NULL)
-//	{
-//		AfxMessageBox("创立股票基本资料文件映射内核时出错");
-//		CloseHandle(hFileBase);
-//		hFileBase=NULL;
-//		hFileMapBase=NULL;
-//		return FALSE;
-//	}
-//	pbDataBase=(PBYTE)MapViewOfFile(hFileMapBase,
-//		FILE_MAP_READ|FILE_MAP_WRITE,
-//		0,0,nlength);
-//	if(pbDataBase==NULL)
-//	{
-//		AfxMessageBox("将股票基本资料文件数据映射入内存时出错");
-//		CloseHandle(hFileBase);
-//		CloseHandle(hFileMapBase);
-//		hFileBase=NULL;
-//		hFileMapBase=NULL;
-//		return FALSE;
-//	}
-//	pFileData=(char *)pbDataBase;
-//	pFileData[nlength-1]='\0';
-//	strncpy(temp,pFileData,80);
-//	temp[80]='\0';
-//
-//	BOOL bRtn = TRUE;
-//	try
-//	{
-//		if(strstr(temp,"博经闻"))
-//			ReadBaseInfoDataBJW(pFileData,pBaseItem);
-//		else if(strstr(temp,"万国股市测评"))
-//		{
-//			ReadBaseInfoDataWG(pFileData,pBaseItem);
-//			pBaseItem->mgwfplr=pBaseItem->wfplr/pBaseItem->zgb;
-//		}
-//		else   
-//		{
-//			bRtn =  FALSE;
-//		}
-//	}
-//	catch(...)
-//	{
-//		bRtn =  FALSE;
-//	}
-//	UnmapViewOfFile(pbDataBase);
-//	CloseHandle(hFileMapBase);
-//
-//	CloseHandle(hFileBase);
-//	return bRtn;
-//}
+BOOL CSharesBaseInfo::InitBaseInfoData(CString Path)
+{
+	//strcpy(m_sFilePath, Path.GetBuffer(0));
+	if (_access(g_baseinfo, 0) == -1)
+	{
+		return InitBaseInfoDataEmpty();
+	}
+	else
+	{
+		return InitBaseInfoDataExist();
+	}
+}
+
+BOOL CSharesBaseInfo::AddStockItem(char* pStockCode, int nKind, PBASEINFO& pBaseItem)
+{
+	int low = 0;
+	int mid = 0;
+	int high = m_BaseFileHead->StockCount - 1;
+	int InsertPose = -1;
+
+	CTaiShanDoc* m_pDoc = ((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc;
+
+	char strStockKind[10];
+	CString strKind = m_pDoc->GetStockKindString(nKind);
+	strcpy(strStockKind, strKind.GetBuffer(0));
+	strcat(strStockKind, pStockCode);
+
+	while (low <= high)
+	{
+		mid = (low + high) / 2;
+		if (low == high)
+		{
+			if (strcmp(strStockKind, m_pBaseInfoPoint[mid]->Symbol) > 0)
+			{
+				if (m_BaseFileHead->StockCount == 0 || m_BaseFileHead->StockCount == mid)
+				{
+					InsertPose = mid;
+				}
+				else
+				{
+					InsertPose = mid + 1;
+				}
+				break;
+			}
+			else if (strcmp(strStockKind, m_pBaseInfoPoint[mid]->Symbol) < 0)
+			{
+				InsertPose = mid;
+				break;
+			}
+			else
+			{
+				pBaseItem = m_pBaseInfoPoint[mid];
+				return TRUE;
+			}
+		}
+
+		if (strcmp(m_pBaseInfoPoint[mid]->Symbol, strStockKind) > 0)
+		{
+			high = mid - 1;
+		}
+		else if (strcmp(m_pBaseInfoPoint[mid]->Symbol, strStockKind) < 0)
+		{
+			low = mid + 1;
+		}
+		else 
+		{
+			pBaseItem = m_pBaseInfoPoint[mid];
+			return TRUE;
+		}
+	}
+
+	if (high < low)
+		InsertPose = low;
+
+
+	if (m_BaseFileHead->StockCount + 1 > m_BaseFileHead->MaxStockCount)
+	{
+		AddStockTypeDataSize();
+	}
+
+	if (m_BaseFileHead->StockCount > InsertPose)
+	{
+		PBASEINFO* ptemp;
+		HGLOBAL	hMem;
+		LPVOID hp;
+		hMem = GlobalAlloc(GPTR, (m_BaseFileHead->StockCount - InsertPose) * sizeof(PBASEINFO));
+		hp = GlobalLock(hMem);
+		if (hp)
+		{
+			ptemp = (PBASEINFO*)hp;
+		}
+		else
+		{
+			AfxMessageBox("分配内存出错", MB_ICONSTOP);
+			return FALSE;
+		}
+
+		memcpy(ptemp, &m_pBaseInfoPoint[InsertPose], (m_BaseFileHead->StockCount - InsertPose) * sizeof( PBASEINFO));
+		memcpy(&m_pBaseInfoPoint[InsertPose + 1], ptemp, (m_BaseFileHead->StockCount - InsertPose) * sizeof( PBASEINFO));
+		GlobalUnlock((HGLOBAL)ptemp);
+		GlobalFree((HGLOBAL)ptemp);
+	}
+
+	m_pBaseInfoPoint[InsertPose] = m_pBaseInfo + m_BaseFileHead->StockCount;
+	strcpy(m_pBaseInfoPoint[InsertPose]->Symbol, strStockKind);
+	m_BaseFileHead->StockCount++;
+	pBaseItem = m_pBaseInfoPoint[InsertPose];
+	memset(pBaseItem, 0, sizeof(BASEINFO));
+	strcpy(pBaseItem->Symbol, strStockKind);
+	pBaseItem->NumSplit = 0;
+
+	SaveBaseInfoToFile(m_BaseFileHead, sizeof(BASEINFOHEAD));
+	SaveBaseInfoToFile(m_pBaseInfoPoint[InsertPose], sizeof(BASEINFO));
+
+	return TRUE;
+}
+
+BOOL CSharesBaseInfo::AddStockItemCorrect(char *pStockCode,PBASEINFO  pBaseItem)
+{
+	int low=0;
+	int high=m_BaseFileHead->StockCount -1 ;
+	int mid=0;
+	int InsertPose=-1;
+	while(low <= high)
+	{
+		mid=(low+high)/2;
+		if(low==high)
+		{
+			if(strcmp(pStockCode , m_pBaseInfoPoint[mid]->Symbol )>0)
+			{
+				if(m_BaseFileHead->StockCount==0||m_BaseFileHead->StockCount==mid)
+					InsertPose=mid ;
+				else
+					InsertPose=mid +1;   
+				break;
+			}
+			else if(strcmp(pStockCode , m_pBaseInfoPoint[mid]->Symbol)<0)
+			{
+				InsertPose=mid ;
+				break;
+			}
+			else
+			{
+				return TRUE ;
+			}
+		}
+		if(strcmp(m_pBaseInfoPoint[mid]->Symbol , pStockCode)>0) high=mid -1;
+		else if(strcmp(m_pBaseInfoPoint[mid]->Symbol ,pStockCode)< 0 ) low=mid +1;
+		else 
+		{
+			return TRUE ;
+		}
+	}
+	if(high<low)
+		InsertPose=low;
+
+
+	if(m_BaseFileHead->StockCount + 1 >m_BaseFileHead->MaxStockCount)  
+	{
+		AddStockTypeDataSize();
+	}
+	if(m_BaseFileHead->StockCount > InsertPose)
+	{
+		PBASEINFO *ptemp;
+		HGLOBAL	hMem;
+		LPVOID hp;
+		hMem = GlobalAlloc( GPTR, (m_BaseFileHead->StockCount - InsertPose )* sizeof( PBASEINFO) );
+		hp=GlobalLock(hMem);
+		if(hp)
+		{
+			ptemp= (PBASEINFO *)hp;
+		}
+		else
+		{
+			AfxMessageBox("分配内存出错",MB_ICONSTOP);
+			return FALSE;
+		}
+		memcpy(ptemp,&m_pBaseInfoPoint[InsertPose],(m_BaseFileHead->StockCount - InsertPose)*sizeof( PBASEINFO));
+		memcpy(&m_pBaseInfoPoint[InsertPose+1],ptemp,(m_BaseFileHead->StockCount - InsertPose)*sizeof( PBASEINFO));
+		GlobalUnlock((HGLOBAL)ptemp);        
+		GlobalFree( (HGLOBAL)ptemp);
+	}
+	m_pBaseInfoPoint[InsertPose]=pBaseItem;
+	m_BaseFileHead->StockCount++;
+	strcpy(m_pBaseInfoPoint[InsertPose]->Symbol,pStockCode);
+	return TRUE;
+}
+
+BOOL CSharesBaseInfo::Lookup(char* m_szStockId, int nKind, PBASEINFO& m_pStock)
+{
+	int low = 0;
+	int high = m_BaseFileHead->StockCount - 1;
+	int mid = 0;
+
+	CTaiShanDoc* m_pDoc = ((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc;
+	char strStockKind[10];
+	CString strKind = m_pDoc->GetStockKindString(nKind);
+	strcpy(strStockKind, strKind.GetBuffer(0));
+	strcat(strStockKind, m_szStockId);
+
+	while (low <= high)
+	{
+		mid = (low + high) / 2;
+		if (strcmp(m_pBaseInfoPoint[mid]->Symbol, strStockKind) > 0)
+		{
+			high = mid - 1;
+		}
+		else if (strcmp(m_pBaseInfoPoint[mid]->Symbol, strStockKind) < 0)
+		{
+			low = mid + 1;
+		}
+		else 
+		{
+			m_pStock = m_pBaseInfoPoint[mid];
+			return TRUE;
+		}
+	}
+
+	m_pStock = NULL;
+
+	return FALSE;
+}
+
+BOOL CSharesBaseInfo::ReadBaseInfoData(char *StockCode,int nKind,PBASEINFO & pBaseItem)
+{
+	//HANDLE hFileBase,hFileMapBase;              
+	//DWORD nlength=0;
+	//BYTE  *pbDataBase;                          
+	//char  *pFileData;
+	//char ls_path[255];
+	//char temp[100];
+	//if(nKind==SHZS||nKind==SHAG||nKind==SHBG||nKind==SHZQ)
+	//{
+	//	strcpy(ls_path,this->m_sFilePath);
+	//	strcat(ls_path,"\\");
+	//	strcat(ls_path,g_sF10sh);
+	//	strcat(ls_path,StockCode);
+	//	strcat(ls_path,".TXT");
+	//}
+	//else if(nKind==SZZS||nKind==SZAG||nKind==SZBG||nKind==SZZQ)
+	//{
+	//	strcpy(ls_path,this->m_sFilePath);
+	//	strcat(ls_path,"\\");
+	//	strcat(ls_path,g_sF10sz);
+	//	strcat(ls_path,StockCode);
+	//	strcat(ls_path,".TXT");
+	//}
+	//if(_access(ls_path,0)==-1)   
+	//{
+	//	return FALSE;
+	//}
+	//hFileBase=CreateFile(ls_path,GENERIC_READ|GENERIC_WRITE,
+	//	FILE_SHARE_READ|FILE_SHARE_WRITE,
+	//	NULL,
+	//	OPEN_ALWAYS,
+	//	FILE_ATTRIBUTE_NORMAL,
+	//	NULL);
+	//if (hFileBase == INVALID_HANDLE_VALUE)
+	//{
+	//	AfxMessageBox("打开股票基本资料数据文件出错");
+	//	return FALSE; 
+	//}
+	//nlength=GetFileSize(hFileBase,NULL);
+	//hFileMapBase=CreateFileMapping(hFileBase,
+	//	NULL,
+	//	PAGE_READWRITE,
+	//	0,
+	//	nlength,
+	//	NULL);
+	//if(hFileMapBase==NULL)
+	//{
+	//	AfxMessageBox("创立股票基本资料文件映射内核时出错");
+	//	CloseHandle(hFileBase);
+	//	hFileBase=NULL;
+	//	hFileMapBase=NULL;
+	//	return FALSE;
+	//}
+	//pbDataBase=(PBYTE)MapViewOfFile(hFileMapBase,
+	//	FILE_MAP_READ|FILE_MAP_WRITE,
+	//	0,0,nlength);
+	//if(pbDataBase==NULL)
+	//{
+	//	AfxMessageBox("将股票基本资料文件数据映射入内存时出错");
+	//	CloseHandle(hFileBase);
+	//	CloseHandle(hFileMapBase);
+	//	hFileBase=NULL;
+	//	hFileMapBase=NULL;
+	//	return FALSE;
+	//}
+	//pFileData=(char *)pbDataBase;
+	//pFileData[nlength-1]='\0';
+	//strncpy(temp,pFileData,80);
+	//temp[80]='\0';
+
+	BOOL bRtn = TRUE;
+	//try
+	//{
+	//	if(strstr(temp,"博经闻"))
+	//		ReadBaseInfoDataBJW(pFileData,pBaseItem);
+	//	else if(strstr(temp,"万国股市测评"))
+	//	{
+	//		ReadBaseInfoDataWG(pFileData,pBaseItem);
+	//		pBaseItem->mgwfplr=pBaseItem->wfplr/pBaseItem->zgb;
+	//	}
+	//	else   
+	//	{
+	//		bRtn =  FALSE;
+	//	}
+	//}
+	//catch(...)
+	//{
+	//	bRtn =  FALSE;
+	//}
+	//UnmapViewOfFile(pbDataBase);
+	//CloseHandle(hFileMapBase);
+
+	//CloseHandle(hFileBase);
+	return bRtn;
+}
+
 //void CSharesBaseInfo::ReadBaseInfoDataBJW(char *pFileData,PBASEINFO & pBaseItem) 
 //{// NOTE: the ClassWizard will add member functions here
 //	char *fileB,*fileA;
@@ -789,213 +959,3 @@ BOOL CSharesBaseInfo::InsertItemPoint(BASEINFO* m_pStk)
 //		return;
 //	}
 //}
-
-BOOL CSharesBaseInfo::AddStockItem(char* pStockCode, int nKind, PBASEINFO& pBaseItem)
-{
-	int low = 0;
-	int mid = 0;
-	int high = m_BaseFileHead->StockCount - 1;
-	int InsertPose = -1;
-
-	CTaiShanDoc* m_pDoc = ((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc;
-
-	char strStockKind[10];
-	CString strKind = m_pDoc->GetStockKindString(nKind);
-	strcpy(strStockKind, strKind.GetBuffer(0));
-	strcat(strStockKind, pStockCode);
-
-	while (low <= high)
-	{
-		mid = (low + high) / 2;
-		if (low == high)
-		{
-			if (strcmp(strStockKind, m_pBaseInfoPoint[mid]->Symbol) > 0)
-			{
-				if (m_BaseFileHead->StockCount == 0 || m_BaseFileHead->StockCount == mid)
-				{
-					InsertPose = mid;
-				}
-				else
-				{
-					InsertPose = mid + 1;
-				}
-				break;
-			}
-			else if (strcmp(strStockKind, m_pBaseInfoPoint[mid]->Symbol) < 0)
-			{
-				InsertPose = mid;
-				break;
-			}
-			else
-			{
-				pBaseItem = m_pBaseInfoPoint[mid];
-				return TRUE;
-			}
-		}
-
-		if (strcmp(m_pBaseInfoPoint[mid]->Symbol, strStockKind) > 0)
-		{
-			high = mid - 1;
-		}
-		else if (strcmp(m_pBaseInfoPoint[mid]->Symbol, strStockKind) < 0)
-		{
-			low = mid + 1;
-		}
-		else 
-		{
-			pBaseItem = m_pBaseInfoPoint[mid];
-			return TRUE;
-		}
-	}
-
-	if (high < low)
-		InsertPose = low;
-
-
-	if (m_BaseFileHead->StockCount + 1 > m_BaseFileHead->MaxStockCount)
-	{
-		AddStockTypeDataSize();
-	}
-
-	if (m_BaseFileHead->StockCount > InsertPose)
-	{
-		PBASEINFO* ptemp;
-		HGLOBAL	hMem;
-		LPVOID hp;
-		hMem = GlobalAlloc(GPTR, (m_BaseFileHead->StockCount - InsertPose) * sizeof(PBASEINFO));
-		hp = GlobalLock(hMem);
-		if (hp)
-		{
-			ptemp = (PBASEINFO*)hp;
-		}
-		else
-		{
-			AfxMessageBox("分配内存出错", MB_ICONSTOP);
-			return FALSE;
-		}
-
-		memcpy(ptemp, &m_pBaseInfoPoint[InsertPose], (m_BaseFileHead->StockCount - InsertPose) * sizeof( PBASEINFO));
-		memcpy(&m_pBaseInfoPoint[InsertPose + 1], ptemp, (m_BaseFileHead->StockCount - InsertPose) * sizeof( PBASEINFO));
-		GlobalUnlock((HGLOBAL)ptemp);
-		GlobalFree((HGLOBAL)ptemp);
-	}
-
-	m_pBaseInfoPoint[InsertPose] = m_pBaseInfo + m_BaseFileHead->StockCount;
-	strcpy(m_pBaseInfoPoint[InsertPose]->Symbol, strStockKind);
-	m_BaseFileHead->StockCount++;
-	pBaseItem = m_pBaseInfoPoint[InsertPose];
-	memset(pBaseItem, 0, sizeof(BASEINFO));
-	strcpy(pBaseItem->Symbol, strStockKind);
-	pBaseItem->NumSplit = 0;
-
-	SaveBaseInfoToFile(m_BaseFileHead, sizeof(BASEINFOHEAD));
-	SaveBaseInfoToFile(m_pBaseInfoPoint[InsertPose], sizeof(BASEINFO));
-
-	return TRUE;
-}
-
-BOOL CSharesBaseInfo::AddStockItemCorrect(char *pStockCode,PBASEINFO  pBaseItem)
-{
-	int low=0;
-	int high=m_BaseFileHead->StockCount -1 ;
-	int mid=0;
-	int InsertPose=-1;
-	while(low <= high)
-	{
-		mid=(low+high)/2;
-		if(low==high)
-		{
-			if(strcmp(pStockCode , m_pBaseInfoPoint[mid]->Symbol )>0)
-			{
-				if(m_BaseFileHead->StockCount==0||m_BaseFileHead->StockCount==mid)
-					InsertPose=mid ;
-				else
-					InsertPose=mid +1;   
-				break;
-			}
-			else if(strcmp(pStockCode , m_pBaseInfoPoint[mid]->Symbol)<0)
-			{
-				InsertPose=mid ;
-				break;
-			}
-			else
-			{
-				return TRUE ;
-			}
-		}
-		if(strcmp(m_pBaseInfoPoint[mid]->Symbol , pStockCode)>0) high=mid -1;
-		else if(strcmp(m_pBaseInfoPoint[mid]->Symbol ,pStockCode)< 0 ) low=mid +1;
-		else 
-		{
-			return TRUE ;
-		}
-	}
-	if(high<low)
-		InsertPose=low;
-
-
-	if(m_BaseFileHead->StockCount + 1 >m_BaseFileHead->MaxStockCount)  
-	{
-		AddStockTypeDataSize();
-	}
-	if(m_BaseFileHead->StockCount > InsertPose)
-	{
-		PBASEINFO *ptemp;
-		HGLOBAL	hMem;
-		LPVOID hp;
-		hMem = GlobalAlloc( GPTR, (m_BaseFileHead->StockCount - InsertPose )* sizeof( PBASEINFO) );
-		hp=GlobalLock(hMem);
-		if(hp)
-		{
-			ptemp= (PBASEINFO *)hp;
-		}
-		else
-		{
-			AfxMessageBox("分配内存出错",MB_ICONSTOP);
-			return FALSE;
-		}
-		memcpy(ptemp,&m_pBaseInfoPoint[InsertPose],(m_BaseFileHead->StockCount - InsertPose)*sizeof( PBASEINFO));
-		memcpy(&m_pBaseInfoPoint[InsertPose+1],ptemp,(m_BaseFileHead->StockCount - InsertPose)*sizeof( PBASEINFO));
-		GlobalUnlock((HGLOBAL)ptemp);        
-		GlobalFree( (HGLOBAL)ptemp);
-	}
-	m_pBaseInfoPoint[InsertPose]=pBaseItem;
-	m_BaseFileHead->StockCount++;
-	strcpy(m_pBaseInfoPoint[InsertPose]->Symbol,pStockCode);
-	return TRUE;
-}
-
-BOOL CSharesBaseInfo::Lookup(char* m_szStockId, int nKind, PBASEINFO& m_pStock)
-{
-	int low = 0;
-	int high = m_BaseFileHead->StockCount - 1;
-	int mid = 0;
-
-	CTaiShanDoc* m_pDoc = ((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc;
-	char strStockKind[10];
-	CString strKind = m_pDoc->GetStockKindString(nKind);
-	strcpy(strStockKind, strKind.GetBuffer(0));
-	strcat(strStockKind, m_szStockId);
-
-	while (low <= high)
-	{
-		mid = (low + high) / 2;
-		if (strcmp(m_pBaseInfoPoint[mid]->Symbol, strStockKind) > 0)
-		{
-			high = mid - 1;
-		}
-		else if (strcmp(m_pBaseInfoPoint[mid]->Symbol, strStockKind) < 0)
-		{
-			low = mid + 1;
-		}
-		else 
-		{
-			m_pStock = m_pBaseInfoPoint[mid];
-			return TRUE;
-		}
-	}
-
-	m_pStock = NULL;
-
-	return FALSE;
-}
