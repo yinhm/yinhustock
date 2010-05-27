@@ -31,7 +31,7 @@ CHistoryFile::CHistoryFile()
 	m_nKlineIndex = pFileK->ReadKLine (symbol,m_pKlineIndex,-1);
 
 	m_strHistoryDate = "";
-	BOOL bOpen = this->Open ("HistoryRealData.dat",0);
+	BOOL bOpen = this->Open ("HistoryRealData.dat",0, 0);
 	ASSERT(bOpen );
 }
 

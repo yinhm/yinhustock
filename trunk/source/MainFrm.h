@@ -31,7 +31,7 @@ class CMainFrame : public CMDIFrameWnd
 public:
 	CMainFrame();
 
-    CTaiToolBar m_TestDialogbar; 
+	CTaiToolBar m_TestDialogbar; 
 	CDialogCwdLeftPop m_dlgLeftPop;
 
 #ifdef WIDE_NET_VERSION
@@ -39,13 +39,13 @@ public:
 
 	static BOOL m_bLogonSuccess;
 #else
-    CSTKDRV	gSTOCKDLL;
+	CSTKDRV	gSTOCKDLL;
 #endif
 private:
 #ifdef WIDE_NET_VERSION
 	BOOL m_bLogonInterface;
 #endif
-	
+
 public:
 	CTaiKlineMemFile m_memFile;
 
@@ -57,36 +57,36 @@ public:
 	CAlertSystem* m_pDlgAlarm;
 	bool m_bAlarmExec;
 	static CTaiShanDoc *m_taiShanDoc;   
-    CMDIChildWnd *m_MDIChildWnd;          
-    CTaiShanKlineShowView* pVwbaseView;
+	CMDIChildWnd *m_MDIChildWnd;          
+	CTaiShanKlineShowView* pVwbaseView;
 	int nLKind[11];
 
 
 	CToolBar* m_drawLineToolBar; 
 
-    void        Drawline();
+	void        Drawline();
 
 	int         m_EnableF10;           
-                                         
-	                                       
-    BOOL		m_EnableF9;             
-		                                 
+
+
+	BOOL		m_EnableF9;             
+
 	BOOL        m_F9ORF10;                  
-	                                   
+
 	bool        m_BaseInfo;                
 	BOOL        m_StopCuoHe;                  
-  
+
 	IndexDataInfo m_index_save;
 
 	//{{AFX_VIRTUAL(CMainFrame)
-	public:
+public:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	protected:
+protected:
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
 	//}}AFX_VIRTUAL
-	public:
+public:
 	afx_msg void OnCompanyinfo();
 
 public:
@@ -107,18 +107,18 @@ public:
 	int nHeight;
 	int nY;
 	int nX;
-	
-	
+
+
 	void TestHQ();
 	static void ActiveVwbase(CTaiShanKlineShowView* pView);
 	static int StaticDrawKlineWindow(WPARAM wParam, LPARAM lParam);
 	CStatusBar_sjl  m_wndStatusBar;
 	bool bAlarm;
-    void DisplayBargain(
-	      float Index_sh,float UpDown_sh,float Vol_sh,float Amount_sh,
-	      float Index_sz,float UpDown_sz,float Vol_sz,float Amount_sz,
-          float Index_cy,float UpDown_cy,float Vol_cy,float Amount_cy,
-	      float percent_sh, float percent_sz,float percent_cy);
+	void DisplayBargain(
+		float Index_sh,float UpDown_sh,float Vol_sh,float Amount_sh,
+		float Index_sz,float UpDown_sz,float Vol_sz,float Amount_sz,
+		float Index_cy,float UpDown_cy,float Vol_cy,float Amount_cy,
+		float percent_sh, float percent_sz,float percent_cy);
 	void SetStatusBar();	
 	void OnUpdateViewFullScreen(CCmdUI* pCmdUI);
 	void OnMenuFullscreen();
@@ -134,15 +134,15 @@ public:
 	static CTaiKlineDlgNeuralLearn* m_pDlgNL;
 
 protected:
-   	 CStringArray m_symbol_array;
-	 IndexDataInfo* pIndex_save;
-	 int *nDays;
-	 int nIndexNum;
-	 int nStockNum;
+	CStringArray m_symbol_array;
+	IndexDataInfo* pIndex_save;
+	int *nDays;
+	int nIndexNum;
+	int nStockNum;
 
 
 protected:  
-	
+
 
 	BOOL	m_bRunFlag;			
 	CRect m_RiseFallRect_sz;
@@ -150,10 +150,10 @@ protected:
 
 
 protected:
-	
+
 	//{{AFX_MSG(CMainFrame)
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-    afx_msg long OnExtService(UINT wFileType, LONG lPara)	;
+	afx_msg long OnExtService(UINT wFileType, LONG lPara)	;
 	afx_msg void OnDestroy();
 	afx_msg void OnTimer(UINT nIDEvent);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
@@ -211,11 +211,11 @@ protected:
 	afx_msg void OnCalc();
 	afx_msg void OnGdfxRegister();
 	//}}AFX_MSG
-    afx_msg LRESULT DisplayAlarmForMsg(WPARAM wParam, LPARAM lParam);
-    afx_msg LRESULT OnTjxg(WPARAM wParam, LPARAM lParam);
-    afx_msg LRESULT DrawKlineWindow(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT DisplayAlarmForMsg(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnTjxg(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT DrawKlineWindow(WPARAM wParam, LPARAM lParam);
 #ifdef WIDE_NET_VERSION
-    afx_msg void OnLoginServer();
+	afx_msg void OnLoginServer();
 	afx_msg void OnRecvStockcode();
 #endif
 
@@ -235,10 +235,5 @@ protected:
 	afx_msg long OnStkDataOK(UINT wFileType, LONG lPara);
 	DECLARE_MESSAGE_MAP()
 };
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_MAINFRM_H__61A31CED_9707_11D1_ACAB_0000E823DBFD__INCLUDED_)

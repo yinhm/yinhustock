@@ -1,12 +1,47 @@
 #ifndef __WSSTOCKSTRUCT_1000_H__
 #define __WSSTOCKSTRUCT_1000_H__
-// by 俞明录
+
 #define CALLOC(n,x)    ((x *) farcalloc((long)(n),sizeof(x)))
 #define FREE(x)        farfree(x)
 
 #define MaxRights 3
 #define MaxStockTYpe 102
 #define MAXJISHUCOUNT 10
+
+
+
+// 实时行情文件头
+typedef struct _tagREALDATA
+{
+	long filetitle;
+	long FileExitDone;
+	long StockCount;
+	long MaxStockCount;
+	long Day;
+	short OldANT[3];
+	BOOL CloseWorkDone;
+	BYTE Res[18];
+} REALDATA;
+typedef REALDATA* PREALDATA;
+
+// 财经文件头
+typedef struct tagBASEINFOHEAD
+{
+	long filetitle;
+	long FileExitDone;
+	long StockCount;
+	long MaxStockCount;
+    long FixedNumSplit;
+	BYTE Res[28];
+} BASEINFOHEAD;
+typedef BASEINFOHEAD* PBASEINFOHEAD;
+
+typedef struct tagPOWER_TOTAL_STRUCTEx
+{
+	RCV_POWER_STRUCTEx* m_RcvPower;
+	long Power_Count;
+} POWER_TOTAL_STRUCTEx;
+
 
 
 typedef struct
@@ -86,17 +121,6 @@ typedef struct tagBASEINFO
 	Split	m_Split[80];
 } BASEINFO;
 typedef BASEINFO* PBASEINFO;
-
-typedef struct tagBASEINFOHEAD
-{
-	long filetitle;
-	long FileExitDone;
-	long StockCount;
-	long MaxStockCount;
-    long FixedNumSplit;
-	BYTE Res[20];
-} BASEINFOHEAD;
-typedef BASEINFOHEAD* PBASEINFOHEAD;
 
 typedef struct
 {
@@ -306,20 +330,6 @@ typedef Tidxd **PTidxd;
 
 
 
-typedef struct _tagREALDATA
-{
-	long filetitle;
-	long Day;
-	short OldANT[3];
-	BOOL CloseWorkDone;
-	long StockCount;
-	long MaxStockCount;
-	long FileExitDone;
-	BYTE Res[12];
-} REALDATA;
-typedef REALDATA* PREALDATA;
-
-
 
 typedef struct _BIG_LIST
 {
@@ -387,12 +397,6 @@ typedef struct  tagDAY_TOTAL_STRUCTEx
 	long Day_Count;                      
 
 }DAY_TOTAL_STRUCTEx;
-typedef struct  tagPOWER_TOTAL_STRUCTEx 
-{
-	RCV_POWER_STRUCTEx *m_RcvPower;   
-	long Power_Count;                   
-
-}POWER_TOTAL_STRUCTEx;
 
 /////////////////////////////////////////////////////////////
 

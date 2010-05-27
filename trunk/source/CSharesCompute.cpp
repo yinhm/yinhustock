@@ -50,61 +50,61 @@ void CSharesCompute::chk_rdp(CReportData  *Cdat,float NewPrice)                 
 	else if (Cdat->rdp=='9' && Cdat->psel1>0 && NewPrice<Cdat->psel1)
 		Cdat->rdp='6';
 }
-	 float Vol;
-	 float Per;
-	 float Acount;
+float Vol;
+float Per;
+float Acount;
 
 void CSharesCompute::SendCuoHeDataToDialog(CReportData *Cdat)
 {
 	CMainFrame *pMain=(CMainFrame *)(AfxGetApp()->m_pMainWnd);
 	char  strBuySell[10];
 	if(Cdat->InOut==0)
-        strcpy(strBuySell,"大单买入");
+		strcpy(strBuySell,"大单买入");
 	else if(Cdat->InOut==1)
-        strcpy(strBuySell,"大单卖出");
+		strcpy(strBuySell,"大单卖出");
 	else if(Cdat->InOut==2)
-        strcpy(strBuySell,"内部撮合");
-    else
+		strcpy(strBuySell,"内部撮合");
+	else
 		return;
-    BOOL IsSend=FALSE;
+	BOOL IsSend=FALSE;
 	if(Cdat->kind==SHAG||Cdat->kind==SHBG||Cdat->kind==SZAG||Cdat->kind==SZBG||Cdat->kind==EBAG)
 	{
 		switch(this->m_MainDocument->m_dadanchoice.Format)
 		{
 		case 0:     if(Cdat->nowv>=this->m_MainDocument->m_dadanchoice.Vol)
 					{
-                       IsSend=TRUE;
+						IsSend=TRUE;
 					}
-                    break; 
-        case 1:     if(Cdat->pBaseInfo!=NULL)
+					break; 
+		case 1:     if(Cdat->pBaseInfo!=NULL)
 					{
 						if(Cdat->kind==SHBG||Cdat->kind==SZBG)  
 						{
 							if(Cdat->pBaseInfo->Bg>0&&(Cdat->nowv>=this->m_MainDocument->m_dadanchoice.Per*Cdat->pBaseInfo->Bg))
 							{
-                               IsSend=TRUE;
+								IsSend=TRUE;
 							}
 						}
 						else                       
 						{
-		                    if(Cdat->pBaseInfo->ltAg>0&&(Cdat->nowv>=this->m_MainDocument->m_dadanchoice.Per*Cdat->pBaseInfo->ltAg))
+							if(Cdat->pBaseInfo->ltAg>0&&(Cdat->nowv>=this->m_MainDocument->m_dadanchoice.Per*Cdat->pBaseInfo->ltAg))
 							{
-                               IsSend=TRUE;
+								IsSend=TRUE;
 							}
 						}
 					}
-			        else
+					else
 						return;
-			        break;
+			break;
 		case 2:     if(Cdat->nowp*Cdat->nowv/100>this->m_MainDocument->m_dadanchoice.Acount)
-					 {
-                               IsSend=TRUE;
-					 }
-			         break;
+					{
+						IsSend=TRUE;
+					}
+					break;
 		} 
 	}
 	if(IsSend)
-       pMain->m_wndStatusBar.SetBigBill(Cdat->id, strBuySell, Cdat->nowv, Cdat->nowp,TRUE);
+		pMain->m_wndStatusBar.SetBigBill(Cdat->id, strBuySell, Cdat->nowv, Cdat->nowp,TRUE);
 
 }
 void CSharesCompute::UpdateHs(CReportData  *Cdat,  short  Curr_Min)                                      //更新该股票每次成交数据
@@ -113,7 +113,7 @@ void CSharesCompute::UpdateHs(CReportData  *Cdat,  short  Curr_Min)             
 	CString s(Cdat->id );
 	pHsFile = CTaiKlineFileHS::GetFilePointer (s,Cdat->kind);
 	pHsFile->WriteHS (Cdat);
- 
+
 }
 
 short CSharesCompute::GetStockMinute(time_t time, int mode)
@@ -153,74 +153,15 @@ short CSharesCompute::GetStockMinute(time_t time, int mode)
 	return(tmp);
 }
 
-void CSharesCompute::StockDataPowerUpdate(POWER_TOTAL_STRUCTEx * m_GpPower)                               
-{
-	int index =0;
-	static int steps=0;
-	int nKind=0;
-	if(m_GpPower->m_RcvPower->m_head.m_dwHeadTag != EKE_HEAD_TAG)
-		return;
-	do
-	{
-		CReportData * Cdat;
-		Cdat=NULL;
-		CString StockId;
-		if( m_GpPower->m_RcvPower[index].m_head .m_dwHeadTag == EKE_HEAD_TAG )   
-		{
-			StockId=m_GpPower->m_RcvPower[index].m_head .m_szLabel ;          
-            StockId.MakeUpper(); 
-			nKind=m_MainDocument->m_sharesInformation.GetStockKind(m_GpPower->m_RcvPower[index].m_head.m_wMarket,m_GpPower->m_RcvPower[index].m_head.m_szLabel);
-			if(m_MainDocument->m_sharesInformation.Lookup(StockId.GetBuffer(0) , Cdat,nKind) != TRUE)      
-			{
-				Cdat=NULL;
-				index++;
-				continue;
-			}
-		}
-		if(Cdat==NULL)                        
-		{
-			index++;
-			continue;
-		}
-		index++;
-		if(Cdat->pBaseInfo==NULL)
-		{
-			 if(Cdat->pBaseInfo==NULL)
-			 {
-				BASEINFO *pBaseItem;
-				if(!m_MainDocument->m_sharesInformation.AddBaseinfoPoint(Cdat->id,nKind,pBaseItem))              //在基本资料数据文件中增加一块数据区域
-				{
-					AfxMessageBox("增加股票基本资料空间区域时出错！");
-					return ;
-				}
-				Cdat->pBaseInfo=pBaseItem;
-			 }
-		}
-		else
-			 Cdat->pBaseInfo->NumSplit=0;
-
-		do
-		{
-            Cdat->pBaseInfo->m_Split[Cdat->pBaseInfo->NumSplit].nTime= m_GpPower->m_RcvPower[index].m_time;
-            Cdat->pBaseInfo->m_Split[Cdat->pBaseInfo->NumSplit].Give= m_GpPower->m_RcvPower[index].m_fGive;
-            Cdat->pBaseInfo->m_Split[Cdat->pBaseInfo->NumSplit].Allocate= m_GpPower->m_RcvPower[index].m_fPei;
-            Cdat->pBaseInfo->m_Split[Cdat->pBaseInfo->NumSplit].AllocatePrice= m_GpPower->m_RcvPower[index].m_fPeiPrice;
-            Cdat->pBaseInfo->m_Split[Cdat->pBaseInfo->NumSplit].Bonus= m_GpPower->m_RcvPower[index].m_fProfit;
-            Cdat->pBaseInfo->NumSplit++;
-			index++;
-		}while(m_GpPower->m_RcvPower[index].m_head.m_dwHeadTag != EKE_HEAD_TAG && index<m_GpPower->Power_Count);
-	}while(index<m_GpPower->Power_Count);
-}
-
 
 int CSharesCompute::GetMarketKind(int nKind)
 {
 	if(nKind==SHZS||nKind==SHBG||nKind==SHAG||nKind==SHZQ)
-	  return SH_MARKET_EX;
+		return SH_MARKET_EX;
 	else if(nKind==SZZS||nKind==SZBG||nKind==SZAG||nKind==SZZQ)
-	  return SZ_MARKET_EX;
+		return SZ_MARKET_EX;
 	else 
-      return EB_MARKET_EX;
+		return EB_MARKET_EX;
 }
 
 
@@ -262,7 +203,7 @@ CString CSharesCompute::GetIndexSymbol(int nKind)
 		}
 		bFirst = false;
 	}
-	
+
 	if(nKind >0)
 	{
 		int stkKind[4] = {SHZS,SZZS,EBZS,EBZS};
@@ -278,47 +219,47 @@ CString CSharesCompute::GetIndexSymbol(int nKind)
 void CSharesCompute::WideStockDataUpdate(RCV_WIDOFEREPORT_STRUCTEx* m_WideGpHqReport)                           //更新即时行情数据             
 {
 	CString m_Zqdm;
-    CReportData  *Cdat;
+	CReportData  *Cdat;
 	RCV_REPORT_STRUCTEx *m_GpHqReport=m_WideGpHqReport->pMarketReport;
 	if(strstr(m_GpHqReport->m_szLabel," "))
 		return;
 	if(strlen(m_GpHqReport->m_szLabel)!=6&&strlen(m_GpHqReport->m_szLabel)!=4)
 		return;
-    m_GpHqReport->m_szName[8]='\0';
+	m_GpHqReport->m_szName[8]='\0';
 	int nKind=m_MainDocument->m_sharesInformation.GetStockKind(m_GpHqReport->m_wMarket,m_GpHqReport->m_szLabel);
-    if(nKind==-1)
+	if(nKind==-1)
 		return;
 	if (this->m_MainDocument->m_sharesInformation.Lookup(m_GpHqReport->m_szLabel, Cdat,nKind) != TRUE)     
 	{
-         return; 
+		return; 
 	} 
 	// add
-    if(Cdat->lastclmin<0 )
-       Cdat->lastclmin=0;
+	if(Cdat->lastclmin<0 )
+		Cdat->lastclmin=0;
 	if(Cdat->lastclmin>240)
-       Cdat->lastclmin=239;
-    WideStockItemUpdate(Cdat, m_WideGpHqReport);                                   
+		Cdat->lastclmin=239;
+	WideStockItemUpdate(Cdat, m_WideGpHqReport);                                   
 }
 void CSharesCompute::WideStockItemUpdate(CReportData  *Cdat,RCV_WIDOFEREPORT_STRUCTEx * m_WideGpHqReport)          
 {
-    int chg=0;
+	int chg=0;
 	short Select_Market;
 	float m_Stockvalue;
 	float OldBuyP1,OldSellP1;
 	RCV_REPORT_STRUCTEx *m_GpHqReport=m_WideGpHqReport->pMarketReport;
 	if(strcmp(Cdat->id,m_GpHqReport->m_szLabel)!=0)
 		return;
-    OldBuyP1=Cdat->pbuy1;
+	OldBuyP1=Cdat->pbuy1;
 	OldSellP1=Cdat->psel1;
-    CString StockId=m_GpHqReport->m_szLabel;
+	CString StockId=m_GpHqReport->m_szLabel;
 	if(m_GpHqReport->m_wMarket == SH_MARKET_EX)
-       Select_Market=0;                                  
+		Select_Market=0;                                  
 	else
-	   Select_Market=1;  	 
+		Select_Market=1;  	 
 
 	Cdat->initdown =TRUE;                                  
 	if(m_GpHqReport->m_fLastClose !=0&& m_GpHqReport->m_fLastClose!=-1)
-	   Cdat->ystc=m_GpHqReport->m_fLastClose;            
+		Cdat->ystc=m_GpHqReport->m_fLastClose;            
 
 	bool bBuySell = false;
 	if(Cdat ->ystc>0 && m_GpHqReport->m_fNewPrice>0)
@@ -330,7 +271,7 @@ void CSharesCompute::WideStockItemUpdate(CReportData  *Cdat,RCV_WIDOFEREPORT_STR
 			if(ff>0.047 || ff<-0.047)
 				bBuySell = true;
 	}
-	
+
 
 	if ((m_GpHqReport->m_fBuyPrice[0]>0 || bBuySell == true) && m_GpHqReport->m_fBuyPrice[0]!=-1)
 	{
@@ -342,7 +283,7 @@ void CSharesCompute::WideStockItemUpdate(CReportData  *Cdat,RCV_WIDOFEREPORT_STR
 			chg=1;                                                                                             
 		}
 	}
-	
+
 	if ((m_GpHqReport->m_fSellPrice[0] >0 || bBuySell == true) && m_GpHqReport->m_fSellPrice[0]!=-1)
 	{
 		if (m_GpHqReport->m_fSellPrice[0]!=Cdat->psel1)
@@ -355,10 +296,10 @@ void CSharesCompute::WideStockItemUpdate(CReportData  *Cdat,RCV_WIDOFEREPORT_STR
 	}
 	if (m_GpHqReport->m_fHigh!=0&&m_GpHqReport->m_fHigh!=-1)                       
 		Cdat->higp=m_GpHqReport->m_fHigh;          
-	
+
 	if (m_GpHqReport->m_fLow!=0&&m_GpHqReport->m_fLow!=-1)
 		Cdat->lowp=m_GpHqReport->m_fLow;                
-	
+
 	if (m_GpHqReport->m_fOpen!=0&&m_GpHqReport->m_fOpen!=-1)
 		Cdat->opnp=m_GpHqReport->m_fOpen;              
 
@@ -383,40 +324,40 @@ void CSharesCompute::WideStockItemUpdate(CReportData  *Cdat,RCV_WIDOFEREPORT_STR
 	}
 
 	if((m_GpHqReport->m_fBuyVolume[0]>0 || bValid == true) &&m_GpHqReport->m_fBuyVolume[0]!=-1 )          //得到买一量
-	   Cdat->vbuy1=m_GpHqReport->m_fBuyVolume[0];
+		Cdat->vbuy1=m_GpHqReport->m_fBuyVolume[0];
 
 	if((m_GpHqReport->m_fBuyPrice[1]>0.01 ||m_GpHqReport->m_fBuyPrice[1] == 0 && bBuySell) &&m_GpHqReport->m_fBuyPrice[1] !=-1)           //得到买二价
-	   Cdat->pbuy2=m_GpHqReport->m_fBuyPrice[1];          
+		Cdat->pbuy2=m_GpHqReport->m_fBuyPrice[1];          
 
 	if((m_GpHqReport->m_fBuyVolume[1]>0 || bValid == true)&&m_GpHqReport->m_fBuyVolume[1] !=-1)          //得到买二量
-	   Cdat->vbuy2=m_GpHqReport->m_fBuyVolume[1];
+		Cdat->vbuy2=m_GpHqReport->m_fBuyVolume[1];
 
 	if((m_GpHqReport->m_fBuyPrice [2]>0.01||m_GpHqReport->m_fBuyPrice[2] == 0 && bBuySell)  &&m_GpHqReport->m_fBuyPrice[2]!=-1)         //得到买三价
-	   Cdat->pbuy3=m_GpHqReport->m_fBuyPrice [2];
+		Cdat->pbuy3=m_GpHqReport->m_fBuyPrice [2];
 
 	if((m_GpHqReport->m_fBuyVolume[2]>0 || bValid == true) && m_GpHqReport->m_fBuyVolume[2]!=-1)         //得到买三量
-	   Cdat->vbuy3=m_GpHqReport->m_fBuyVolume [2];
+		Cdat->vbuy3=m_GpHqReport->m_fBuyVolume [2];
 
 	if((m_GpHqReport->m_fSellVolume[0]>0 || bValid == true)&& m_GpHqReport->m_fBuyVolume[0]!=-1)      //得到卖一量
-	   Cdat->vsel1=m_GpHqReport->m_fSellVolume [0];
+		Cdat->vsel1=m_GpHqReport->m_fSellVolume [0];
 
 	if((m_GpHqReport->m_fSellPrice [1]>0.001||m_GpHqReport->m_fSellPrice[1] == 0 && bBuySell)   &&m_GpHqReport->m_fSellPrice[1]!=-1)       //得到卖二价
-	   Cdat->psel2=m_GpHqReport->m_fSellPrice [1];          
+		Cdat->psel2=m_GpHqReport->m_fSellPrice [1];          
 
 	if((m_GpHqReport->m_fSellVolume[1]>0 || bValid == true)&&m_GpHqReport->m_fSellVolume[1]!=-1)      //得到卖二量
-	   Cdat->vsel2=m_GpHqReport->m_fSellVolume [1];
+		Cdat->vsel2=m_GpHqReport->m_fSellVolume [1];
 
 	if((m_GpHqReport->m_fSellPrice [2]>0.001||m_GpHqReport->m_fSellPrice[1] == 0 && bBuySell) &&m_GpHqReport->m_fSellPrice [2]!=-1)       //得到卖三价
-	   Cdat->psel3=m_GpHqReport->m_fSellPrice [2];
+		Cdat->psel3=m_GpHqReport->m_fSellPrice [2];
 
 	if((m_GpHqReport->m_fSellVolume[2]>0 || bValid == true) &&m_GpHqReport->m_fSellVolume[2]!=-1)        //得到卖三量
-	  Cdat->vsel3=m_GpHqReport->m_fSellVolume[2];
+		Cdat->vsel3=m_GpHqReport->m_fSellVolume[2];
 
 	m_Stockvalue=m_GpHqReport->m_fVolume  ;                    
 	if (m_GpHqReport->m_fVolume>0)
 	{
 		if(m_Stockvalue==0 && Cdat->totv>0 && m_MainDocument->m_nANT[0]>0)
-		  m_Stockvalue=Cdat->totv;                        
+			m_Stockvalue=Cdat->totv;                        
 		if (m_Stockvalue!=Cdat->totv)
 		{
 			if (m_MainDocument->m_nANT[Select_Market]<0)
@@ -429,13 +370,13 @@ void CSharesCompute::WideStockItemUpdate(CReportData  *Cdat,RCV_WIDOFEREPORT_STR
 		}
 	}
 	if(m_Stockvalue!=0)
-	   Cdat->totv=m_Stockvalue;                                                
+		Cdat->totv=m_Stockvalue;                                                
 	if (m_GpHqReport->m_fAmount!=0&&m_GpHqReport->m_fAmount!=-1)                         
-	   Cdat->totp =m_GpHqReport->m_fAmount;
+		Cdat->totp =m_GpHqReport->m_fAmount;
 
 	Cdat->rvol=m_WideGpHqReport->m_fActiveBuyVolumn;
 	Cdat->dvol=Cdat->totv - Cdat->rvol;
-	
+
 	if (Cdat->nowv<0)
 		Cdat->nowv=0;
 }
@@ -454,7 +395,7 @@ void CSharesCompute::WideStockDataMinUpdate(MIN_TOTAL_STRUCTEx * m_GpMinute)
 		{
 
 			StockId=m_GpMinute->m_RcvMinute[index].m_head.m_szLabel ;          
-            StockId.MakeUpper(); 
+			StockId.MakeUpper(); 
 			int nKind=m_MainDocument->m_sharesInformation.GetStockKind(m_GpMinute->m_RcvMinute[index].m_head.m_wMarket,m_GpMinute->m_RcvMinute[index].m_head.m_szLabel);
 			if(m_MainDocument->m_sharesInformation.Lookup(StockId.GetBuffer(0) , Cdat,nKind) != TRUE)       
 			{
@@ -478,20 +419,20 @@ void CSharesCompute::WideStockDataMinUpdate(MIN_TOTAL_STRUCTEx * m_GpMinute)
 		}
 		if(m_GpMinute->m_RcvMinute[index].m_head.m_wMarket ==SZ_MARKET_EX)    
 			mode=1;
-        short MinuteCount=0;
+		short MinuteCount=0;
 		do
 		{
 			if(m_GpMinute->m_RcvMinute[index].m_time>240)
 			{
-			   MinuteCount=GetStockMinute(m_GpMinute->m_RcvMinute[index].m_time,mode+1   ); 
+				MinuteCount=GetStockMinute(m_GpMinute->m_RcvMinute[index].m_time,mode+1   ); 
 			}
 			else
 			{
-			   MinuteCount=m_GpMinute->m_RcvMinute[index].m_time;
+				MinuteCount=m_GpMinute->m_RcvMinute[index].m_time;
 			}
 			if(MinuteCount<=m_MainDocument->m_nANT[0])
 			{
-                if(m_GpMinute->m_RcvMinute[index].m_fPrice!=0)
+				if(m_GpMinute->m_RcvMinute[index].m_fPrice!=0)
 				{
 					Cdat->m_Kdata1[MinuteCount].Price   =m_GpMinute->m_RcvMinute[index].m_fPrice ;
 					Cdat->m_Kdata1[MinuteCount].Amount  =m_GpMinute->m_RcvMinute[index].m_fAmount;
@@ -856,12 +797,12 @@ void CSharesCompute::StockItemUpdate(CReportData  *Cdat,RCV_REPORT_STRUCTEx* m_G
 		Cdat->m_Kdata1[m_MainDocument->m_nANT[Select_Market]].Volume =m_GpHqReport->m_fVolume ;
 	if(Cdat->id[1] <65) 
 		//if (chg==2 || chg==3)                                             
-		{
-			UpdateHs(Cdat,m_MainDocument->m_nANT[Select_Market]);
-		}
-		Cdat->lastclmin=m_MainDocument->m_nANT[Select_Market];
+	{
+		UpdateHs(Cdat,m_MainDocument->m_nANT[Select_Market]);
+	}
+	Cdat->lastclmin=m_MainDocument->m_nANT[Select_Market];
 
-		AddDataCdat1(Cdat);
+	AddDataCdat1(Cdat);
 }
 void CSharesCompute::StockDataMinUpdate(MIN_TOTAL_STRUCTEx * m_GpMinute)                      
 {
@@ -1080,4 +1021,73 @@ void CSharesCompute::StockDataDayUpdate(DAY_TOTAL_STRUCTEx* m_GpDay)
 		GlobalFree((HGLOBAL)pDay);
 	}
 	while (index < m_GpDay->Day_Count);
+}
+
+void CSharesCompute::StockDataPowerUpdate(POWER_TOTAL_STRUCTEx* m_GpPower)
+{
+	int index = 0;
+	static int steps = 0;
+	int nKind = 0;
+
+	if (m_GpPower->m_RcvPower->m_head.m_dwHeadTag != EKE_HEAD_TAG)
+	{
+		return;
+	}
+
+	do
+	{
+		CReportData* Cdat = NULL;
+		WORD wMarket;
+		CString StockId;
+
+		if (m_GpPower->m_RcvPower[index].m_head.m_dwHeadTag == EKE_HEAD_TAG)
+		{
+			wMarket = m_GpPower->m_RcvPower[index].m_head.m_wMarket;
+			StockId = m_GpPower->m_RcvPower[index].m_head.m_szLabel;
+			StockId.MakeUpper();
+			nKind = m_MainDocument->m_sharesInformation.GetStockKind(wMarket, StockId.GetBuffer(0));
+			if (m_MainDocument->m_sharesInformation.Lookup(StockId.GetBuffer(0), Cdat, nKind) != TRUE)
+			{
+				Cdat = NULL;
+				index++;
+				continue;
+			}
+		}
+
+		if (Cdat == NULL)
+		{
+			index++;
+			continue;
+		}
+
+		index++;
+
+		if (Cdat->pBaseInfo == NULL)
+		{
+			BASEINFO* pBaseItem;
+			if (!m_MainDocument->m_sharesInformation.AddBaseinfoPoint(Cdat->id, nKind, pBaseItem))
+			{
+				ASSERT(FALSE);
+				return;
+			}
+			Cdat->pBaseInfo = pBaseItem;
+		}
+		else
+		{
+			Cdat->pBaseInfo->NumSplit = 0;
+		}
+
+		do
+		{
+			Cdat->pBaseInfo->m_Split[Cdat->pBaseInfo->NumSplit].nTime = m_GpPower->m_RcvPower[index].m_time;
+			Cdat->pBaseInfo->m_Split[Cdat->pBaseInfo->NumSplit].Give = m_GpPower->m_RcvPower[index].m_fGive;
+			Cdat->pBaseInfo->m_Split[Cdat->pBaseInfo->NumSplit].Allocate = m_GpPower->m_RcvPower[index].m_fPei;
+			Cdat->pBaseInfo->m_Split[Cdat->pBaseInfo->NumSplit].AllocatePrice = m_GpPower->m_RcvPower[index].m_fPeiPrice;
+			Cdat->pBaseInfo->m_Split[Cdat->pBaseInfo->NumSplit].Bonus = m_GpPower->m_RcvPower[index].m_fProfit;
+			Cdat->pBaseInfo->NumSplit++;
+			index++;
+		}
+		while (m_GpPower->m_RcvPower[index].m_head.m_dwHeadTag != EKE_HEAD_TAG && index < m_GpPower->Power_Count);
+	}
+	while (index < m_GpPower->Power_Count);
 }

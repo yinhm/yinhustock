@@ -26,22 +26,22 @@ public:
 	void UpdateHs(CReportData  *Cdat, short Curr_Min);                                   
 	void SendCuoHeDataToDialog(CReportData *Cdat);                                 
 	short GetStockMinute(time_t time,int mode);                               
-    void StockDataPowerUpdate(POWER_TOTAL_STRUCTEx * m_GpPower);                     
 
 #ifdef WIDE_NET_VERSION
 	void WideStockDataUpdate(RCV_WIDOFEREPORT_STRUCTEx* m_GpHqReport);                                 
 	void WideStockItemUpdate(CReportData  *Cdat,RCV_WIDOFEREPORT_STRUCTEx* m_GpHqReport);       
-    void WideStockDataMinUpdate(MIN_TOTAL_STRUCTEx * m_GpMinute);                            
+	void WideStockDataMinUpdate(MIN_TOTAL_STRUCTEx * m_GpMinute);                            
 #else
 	void StockDataUpdate(RCV_REPORT_STRUCTEx* m_GpHqReport);                                
 	void StockItemUpdate(CReportData  *Cdat,RCV_REPORT_STRUCTEx* m_GpHqReport);    
-    void StockDataMinUpdate(MIN_TOTAL_STRUCTEx * m_GpMinute);                         
+	void StockDataMinUpdate(MIN_TOTAL_STRUCTEx * m_GpMinute);                         
 
 #endif	
 
 public:
-    int CheckStockDaytime(DAY_TOTAL_STRUCTEx* m_GpDay, int index);
+	int CheckStockDaytime(DAY_TOTAL_STRUCTEx* m_GpDay, int index);
 	void StockDataDayUpdate(DAY_TOTAL_STRUCTEx* m_GpDay);
+	void StockDataPowerUpdate(POWER_TOTAL_STRUCTEx* m_GpPower);
 };
 
 #endif // !defined(AFX_STOCKDATACalc_H__4BE51F0E_A261_11D2_B30C_00C04FCCA334__INCLUDED_)
