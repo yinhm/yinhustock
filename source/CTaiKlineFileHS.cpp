@@ -1,16 +1,16 @@
-// CTaiKlineFileHS.cpp: implementation of the CTaiKlineFileHS class.
-//
-//////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
 #include "CTaiShanApp.h"
 #include "CTaiKlineFileHS.h"
+
 #include "MainFrm.h"
 #include "CTaiShanDoc.h"
+
 #include "CTaiKlineDoFenshi.h"
 #include "ProgressDialog.h"
 #include "CTaiShanKlineShowView.h"
 #include "CTaiKlineTransferKline.h"
+
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -19,42 +19,37 @@ static char THIS_FILE[]=__FILE__;
 #endif
 
 
-#define HS_HEAD  16
+#define HS_HEAD					16
+#define HsSmallHeadByteEach		48								// sizeof(HSSMALLHEAD)
+#define FixedHsPerBlock			240								// 
+#define HsByteEach				sizeof(TRADE_DETAIL_H_PER)		// 
+#define SMALLHEADLENGTH			4096 * 48 + 16					// 数据起始地址
 
-#define SMALLHEADLENGTH 4096 * 48 + 16
-#define FixedHsPerBlock	240
-#define HsByteEach	sizeof(TRADE_DETAIL_H_PER)
-#define HsSmallHeadByteEach	48
-;
 
-CTaiKlineFileHS*	CTaiKlineFileHS::m_fileHsSz = NULL;
-CTaiKlineFileHS*	CTaiKlineFileHS::m_fileHsSh = NULL;
-CTaiKlineFileHS*	CTaiKlineFileHS::m_fileHsSzBak = NULL;
-CTaiKlineFileHS*	CTaiKlineFileHS::m_fileHsShBak = NULL;
-
+CTaiKlineFileHS* CTaiKlineFileHS::m_fileHsSh = NULL;
+CTaiKlineFileHS* CTaiKlineFileHS::m_fileHsSz = NULL;
 
 
 CTaiKlineFileHS::CTaiKlineFileHS()
 {
 	m_nMarket = SZ_MARKET_EX;
-	m_bToday = true;
+	m_bToday = TRUE;
+}
+
+CTaiKlineFileHS::CTaiKlineFileHS(int nMarket, BOOL bToday)
+{
+	ASSERT(nMarket!=0 && nMarket != 1);
+	m_nMarket = nMarket;
+	m_bToday = bToday;
+
+	m_nAddReMap = HsByteEach * FixedHsPerBlock * 5;
+
+	pDoc = ((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc;
 }
 
 CTaiKlineFileHS::~CTaiKlineFileHS()
 {
 	DeleteMap();
-}
-CTaiKlineFileHS::CTaiKlineFileHS(int nMarket,bool bToday)
-{
-	ASSERT(nMarket!=0 && nMarket!=1);
-	m_nMarket = nMarket;
-	m_nAddReMap = HsByteEach *  FixedHsPerBlock*5;
-	CMainFrame* pFm=(CMainFrame*)AfxGetMainWnd();
-	pDoc = pFm->m_taiShanDoc ;
-	m_bToday = bToday;
-
-	int n = sizeof(TRADE_DETAIL_H_PER);
-
 }
 
 int CTaiKlineFileHS::ReadHS(CString symbol,CBuySellList& buySellList,bool bClearAll)
@@ -83,9 +78,9 @@ int CTaiKlineFileHS::ReadHS(CString symbol,CBuySellList& buySellList,bool bClear
 			pHs = GetAtBS(&buySellList, 0,n);
 		}
 
-		 char *strLabel = symbol.GetBuffer (0);
-		 int nMarket = m_nMarket;
-		 int stkKind = CSharesInformation::GetStockKind(nMarket,strLabel);
+		char *strLabel = symbol.GetBuffer (0);
+		int nMarket = m_nMarket;
+		int stkKind = CSharesInformation::GetStockKind(nMarket,strLabel);
 
 		CReportData* pCdat = NULL;
 		CBuySellList buySellList2;
@@ -127,7 +122,7 @@ int CTaiKlineFileHS::ReadHS(CString symbol,CBuySellList& buySellList,bool bClear
 			if(pCdat->m_Kdata1[i].Volume<=0.00001 ) continue;
 			if(i>0)
 				if(pCdat->m_Kdata1[i].Volume == pCdat->m_Kdata1[i-1].Volume) continue;
-				;
+			;
 
 			if(pCdat->m_Kdata1[i].Price >0 
 				&& (pHs->vol )>pCdat->m_Kdata1[i].Volume )
@@ -158,7 +153,7 @@ int CTaiKlineFileHS::ReadHS(CString symbol,CBuySellList& buySellList,bool bClear
 			buySellList.AddTail (buySellList2.GetNext (pos));
 		}
 
-	
+
 		if(buySellList2.GetCount ()>0 || bNew ==true)
 			WriteHS2(symbol,buySellList);
 #endif
@@ -166,7 +161,7 @@ int CTaiKlineFileHS::ReadHS(CString symbol,CBuySellList& buySellList,bool bClear
 	return buySellList.GetCount ();
 }
 int CTaiKlineFileHS::ReadHSPeriod(CString symbol,CBuySellList& buySellList, CTime timeStart, CTime timeEnd,bool bClearAll)//读取一段时间的K线数据
-	
+
 {
 	return 0;
 }
@@ -217,7 +212,7 @@ void CTaiKlineFileHS::Cdat1ToHs(CReportData *pCdat, TRADE_DETAIL_H_PER *pHs,bool
 				}
 				else
 					pHs->buySellOrIndex .buySellInfo .buyP [i] 
-					=(pCdat->nowp  - *pPriceVol[i][0])*125
+				=(pCdat->nowp  - *pPriceVol[i][0])*125
 					/ pHs->buySellOrIndex .buySellInfo .unitCountPrc;
 			}
 		}
@@ -234,7 +229,7 @@ void CTaiKlineFileHS::Cdat1ToHs(CReportData *pCdat, TRADE_DETAIL_H_PER *pHs,bool
 
 		CTime tm = CTime::GetCurrentTime ();
 		pHs->time  = (int)tm.GetTime ()  ;
-		
+
 		int nYear = tm.GetYear();
 		int nMon = tm.GetMonth();
 		int nDay = tm.GetDay();
@@ -289,13 +284,13 @@ void CTaiKlineFileHS::Cdat1ToHs(CReportData *pCdat, TRADE_DETAIL_H_PER *pHs,bool
 			{
 				if(pHs->buySellOrIndex .buySellInfo .buyP [i] != 127)
 					*pPriceVol[i][0]=pCdat->nowp-(float)((char)(pHs->buySellOrIndex .buySellInfo .buyP [i] )
-				* pHs->buySellOrIndex .buySellInfo .unitCountPrc)/(float)(125);
+					* pHs->buySellOrIndex .buySellInfo .unitCountPrc)/(float)(125);
 				else *pPriceVol[i][0] = 0;
 			}
 
 		}
 
-		
+
 		float max= (float)pHs->buySellOrIndex .buySellInfo .unitCountVol ;
 		if(max<=0)
 		{
@@ -344,7 +339,7 @@ bool CTaiKlineFileHS::WriteHS(CReportData* pCdat,bool bFirstOne)
 
 
 	this->SetHsSmallHeader (nIndexStock,pHsSmallHead);
-//	}
+	//	}
 
 	return true;
 
@@ -424,7 +419,7 @@ int CTaiKlineFileHS::TransferHsToMin1(CBuySellList& buySellList,TRADE_DETAIL_H_P
 }
 
 int CTaiKlineFileHS::GetHsSmallHeader(CString symbol,HSSMALLHEAD* pHsSmallHead)
-								
+
 {
 	if(m_pSymbolToPos == NULL)
 		AddIndexToMap();
@@ -439,10 +434,10 @@ int CTaiKlineFileHS::GetHsSmallHeader(CString symbol,HSSMALLHEAD* pHsSmallHead)
 	}
 	if(!m_pSymbolToPos->Lookup(symbol,(void*&)i))
 		i = -1;
-	
+
 	if(i==-1)
 	{
-	
+
 		AddNewStockToFile(symbol,pHsSmallHead3);
 		if(GetStockNumber()>0)
 			i = GetStockNumber()-1;
@@ -485,29 +480,6 @@ bool CTaiKlineFileHS::SetHsSmallHeader(int nIndex,HSSMALLHEAD* pHsSmallHead)
 	return true;
 }
 
-//
-void CTaiKlineFileHS::WriteHeaderInfo()
-{
-	this->SeekToBegin();
-	int nStock=0;
-	Write(&nStock,4);
-	Write(&nStock,4);
-	nStock=65798809;
-	Write(&nStock,4);
-	WORD wd = FixedHsPerBlock;
-	Write(&wd,2);
-	wd=MaxNumStock;
-	Write(&wd,2);
-
-	char buff[8192];
-	memset(buff,255,MaxNumStock);
-	for(int i=0;i<HsSmallHeadByteEach;i++)
-		Write(buff,MaxNumStock);
-
-
-
-}
-
 void CTaiKlineFileHS::AddNewStockToFile(CString symbol,HSSMALLHEAD*& pHsSmallHead)
 {
 	int nStock = this->GetStockNumber ();
@@ -526,7 +498,7 @@ void CTaiKlineFileHS::AddNewStockToFile(CString symbol,HSSMALLHEAD*& pHsSmallHea
 	{
 		symbol = symbol.Left (6);
 	}
-	
+
 	Write(symbol.GetBuffer (8),8);
 
 	int nKline = 0;
@@ -556,8 +528,8 @@ int CTaiKlineFileHS::CreateOrMoveSmallBlock(HSSMALLHEAD* pHsSmallHead,int& nBloc
 		int nCountBlock = this->GetSmallBlockCount ();
 		this->SetSmallBlockCount (nCountBlock+1);
 		int addr2 = SMALLHEADLENGTH + nCountBlock 
-				* HsByteEach *  FixedHsPerBlock;
-									 
+			* HsByteEach *  FixedHsPerBlock;
+
 		char buff[ HsByteEach *  FixedHsPerBlock];
 		memset(buff,255,HsByteEach *  FixedHsPerBlock);
 		this->Seek(addr2,this->begin);
@@ -581,7 +553,7 @@ BOOL CTaiKlineFileHS::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFile
 	}
 	BOOL bOk = TRUE;
 	bOk = CTaiKlineMemFile::Open( lpszFileName,  nOpenFlags,  0,
-	 pException);
+		pException);
 	if(bOk == FALSE) return bOk;
 
 
@@ -590,13 +562,13 @@ BOOL CTaiKlineFileHS::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFile
 	{
 		this->ReMapFromBegin (SMALLHEADLENGTH+250* HsByteEach *  FixedHsPerBlock);
 
-	
+
 		WriteHeaderInfo();
 	}
 	else
 	{
 
-	//
+		//
 		int bID = 1;
 		if(GetID()!=65798809) bID =0;
 		int nBlock = this->GetSmallBlockCount();
@@ -660,214 +632,175 @@ BOOL CTaiKlineFileHS::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFile
 
 void CTaiKlineFileHS::AddIndexToMap()
 {
-	int nStock = this->GetStockNumber();
-	m_pSymbolToPos = new CMapStringToPtr((int)(nStock*1.25)+1);
-	ASSERT(nStock<=MaxNumStock);
-	for(int i=0;i<nStock;i++)
-	{
-		int addr = 16+i*48;
-		this->Seek(addr,this->begin);
-		HSSMALLHEAD* pHsSmallHead = (HSSMALLHEAD*)this->GetFileCurrentPointer();
-		CString symbol (pHsSmallHead->StockSign);
-		m_pSymbolToPos->SetAt(symbol,(CObject*)i);
+	int nStock = GetStockNumber();
+	ASSERT(nStock <= MaxNumStock);
+	m_pSymbolToPos = new CMapStringToPtr((int)(nStock * 1.25) + 1);
 
+	for (int i = 0; i < nStock; i++)
+	{
+		int addr = 16 + i * 48;
+		Seek(addr, begin);
+		HSSMALLHEAD* pHsSmallHead = (HSSMALLHEAD*)GetFileCurrentPointer();
+		CString symbol(pHsSmallHead->StockSign);
+		m_pSymbolToPos->SetAt(symbol, (CObject*)i);
 	}
 }
 
-
-int CTaiKlineFileHS::ReadHS2(CString symbol, CBuySellList &buySellList, bool bClearAll)
+void CTaiKlineFileHS::WriteHeaderInfo()
 {
+	SeekToBegin();
 
-	{
-	if(symbol.GetLength ()!=6&&symbol.GetLength ()!=4) return 0;
+	int nStock = 0;
+	Write(&nStock, 4);
+	Write(&nStock, 4);
+
+	nStock = 65798809;
+	Write(&nStock, 4);
+	WORD wd = FixedHsPerBlock;
+	Write(&wd, 2);
+	wd = MaxNumStock;
+	Write(&wd, 2);
+
+	char buff[8192];
+	memset(buff, 255, MaxNumStock);
+	for (int i = 0; i < HsSmallHeadByteEach; i++)
+		Write(buff, MaxNumStock);
+}
+
+int CTaiKlineFileHS::ReadHS2(CString symbol, CBuySellList& buySellList, BOOL bClearAll)
+{
+	//if (symbol.GetLength() != 6 && symbol.GetLength() != 4) return 0;
 
 	HSSMALLHEAD hsSmallHead;
 	HSSMALLHEAD* pHsSmallHead = &hsSmallHead;
-	int nIndexStock = GetHsSmallHeader(symbol,pHsSmallHead);
+	int nIndexStock = GetHsSmallHeader(symbol, pHsSmallHead);
 
-	if(bClearAll==true)
+	if (bClearAll == TRUE)
 	{
 		RemoveHs(buySellList);
 	}
 
-
-	int nList = buySellList.GetCount ();
-	if(nList>pHsSmallHead->numHS)
+	int nList = buySellList.GetCount();
+	if (nList > pHsSmallHead->numHS)
 	{
 		ASSERT(FALSE);
-		return nList ;
+		return nList;
 	}
 
-	this->SeekToBegin ();
-	ASSERT(pHsSmallHead->numHS<=0
-		?TRUE:(int)pHsSmallHead->symBlock[(pHsSmallHead->numHS-1) / FixedHsPerBlock ]<0xffff);
+	SeekToBegin();
+	ASSERT(pHsSmallHead->numHS <= 0 ? TRUE : (int)pHsSmallHead->symBlock[(pHsSmallHead->numHS - 1) / FixedHsPerBlock] < 0xFFFF);
 
-
-	for(int i=nList;i<pHsSmallHead->numHS ;i++)
+	for (int i = nList; i < pHsSmallHead->numHS; i++)
 	{
-		int blkCount= i / FixedHsPerBlock  ;	 
-		int stockCount=i % FixedHsPerBlock  ;	  
-		int addr = SMALLHEADLENGTH + pHsSmallHead->symBlock[blkCount] 
-				* HsByteEach *  FixedHsPerBlock
-					 + stockCount * HsByteEach;
-									 
-		this->Seek(addr,this->begin);
+		int blkCount = i / FixedHsPerBlock;
+		int stockCount = i % FixedHsPerBlock;
+		int addr = SMALLHEADLENGTH + pHsSmallHead->symBlock[blkCount] * HsByteEach * FixedHsPerBlock + stockCount * HsByteEach;
+
+		Seek(addr, begin);
 		TRADE_DETAIL_H_PER* pHs = new TRADE_DETAIL_H_PER;
-		Read(pHs,HsByteEach);
-		if(pHs->price == 0 )
+		Read(pHs, HsByteEach);
+		if (pHs->price == 0)
+		{
 			delete pHs;
+		}
 		else
+		{
 			buySellList.AddHead(pHs);
-	}
+		}
 	}
 
 	return buySellList.GetCount();
-
-
-
 }
 
-bool CTaiKlineFileHS::WriteHS2(CString symbol, CBuySellList &buySellList)
+BOOL CTaiKlineFileHS::WriteHS(HSSMALLHEAD* pHsSmallHead,TRADE_DETAIL_H_PER *pHs)
 {
-	if(symbol.GetLength ()!=6&&symbol.GetLength ()!=4) return 0;
+	CString symbol(pHsSmallHead->StockSign);
+	//if (symbol.GetLength() != 6 && symbol.GetLength() != 4) return 0;
+
+	ASSERT(pHsSmallHead->numHS <= 0 ? TRUE : (int)pHsSmallHead->symBlock[(pHsSmallHead->numHS - 1) / FixedHsPerBlock] < 0xFFFF);
+
+	int i = pHsSmallHead->numHS;
+	int blkCount = i / FixedHsPerBlock;
+	int stockCount = i % FixedHsPerBlock;
+	if (stockCount == 0)
+	{
+		CString s2(pHsSmallHead->StockSign);
+		CreateOrMoveSmallBlock(pHsSmallHead, blkCount);
+	}
+
+	int addr = SMALLHEADLENGTH + pHsSmallHead->symBlock[blkCount] * HsByteEach * FixedHsPerBlock + stockCount * HsByteEach;
+
+	Seek(addr, begin);
+	Write(pHs, HsByteEach);
+	pHsSmallHead->numHS++;
+
+	return TRUE;
+}
+
+BOOL CTaiKlineFileHS::WriteHS2(CString symbol, CBuySellList& buySellList)
+{
+	//if (symbol.GetLength() != 6 && symbol.GetLength() != 4) return 0;
 
 	HSSMALLHEAD hsSmallHead;
 	HSSMALLHEAD* pHsSmallHead = &hsSmallHead;
-	int nIndexStock = GetHsSmallHeader(symbol,pHsSmallHead);
+	int nIndexStock = GetHsSmallHeader(symbol, pHsSmallHead);
 
-	int nList = buySellList.GetCount ();
+	int nList = buySellList.GetCount();
 
-
-	for(int i=0;i<nList ;i++)
+	for (int i = 0; i < nList; i++)
 	{
-		int blkCount= i / FixedHsPerBlock  ;	  
-		int stockCount=i % FixedHsPerBlock  ;	
-		if(stockCount == 0)
+		int blkCount = i / FixedHsPerBlock;
+		int stockCount = i % FixedHsPerBlock;
+		if (stockCount == 0)
 		{
 			CString s2(pHsSmallHead->StockSign);
 			CreateOrMoveSmallBlock(pHsSmallHead, blkCount);
 		}
 
-		int addr = SMALLHEADLENGTH + pHsSmallHead->symBlock[blkCount] 
-				* HsByteEach *  FixedHsPerBlock
-					 + stockCount * HsByteEach;
-									 
-		this->Seek(addr,this->begin);
-		POSITION pos=buySellList.FindIndex(nList - i - 1 ) ;
-		TRADE_DETAIL_H_PER* pHs=buySellList.GetAt( pos );
-		Write(pHs,HsByteEach);
+		int addr = SMALLHEADLENGTH + pHsSmallHead->symBlock[blkCount] * HsByteEach * FixedHsPerBlock + stockCount * HsByteEach;
+
+		Seek(addr, begin);
+		POSITION pos = buySellList.FindIndex(nList - i - 1);
+		TRADE_DETAIL_H_PER* pHs = buySellList.GetAt(pos);
+		Write(pHs, HsByteEach);
 	}
 
 	pHsSmallHead->numHS = nList;
-	this->SetHsSmallHeader (nIndexStock,pHsSmallHead);
-	return true;
-}
+	SetHsSmallHeader(nIndexStock, pHsSmallHead);
 
-void CTaiKlineFileHS::RemoveHs(CBuySellList &buySellList)
-{
-		TRADE_DETAIL_H_PER* phs;
-		for(;buySellList.IsEmpty()==0;)
-		{
-			phs=buySellList.RemoveHead();
-			delete phs;
-		}
-		buySellList.RemoveAll();
-
-}
-
-int CTaiKlineFileHS::GetDataCount(CString symbol)
-{
-	int nIndex=0;
-	HSSMALLHEAD hsSmallHead;
-	HSSMALLHEAD* pHsSmallHead = &hsSmallHead;
-	int nIndexStock = GetHsSmallHeader(symbol,pHsSmallHead);
-	if( pHsSmallHead==NULL)
-		return 0;
-	return pHsSmallHead->numHS ;
-}
-
-void CTaiKlineFileHS::SetDaysCount(int nDays)
-{
-	int addr = 8;
-	this->Seek(addr,this->begin);
-	this->Write(&nDays,4);
-
-}
-
-int CTaiKlineFileHS::GetDaysCount()
-{
-	int addr = 8;
-	int nDays = 0;
-	this->Seek(addr,this->begin);
-	this->Read(&nDays,4);
-	return nDays;
-}
-
-int CTaiKlineFileHS::ComputeDaysCount(CBuySellList *buySellList)
-{
-	//if it is today's
-	int n = buySellList->GetCount ();
-	if(n==0)
-		return 0;
-	POSITION pos=buySellList->FindIndex(n - 1 ) ;
-	TRADE_DETAIL_H_PER* pHs=buySellList->GetAt( pos );
-	CTime tm = CTime::GetCurrentTime ();
-	int tmt = (int)tm.GetTime ();
-	if(tmt/(24*60*60)==pHs->time /(24*60*60))
-		return 1;
-	else if(tmt/(24*60*60)<pHs->time /(24*60*60))
-	{
-		ASSERT(FALSE);
-		return 0;
-	}
-
-
-	int nRtn = 1;
-	int tmPre = tmt/(24*60*60);
-	for(int i=240;i<n;i+=240)
-	{
-		pos=buySellList->FindIndex(n -i- 1 ) ;
-		pHs=buySellList->GetAt( pos );
-		if(pHs->time /(24*60*60)>tmPre)
-		{
-			tmPre= pHs->time /(24*60*60);
-			nRtn++;
-		}
-		else if(pHs->time /(24*60*60)<tmPre)
-			ASSERT(FALSE);
-	}
-	pos=buySellList->FindIndex(0 ) ;
-	pHs=buySellList->GetAt( pos );
-	if(pHs->time /(24*60*60)>tmPre)
-	{
-		tmPre= pHs->time /(24*60*60);
-		nRtn++;
-	}
-	else if(pHs->time /(24*60*60)<tmPre)
-		ASSERT(FALSE);
-
-	return nRtn;
-
+	return TRUE;
 }
 
 void CTaiKlineFileHS::ZeroHsCountEach()
 {
-
 	int addr = 16;
-	int nStock = this->GetStockNumber ();
-	for(int i=0;i<nStock;i++)
+	int nStock = GetStockNumber();
+	for (int i = 0; i < nStock; i++)
 	{
-		this->Seek(addr,this->begin);
-		HSSMALLHEAD* pHsSmallHead = (HSSMALLHEAD*)this->GetFileCurrentPointer();
-		memset(pHsSmallHead,0xff,sizeof(HSSMALLHEAD));
+		Seek(addr, begin);
+		HSSMALLHEAD* pHsSmallHead = (HSSMALLHEAD*)GetFileCurrentPointer();
+		memset(pHsSmallHead, 0xFF, sizeof(HSSMALLHEAD));
 		pHsSmallHead->numHS = 0;
-		addr+=HsSmallHeadByteEach;
+		addr += HsSmallHeadByteEach;
 	}
-	DeleteMap();
-	this->SetStockNumber (0);
-	this->SetSmallBlockCount (0);
 
+	DeleteMap();
+
+	SetStockNumber(0);
+	SetSmallBlockCount(0);
 }
+
+int CTaiKlineFileHS::GetDataCount(CString symbol)
+{
+	HSSMALLHEAD hsSmallHead;
+	HSSMALLHEAD* pHsSmallHead = &hsSmallHead;
+	int nIndexStock = GetHsSmallHeader(symbol, pHsSmallHead);
+	if (pHsSmallHead == NULL)
+		return 0;
+
+	return pHsSmallHead->numHS;
+}
+
 void CTaiKlineFileHS::TransferHs(CBuySellList *pBuySellList, ARRAY_BE &pp, int nMax, int nKindIn, int nOther, KlineEx *pKlineEx)
 {
 	ASSERT(nMax==pBuySellList->GetCount ());
@@ -943,10 +876,6 @@ void CTaiKlineFileHS::TransferHs(CBuySellList *pBuySellList, ARRAY_BE &pp, int n
 	}
 
 }
-void CTaiKlineFileHS::HsToCdat1(CReportData *pCdat, Kline *pKline, int nFoot, CBuySellList *pBuySellList)
-{
-
-}
 
 TRADE_DETAIL_H_PER* CTaiKlineFileHS::GetAtBS(CBuySellList *pBuySellList, int nFoot,int nCount)
 {
@@ -956,60 +885,17 @@ TRADE_DETAIL_H_PER* CTaiKlineFileHS::GetAtBS(CBuySellList *pBuySellList, int nFo
 	return pHs;
 }
 
-bool CTaiKlineFileHS::WriteHS(HSSMALLHEAD* pHsSmallHead,TRADE_DETAIL_H_PER *pHs)
-{
-	CString symbol(pHsSmallHead->StockSign );
-	if(symbol.GetLength ()!=6&&symbol.GetLength ()!=4) return 0;
-
-
-	ASSERT(pHsSmallHead->numHS<=0?TRUE:(int)pHsSmallHead->symBlock[(pHsSmallHead->numHS-1) / FixedHsPerBlock ]<0xffff);
-
-	
-	int i = pHsSmallHead->numHS;
-	int blkCount= i / FixedHsPerBlock  ;	  
-	int stockCount=i % FixedHsPerBlock  ;	 
-	int addr ;
-	if(stockCount == 0)
-	{
-		CString s2(pHsSmallHead->StockSign);
-		CreateOrMoveSmallBlock(pHsSmallHead, blkCount);
-	}
-	addr = SMALLHEADLENGTH + pHsSmallHead->symBlock[blkCount] 
-			* HsByteEach *  FixedHsPerBlock
-				 + stockCount * HsByteEach;
-								  
-	this->Seek(addr,this->begin);
-	Write(pHs,HsByteEach);
-	pHsSmallHead->numHS++;
-
-	return true;
-
-}
-
 void CTaiKlineFileHS::DoCloseWorkHs(CProgressDialog* pDlg)
 {
 	WriteHistoryHsFile(true,pDlg);
 	WriteHistoryHsFile(false,pDlg);
 }
 
-CTaiKlineFileHS* CTaiKlineFileHS::GetFilePointer(CString symbol,int stkKind)
-{
-
-	CTaiKlineFileHS*	pFileHs;
-
-	pFileHs=CTaiKlineFileHS::m_fileHsSh ;
-	if(SZ_MARKET_EX == CSharesCompute::GetMarketKind(stkKind))
-		pFileHs=CTaiKlineFileHS::m_fileHsSz ;
-
-	return pFileHs;
-
-}
-
 void CTaiKlineFileHS::WriteHistoryHsFile(bool bSh,CProgressDialog* pDlg)
 {
 	CTaiShanDoc * pDoc = CMainFrame::m_taiShanDoc ;
 
-	
+
 	CString sPath = "data\\historysh\\";
 	CString strName = CSharesCompute::GetIndexSymbol(0);
 	int nMarket = SH_MARKET_EX;
@@ -1035,23 +921,23 @@ void CTaiKlineFileHS::WriteHistoryHsFile(bool bSh,CProgressDialog* pDlg)
 	CStringArray sArray;
 	while(bWorking)
 	{
-	  bWorking = finder.FindNextFile();
-	  CString filename = finder.GetFileTitle();
-	  int nSize = sArray.GetSize ();
-	  if(nSize == 0 )
-		  sArray.Add (filename);
-	  else
-		  for(int j=0;j<nSize;j++)
-		  {
-			  if(filename <sArray[j])
-			  {
-				  sArray.InsertAt (j,filename);
-				  break;
-			  }
-			  if(j==nSize-1)
-				sArray.Add (filename);
-		  };
-	  n++;
+		bWorking = finder.FindNextFile();
+		CString filename = finder.GetFileTitle();
+		int nSize = sArray.GetSize ();
+		if(nSize == 0 )
+			sArray.Add (filename);
+		else
+			for(int j=0;j<nSize;j++)
+			{
+				if(filename <sArray[j])
+				{
+					sArray.InsertAt (j,filename);
+					break;
+				}
+				if(j==nSize-1)
+					sArray.Add (filename);
+			};
+		n++;
 	}
 
 	CString strMax="";
@@ -1076,7 +962,7 @@ void CTaiKlineFileHS::WriteHistoryHsFile(bool bSh,CProgressDialog* pDlg)
 	if(sToday == strMax)
 	{
 		CString s = sPath+strMax+".hst";
-	
+
 		::DeleteFile (s);
 	}
 	if(n>=pDoc->m_propertyInitiate .countOfHistoryFile)
@@ -1085,7 +971,7 @@ void CTaiKlineFileHS::WriteHistoryHsFile(bool bSh,CProgressDialog* pDlg)
 		{
 			if(sArray.GetSize()<=0) break;
 			CString s = sPath+sArray[0]+".hst";
-	
+
 			::DeleteFile (s);
 			sArray.RemoveAt (0);
 		}
@@ -1103,7 +989,7 @@ void CTaiKlineFileHS::WriteHistoryHsFile(bool bSh,CProgressDialog* pDlg)
 
 	fileHist.ReMapFromBegin (SMALLHEADLENGTH+(pFileToday->GetSmallBlockCount())* HsByteEach *  FixedHsPerBlock/2);
 
-	
+
 	int addr = 16;
 	int nStock = pFileToday->GetStockNumber();
 
@@ -1119,7 +1005,7 @@ void CTaiKlineFileHS::WriteHistoryHsFile(bool bSh,CProgressDialog* pDlg)
 		pHsSmallHead->numHS =0;
 		strcpy(pHsSmallHead->StockSign ,symbol);
 
-		
+
 		if(CTaiShanKlineShowView::IsIndexStock3(symbol))
 			ASSERT(TRUE);
 		pFileToday->ReadHS (symbol,buySellList,true);
@@ -1157,9 +1043,9 @@ int CTaiKlineFileHS::ReadIndexHS(CString symbol, CBuySellList &buySellList, bool
 	ASSERT(nList==0);
 
 
-	 char *strLabel = symbol.GetBuffer (0);
-	 int nMarket = m_nMarket;
-	 int stkKind = CSharesInformation::GetStockKind(nMarket,strLabel);
+	char *strLabel = symbol.GetBuffer (0);
+	int nMarket = m_nMarket;
+	int stkKind = CSharesInformation::GetStockKind(nMarket,strLabel);
 	CReportData* pdt=NULL;
 	if(pDoc->m_sharesInformation.Lookup(symbol.GetBuffer (0),pdt,stkKind)==0)
 		return 0;
@@ -1199,7 +1085,7 @@ int CTaiKlineFileHS::ReadIndexHS(CString symbol, CBuySellList &buySellList, bool
 		pHs->vol = pdt->m_Kdata1 [i].Volume  ;
 		pHs->time = tmt+60*i ;
 		if(i>=120)
-				pHs->time  = tmt+60*i+90*60 ;
+			pHs->time  = tmt+60*i+90*60 ;
 		pHs->buySellOrIndex .indexInfo .amount   = pdt->m_Kdata1 [i].Amount   ;
 		pHs->buySellOrIndex .indexInfo .advance  = Nidx[isSz][i].rsn ;
 		pHs->buySellOrIndex .indexInfo .decline  = Nidx[isSz][i].dnn ;
@@ -1234,25 +1120,25 @@ bool CTaiKlineFileHS::TransferDataEx(CBuySellList *pBuySellList, KlineEx *&pKlin
 		TRADE_DETAIL_H_PER* pHs = GetAtBS(pBuySellList, i,nMax);
 
 		if(pHsPre )
-		if(pHs->vol - pHsPre->vol == 430)
-		{
-			int k = 20;
-			k = 90;
+			if(pHs->vol - pHsPre->vol == 430)
+			{
+				int k = 20;
+				k = 90;
 
-		}
-		
-		CReportData cdat;
-		Cdat1ToHs(&cdat, pHs, false,pHsPre);
-		float* pf = &(cdat.pbuy1);
+			}
 
-		pHsPre = pHs;
-		for(int j=0;j<3;j++)
-		{
-			pKlineEx[i].fDataEx [j] = pf[j*2];
-			pKlineEx[i].fDataEx [j+3] = pf[j*2+1];
-			pKlineEx[i].fDataEx [j+6] = pf[j*2+6];
-			pKlineEx[i].fDataEx [j+9] = pf[j*2+6+1];
-		}
+			CReportData cdat;
+			Cdat1ToHs(&cdat, pHs, false,pHsPre);
+			float* pf = &(cdat.pbuy1);
+
+			pHsPre = pHs;
+			for(int j=0;j<3;j++)
+			{
+				pKlineEx[i].fDataEx [j] = pf[j*2];
+				pKlineEx[i].fDataEx [j+3] = pf[j*2+1];
+				pKlineEx[i].fDataEx [j+6] = pf[j*2+6];
+				pKlineEx[i].fDataEx [j+9] = pf[j*2+6+1];
+			}
 	}
 
 	return true;
@@ -1322,50 +1208,98 @@ void CTaiKlineFileHS::DeleteMap()
 	}
 }
 
-bool CTaiKlineFileHS::OpenAll()
+BOOL CTaiKlineFileHS::OpenAll()
 {
-	m_fileHsSh	= new CTaiKlineFileHS(SH_MARKET_EX);
-	m_fileHsSz	= new CTaiKlineFileHS(SZ_MARKET_EX);
+	m_fileHsSh = new CTaiKlineFileHS(SH_MARKET_EX);
+	m_fileHsSz = new CTaiKlineFileHS(SZ_MARKET_EX);
 
-	CString sPath2 ;
+	BOOL bRtn = TRUE;
+
+	CString sPath2;
 	sPath2 = g_buysellsh;
-	bool bRtn = true;
-	if(!m_fileHsSh->Open(sPath2, 0,NULL))
+	if (!m_fileHsSh->Open(sPath2, 0, NULL))
 	{
+		ASSERT(FALSE);
 		delete m_fileHsSh;
-		m_fileHsSh=NULL;
-		bRtn = false;
-		AfxMessageBox("打开文件时出错，请关闭程序后，删除文件 data\\sh\\tick.dat ",MB_OK|MB_ICONERROR);
+		m_fileHsSh = NULL;
+		bRtn = FALSE;
 	}
+
 	sPath2 = g_buysellsz;
-	if(!m_fileHsSz->Open(sPath2, 0,NULL))
+	if (!m_fileHsSz->Open(sPath2, 0, NULL))
 	{
+		ASSERT(FALSE);
 		delete m_fileHsSz;
-		m_fileHsSz=NULL;
-		bRtn = false;
-		AfxMessageBox("打开文件时出错",MB_OK|MB_ICONERROR);
+		m_fileHsSz = NULL;
+		bRtn = FALSE;
 	}
 
 	return bRtn;
-
 }
 
 void CTaiKlineFileHS::CloseAll()
 {
-	if(m_fileHsSh != NULL)
+	if (m_fileHsSh != NULL)
 	{
 		m_fileHsSh->Close();
 		delete m_fileHsSh;
 		m_fileHsSh = NULL;
 	}
-	if(m_fileHsSz != NULL)
+
+	if (m_fileHsSz != NULL)
 	{
 		m_fileHsSz->Close();
 		delete m_fileHsSz;
 		m_fileHsSz = NULL;
 	}
+}
 
+CTaiKlineFileHS* CTaiKlineFileHS::GetFilePointer(CString symbol, int stkKind)
+{
+	CTaiKlineFileHS* pFileHs;
 
+	pFileHs = CTaiKlineFileHS::m_fileHsSh;
+
+	if (SZ_MARKET_EX == CSharesCompute::GetMarketKind(stkKind))
+		pFileHs = CTaiKlineFileHS::m_fileHsSz;
+
+	return pFileHs;
+}
+
+CTaiKlineFileHS* CTaiKlineFileHS::GetFilePointer2(int nMarket)
+{
+	CTaiKlineFileHS* pFileHs = NULL;
+
+	pFileHs = CTaiKlineFileHS::m_fileHsSh;
+	if (SH_MARKET_EX == nMarket)
+	{
+		pFileHs=CTaiKlineFileHS::m_fileHsSh;
+	}
+	else if (SZ_MARKET_EX == nMarket)
+	{
+		pFileHs = CTaiKlineFileHS::m_fileHsSz;
+	}
+
+	return pFileHs;
+}
+
+int CTaiKlineFileHS::GetDataCountAll(CString symbol, int stkKind)
+{
+	CTaiKlineFileHS* pFile = GetFilePointer(symbol, stkKind);
+	return pFile->GetDataCount(symbol);
+}
+
+void CTaiKlineFileHS::RemoveHs(CBuySellList& buySellList)
+{
+	TRADE_DETAIL_H_PER* phs;
+
+	for ( ; buySellList.IsEmpty()==0; )
+	{
+		phs = buySellList.RemoveHead();
+		delete phs;
+	}
+
+	buySellList.RemoveAll();
 }
 
 int CTaiKlineFileHS::GetCountPre(CString symbol,int stkKind)
@@ -1402,7 +1336,7 @@ bool CTaiKlineFileHS::IsNeedHsHistData(CString symbol,int stkKind, CString sDate
 	}
 
 	CFileFind finder;
-	
+
 
 	int n = 0;
 	BOOL bWorking = finder.FindFile(sPath+sDate+".hst");
@@ -1422,7 +1356,7 @@ bool CTaiKlineFileHS::IsNeedHsHistData(CString symbol,int stkKind, CString sDate
 		n = hsSmallHead.numHS  ;
 		if(n>0)
 			brtn = false;
-		
+
 	}
 	return brtn;
 }
@@ -1431,7 +1365,7 @@ bool CTaiKlineFileHS::IsNeedHsHistData(CString symbol,int stkKind, CString sDate
 
 bool CTaiKlineFileHS::WriteHsDataWideNet(RCV_DISPBARGAINING_STRUCTEx *pData,int nPacketNum,int nRequest)
 {
-    int index=0;
+	int index=0;
 	if(pData->m_head.m_dwHeadTag != EKE_HEAD_TAG)
 		return false;
 
@@ -1441,31 +1375,31 @@ bool CTaiKlineFileHS::WriteHsDataWideNet(RCV_DISPBARGAINING_STRUCTEx *pData,int 
 
 	while(index<nPacketNum)
 	{
-		
-        CString StockId;
+
+		CString StockId;
 		int nMarket;
 		if(pData[index].m_head.m_dwHeadTag == EKE_HEAD_TAG)
 		{
-		   StockId=pData[index].m_head.m_szLabel;
-		   nMarket=pData[index].m_head.m_wMarket;
+			StockId=pData[index].m_head.m_szLabel;
+			nMarket=pData[index].m_head.m_wMarket;
 		}
 		else break;
 		index++;
 
-	
-        int  endindex= index; 
+
+		int  endindex= index; 
 		while(pData[endindex].m_head.m_dwHeadTag != EKE_HEAD_TAG && endindex<nPacketNum)
 		{
 			endindex++;
 		}
 
-		
+
 		{
 			int nDataCount = endindex - index;
 			if(nDataCount<=0) continue;
 
-			
-			 CString sDate ="";
+
+			CString sDate ="";
 			if(bHistory == false)
 			{
 			}
@@ -1477,7 +1411,7 @@ bool CTaiKlineFileHS::WriteHsDataWideNet(RCV_DISPBARGAINING_STRUCTEx *pData,int 
 			WriteHsToFileWideNet(StockId,nMarket, sDate, pData+index, nDataCount,nRequest);
 		}
 
-		
+
 		index = endindex;
 	}
 	return true;
@@ -1491,7 +1425,7 @@ void CTaiKlineFileHS::WriteHsToFileWideNet(CString symbol,int nMarket, CString s
 		CTaiKlineFileHS* pFile = CTaiKlineFileHS::GetFilePointer2(nMarket);
 		n = pFile->WriteHsToFile( symbol, pData,  nRecord);
 
-	
+
 		if(nRequest < 2000 )
 		{
 			HSSMALLHEAD hsSmallHead;
@@ -1516,8 +1450,8 @@ void CTaiKlineFileHS::WriteHsToFileWideNet(CString symbol,int nMarket, CString s
 	{
 		CString sPath = FILE_PATH_HSH_SH;
 		bool bSh = true;
-		 char *strLabel = symbol.GetBuffer (0);
-		 int stkKind2 = CSharesInformation::GetStockKind(nMarket,strLabel);
+		char *strLabel = symbol.GetBuffer (0);
+		int stkKind2 = CSharesInformation::GetStockKind(nMarket,strLabel);
 		int nMarket = SH_MARKET_EX;
 		if(CSharesCompute::GetMarketKind(stkKind2) !=SH_MARKET_EX)
 		{
@@ -1540,7 +1474,7 @@ void CTaiKlineFileHS::WriteHsToFileWideNet(CString symbol,int nMarket, CString s
 		}
 	}
 
-	
+
 
 }
 
@@ -1556,7 +1490,7 @@ int CTaiKlineFileHS::WriteHsToFile(CString symbol, RCV_DISPBARGAINING_STRUCTEx *
 
 
 	CBuySellList buySellList;
-	 ReadHS2(symbol, buySellList,false);
+	ReadHS2(symbol, buySellList,false);
 
 	bool bWriteDirect = false;
 	int nCountFile = buySellList.GetCount();
@@ -1588,7 +1522,7 @@ int CTaiKlineFileHS::WriteHsToFile(CString symbol, RCV_DISPBARGAINING_STRUCTEx *
 		dat1.vsel1   = pData[i].m_fSellVolume  [0];
 		dat1.vsel2   = pData[i].m_fSellVolume  [1];
 		dat1.vsel3   = pData[i].m_fSellVolume  [2];
-		 Cdat1ToHs(&dat1, pHs,true, NULL);
+		Cdat1ToHs(&dat1, pHs,true, NULL);
 		pHs->time = pData[i].m_time ;
 
 		if(bWriteDirect)
@@ -1624,10 +1558,10 @@ int CTaiKlineFileHS::WriteHsToFile(CString symbol, RCV_DISPBARGAINING_STRUCTEx *
 	}
 
 
-	 WriteHS2(symbol, buySellList);
-	 int nRtn = buySellList.GetCount ();
-	 RemoveHs (buySellList);
-	 return nRtn;
+	WriteHS2(symbol, buySellList);
+	int nRtn = buySellList.GetCount ();
+	RemoveHs (buySellList);
+	return nRtn;
 
 }
 
@@ -1637,7 +1571,7 @@ void CTaiKlineFileHS::AddSmallHeadBlock()
 	int n = (MaxNumStock - 4096)/(240/2);
 	if(n<0) return;
 
-	
+
 	int nStock = GetStockNumber ();
 
 	HSSMALLHEAD klineSmallHead;
@@ -1671,14 +1605,14 @@ void CTaiKlineFileHS::AddSmallHeadBlock()
 			int blkCount= j ;	  
 			int stockCount=k  ;	  
 			int addr = SMALLHEADLENGTH + klineSmallHead.symBlock[blkCount] 
-					* HsByteEach *  FixedHsPerBlock
-						 + stockCount * HsByteEach;
-										  
+			* HsByteEach *  FixedHsPerBlock
+				+ stockCount * HsByteEach;
+
 			this->Seek(addr,this->begin);
 			Read(&kline,HsByteEach);
 			addr = SMALLHEADLENGTH + klineSmallHead.symBlock[nNewBlock] 
-					* HsByteEach *  FixedHsPerBlock
-						 + stockCount * HsByteEach;
+			* HsByteEach *  FixedHsPerBlock
+				+ stockCount * HsByteEach;
 			this->Seek(addr,this->begin);
 			Write(&kline,HsByteEach);
 		}
@@ -1696,67 +1630,5 @@ void CTaiKlineFileHS::AddSmallHeadBlock()
 	MaxNumStock+=120;
 	WORD nMaxNumStock = MaxNumStock;
 	SetMaxNumStock(nMaxNumStock);
-
-}
-
-CTaiKlineFileHS* CTaiKlineFileHS::GetFilePointer2(int nMarket)
-{
-	CTaiKlineFileHS*	pFileHs = NULL;
-	pFileHs=CTaiKlineFileHS::m_fileHsSh ;
-	if(SH_MARKET_EX == nMarket)
-		pFileHs=CTaiKlineFileHS::m_fileHsSh ;
-	else 	if(SZ_MARKET_EX == nMarket)
-		pFileHs=CTaiKlineFileHS::m_fileHsSz ;
-
-	return pFileHs;
-
-}
-
-int CTaiKlineFileHS::GetDataCountAll(CString symbol, int stkKind)
-{
-	CTaiKlineFileHS* pFile = GetFilePointer( symbol,stkKind);
-	return pFile->GetDataCount (symbol);
-
-
-}
-
-void CTaiKlineFileHS::Symbol4To6()
-{
-	CFileFind finder;
-	CString sPath = "data\\historysz\\";
-	BOOL bWorking = finder.FindFile(sPath+"*.hst");
-	if(bWorking == FALSE)
-	{
-		CString s = sPath;
-		s.TrimRight ("\\");
-		::CreateDirectory (s,NULL);
-	}
-	while(bWorking)
-	{
-	  bWorking = finder.FindNextFile();
-	  CString filename = finder.GetFilePath();
-	  CTaiKlineFileHS fl(SZ_MARKET_EX);
-	  if(fl.Open (filename,CFile::modeRead))
-	  {
-			int nStock = fl.GetStockNumber();
-			for(int i=0;i<nStock;i++)
-			{
-				int addr = 16+i*HsSmallHeadByteEach;
-				fl.Seek(addr,fl.begin);
-				char ch[8];
-				ch[7]=0;
-				fl.Read (ch,8);
-				CString s = ch;
-				if(s.GetLength () <=4) 
-				{
-					s = CSharesInformation::Symbol4To6(s);//"00" + s;
-					strcpy(ch,s);
-					fl.Seek(addr,fl.begin);
-					fl.Write (ch,8);
-				}
-			}
-	  }
-	}
-
 
 }

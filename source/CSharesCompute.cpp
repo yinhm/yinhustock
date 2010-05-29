@@ -13,7 +13,6 @@
 #include "CSharesCompute.h"
 #include "CTaiKlineMemFile.h"
 #include "CTaiKlineFileKLine.h"
-#include "CTaiKlineFileHS.h"
 
 #include "StkDatabase.h"
 
@@ -111,7 +110,7 @@ void CSharesCompute::UpdateHs(CReportData  *Cdat,  short  Curr_Min)             
 {
 	CTaiKlineFileHS* pHsFile ;
 	CString s(Cdat->id );
-	pHsFile = CTaiKlineFileHS::GetFilePointer (s,Cdat->kind);
+	pHsFile = TSKDatabase()->GetTickFile (s,Cdat->kind);
 	pHsFile->WriteHS (Cdat);
 
 }

@@ -5,8 +5,9 @@
 
 #include "MainFrm.h"
 #include "CTaiShanDoc.h"
-#include "CTaiKlineFileHS.h"
 #include "CTaiKlineTransferKline.h"
+
+#include "StkDatabase.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -1037,7 +1038,7 @@ int CTaiKlineFileKLine::ReadKLineAny(CString symbol,int stkKind, Kline *&pKline,
 	{
 		
 		CTaiKlineFileHS*	pFileHs;
-		pFileHs=CTaiKlineFileHS::GetFilePointer (symbol,stkKind);
+		pFileHs=TSKDatabase()->GetTickFile (symbol,stkKind);
 		pFileHs->ReadHS (symbol,*pBuySellList,true);
 
 		CTaiKlineTransferKline trans(pBuySellList);

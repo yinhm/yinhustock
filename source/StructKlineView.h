@@ -631,39 +631,46 @@ struct  SCREEN_RESULT_L
 #define HS_K_LINE		25
 #define MINUTE_1_K_LINE		35
 #define NUM_MANY_DAY		50
-struct  INDEX_INFO
+
+
+
+struct INDEX_INFO
 {
-	WORD  advance;	
-	WORD  decline;
-	float amount;
-	Tidxd tidxd;	
-	float faccbaccs;
+	WORD	advance;
+	WORD	decline;
+	float	amount;
+	Tidxd	tidxd;
+	float	faccbaccs;
 };
-struct  TRADE_DETAIL_INFO
+
+struct TRADE_DETAIL_INFO
 {
-	float unitCountVol;	
-	float unitCountPrc;	
-	BYTE buyP[3];	
-	BYTE sellP[3];
-	BYTE buyV[3];	
-	BYTE sellV[3];		
+	float	unitCountVol;
+	float	unitCountPrc;
+	BYTE	buyP[3];
+	BYTE	sellP[3];
+	BYTE	buyV[3];
+	BYTE	sellV[3];
 };
-union	TRADE_DETAIL_INDEX
+
+union TRADE_DETAIL_INDEX
 {
-	TRADE_DETAIL_INFO buySellInfo;
-	INDEX_INFO	indexInfo;
+	INDEX_INFO			indexInfo;
+	TRADE_DETAIL_INFO	buySellInfo;
 };
-struct  TRADE_DETAIL_H_PER
+
+struct TRADE_DETAIL_H_PER
 {
-	float vol;	
-	float price;
-	int time;
+	float	vol;	
+	float	price;
+	int		time;
 
 	TRADE_DETAIL_INDEX buySellOrIndex;
-
 };
 
-typedef CTypedPtrList<CPtrList,TRADE_DETAIL_H_PER*> CBuySellList; 
+typedef CTypedPtrList<CPtrList, TRADE_DETAIL_H_PER*> CBuySellList;
+
+
 typedef CArray<POWER,POWER&> powerArr; 
 typedef union tagKlineEx
 {

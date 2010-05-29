@@ -8,7 +8,7 @@
 #include "CTaiShanReportView.h"
 #include "CTaiShanApp.h"
 #include "MySplitter.h"
-#include "CompanyInfoView.h"
+//#include "CompanyInfoView.h"
 #include "ChildFrm.h"
 #include "MainFrm.h"
 #include "CTaiShanKlineShowView.h"

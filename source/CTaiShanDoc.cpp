@@ -363,15 +363,15 @@ BOOL CTaiShanDoc::OnNewDocument()
 		m_4or6=0;
 		//CTaiKlineFileKLine::Transfer4To6();		
 	}
-		
+
 
 	CTaiKlineFileHS::OpenAll();
 
-	time_t now; 
-	time( &now );
-    m_week = *localtime( &now );
+	time_t now;
+	time(&now);
+	m_week = *localtime(&now);
 
-	
+
 #ifdef WIDE_NET_VERSION
 	Init_dat();
     Init_StockData(2);  
@@ -668,13 +668,12 @@ void CTaiShanDoc::OnCloseDocument()
 	CFormularContent::ClearIndex(this, 0);
 	CFormularContent::ClearIndex(this, 1);
 	CFormularContent::ClearIndex(this, 2);
-	
 
 
 	CTaiKlineFileKLine::CloseAll();
 	CTaiKlineFileHS::CloseAll();
 
-    CDocument::OnCloseDocument();
+	CDocument::OnCloseDocument();
 }
 
 

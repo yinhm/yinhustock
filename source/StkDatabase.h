@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "CTaiKlineFileHS.h"
+
 //class CStkReportFile;
 class CTaiKlineFileKLine;
 class CSharesBaseInfo;
@@ -28,6 +30,8 @@ public:
 public:
 	//CStkReportFile* GetReportFile(WORD wMarket);
 	CTaiKlineFileKLine* GetKLineFile(WORD wMarket);
+	CTaiKlineFileHS* GetTickFile(WORD wMarket);
+	CTaiKlineFileHS* GetTickFile(CString strSymbol, int nKind);
 	CSharesBaseInfo* GetBaseInfoFile(WORD wMarket);
 };
 
