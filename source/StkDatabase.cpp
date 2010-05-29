@@ -4,6 +4,10 @@
 
 //#include "StkReportFile.h"
 #include "CTaiKlineFileKLine.h"
+#include "CSharesBaseInfo.h"
+
+#include "mainfrm.h"
+#include "CTaiShanDoc.h"
 
 CStkDatabase* CStkDatabase::s_pInstance = NULL;
 
@@ -11,11 +15,13 @@ CStkDatabase::CStkDatabase()
 {
 	m_strPath = _T("");
 	//m_pStkReport = NULL;
+	m_pFinance = NULL;
 }
 
 CStkDatabase::~CStkDatabase()
 {
 	//if (m_pStkReport) m_pStkReport->Close();
+	if (m_pFinance) m_pFinance->Close();
 }
 
 BOOL CStkDatabase::InitInstance()
@@ -71,6 +77,18 @@ CTaiKlineFileKLine* CStkDatabase::GetKLineFile(WORD wMarket)
 	else if (wMarket == SZ_MARKET_EX)
 	{
 		pFile = CTaiKlineFileKLine::m_fileDaySz;
+	}
+
+	return pFile;
+}
+
+CSharesBaseInfo* CStkDatabase::GetBaseInfoFile(WORD wMarket)
+{
+	CSharesBaseInfo* pFile = NULL;
+
+	if (wMarket == SH_MARKET_EX || wMarket == SZ_MARKET_EX)
+	{
+		pFile = m_pFinance;
 	}
 
 	return pFile;

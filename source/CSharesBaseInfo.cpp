@@ -8,8 +8,6 @@
 #include <share.h>
 #include <io.h>
 
-#include "StockDrv.h"
-
 CString g_strFinance = _T("Data\\Finance.tsk");
 
 //////////////////////////////////////////////////////////////////////
@@ -303,8 +301,7 @@ BOOL CSharesBaseInfo::InsertItemPoint(BASEINFO* m_pStk)
 
 BOOL CSharesBaseInfo::InitBaseInfoData(CString Path)
 {
-	//strcpy(m_sFilePath, Path.GetBuffer(0));
-	if (_access(g_baseinfo, 0) == -1)
+	if (_access(g_strFinance, 0) == -1)
 	{
 		return InitBaseInfoDataEmpty();
 	}
@@ -314,19 +311,15 @@ BOOL CSharesBaseInfo::InitBaseInfoData(CString Path)
 	}
 }
 
-BOOL CSharesBaseInfo::AddStockItem(char* pStockCode, int nKind, PBASEINFO& pBaseItem)
+BOOL CSharesBaseInfo::AddStockItem(CString strSymbol, PBASEINFO& pBaseItem)
 {
 	int low = 0;
 	int mid = 0;
 	int high = m_BaseFileHead->StockCount - 1;
 	int InsertPose = -1;
 
-	CTaiShanDoc* m_pDoc = ((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc;
-
 	char strStockKind[10];
-	CString strKind = m_pDoc->GetStockKindString(nKind);
-	strcpy(strStockKind, strKind.GetBuffer(0));
-	strcat(strStockKind, pStockCode);
+	strcpy(strStockKind, strSymbol.GetBuffer(0));
 
 	while (low <= high)
 	{
@@ -394,7 +387,7 @@ BOOL CSharesBaseInfo::AddStockItem(char* pStockCode, int nKind, PBASEINFO& pBase
 		}
 		else
 		{
-			AfxMessageBox("分配内存出错", MB_ICONSTOP);
+			ASSERT(FALSE);
 			return FALSE;
 		}
 
@@ -418,88 +411,104 @@ BOOL CSharesBaseInfo::AddStockItem(char* pStockCode, int nKind, PBASEINFO& pBase
 	return TRUE;
 }
 
-BOOL CSharesBaseInfo::AddStockItemCorrect(char *pStockCode,PBASEINFO  pBaseItem)
+BOOL CSharesBaseInfo::AddStockItemCorrect(char* pStockCode, PBASEINFO pBaseItem)
 {
-	int low=0;
-	int high=m_BaseFileHead->StockCount -1 ;
-	int mid=0;
-	int InsertPose=-1;
-	while(low <= high)
+	int low = 0;
+	int mid = 0;
+	int high = m_BaseFileHead->StockCount - 1;
+	int InsertPose = -1;
+
+	while (low <= high)
 	{
-		mid=(low+high)/2;
-		if(low==high)
+		mid = (low + high) / 2;
+
+		if (low == high)
 		{
-			if(strcmp(pStockCode , m_pBaseInfoPoint[mid]->Symbol )>0)
+			if (strcmp(pStockCode, m_pBaseInfoPoint[mid]->Symbol) > 0)
 			{
-				if(m_BaseFileHead->StockCount==0||m_BaseFileHead->StockCount==mid)
-					InsertPose=mid ;
+				if (m_BaseFileHead->StockCount == 0 || m_BaseFileHead->StockCount == mid)
+				{
+					InsertPose = mid;
+				}
 				else
-					InsertPose=mid +1;   
+				{
+					InsertPose = mid + 1;
+				}
 				break;
 			}
-			else if(strcmp(pStockCode , m_pBaseInfoPoint[mid]->Symbol)<0)
+			else if (strcmp(pStockCode, m_pBaseInfoPoint[mid]->Symbol) < 0)
 			{
-				InsertPose=mid ;
+				InsertPose = mid;
 				break;
 			}
 			else
 			{
-				return TRUE ;
+				return TRUE;
 			}
 		}
-		if(strcmp(m_pBaseInfoPoint[mid]->Symbol , pStockCode)>0) high=mid -1;
-		else if(strcmp(m_pBaseInfoPoint[mid]->Symbol ,pStockCode)< 0 ) low=mid +1;
+
+		if (strcmp(m_pBaseInfoPoint[mid]->Symbol, pStockCode) > 0)
+		{
+			high = mid - 1;
+		}
+		else if (strcmp(m_pBaseInfoPoint[mid]->Symbol, pStockCode) < 0)
+		{
+			low = mid + 1;
+		}
 		else 
 		{
-			return TRUE ;
+			return TRUE;
 		}
 	}
-	if(high<low)
-		InsertPose=low;
 
+	if (high < low)
+	{
+		InsertPose = low;
+	}
 
-	if(m_BaseFileHead->StockCount + 1 >m_BaseFileHead->MaxStockCount)  
+	if (m_BaseFileHead->StockCount + 1 > m_BaseFileHead->MaxStockCount)
 	{
 		AddStockTypeDataSize();
 	}
-	if(m_BaseFileHead->StockCount > InsertPose)
+
+	if (m_BaseFileHead->StockCount > InsertPose)
 	{
-		PBASEINFO *ptemp;
+		PBASEINFO* ptemp;
 		HGLOBAL	hMem;
 		LPVOID hp;
-		hMem = GlobalAlloc( GPTR, (m_BaseFileHead->StockCount - InsertPose )* sizeof( PBASEINFO) );
-		hp=GlobalLock(hMem);
-		if(hp)
+		hMem = GlobalAlloc(GPTR, (m_BaseFileHead->StockCount - InsertPose) * sizeof(PBASEINFO));
+		hp = GlobalLock(hMem);
+		if (hp)
 		{
-			ptemp= (PBASEINFO *)hp;
+			ptemp = (PBASEINFO*)hp;
 		}
 		else
 		{
-			AfxMessageBox("分配内存出错",MB_ICONSTOP);
+			ASSERT(FALSE);
 			return FALSE;
 		}
-		memcpy(ptemp,&m_pBaseInfoPoint[InsertPose],(m_BaseFileHead->StockCount - InsertPose)*sizeof( PBASEINFO));
-		memcpy(&m_pBaseInfoPoint[InsertPose+1],ptemp,(m_BaseFileHead->StockCount - InsertPose)*sizeof( PBASEINFO));
-		GlobalUnlock((HGLOBAL)ptemp);        
-		GlobalFree( (HGLOBAL)ptemp);
+
+		memcpy(ptemp, &m_pBaseInfoPoint[InsertPose], (m_BaseFileHead->StockCount - InsertPose) * sizeof(PBASEINFO));
+		memcpy(&m_pBaseInfoPoint[InsertPose + 1], ptemp, (m_BaseFileHead->StockCount - InsertPose) * sizeof( PBASEINFO));
+		GlobalUnlock((HGLOBAL)ptemp);
+		GlobalFree((HGLOBAL)ptemp);
 	}
-	m_pBaseInfoPoint[InsertPose]=pBaseItem;
+
+	m_pBaseInfoPoint[InsertPose] = pBaseItem;
 	m_BaseFileHead->StockCount++;
-	strcpy(m_pBaseInfoPoint[InsertPose]->Symbol,pStockCode);
+	strcpy(m_pBaseInfoPoint[InsertPose]->Symbol, pStockCode);
+
 	return TRUE;
 }
 
-BOOL CSharesBaseInfo::Lookup(char* m_szStockId, int nKind, PBASEINFO& m_pStock)
+BOOL CSharesBaseInfo::Lookup(CString strSymbol, PBASEINFO& m_pStock)
 {
 	int low = 0;
 	int high = m_BaseFileHead->StockCount - 1;
 	int mid = 0;
 
-	CTaiShanDoc* m_pDoc = ((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc;
 	char strStockKind[10];
-	CString strKind = m_pDoc->GetStockKindString(nKind);
-	strcpy(strStockKind, strKind.GetBuffer(0));
-	strcat(strStockKind, m_szStockId);
+	strcpy(strStockKind, strSymbol.GetBuffer(0));
 
 	while (low <= high)
 	{
@@ -524,7 +533,7 @@ BOOL CSharesBaseInfo::Lookup(char* m_szStockId, int nKind, PBASEINFO& m_pStock)
 	return FALSE;
 }
 
-BOOL CSharesBaseInfo::ReadBaseInfoData(char *StockCode,int nKind,PBASEINFO & pBaseItem)
+BOOL CSharesBaseInfo::ReadBaseInfoData(CString strSymbol, PBASEINFO& pBaseItem)
 {
 	//HANDLE hFileBase,hFileMapBase;              
 	//DWORD nlength=0;

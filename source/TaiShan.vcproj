@@ -442,28 +442,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="CaiwuData.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="CAlertPopDlg.cpp"
 				>
 				<FileConfiguration
@@ -1828,50 +1806,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="INFORMATION_SH.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="INFORMATION_SZ.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="InfoView.cpp"
 				>
 				<FileConfiguration
@@ -2141,28 +2075,6 @@
 			</File>
 			<File
 				RelativePath="MainFrm.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="mainFrmD.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -3220,28 +3132,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="SymbolContrast.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="Sysface.cpp"
 				>
 				<FileConfiguration
@@ -3637,10 +3527,6 @@
 				>
 			</File>
 			<File
-				RelativePath="CaiwuData.h"
-				>
-			</File>
-			<File
 				RelativePath="CAlertPopDlg.h"
 				>
 			</File>
@@ -3905,14 +3791,6 @@
 				>
 			</File>
 			<File
-				RelativePath="INFORMATION_SH.h"
-				>
-			</File>
-			<File
-				RelativePath="INFORMATION_SZ.h"
-				>
-			</File>
-			<File
 				RelativePath="InfoView.h"
 				>
 			</File>
@@ -3958,10 +3836,6 @@
 			</File>
 			<File
 				RelativePath="MainFrm.h"
-				>
-			</File>
-			<File
-				RelativePath="mainFrmD.h"
 				>
 			</File>
 			<File
@@ -4186,10 +4060,6 @@
 			</File>
 			<File
 				RelativePath="StructView.h"
-				>
-			</File>
-			<File
-				RelativePath="SymbolContrast.h"
 				>
 			</File>
 			<File
@@ -4841,6 +4711,32 @@
 		<Filter
 			Name="dialogs"
 			>
+			<File
+				RelativePath="CaiwuData.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="CaiwuData.h"
+				>
+			</File>
 			<File
 				RelativePath="CTaiKlineColorTreeCtrl.cpp"
 				>
@@ -6269,6 +6165,32 @@
 			</File>
 			<File
 				RelativePath="DownLoadDlg.h"
+				>
+			</File>
+			<File
+				RelativePath="SymbolContrast.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="SymbolContrast.h"
 				>
 			</File>
 		</Filter>

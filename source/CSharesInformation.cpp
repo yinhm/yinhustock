@@ -2,14 +2,14 @@
 #include "stdafx.h"
 #include "CSharesInformation.h"
 
-#include <share.h>
-#include  <io.h>
-#include "StructTaiShares.h"
 #include "mainfrm.h"
 #include "CTaiShanDoc.h"
 
+#include <share.h>
+#include <io.h>
+
 CString g_strReoprt =_T("Data\\Report.tsk");
-\
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -60,28 +60,64 @@ CSharesInformation::~CSharesInformation()
 		CloseHandle(m_hFile);
 }
 
-void CSharesInformation::SavePosToFile(int StockType)
-{
-	for(int j=0;j<m_pdwStockCurrentCount[StockType];j++)
-	{
-		if(m_pData[StockType][j].pItem==NULL)
-			continue;
-		m_pData[StockType][j].pItem->sel=j; 
-	}
-}
 BOOL CSharesInformation::SavePosToFile()
 {
-	for(int i=0;i<STOCKTYPE;i++)
+	for (int i = 0; i < STOCKTYPE; i++)
 	{
-		for(int j=0;j<m_pdwStockCurrentCount[i];j++)
+		for (int j = 0; j < m_pdwStockCurrentCount[i]; j++)
 		{
-			if(m_pData[i][j].pItem==NULL)
+			if (m_pData[i][j].pItem == NULL)
 			{
 				return FALSE;
 			}
-			m_pData[i][j].pItem->sel=j; 
+			m_pData[i][j].pItem->sel = j;
 		}
 	}
+
+	return TRUE;
+}
+
+void CSharesInformation::SavePosToFile(int StockType)
+{
+	for (int j = 0; j < m_pdwStockCurrentCount[StockType]; j++)
+	{
+		if (m_pData[StockType][j].pItem == NULL)
+			continue;
+
+		m_pData[StockType][j].pItem->sel = j;
+	}
+}
+
+BOOL CSharesInformation::ClearRealDataMinute()
+{
+	for (int j = 0; j < STOCKTYPE; j++)
+	{
+		for (int i = 0; i < m_pdwStockCurrentCount[j]; i++)
+		{
+			if (m_pData[j][i].pItem == NULL)
+				continue;
+
+			m_pData[j][i].pItem->rdp = '9';
+			m_pData[j][i].pItem->lastclmin = 0;
+			m_pData[j][i].pItem->initdown = FALSE;
+			m_pData[j][i].pItem->volume5 = 0;
+			memset(&m_pData[j][i].pItem->ystc, 0, 8 * sizeof(float));
+			memset(&m_pData[j][i].pItem->rvol, 0, 2 * sizeof(float));
+			memset(&m_pData[j][i].pItem->accb, 0, 2 * sizeof(float));
+			memset(&m_pData[j][i].pItem->pbuy1, 0, 12 * sizeof(float));
+			memset(m_pData[j][i].pItem->m_Kdata1, 0, sizeof(Kdata1) * 240);
+		}
+	}
+
+	memset(Nidx[0], 0, 240 * sizeof(Rsdn1));
+	memset(Nidx[1], 0, 240 * sizeof(Rsdn1));
+	memset(Nidx[2], 0, 240 * sizeof(Rsdn1));
+
+	for (int j = 0; j < 240; j++)
+	{
+		Tidx[0][j].sec5 = Tidx[1][j].sec5 = Tidx[2][j].sec5 = 9911;
+	}
+
 	return TRUE;
 }
 
@@ -197,22 +233,23 @@ BOOL CSharesInformation::InsertItem(char* StockId, PCdat1& pStockData, DWORD Sto
 	return TRUE;
 }
 
-BOOL CSharesInformation::InitRealTimeData(CString path)
+BOOL CSharesInformation::InitRealTimeData(CString strPath)
 {
-	strcpy(m_sPath,path.GetBuffer(0)); 
-	this->m_StockBaseInfo.InitBaseInfoData(path);  
-	if(_access(g_realtime,0)==-1)   
+	strcpy(m_sPath, strPath.GetBuffer(0));
+	m_StockBaseInfo.InitBaseInfoData(strPath);
+
+	if (_access(g_strReoprt.GetBuffer(0), 0) == -1)
 	{
 		InitRealTimeDataEmpty();
 	}
 	else
 	{
 		InitRealTimeDataExist();
-
 	}
 
 	return TRUE;
 }
+
 BOOL  CSharesInformation::InsertItemPoint(CReportData *pStockData )          
 {     
 	int StockType=pStockData->kind; 
@@ -301,94 +338,8 @@ void CSharesInformation::CalcIndexBuyAndSell()
 		}
 	}
 }
-BOOL CSharesInformation::ClearRealDataMinute()
-{
-	for(int j=0;j<STOCKTYPE;j++)
-	{
-		for(int i=0;i<m_pdwStockCurrentCount[j];i++)
-		{
-			if(m_pData[j][i].pItem==NULL)
-				continue;
-			m_pData[j][i].pItem->rdp='9';
-			m_pData[j][i].pItem->lastclmin =0;
-			m_pData[j][i].pItem->initdown =FALSE;
-			m_pData[j][i].pItem->volume5=0;
-			memset(&m_pData[j][i].pItem->ystc,0,8*sizeof(float));
-			memset(&m_pData[j][i].pItem->rvol,0,2*sizeof(float));
-			memset(&m_pData[j][i].pItem->accb,0,2*sizeof(float));
-			memset(&m_pData[j][i].pItem->pbuy1,0,12*sizeof(float));
-			memset(m_pData[j][i].pItem->m_Kdata1,0,sizeof(Kdata1)*240);
-		}
-	}
-	memset(Nidx[0],0,240*sizeof(Rsdn1));
-	memset(Nidx[1],0,240*sizeof(Rsdn1));
-	memset(Nidx[2],0,240*sizeof(Rsdn1));
-	for(int j=0;j<240;j++)
-	{
-		Tidx[0][j].sec5=Tidx[1][j].sec5=Tidx[2][j].sec5=9911;
-	}
-	return TRUE;
-}
 
 
-
-void CSharesInformation::InitBaseInfoData()
-{
-	int BaseCount = m_StockBaseInfo.GetStockCount();
-	if (BaseCount < 0)
-		return;
-
-	for (int i = 0; i < BaseCount; i++)
-	{
-		BASEINFO* pBase;
-		CReportData* Cdat;
-		CTaiShanDoc* m_pDoc = ((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc;
-
-		m_StockBaseInfo.GetStockItem(i, pBase);
-		CString m_strZqdmKind = pBase->Symbol;
-		CString m_strZqdm = m_strZqdmKind.Right(m_strZqdmKind.GetLength() - 2);
-
-		int nKind = m_pDoc->GetStockKind(m_strZqdmKind.Left(2));
-		if (nKind < 0)
-			continue;
-
-		if (Lookup(m_strZqdm.GetBuffer(0), Cdat, nKind))
-		{
-			Cdat->pBaseInfo = pBase;
-		}
-	}
-}
-
-void CSharesInformation::ReadAllBaseInfo()
-{
-	for (int i = 0; i < STOCKTYPE; i++)
-	{
-		if (i == SHZS || i == SZZS || i == STKTYPE)
-			continue;
-
-		for (int j = 0; j < m_pdwStockCurrentCount[i]; j++)
-		{
-			ReadBaseInfoData(m_pData[i][j].pItem);
-		}
-	}
-}
-
-void CSharesInformation::ReadBaseInfoData(PCdat1 &pStockData)      
-{
-	if(pStockData->pBaseInfo==NULL)
-	{
-		BASEINFO *pBaseItem;
-		if(!m_StockBaseInfo.AddStockItem(pStockData->id,pStockData->kind,pBaseItem))              //在基本资料数据文件中增加一块数据区域
-		{
-			AfxMessageBox("增加股票基本资料空间区域时出错！");
-			return;
-		}
-		pBaseItem->NumSplit=0;
-		pStockData->pBaseInfo=pBaseItem;
-	}
-	m_StockBaseInfo.ReadBaseInfoData(pStockData->id,pStockData->kind,pStockData->pBaseInfo); //读入数据
-	m_StockBaseInfo.SaveBaseInfoToFile(pStockData->pBaseInfo,sizeof(BASEINFO));
-}
 
 BOOL CSharesInformation::AddOneStockInfo(CString strStockCode,CString strStockName,
 										 CString strStockPyjc,int nKind)
@@ -430,144 +381,69 @@ int CSharesInformation::GetChuQuanInfo(CString strStockCode, int nKind, PSplit& 
 	return -1;
 }
 
-BOOL CSharesInformation::AddBaseinfoPoint(CString strStockCode, int nKind, PBASEINFO& pBaseinfo)
-{
-	pBaseinfo = NULL;
-	CReportData* pCdat;
-
-	if (Lookup(strStockCode.GetBuffer(0), pCdat, nKind))
-	{
-		if (pCdat->pBaseInfo == NULL)
-		{
-			BASEINFO* pBaseItem = NULL;
-			if (!m_StockBaseInfo.AddStockItem(pCdat->id, nKind, pBaseItem))
-			{
-				ASSERT(FALSE);
-				return FALSE;
-			}
-			pBaseItem->NumSplit = 0;
-			pCdat->pBaseInfo = pBaseItem;
-			pBaseinfo = pBaseItem;
-
-			return TRUE; 
-		}
-		else
-		{
-			pBaseinfo = pCdat->pBaseInfo;
-
-			return TRUE;
-		}
-	}
-
-	return FALSE;
-}
-
 BOOL CSharesInformation::AddChuQuanInfo(CString strStockCode, int nKind, Split* pSplit)
 {
-	CReportData* pCdat;
-	if (Lookup(strStockCode.GetBuffer(0), pCdat, nKind))
-	{
-		if (pCdat->pBaseInfo == NULL)
-		{
-			BASEINFO* pBaseItem;
-			if (!m_StockBaseInfo.AddStockItem(pCdat->id, pCdat->kind, pBaseItem))
-			{
-				ASSERT(FALSE);
-				return FALSE;
-			}
-			pBaseItem->NumSplit = 0;
-			pCdat->pBaseInfo = pBaseItem;
-		}
+	//CReportData* pCdat;
+	//if (Lookup(strStockCode.GetBuffer(0), pCdat, nKind))
+	//{
+	//	if (pCdat->pBaseInfo == NULL)
+	//	{
+	//		BASEINFO* pBaseItem;
+	//		if (!m_StockBaseInfo.AddStockItem(pCdat->id, pCdat->kind, pBaseItem))
+	//		{
+	//			ASSERT(FALSE);
+	//			return FALSE;
+	//		}
+	//		pBaseItem->NumSplit = 0;
+	//		pCdat->pBaseInfo = pBaseItem;
+	//	}
 
-		memcpy(pCdat->pBaseInfo->m_Split + pCdat->pBaseInfo->NumSplit, pSplit, sizeof(Split));
-		pCdat->pBaseInfo->NumSplit++;
+	//	memcpy(pCdat->pBaseInfo->m_Split + pCdat->pBaseInfo->NumSplit, pSplit, sizeof(Split));
+	//	pCdat->pBaseInfo->NumSplit++;
 
-		return TRUE; 
-	}
+	//	return TRUE; 
+	//}
 
 	return FALSE;
 }
 
 BOOL CSharesInformation::ModifyChuQuanInfo(CString strStockCode, int nWhichItem, Split* pSplit, int nKind)
 {
-	CReportData* pCdat;
-	if (Lookup(strStockCode.GetBuffer(0), pCdat, nKind))
-	{
-		if (pCdat->pBaseInfo != NULL)
-		{
-			if (nWhichItem >= pCdat->pBaseInfo->NumSplit)
-				return FALSE;
+	//CReportData* pCdat;
+	//if (Lookup(strStockCode.GetBuffer(0), pCdat, nKind))
+	//{
+	//	if (pCdat->pBaseInfo != NULL)
+	//	{
+	//		if (nWhichItem >= pCdat->pBaseInfo->NumSplit)
+	//			return FALSE;
 
-			memcpy(pCdat->pBaseInfo->m_Split + nWhichItem, pSplit, sizeof(Split));
+	//		memcpy(pCdat->pBaseInfo->m_Split + nWhichItem, pSplit, sizeof(Split));
 
-			return TRUE; 
-		}
-	}
+	//		return TRUE; 
+	//	}
+	//}
 
 	return FALSE;
 }
 
 BOOL CSharesInformation::DeleteChuQuanInfo(CString strStockCode, int nWhichItem, int nKind)
 {
-	CReportData* pCdat;
-	if (Lookup(strStockCode.GetBuffer(0), pCdat, nKind))
-	{
-		if (pCdat->pBaseInfo != NULL)
-		{
-			if (nWhichItem >= pCdat->pBaseInfo->NumSplit)
-				return FALSE;
+	//CReportData* pCdat;
+	//if (Lookup(strStockCode.GetBuffer(0), pCdat, nKind))
+	//{
+	//	if (pCdat->pBaseInfo != NULL)
+	//	{
+	//		if (nWhichItem >= pCdat->pBaseInfo->NumSplit)
+	//			return FALSE;
 
-			memmove(pCdat->pBaseInfo->m_Split + nWhichItem, pCdat->pBaseInfo->m_Split + nWhichItem + 1,
-				(pCdat->pBaseInfo->NumSplit - nWhichItem - 1) * sizeof(Split));
-			pCdat->pBaseInfo->NumSplit--;
+	//		memmove(pCdat->pBaseInfo->m_Split + nWhichItem, pCdat->pBaseInfo->m_Split + nWhichItem + 1,
+	//			(pCdat->pBaseInfo->NumSplit - nWhichItem - 1) * sizeof(Split));
+	//		pCdat->pBaseInfo->NumSplit--;
 
-			return TRUE; 
-		}
-	}
+	//		return TRUE; 
+	//	}
+	//}
 
-	return FALSE;
-}
-
-BOOL CSharesInformation::ImportChuQuanInfo(CString strStockCode,Split *pSplit,
-										   int nChuquanTotalTimes,int nKind)
-{
-	CReportData *pCdat;
-	if(Lookup(strStockCode.GetBuffer(0) ,pCdat,nKind))
-	{
-		if(pCdat->pBaseInfo==NULL)
-		{
-			BASEINFO *pBaseItem;
-			if(!m_StockBaseInfo.AddStockItem(pCdat->id,nKind,pBaseItem))         
-			{
-				AfxMessageBox("增加股票基本资料空间区域时出错！");
-				return FALSE;
-			}
-			pBaseItem->NumSplit=0;
-			pCdat->pBaseInfo=pBaseItem;
-		}
-
-		memcpy(pCdat->pBaseInfo->m_Split,
-			pSplit,sizeof(Split)*nChuquanTotalTimes); 
-		pCdat->pBaseInfo->NumSplit =nChuquanTotalTimes;  
-		m_StockBaseInfo.SaveBaseInfoToFile(pCdat->pBaseInfo,sizeof(BASEINFO)+sizeof(Split)*80);
-		return TRUE; 
-	}
-	return FALSE;
-
-}
-BOOL CSharesInformation::ExportChuQuanInfo(CString strStockCode,PSplit &pSplit,
-										   int& nChuquanTotalTimes,int nKind)
-{
-	CReportData *pCdat;
-	if(Lookup(strStockCode.GetBuffer(0) ,pCdat,nKind))
-	{
-		if(pCdat->pBaseInfo!=NULL)
-		{
-			pSplit=pCdat->pBaseInfo->m_Split;
-			nChuquanTotalTimes=pCdat->pBaseInfo->NumSplit;  
-			return TRUE; 
-		}
-	}
 	return FALSE;
 }
 BOOL CSharesInformation::RemoveStockInfo()
@@ -631,34 +507,24 @@ int CSharesInformation::GetStockPos(int StockType,char *StockId)
 	}
 	return -1;
 }
-BOOL CSharesInformation::ImportCaiwuInfo(BASEINFO *pBaseinfo)
+
+BOOL CSharesInformation::ExportChuQuanInfo(CString strStockCode, PSplit& pSplit, int& nChuquanTotalTimes, int nKind)
 {
-	CReportData *pCdat;
-	CTaiShanDoc	*m_pDoc =((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc ;
-	CString m_strStockKind=pBaseinfo->Symbol;
-	CString m_strZqdm=m_strStockKind.Right(m_strStockKind.GetLength()-2);
-	int nKind=m_pDoc->GetStockKind(m_strStockKind.Left(2));
+	CReportData* pCdat;
 
-	if(Lookup(m_strZqdm.GetBuffer(0),pCdat,nKind))
+	if (Lookup(strStockCode.GetBuffer(0), pCdat, nKind))
 	{
-		if(pCdat->pBaseInfo==NULL)
+		if (pCdat->pBaseInfo != NULL)
 		{
-			BASEINFO *pBaseItem;
-			if(!m_StockBaseInfo.AddStockItem(pCdat->id,nKind,pBaseItem))           
-			{
-				AfxMessageBox("增加股票基本资料空间区域时出错！");
-				return FALSE;
-			}
-			pBaseItem->NumSplit=0;
-			pCdat->pBaseInfo=pBaseItem;
+			pSplit = pCdat->pBaseInfo->m_Split;
+			nChuquanTotalTimes = pCdat->pBaseInfo->NumSplit;
+			return TRUE; 
 		}
-		memcpy(&pCdat->pBaseInfo->zgb, &pBaseinfo->zgb,sizeof(float)*33);
-		m_StockBaseInfo.SaveBaseInfoToFile(pCdat->pBaseInfo,sizeof(BASEINFO));
-		return TRUE; 
 	}
-	return FALSE;
 
+	return FALSE;
 }
+
 BOOL  CSharesInformation::InsertItemCorrect(char *StockId ,PCdat1 pStockData, DWORD StockType)
 {
 	int low=0;
@@ -839,6 +705,14 @@ DWORD CSharesInformation::GetStockKind(int MarketType, char* strLabel)
 	}
 
 	return -1;
+}
+
+WORD CSharesInformation::GetStockMarket(int nKind)
+{
+	if (nKind == SHAG)
+		return SH_MARKET_EX;
+	else if (nKind == SZAG)
+		return SZ_MARKET_EX;
 }
 
 CString CSharesInformation::Symbol4To6(CString sIn)
@@ -1619,4 +1493,173 @@ BOOL CSharesInformation::RecvStockDataForType(PSTOCKDATASHOW& p, BYTE StockType)
 	memcpy(p, m_pData[StockType], m_pdwStockCurrentCount[StockType] * sizeof(STOCKDATASHOW));
 
 	return TRUE;
+}
+
+void CSharesInformation::InitBaseInfoData()
+{
+	int nBaseCount = m_StockBaseInfo.GetStockCount();
+	if (nBaseCount < 0)
+		return;
+
+	for (int i = 0; i < nBaseCount; i++)
+	{
+		BASEINFO* pBase;
+		m_StockBaseInfo.GetStockItem(i, pBase);
+
+		CString strSymbol = pBase->Symbol;
+		CString strCode = strSymbol.Right(strSymbol.GetLength() - 2);
+		WORD wMarket;
+		memcpy(&wMarket, strSymbol.Left(2), sizeof(wMarket));
+
+		int nKind = GetStockKind(wMarket, strCode.GetBuffer(0));
+		if (nKind < 0)
+			continue;
+
+		CReportData* Cdat;
+		if (Lookup(strCode.GetBuffer(0), Cdat, nKind))
+		{
+			Cdat->pBaseInfo = pBase;
+		}
+	}
+}
+
+BOOL CSharesInformation::AddBaseinfoPoint(CString strStockCode, int nKind, PBASEINFO& pBaseinfo)
+{
+	CReportData* pCdat;
+	pBaseinfo = NULL;
+
+	WORD wMarket = GetStockMarket(nKind);
+
+	char szStock[STKLABEL_LEN] = "";
+	memcpy(szStock, &wMarket, sizeof(WORD));
+	strcat(szStock, strStockCode);
+
+	CString strSymbol(szStock);
+
+	if (Lookup(strStockCode.GetBuffer(0), pCdat, nKind))
+	{
+		if (pCdat->pBaseInfo == NULL)
+		{
+			BASEINFO* pBaseItem = NULL;
+			if (!m_StockBaseInfo.AddStockItem(strSymbol, pBaseItem))
+			{
+				ASSERT(FALSE);
+				return FALSE;
+			}
+			pBaseItem->NumSplit = 0;
+			pCdat->pBaseInfo = pBaseItem;
+			pBaseinfo = pBaseItem;
+			return TRUE; 
+		}
+		else
+		{
+			pBaseinfo = pCdat->pBaseInfo;
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
+void CSharesInformation::ReadAllBaseInfo()
+{
+	for (int i = 0; i < STOCKTYPE; i++)
+	{
+		if (i == SHZS || i == SZZS || i == STKTYPE)
+			continue;
+
+		for (int j = 0; j < m_pdwStockCurrentCount[i]; j++)
+		{
+			ReadBaseInfoData(m_pData[i][j].pItem);
+		}
+	}
+}
+
+void CSharesInformation::ReadBaseInfoData(PCdat1& pStockData)
+{
+	CString strSymbol;
+	memcpy(strSymbol.GetBuffer(0), &pStockData->wMarket, sizeof(WORD));
+	strSymbol += pStockData->id;
+
+	if (pStockData->pBaseInfo == NULL)
+	{
+		BASEINFO* pBaseItem;
+		if (!m_StockBaseInfo.AddStockItem(strSymbol, pBaseItem))
+		{
+			ASSERT(FALSE);
+			return;
+		}
+		pBaseItem->NumSplit = 0;
+		pStockData->pBaseInfo = pBaseItem;
+	}
+
+	m_StockBaseInfo.ReadBaseInfoData(strSymbol, pStockData->pBaseInfo);
+	m_StockBaseInfo.SaveBaseInfoToFile(pStockData->pBaseInfo, sizeof(BASEINFO));
+}
+
+BOOL CSharesInformation::ImportCaiwuInfo(BASEINFO* pBaseinfo)
+{
+	CReportData* pCdat;
+
+	CString strSymbol = pBaseinfo->Symbol;
+	CString strCode = strSymbol.Right(strSymbol.GetLength() - 2);
+	WORD wMarket;
+	memcpy(&wMarket, strSymbol.Left(2).GetBuffer(0), sizeof(wMarket));
+
+	int nKind = GetStockKind(wMarket, strCode.GetBuffer(0));
+
+	if (Lookup(strCode.GetBuffer(0), pCdat, nKind))
+	{
+		if (pCdat->pBaseInfo == NULL)
+		{
+			BASEINFO* pBaseItem;
+			if (!m_StockBaseInfo.AddStockItem(strSymbol, pBaseItem))
+			{
+				ASSERT(FALSE);
+				return FALSE;
+			}
+			pBaseItem->NumSplit = 0;
+			pCdat->pBaseInfo = pBaseItem;
+		}
+
+		memcpy(&pCdat->pBaseInfo->zgb, &pBaseinfo->zgb, sizeof(float) * 33);
+		m_StockBaseInfo.SaveBaseInfoToFile(pCdat->pBaseInfo, sizeof(BASEINFO));
+
+		return TRUE; 
+	}
+
+	return FALSE;
+}
+
+BOOL CSharesInformation::ImportChuQuanInfo(CString strStockCode, Split* pSplit, int nChuquanTotalTimes, int nKind)
+{
+	CReportData* pCdat;
+
+	CString strSymbol;
+	WORD wMarket = GetStockMarket(nKind);
+	memcpy(strSymbol.GetBuffer(0), &wMarket, sizeof(WORD));
+	strSymbol += strStockCode;
+
+	if (Lookup(strStockCode.GetBuffer(0), pCdat, nKind))
+	{
+		if (pCdat->pBaseInfo == NULL)
+		{
+			BASEINFO* pBaseItem;
+			if (!m_StockBaseInfo.AddStockItem(strSymbol, pBaseItem))
+			{
+				ASSERT(FALSE);
+				return FALSE;
+			}
+			pBaseItem->NumSplit = 0;
+			pCdat->pBaseInfo = pBaseItem;
+		}
+
+		memcpy(pCdat->pBaseInfo->m_Split, pSplit, sizeof(Split) * nChuquanTotalTimes);
+		pCdat->pBaseInfo->NumSplit = nChuquanTotalTimes;
+		m_StockBaseInfo.SaveBaseInfoToFile(pCdat->pBaseInfo, sizeof(BASEINFO) + sizeof(Split) * 80);
+
+		return TRUE; 
+	}
+
+	return FALSE;
 }

@@ -26,7 +26,7 @@
 #include "STKDRV.H"
 #include "stockdrv.h"
 #include "StructTaiShares.h"
-#include "CSharesBaseInfo.h"
+//#include "CSharesBaseInfo.h"
 #include "CSharesInformation.h"
 #include "CSharesCompute.h"
 #include "StructKlineView.h"

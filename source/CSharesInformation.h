@@ -1,3 +1,4 @@
+
 #if !defined(AFX_STOCKDATAINFO_H__4BE51F0E_A261_11D2_B30C_00C04FCCA334__INCLUDED_)
 #define AFX_STOCKDATAINFO_H__4BE51F0E_A261_11D2_B30C_00C04FCCA334__INCLUDED_
 
@@ -6,9 +7,10 @@
 #endif // _MSC_VER > 1000
 
 #include "StkFile.h"
+#include "CSharesBaseInfo.h"
 
 #define STOCKTYPE  13
-#define ADDCOUNT   10 
+#define ADDCOUNT   10
 
 class CSharesInformation : public CStkFile
 {
@@ -17,8 +19,6 @@ public:
 	virtual ~CSharesInformation();
 
 protected:
-	//HANDLE m_hFile;
-	//HANDLE m_hFileMap;
 
 	BYTE* m_pbData;
 
@@ -37,11 +37,17 @@ protected:
 	float m_indexAmount[4][6];
 
 	char m_sPath[255];
-	CSharesBaseInfo m_StockBaseInfo;   
 
+
+	CSharesBaseInfo m_StockBaseInfo;
 
 
 protected:
+	BOOL SavePosToFile();
+	void SavePosToFile(int StockType);
+
+public:
+	BOOL ClearRealDataMinute();
 
 
 public:
@@ -55,18 +61,17 @@ public:
 	BOOL Lookup(char *StockId,PCdat1 &pStockData,int nKind);  
 	int   GetStockPos(int StockType,char *StockId); 
 
+
 public:
-	BOOL InitRealTimeData(CString path);   
+	BOOL InitRealTimeData(CString strPath = _T(""));
+
 	void CalcIndexBuyAndSell();  
 	void GetIndexRsdn(PRsdn1 &pNidx) { pNidx=&Nidx[0]; }                          
 	void GetIndexTidxd(PTidxd &pTidx ){ pTidx=&Tidx[0]; }                        
 	REALDATA *GetRealDataHead() {return m_RealFileHead ;}   
 	BOOL SetRealDataHead(PREALDATA &pRealData);              
-	BOOL ClearRealDataMinute();                                 
 	void SaveRealDataToFile(LPCVOID lpBaseAddress,DWORD dwNumberOfBytesToFlush);                                                                
 public:
-	BOOL SavePosToFile();         
-	void SavePosToFile(int StockType); 
 
 private:
 
@@ -81,32 +86,20 @@ public:
 	void AddStocksIfEmpty();
 	static CString Symbol4To6(CString sIn);
 	static DWORD GetStockKind(int MarketType,char *strLabel);
+	static WORD GetStockMarket(int nKind);
 	BOOL AddOneStockInfo(CString strStockCode,CString strStockName,
 		CString strStockPyjc,int nKind);               
 	BOOL MOdifyOneStockInfo(CString strStockCode,CString strStockName,
 		CString strStockPyjc,int nKind);               
 	BOOL RemoveAllStockCjmxTj();                   
 
-
-
-public:
-	void InitBaseInfoData();
-	void ReadAllBaseInfo();             
-
-	void ReadBaseInfoData(PCdat1 &pStockData);       
 public:
 	int GetChuQuanInfo(CString strStockCode, int nKind, PSplit& pSplit);
-	BOOL AddBaseinfoPoint(CString strStockCode, int nKind, PBASEINFO& pBaseinfo);
-	BOOL LookupBase(char* m_szStockId, int nKind, PBASEINFO& m_pStock);
 	BOOL AddChuQuanInfo(CString strStockCode, int nKind, Split* pSplit);
 	BOOL ModifyChuQuanInfo(CString strStockCode, int nWhichItem, Split* pSplit, int nKind);
 	BOOL DeleteChuQuanInfo(CString strStockCode, int nWhichItem, int nKind);
 
-	BOOL ExportChuQuanInfo(CString strStockCode,PSplit &pSplit,  
-		int& nChuquanTotalTimes,int nKind); 
-	BOOL ImportChuQuanInfo(CString strStockCode,Split *pSplit,  
-		int nChuquanTotalTimes,int nKind);
-	BOOL ImportCaiwuInfo(BASEINFO *pBaseinfo);
+	BOOL ExportChuQuanInfo(CString strStockCode, PSplit& pSplit, int& nChuquanTotalTimes, int nKind);
 
 	BOOL RemoveStockInfo();                                  
 	BOOL RemoveStockCjmxTj(char *code,int nKind,BOOL IsAdd);            
@@ -136,11 +129,38 @@ public:
 
 public:
 	BOOL RecvStockDataForType(PSTOCKDATASHOW& p, BYTE StockType);
+
+
+
+public:
+	/* 初始化财务资料，将财务资料连接到 Report
+	*/
+	void InitBaseInfoData();
+
+public:
+	/* 插入财务项目
+	*/
+	BOOL AddBaseinfoPoint(CString strStockCode, int nKind, PBASEINFO& pBaseinfo);
+	BOOL LookupBase(CString strStockCode, int nKind, PBASEINFO& m_pStock);
+
+public:
+	void ReadAllBaseInfo();
+	void ReadBaseInfoData(PCdat1& pStockData);
+	BOOL ImportCaiwuInfo(BASEINFO* pBaseinfo);
+	BOOL ImportChuQuanInfo(CString strStockCode, Split* pSplit, int nChuquanTotalTimes, int nKind);
 };
 
-inline BOOL CSharesInformation::LookupBase(char* m_szStockId, int nKind, PBASEINFO& m_pStock)
+inline BOOL CSharesInformation::LookupBase(CString strStockCode, int nKind, PBASEINFO& m_pStock)
 {
-	return m_StockBaseInfo.Lookup(m_szStockId,nKind,m_pStock);
+	WORD wMarket = GetStockMarket(nKind);
+
+	char szStock[STKLABEL_LEN] = "";
+	memcpy(szStock, &wMarket, sizeof(WORD));
+	strcat(szStock, strStockCode);
+
+	CString strSymbol(szStock);
+
+	return m_StockBaseInfo.Lookup(strSymbol, m_pStock);
 }
 
 inline void CSharesInformation::SaveRealDataToFile(LPCVOID lpBaseAddress,DWORD dwNumberOfBytesToFlush)

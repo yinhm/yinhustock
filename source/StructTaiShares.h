@@ -42,6 +42,18 @@ typedef struct tagPOWER_TOTAL_STRUCTEx
 	long Power_Count;
 } POWER_TOTAL_STRUCTEx;
 
+typedef struct tagSPLIT
+{
+	int		nFlags;
+	int		nTime;
+	float	Give;
+	float	Allocate;
+	float	AllocatePrice;
+	float	Bonus;
+	BYTE	Free[4];
+} Split;
+typedef Split* PSplit;
+
 
 
 typedef struct
@@ -62,18 +74,6 @@ typedef struct
 		float   dif_accb;  
 		float   dif_accs;   
 }DpKdata1;
-
-typedef struct tagSPLIT
-{
-	int		nFlags;
-	int		nTime;
-	float	Give;
-	float	Allocate;
-	float	AllocatePrice;
-	float	Bonus;
-	BYTE	Free[4];
-} Split;
-typedef Split* PSplit;
 
 typedef struct tagBASEINFO
 {

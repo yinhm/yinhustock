@@ -3,6 +3,7 @@
 
 //class CStkReportFile;
 class CTaiKlineFileKLine;
+class CSharesBaseInfo;
 
 class CStkDatabase
 {
@@ -16,6 +17,7 @@ public:
 protected:
 	CString m_strPath;
 	//CStkReportFile* m_pStkReport;
+	CSharesBaseInfo* m_pFinance;
 
 public:
 	BOOL InitInstance();
@@ -26,6 +28,7 @@ public:
 public:
 	//CStkReportFile* GetReportFile(WORD wMarket);
 	CTaiKlineFileKLine* GetKLineFile(WORD wMarket);
+	CSharesBaseInfo* GetBaseInfoFile(WORD wMarket);
 };
 
 CStkDatabase* TSKDatabase();
