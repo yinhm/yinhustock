@@ -1,3 +1,4 @@
+
 #if !defined(AFX_CHUQUANDATA_H__34161F42_8E06_11D4_9426_0080C8E20736__INCLUDED_)
 #define AFX_CHUQUANDATA_H__34161F42_8E06_11D4_9426_0080C8E20736__INCLUDED_
 
@@ -9,18 +10,20 @@
 class CChuquanData : public CPropertyPage
 {
 	DECLARE_DYNCREATE(CChuquanData)
+public:
+	CChuquanData();
+	virtual ~CChuquanData();
 
+protected:
+	CTaiShanDoc* pDoc;
+	int m_nKind;
 
 public:
-	int m_nKind;
 	void OutChuQuanData(CString FilePath);
 	BOOL IsAlreadyChuQuan(int nSeconds);
 	void InsertItem(int nItem,CString strNo,POWER& nPower);
 	int GetChuQuanInfo(CString strStockCode,PSplit &pSplit);
 	void EnableButton(BOOL bEnable);
-	CChuquanData();
-	~CChuquanData();
-	CTaiShanDoc* pDoc;   
 
 	//{{AFX_DATA(CChuquanData)
 	enum { IDD = IDD_POWER2 };
@@ -33,13 +36,13 @@ public:
 	CString	m_strStockCode;
 	//}}AFX_DATA
 private: 
-   int m_nChuQuanKind[80];
+	int m_nChuQuanKind[80];
 
 
 	//{{AFX_VIRTUAL(CChuquanData)
-	public:
+public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);  
 	//}}AFX_VIRTUAL
 
@@ -50,6 +53,7 @@ protected:
 	void ModifyChuQuanInfo(CString strStockCode, int nWhichItem,POWER *pPower);
 	void AddChuQuanInfo(CString strStockCode, POWER *pPower);
 
+protected:
 	//{{AFX_MSG(CChuquanData)
 	virtual BOOL OnInitDialog();
 	afx_msg void OnChangeStockSymbol();
@@ -63,8 +67,5 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_CHUQUANDATA_H__34161F42_8E06_11D4_9426_0080C8E20736__INCLUDED_)

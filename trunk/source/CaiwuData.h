@@ -1,3 +1,4 @@
+
 #if !defined(AFX_CAIWUDATA_H__34161F41_8E06_11D4_9426_0080C8E20736__INCLUDED_)
 #define AFX_CAIWUDATA_H__34161F41_8E06_11D4_9426_0080C8E20736__INCLUDED_
 
@@ -9,18 +10,17 @@
 class CCaiwuData : public CPropertyPage
 {
 	DECLARE_DYNCREATE(CCaiwuData)
-
-
 public:
-	int m_nKind;
-    static	BOOL ImportCwData(CString FileName);
-	void OutCaiWuData(CString PathFileName);
 	CCaiwuData();
-	~CCaiwuData();
-	CTaiShanDoc* pDoc; 
+	virtual ~CCaiwuData();
+
+protected:
+	CTaiShanDoc* pDoc;
+	int m_nKind;
 
 	//{{AFX_DATA(CCaiwuData)
 	enum { IDD = IDD_CAIWUINOUT };
+
 	CButtonST	m_zdtq;
 	CButtonST	m_button6;
 	CButtonST	m_button5;
@@ -29,31 +29,28 @@ public:
 	CString	m_ShowStatus;
 	//}}AFX_DATA
 
-
+public:
+	static BOOL ImportCwData(CString FileName);
+	void OutCaiWuData(CString PathFileName);
 
 	//{{AFX_VIRTUAL(CCaiwuData)
-	public:
+public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);   
-	//}}AFX_VIRTUAL
-
 
 protected:
-	
-	//{{AFX_MSG(CCaiwuData)
+	virtual void DoDataExchange(CDataExchange* pDX);   
 	virtual BOOL OnInitDialog();
+	//}}AFX_VIRTUAL
+
+protected:
+	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
+	//{{AFX_MSG(CCaiwuData)
 	afx_msg void OnChangeStockSymbol();
 	afx_msg void OnExport();
 	afx_msg void OnImport();
 	afx_msg void OnZdtq();
-	afx_msg BOOL OnHelpInfo(HELPINFO* pHelpInfo);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_CAIWUDATA_H__34161F41_8E06_11D4_9426_0080C8E20736__INCLUDED_)

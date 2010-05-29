@@ -78,13 +78,18 @@ BOOL CStkReceiver::CopyProcessInfo()
 		m_hSendWnd = m_hWnd;
 	}
 
-	FOX_SHAREINFO foxSi;
-	memset(&foxSi, 0, sizeof(foxSi));
-	foxSi.stime = time(&foxSi.stime);
-	foxSi.dwFoxPid = GetCurrentProcessId();
-	foxSi.hReceiverWnd = m_hSendWnd;
+	//FOX_SHAREINFO foxSi;
+	//memset(&foxSi, 0, sizeof(foxSi));
+	//foxSi.stime = time(&foxSi.stime);
+	//foxSi.dwFoxPid = GetCurrentProcessId();
+	//foxSi.hReceiverWnd = m_hSendWnd;
 
-	memcpy(m_pMapping, (void*)&foxSi, sizeof(foxSi));
+	//memcpy(m_pMapping, (void*)&foxSi, sizeof(foxSi));
+
+	FOX_SHAREINFO* pSi = (FOX_SHAREINFO*)m_pMapping;
+	pSi->dtime = time(&pSi->dtime);
+	pSi->dwDriverPid = GetCurrentProcessId();
+	pSi->hDrvierWnd = m_hWnd;
 
 	return TRUE;
 }
@@ -109,7 +114,7 @@ HWND CStkReceiver::CreateReceiverWnd()
 	RegisterClassEx(&wcex);
 
 	HWND hWnd;
-	hWnd = CreateWindow(_T("CStkReceiverWnd"), _T("飞师交易师 - "), WS_OVERLAPPEDWINDOW,
+	hWnd = CreateWindow(_T("CStkReceiverWnd"), _T(""), WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, /*hInstance*/NULL, NULL);
 
 	if (!hWnd)
@@ -128,18 +133,28 @@ HWND CStkReceiver::CreateReceiverWnd()
 BOOL CStkReceiver::StartEngine()
 {
 	CreateReceiverWnd();
-	CreateFoxMemoryShare();
+	CreateFoxMemoryShare(3552);
 	CopyProcessInfo();
 
 	if (m_pMapping)
 	{
-		CFile file;
-		file.Open("E:\\Stock.dat", CFile::modeCreate | CFile::modeReadWrite);
-		file.Write(m_pMapping, 0x1000);
-		file.Close();
+		//CFile file;
+		//file.Open("E:\\Stock.dat", CFile::modeCreate | CFile::modeReadWrite);
+		//file.Write(m_pMapping, 0x1000);
+		//file.Close();
 	}
 
 	FOX_SHAREINFO* pSi = (FOX_SHAREINFO*)m_pMapping;
+	int* n = new int;
+	*n = 1;
+	COPYDATASTRUCT data;
+	data.cbData = 4;
+	data.dwData = 1;
+	data.lpData = n;
+
+	::SendMessage(pSi->hReceiverWnd, WM_COPYDATA, 1, (LPARAM)&data);
+
+	delete n;
 
 	return TRUE;
 }
@@ -166,18 +181,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		file.Open(filename, CFile::modeCreate | CFile::modeReadWrite);
 		file.Write(pData->lpData, pData->cbData);
 		file.Close();
-	//	FOX_DATA* pFoxHeader = (FOX_DATA*)pData->lpData;
-	//	int nNumPack = pFoxHeader->m_nCount;
-	//	BYTE* pBuffBase = (BYTE*)pData->lpData + 0x0124;
-
-	//	if (pFoxHeader->m_dwType == RCV_REPORT)
-	//	{
-	//		TSKReceiver()->NotifyReceiverData(RCV_REPORT, pBuffBase, nNumPack);
-	//	}
-	//	else if (pFoxHeader->m_dwType == 0x00000053)
-	//	{
-	//		pBuffBase;
-	//	}
 
 		return 1;
 	}

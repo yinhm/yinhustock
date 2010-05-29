@@ -28,22 +28,17 @@ protected:
 	BOOL InsertItemPoint(BASEINFO* m_pStk);
 
 public:
-	BOOL InitBaseInfoData(CString Path);
-	BOOL AddStockItem(char* pStockCode, int nKind, PBASEINFO& pBaseItem);
-	BOOL AddStockItemCorrect(char* pStockCode, PBASEINFO pBaseItem);
-	BOOL Lookup(char* m_szStockId, int nKind, PBASEINFO& m_pStock);
-	BOOL ReadBaseInfoData(char* StockCode, int nKind, PBASEINFO& pBaseItem);
-	void SaveBaseInfoToFile(LPCVOID lpBaseAddress, DWORD dwNumberOfBytesToFlush);
+	LONG GetStockCount() { return m_BaseFileHead->StockCount; };
+	BOOL GetStockItem(int nPos, PBASEINFO& pBaseItem);
 
 public:
-	LONG GetStockCount() { return m_BaseFileHead->StockCount; };
-	BOOL GetStockItem(int ls_pos, PBASEINFO& pBaseItem);
+	BOOL InitBaseInfoData(CString Path);
+	BOOL AddStockItem(CString strSymbol, PBASEINFO& pBaseItem);
+	BOOL AddStockItemCorrect(char* pStockCode, PBASEINFO pBaseItem);
+	BOOL Lookup(CString strSymbol, PBASEINFO& m_pStock);
+	BOOL ReadBaseInfoData(CString strSymbol, PBASEINFO& pBaseItem);
+	void SaveBaseInfoToFile(LPCVOID lpBaseAddress, DWORD dwNumberOfBytesToFlush);
 };
-
-inline void CSharesBaseInfo::SaveBaseInfoToFile(LPCVOID lpBaseAddress, DWORD dwNumberOfBytesToFlush)
-{
-	FlushViewOfFile(lpBaseAddress, dwNumberOfBytesToFlush);
-}
 
 inline BOOL CSharesBaseInfo::GetStockItem(int nPos, PBASEINFO& pBaseItem)
 {
@@ -54,6 +49,11 @@ inline BOOL CSharesBaseInfo::GetStockItem(int nPos, PBASEINFO& pBaseItem)
 	}
 
 	return FALSE;
+}
+
+inline void CSharesBaseInfo::SaveBaseInfoToFile(LPCVOID lpBaseAddress, DWORD dwNumberOfBytesToFlush)
+{
+	FlushViewOfFile(lpBaseAddress, dwNumberOfBytesToFlush);
 }
 
 #endif // !defined(AFX_STOCKBASEINFO_H__4BE51F0E_A261_11D2_B30C_00C04FCCA334__INCLUDED_)
