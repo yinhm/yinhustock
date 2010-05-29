@@ -6,9 +6,10 @@
 #include "CTaiKlineTransferKline.h"
 #include "MainFrm.h"
 #include "CTaiShanDoc.h"
-#include "CTaiKlineFileHS.h"
 #include "CTaiKlineFileKLine.h"
 #include "CTaiKlineDoFenshi.h"
+
+#include "StkDatabase.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -597,7 +598,7 @@ int CTaiKlineTransferKline::CaclKline1Minu(Kline*& pKline,CString name,int stkKi
 	
 		pBuySellList = new CBuySellList;
 		CTaiKlineFileHS*	pFileHs;
-		pFileHs=CTaiKlineFileHS::GetFilePointer( name,stkKind);
+		pFileHs=TSKDatabase()->GetTickFile(name,stkKind);
 		pFileHs->ReadHS (name,*pBuySellList,true);
 		if(m_bRemoveBuySellList==false)
 			m_bRemoveBuySellList = true;
@@ -768,7 +769,7 @@ int CTaiKlineTransferKline::CaclKline1MinuIndex(Kline*& pKline,CString name,int 
 	
 		pBuySellList = new CBuySellList;
 		CTaiKlineFileHS*	pFileHs;
-		pFileHs=CTaiKlineFileHS::GetFilePointer (name,stkKind);
+		pFileHs=TSKDatabase()->GetTickFile (name,stkKind);
 		pFileHs->ReadHS (name,*pBuySellList,true);
 		if(m_bRemoveBuySellList==false)
 			m_bRemoveBuySellList = true;

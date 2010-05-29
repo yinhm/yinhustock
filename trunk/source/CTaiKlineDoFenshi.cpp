@@ -12,10 +12,11 @@
 #include "CTaiShanDoc.h"
 #include "SheetScrollBar.h"
 #include "SHARE.H"
-#include "CTaiKlineFileHS.h"
 #include "CTaiKlineDlgDealHistory.h"
 #include "CTaiKlineTransferKline.h"
 #include "CTaiKlineDialogShiDuanTJ.h"
+
+#include "StkDatabase.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -181,7 +182,7 @@ void CTaiKlineMin1::InitMinuteLine()
 
 	if(m_bHist==false)
 	{
-		m_pFileHs=CTaiKlineFileHS::GetFilePointer (symbol,pView->m_stkKind );
+		m_pFileHs=TSKDatabase()->GetTickFile (symbol,pView->m_stkKind );
 
 	
 		isSz=0;

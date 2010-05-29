@@ -750,28 +750,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="CompanyInfoView.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="CoolPopupMenu.cpp"
 				>
 				<FileConfiguration
@@ -2272,28 +2250,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="MYMAINTB.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="MyRichEditCtrl.cpp"
 				>
 				<FileConfiguration
@@ -2954,28 +2910,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="SHEETBHADD.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="SHEETBKCYBK.cpp"
 				>
 				<FileConfiguration
@@ -3587,10 +3521,6 @@
 				>
 			</File>
 			<File
-				RelativePath="CompanyInfoView.h"
-				>
-			</File>
-			<File
 				RelativePath="CoolPopupMenu.h"
 				>
 			</File>
@@ -3875,10 +3805,6 @@
 				>
 			</File>
 			<File
-				RelativePath="MYMAINTB.h"
-				>
-			</File>
-			<File
 				RelativePath="MyRichEditCtrl.h"
 				>
 			</File>
@@ -4008,10 +3934,6 @@
 			</File>
 			<File
 				RelativePath="SetTimeInter.h"
-				>
-			</File>
-			<File
-				RelativePath="SHEETBHADD.h"
 				>
 			</File>
 			<File

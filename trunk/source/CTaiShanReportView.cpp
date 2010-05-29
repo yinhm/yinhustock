@@ -19,13 +19,13 @@
 #include "CTaiShanReportView.h"
 #include "keybrodeangel.h"
 
-#include "Companyinfoview.h"
+//#include "Companyinfoview.h"
 #include "GridCtrl.h"
 #include "CTaiShanKlineShowView.h"
 #include "MainFrm.h"
 #include "NineShowView.h"
 
-#include "sheetbhadd.h"
+//#include "sheetbhadd.h"
 #include "DiaTest.h"
 #include "CTaiKlineFileHS.h"
 #include "HistoryDlg.h"
@@ -5767,12 +5767,13 @@ void CTaiShanReportView::OnSaveStocktype()
 {
     CTaiShanDoc* pDoc = GetDocument();
     BOOL IsAdd=TRUE;    
-	CSHEETBHADD dlg;
-	dlg.m_OpenKind =TRUE;
 	CString filename;
-	if(dlg.DoModal()!=IDOK) 
-      return ;
-	filename=dlg.m_bkname; 
+	//CSHEETBHADD dlg;
+	//dlg.m_OpenKind =TRUE;
+	//if(dlg.DoModal()!=IDOK) 
+ //     return ;
+	//filename=dlg.m_bkname; 
+	ASSERT(FALSE);
 	if(filename=="条件选股")
 	{
 		AfxMessageBox("条件选股为系统采用专用名字，故不能采用！请选择其它名字！");
@@ -6778,19 +6779,20 @@ void CTaiShanReportView::OnSaveScreenStocktype(SymbolKindArr &StockCodeArray ,CS
 {
     CTaiShanDoc* pDoc=((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc ;
     BOOL IsAdd=TRUE;    
-	CSHEETBHADD dlg;
 	CString filename;
-	if(StockName->GetLength()==0)
-	{
-		dlg.m_OpenKind =TRUE;
-		if(dlg.DoModal()!=IDOK) 
-		  return ;
-		filename=dlg.m_bkname;
-	}
-	else
-	{
-		filename=StockName->GetBuffer(0);
-	}
+	//CSHEETBHADD dlg;
+	//if(StockName->GetLength()==0)
+	//{
+	//	dlg.m_OpenKind =TRUE;
+	//	if(dlg.DoModal()!=IDOK) 
+	//	  return ;
+	//	filename=dlg.m_bkname;
+	//}
+	//else
+	//{
+	//	filename=StockName->GetBuffer(0);
+	//}
+	ASSERT(FALSE);
 	if(filename=="条件选股")
 	{
 		AfxMessageBox("条件选股为系统采用专用名字，故不能采用！请选择其它名字！");

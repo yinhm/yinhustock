@@ -10,7 +10,7 @@
 #include "cellRange.h"
 #include "CTaiShanReportView.h"
 #include "CTaiShanKlineShowView.h"
-#include "CompanyInfoView.h"
+//#include "CompanyInfoView.h"
 #include "MyTreeView.h"
 #include "MyRichView.h"
 #include "InfoView.h"

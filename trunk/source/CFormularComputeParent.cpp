@@ -7,13 +7,14 @@
 #include "CTaiShanApp.h"
 #include "CTaiShanDoc.h"
 #include "MainFrm.h"
-#include "CTaiKlineFileHS.h"
 #include "CTaiKlineFileKLine.h"
 #include "CTaiKlineTransferKline.h"
 #include "TechNnetBP.h"
 #include "CTaiKlineMoveChenben.h"
 #include "CTaiKlineDlgHistorySelect.h"
 #include "XgnExtDataDlg.h"
+
+#include "StkDatabase.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -5446,7 +5447,7 @@ bool CFormularComputeParent::GetBuySellList()
 
 	m_pBuySellList = new CBuySellList;
 	CTaiKlineFileHS*	pFileHs;
-	pFileHs=CTaiKlineFileHS::GetFilePointer (m_symbol,m_stkKind);
+	pFileHs=TSKDatabase()->GetTickFile(m_symbol,m_stkKind);
 	pFileHs->ReadHS (m_symbol,*m_pBuySellList,false);
 	if(m_bCreateBsList==false)
 		m_bCreateBsList = true;

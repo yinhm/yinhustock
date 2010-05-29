@@ -181,7 +181,6 @@
 #define IDD_DMDZ                        168
 #define IDB_BITMAP21                    168
 #define IDB_COLDTOOLBAR                 169
-#define IDD_SJGLCQSJ                    169
 #define IDR_MENU_BLOCK                  169
 #define IDR_BLOCKM                      169
 #define ID_CURSOR_MULTI                 170

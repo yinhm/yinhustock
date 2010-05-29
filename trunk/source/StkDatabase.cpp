@@ -82,6 +82,24 @@ CTaiKlineFileKLine* CStkDatabase::GetKLineFile(WORD wMarket)
 	return pFile;
 }
 
+CTaiKlineFileHS* CStkDatabase::GetTickFile(WORD wMarket)
+{
+	CTaiKlineFileHS* pFile = CTaiKlineFileHS::GetFilePointer2(wMarket);
+	ASSERT(pFile);
+	if (pFile == NULL)
+	{
+		CTaiKlineFileHS::m_fileHsSh;
+	}
+
+	return pFile;
+}
+
+CTaiKlineFileHS* CStkDatabase::GetTickFile(CString strSymbol, int nKind)
+{
+	WORD wMarket = CSharesInformation::GetStockMarket(nKind);
+	return GetTickFile(wMarket);
+}
+
 CSharesBaseInfo* CStkDatabase::GetBaseInfoFile(WORD wMarket)
 {
 	CSharesBaseInfo* pFile = NULL;

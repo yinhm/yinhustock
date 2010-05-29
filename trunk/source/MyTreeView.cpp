@@ -5,7 +5,7 @@
 #include "CTaiShanApp.h"
 #include "CTaiShanDoc.h"
 #include "MyTreeView.h"
-#include "CompanyInfoView.h"
+//#include "CompanyInfoView.h"
 #include "ChildFrm.h"
 #include "resource.h"
 #include "MyRichView.h"
