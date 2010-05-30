@@ -42,9 +42,6 @@ CSTKDRV::~CSTKDRV()
 
 void CSTKDRV::GetAdress()
 {
-	if (CTaiShanApp::m_gbUseExe == TRUE)
-		return;
-
 	CFileFind flfd;
 	CString m_CurrentWorkDirectory;
 	GetCurrentDirectory(MAX_PATH, m_CurrentWorkDirectory.GetBuffer(MAX_PATH));
@@ -99,9 +96,6 @@ void CSTKDRV::GetAdress()
 
 int CSTKDRV::Stock_Init(HWND hWnd, UINT uMsg, int nWorkMode)
 {
-	if(CTaiShanApp::m_gbUseExe ==true)
-		return 1;
-
 	if( !m_pfnStock_Init )
 		return -1;
 	CString m_CurrentWorkDirectory;
@@ -117,8 +111,6 @@ int CSTKDRV::Stock_Init(HWND hWnd, UINT uMsg, int nWorkMode)
 
 int CSTKDRV::Stock_Quit(HWND hWnd)
 {
-	if(CTaiShanApp::m_gbUseExe ==true)
-		return 1;
 	if( !m_pfnStock_Quit )
 		return -1;
 	return( (*m_pfnStock_Quit)(hWnd));
@@ -134,8 +126,6 @@ int CSTKDRV::GetTotalNumber()
 
 int CSTKDRV::SetupReceiver(BOOL bSetup)
 {
-	if(CTaiShanApp::m_gbUseExe ==true)
-		return 1;
 	if( !m_pfnSetupReceiver )
 		return -1;
 	return( (*m_pfnSetupReceiver)(bSetup));
@@ -150,8 +140,6 @@ DWORD CSTKDRV::GetStockDrvInfo(int nInfo, void *pBuf)
 }
 void CSTKDRV::SetNewsPath(LPCTSTR lpszNewsPath)
 {
-	if(CTaiShanApp::m_gbUseExe ==true)
-		return ;
 	if( !m_pfnSetNewsPath )
 		return ;
 

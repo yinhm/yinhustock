@@ -1,5 +1,3 @@
-// CTaiShanApp.cpp : Defines the class behaviors for the application.
-// Tel:13366898744
 
 #include "stdafx.h"
 #include "CTaiShanApp.h"
@@ -37,10 +35,10 @@ static char THIS_FILE[] = __FILE__;
 
 #ifdef __cplusplus
 extern "C" {
-extern long ReadDog( void );
-extern long WriteDog( void );
-extern short DogAddr,DogBytes;
-extern void * DogData;
+	extern long ReadDog( void );
+	extern long WriteDog( void );
+	extern short DogAddr,DogBytes;
+	extern void * DogData;
 }
 #else
 extern long ReadDog( void );
@@ -50,15 +48,12 @@ extern void * DogData;
 #endif
 extern HANDLE hDevice;
 
-int CTaiShanApp::m_gMessageID = 0;
-bool CTaiShanApp::m_gbUseExe = false;
-bool CTaiShanApp::m_gbDoInitate = true;
 
 void DoHtmlHelp(CWnd* pWnd,int nID)
 {
 	if(pWnd)
 
-	::ShellExecute( pWnd->m_hWnd, "open", "", NULL, NULL, SW_SHOWNORMAL);
+		::ShellExecute( pWnd->m_hWnd, "open", "", NULL, NULL, SW_SHOWNORMAL);
 };
 
 BEGIN_MESSAGE_MAP(CTaiShanApp, CWinApp)
@@ -67,7 +62,7 @@ BEGIN_MESSAGE_MAP(CTaiShanApp, CWinApp)
 	ON_COMMAND(ID_FILE_PRINT_SETUP, OnFilePrintSetup)
 	ON_UPDATE_COMMAND_UI(ID_APP_ABOUT, OnUpdateAppAbout)
 	//}}AFX_MSG_MAP
-	
+
 	ON_COMMAND(ID_FILE_NEW, CWinApp::OnFileNew)
 	ON_COMMAND(ID_FILE_OPEN, CWinApp::OnFileOpen)
 
@@ -78,11 +73,10 @@ END_MESSAGE_MAP()
 
 CTaiShanApp::CTaiShanApp()
 {
-	
-    Line_mode = 5;
+
+	Line_mode = 5;
 	m_key = 0;
 	m_bAppAuthorized=TRUE;
-	m_gbUseExe = false;
 }
 
 
@@ -101,8 +95,7 @@ BOOL CTaiShanApp::InitInstance()
 {
 	AfxEnableControlContainer();
 
-	m_gMessageID = ::RegisterWindowMessage("WsSendMessageHqData");
-	CFileFind fnd;
+
 	if(S_OK != ::CoInitialize (NULL))
 		return FALSE;
 
@@ -110,13 +103,9 @@ BOOL CTaiShanApp::InitInstance()
 	if(!FyRegister::IsValidUser())
 		return FALSE;
 
-   memset( &startup, 0, sizeof( startup ) );
-   startup.cb = sizeof( startup );
-   memset( &process, 0, sizeof( process ) );
-	if(fnd.FindFile ("WsSendMessageShare.exe"))
-	{
-		m_gbUseExe = true;
-	}
+	memset( &startup, 0, sizeof( startup ) );
+	startup.cb = sizeof( startup );
+	memset( &process, 0, sizeof( process ) );
 
 	hAppMutex=::CreateMutex(NULL,TRUE,m_pszExeName);
 	if(GetLastError() == ERROR_ALREADY_EXISTS)
@@ -126,11 +115,11 @@ BOOL CTaiShanApp::InitInstance()
 		{
 			if(::GetProp(pPrevWnd->GetSafeHwnd(),m_pszExeName))
 			{
-			  if(pPrevWnd->IsIconic())
-				  pPrevWnd->ShowWindow(SW_RESTORE);
-			  pPrevWnd->SetForegroundWindow();
-			  pPrevWnd->GetLastActivePopup()->SetForegroundWindow();
-			  return false;
+				if(pPrevWnd->IsIconic())
+					pPrevWnd->ShowWindow(SW_RESTORE);
+				pPrevWnd->SetForegroundWindow();
+				pPrevWnd->GetLastActivePopup()->SetForegroundWindow();
+				return false;
 			} 
 			pPrevWnd = pPrevWnd->GetWindow(GW_HWNDNEXT);
 		}
@@ -155,7 +144,7 @@ BOOL CTaiShanApp::InitInstance()
 
 
 
-    CTaiTestSplash *m_splash;
+	CTaiTestSplash *m_splash;
 	BOOL SplashOpen=FALSE;
 	m_splash = new CTaiTestSplash;
 	SplashOpen=m_splash->Create();
@@ -164,17 +153,6 @@ BOOL CTaiShanApp::InitInstance()
 	DWORD Currenttime=GetTickCount();
 	BeginWaitCursor();
 
-#ifdef TEST_USER1
-	t = CTime::GetCurrentTime();
-    CTime t2 = g_timeUseEnd;
-	if(t >= t2)
-	{
-
-	}
-	else
-	{
-	}
-#endif
 
 	AfxInitRichEdit( );
 #ifdef _AFXDLL
@@ -182,9 +160,6 @@ BOOL CTaiShanApp::InitInstance()
 #else
 	Enable3dControlsStatic();	
 #endif
-
-	
-	UpdateTheOEMInfo();	
 
 	SetRegistryKey("");
 	LoadStdProfileSettings();  
@@ -199,7 +174,7 @@ BOOL CTaiShanApp::InitInstance()
 	AddDocTemplate(pDocTemplate);
 
 
-    pDrawTemplate = new CMultiDocTemplate(
+	pDrawTemplate = new CMultiDocTemplate(
 		IDR_VWBASETYPE_WIDE,
 		RUNTIME_CLASS(CTaiShanDoc),
 		RUNTIME_CLASS(CChildFrame), 
@@ -213,21 +188,21 @@ BOOL CTaiShanApp::InitInstance()
 	AddDocTemplate(pDocTemplate);
 
 
-    pDrawTemplate = new CMultiDocTemplate(
+	pDrawTemplate = new CMultiDocTemplate(
 		IDR_NEWTYPE,
 		RUNTIME_CLASS(CTaiShanDoc),
 		RUNTIME_CLASS(CChildFrame),
 		RUNTIME_CLASS(CTaiShanKlineShowView));
 #endif
-	
 
-    m_pBroadcastDocTemplate = new CMultiDocTemplate(
+
+	m_pBroadcastDocTemplate = new CMultiDocTemplate(
 		IDR_BASEINFO,
 		RUNTIME_CLASS(CTaiShanDoc),
 		RUNTIME_CLASS(CChildFrame), 
 		RUNTIME_CLASS(CTaiTestRichView)); 
 
-    
+
 	pNineShowTemplate = new CMultiDocTemplate(
 		IDR_NINE_VIEW,
 		RUNTIME_CLASS(CTaiShanDoc),
@@ -248,11 +223,8 @@ BOOL CTaiShanApp::InitInstance()
 
 	CCommandLineInfo cmdInfo;
 	ParseCommandLine(cmdInfo);
-	CString sCommand = this->m_lpCmdLine;
-	if(sCommand.GetLength ()>0)
-		m_gbDoInitate = false;
 
-	
+
 	if (!ProcessShellCommand(cmdInfo))
 		return FALSE;
 
@@ -261,7 +233,7 @@ BOOL CTaiShanApp::InitInstance()
 	pMainFrame->ShowWindow(m_nCmdShow);
 	pMainFrame->UpdateWindow();	
 	Currenttime=GetTickCount() - Currenttime;
-    if(Currenttime<8000)
+	if(Currenttime<8000)
 	{
 		if(SplashOpen)
 		{
@@ -276,16 +248,11 @@ BOOL CTaiShanApp::InitInstance()
 		else
 			delete m_splash;
 	}
-    ::SetProp(pMainFrame->GetSafeHwnd(),m_pszExeName,(HANDLE)1);
+	::SetProp(pMainFrame->GetSafeHwnd(),m_pszExeName,(HANDLE)1);
 	EndWaitCursor(); 
 
 	pMainFrame->SendMessage(WM_SYSCOMMAND,SC_MAXIMIZE,0);
 
-	if(m_gbUseExe == true)
-	{
-		BOOL tSuccess = CreateProcess( _T("WsSendMessageShare.exe"), NULL, NULL, NULL,
-						FALSE, 0, NULL, NULL, &startup, &process );
-	}
 	return TRUE;
 }
 
@@ -308,9 +275,9 @@ public:
 	CString	m_strPName;
 	//}}AFX_DATA
 
-	
+
 	//{{AFX_VIRTUAL(CAboutDlg)
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);   
 	//}}AFX_VIRTUAL
 
@@ -345,7 +312,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
-	
+
 END_MESSAGE_MAP()
 
 
@@ -361,13 +328,13 @@ BOOL CAboutDlg::OnInitDialog()
 	CDialog::OnInitDialog();
 
 	CTaiShanApp * pApp = (CTaiShanApp*)AfxGetApp();
-	
-	
+
+
 	CTaiShanDoc *pDoc = CMainFrame::m_taiShanDoc;
-	
+
 
 	return TRUE; 
-	              
+
 }
 
 
@@ -376,7 +343,7 @@ int CTaiShanApp::ExitInstance()
 	if(pDrawTemplate)
 		delete pDrawTemplate;
 
-    ReleaseMutex(hAppMutex);
+	ReleaseMutex(hAppMutex);
 
 
 
@@ -394,7 +361,7 @@ void CTaiShanApp::OnFilePrintSetup()
 	catch(...)
 	{
 	}
-	
+
 }
 BOOL CTaiShanApp::OnIdle(LONG lCount)
 {
@@ -402,10 +369,10 @@ BOOL CTaiShanApp::OnIdle(LONG lCount)
 
 	CTaiShanDoc* pDoc = (CTaiShanDoc*)(((CMainFrame*)m_pMainWnd)->m_taiShanDoc);
 	if(pDoc==NULL)
-	   return bMore;
+		return bMore;
 
 	if ( pDoc->IdleProc( lCount ) )
-	   bMore = TRUE;
+		bMore = TRUE;
 	return bMore;
 }
 
@@ -478,23 +445,23 @@ void CLongString::FloatArrayToExcelString(CLongString & longStr,float *pFloat, i
 
 void CTaiShanApp::DispatchMessageEachTime()
 {
-		MSG message;
-		if(PeekMessage(&message,NULL,0,0,PM_REMOVE))
+	MSG message;
+	if(PeekMessage(&message,NULL,0,0,PM_REMOVE))
+	{
+		if (message.message != WM_KICKIDLE && !theApp.PreTranslateMessage(&message))
 		{
-			if (message.message != WM_KICKIDLE && !theApp.PreTranslateMessage(&message))
-			{
-				 TranslateMessage(&message);
-				 DispatchMessage(&message);
-			}
+			TranslateMessage(&message);
+			DispatchMessage(&message);
 		}
+	}
 }
 
 int CTaiShanApp::Run() 
 {
-	
+
 	ASSERT_VALID(this);
 
-	
+
 	BOOL bIdle = TRUE;
 	LONG lIdleCount = 0;
 
@@ -504,34 +471,34 @@ int CTaiShanApp::Run()
 	MSG m_msgCur;
 	for (;;)
 	{
-	
+
 		while (bIdle &&
 			!::PeekMessage(&m_msgCur, NULL, NULL, NULL, PM_NOREMOVE))
 		{
-		
+
 			if (!OnIdle(lIdleCount++))
 				bIdle = FALSE; 
 		}
 
-		
+
 #ifndef _DEBUG
-	try
-	{
-#endif 
-		do
+		try
 		{
-		
-			if (!PumpMessage())
-				return ExitInstance();
-
-		
-			if (IsIdleMessage(&m_msgCur))
+#endif 
+			do
 			{
-				bIdle = TRUE;
-				lIdleCount = 0;
-			}
 
-		} while (::PeekMessage(&m_msgCur, NULL, NULL, NULL, PM_NOREMOVE));
+				if (!PumpMessage())
+					return ExitInstance();
+
+
+				if (IsIdleMessage(&m_msgCur))
+				{
+					bIdle = TRUE;
+					lIdleCount = 0;
+				}
+
+			} while (::PeekMessage(&m_msgCur, NULL, NULL, NULL, PM_NOREMOVE));
 #ifndef _DEBUG
 		}
 
@@ -551,31 +518,10 @@ int CTaiShanApp::Run()
 
 	ASSERT(FALSE);  
 
-	
+
 
 }
 
-void CTaiShanApp::ToTerminateChildProcess()
-{
-	if(process.hProcess !=0)
-	{
-		::TerminateProcess (process.hProcess,9);
-	}
-}
-
-CString CTaiShanApp::GetStkName( LPCSTR lpszLabel, WORD wMarket )
-{
-	CString s = "";
-	int kind = CMainFrame::m_taiShanDoc ->m_sharesInformation .GetStockKind(wMarket,(char*)lpszLabel);
-	if(kind>=0)
-	{
-		PCdat1 pStockData = NULL;
-		if(CMainFrame::m_taiShanDoc ->m_sharesInformation.Lookup ((char*)lpszLabel,pStockData,kind))
-			s = pStockData->name ;
-	}
-	return s;
-}
- 
 
 void* CTaiShanApp::GetLineDayData( LPCSTR lpszLabel, WORD wMarket, CTime tm, BOOL bDoPowerSplit )
 {
@@ -601,7 +547,7 @@ void* CTaiShanApp::GetLineDayData( LPCSTR lpszLabel, WORD wMarket, CTime tm, BOO
 	}
 	return pKline;
 }
- 
+
 
 void * CTaiShanApp::GetBaseInfoData( LPCSTR lpszLabel, WORD wMarket)
 {
@@ -617,7 +563,7 @@ void * CTaiShanApp::GetBaseInfoData( LPCSTR lpszLabel, WORD wMarket)
 	}
 	return pBase;
 }
- 
+
 
 void CTaiShanApp::SwitchToReportView( LPCSTR lpszLabel, WORD wMarket)
 {
@@ -634,7 +580,7 @@ void CTaiShanApp::SwitchToReportView( LPCSTR lpszLabel, WORD wMarket)
 		}
 	}
 }
- 
+
 
 void CTaiShanApp::SwitchToKlineView( LPCSTR lpszLabel, WORD wMarket)
 {
@@ -651,7 +597,7 @@ void CTaiShanApp::SwitchToKlineView( LPCSTR lpszLabel, WORD wMarket)
 		}
 	}
 }
- 
+
 
 void CTaiShanApp::SwitchToF10View( LPCSTR lpszLabel, WORD wMarket)
 {
@@ -668,7 +614,7 @@ void CTaiShanApp::SwitchToF10View( LPCSTR lpszLabel, WORD wMarket)
 		}
 	}
 }
- 
+
 
 void  CTaiShanApp::OnKeyboardGeniusCmd( LPCSTR lpszCmd )
 {
@@ -679,52 +625,6 @@ void  CTaiShanApp::OnKeyboardGeniusCmd( LPCSTR lpszCmd )
 }
 
 
-COLORREF CTaiShanApp::GetColorScheme( int nColorIndex )
-{
-	COLORREF colorRetVal;
-
-	CTaiShanDoc * pDoc = CMainFrame::m_taiShanDoc;
-	if( NULL == pDoc )
-		return RGB(0,0,0);
-	switch( nColorIndex )
-	{
-	case 0:		
-		colorRetVal = pDoc->m_colorArray[18];
-		break;
-	case 1:		
-		colorRetVal = pDoc->m_colorArray[17];
-		break;
-	case 2:		
-		colorRetVal = pDoc->m_colorArray[13];
-		break;
-	case 3:		
-		colorRetVal = pDoc->m_colorArray[15];
-		break;
-	case 4:		
-		colorRetVal = pDoc->m_colorArray[14];
-		break;
-	case 5:			
-		colorRetVal = pDoc->m_colorArray[16];
-		break;
-
-	default:
-		ASSERT( FALSE );
-	}
-	
-	return colorRetVal;
-}
-
-
-BOOL CTaiShanApp::GetFontScheme( int nFontIndex, LOGFONT & OutLogFont )
-{
-	return FALSE;
-}
-
-
 void CTaiShanApp::OnUpdateAppAbout(CCmdUI* pCmdUI) 
-{
-}
-
-void CTaiShanApp::UpdateTheOEMInfo()
 {
 }

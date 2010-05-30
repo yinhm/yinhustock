@@ -33,6 +33,10 @@ public:
 	CTaiKlineFileHS* GetTickFile(WORD wMarket);
 	CTaiKlineFileHS* GetTickFile(CString strSymbol, int nKind);
 	CSharesBaseInfo* GetBaseInfoFile(WORD wMarket);
+
+public:
+	CString GetStockSymbol(char* szStock, int nKind);
+	void GetStockSymbol(SymbolKind& symbol, char* szSymbol);
 };
 
 CStkDatabase* TSKDatabase();

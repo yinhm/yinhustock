@@ -1,22 +1,3 @@
-/////////////////////////////////////////////////////////
-// PageWnd.cpp : implementation file
-// this file is designed to show MAX_PAGE page in a wnd
-// each page can move in east & west direction
-/////////////////////////////////////////////////////////
-//
-// this file is designed 
-// 1999/4/10
-// by yml
-// Tel:13366898744
-// 
-///////////////////////////////////////////////////////////
-//
-// the method to use this class
-//
-// 1.create an object of CPageWnd
-// 2.call CPageWnd::Create(....)
-// 3.deal with the message from CPageWnd
-////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
 #include "CTaiShanApp.h"
@@ -53,7 +34,7 @@ void CPageWnd::ExecuteMenu(int mode)
 
 	CPoint posMouse;
 	::GetCursorPos(&posMouse);
-    InitTypeMenu(mode) ;
+	InitTypeMenu(mode) ;
 	m_TypeMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON,posMouse.x,posMouse.y,this);
 }
 
@@ -61,7 +42,7 @@ CPageWnd::CPageWnd()
 {
 	//Initialize all parameters
 	m_scrollbar = NULL;//new CScrollBar;
-    m_nMovebar = 0;
+	m_nMovebar = 0;
 	m_nBarlength = 250;
 	m_nBarLen=m_nBarlength;
 	m_TypeMenu=NULL;
@@ -104,11 +85,11 @@ int CPageWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-    CRect rect;
+	CRect rect;
 	GetClientRect(rect);
 	CSize size(2*BOTTOM_HIGHT,BOTTOM_HIGHT);
 	m_PageBtn.Create(SBS_HORZ|WS_CHILD|WS_VISIBLE,CRect(CPoint(rect.left,rect.top),size),this,IDC_PAGEBUTTON);
-    
+
 	InitAllPara();
 	m_TypeMenu = new CMenu;
 	HMENU m_hmenu=CreatePopupMenu();
@@ -131,117 +112,128 @@ int CPageWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CPageWnd::InitAllPara()
 {
-    CTaiShanReportView* pView = (CTaiShanReportView*)GetParent();
-    CTaiShanDoc *pDoc = pView->GetDocument();
+	CTaiShanReportView* pView = (CTaiShanReportView*)GetParent();
+	CTaiShanDoc* pDoc = pView->GetDocument();
 
 	m_nBeginX = BOTTOM_HIGHT * 2;
-	m_nActivePage=0;
-	m_bRefrash=TRUE;
- 	CString str;
+	m_nActivePage = 0;
+	m_bRefrash = TRUE;
+
+	CString str;
 	str.Format("上证指数");
 	m_strPageTitle.Add(str);
 	str.Format("深证指数");
-
 	m_strPageTitle.Add(str);
 	str.Format("板块指数");
 	m_strPageTitle.Add(str);
 	str.Format("自选股票");
 	m_strPageTitle.Add(str);
-	str="TEST";
+	str.Format("TEST");
 	m_strPageTitle.Add(str);
-	str="TEST";
+	str.Format("TEST");
 	m_strPageTitle.Add(str);
-	//init page
-	m_nFirstPage=0;
-	m_nEndPage=m_strPageTitle.GetSize();
-	int i;
-	for(i=0;i<m_nEndPage;i++)
-	{
-		str=m_strPageTitle.GetAt(i);
-		if(str.GetLength( )<5)
-	      PageWidth[i]=5*DEFAULTFONTWIDTH;
-		else
-	      PageWidth[i]=str.GetLength( )*DEFAULTFONTWIDTH;
-	}
-	for(i=m_nEndPage;i<MAX_PAGE;i++)  
-		PageWidth[i]=0;
-}
+	str.Format("TEST");
+	m_strPageTitle.Add(str);
+	str.Format("TEST");
+	m_strPageTitle.Add(str);
+	str.Format("TEST");
+	m_strPageTitle.Add(str);
+	str.Format("TEST");
+	m_strPageTitle.Add(str);
 
+	m_nFirstPage = 0;
+	m_nEndPage = m_strPageTitle.GetSize();
+
+	int i;
+	for (i = 0; i < m_nEndPage; i++)
+	{
+		str = m_strPageTitle.GetAt(i);
+		if (str.GetLength() < 5)
+			PageWidth[i] = 5 * DEFAULTFONTWIDTH;
+		else
+			PageWidth[i] = str.GetLength() * DEFAULTFONTWIDTH;
+	}
+
+	for (i = m_nEndPage; i < MAX_PAGE; i++)
+	{
+		PageWidth[i] = 0;
+	}
+}
 
 BOOL CPageWnd::OnEraseBkgnd(CDC* pDC) 
 {
-
 	CClientDC dc(this);
-	ShowAllPage((CDC *)&dc);
+
+	ShowAllPage((CDC*)&dc);
 	ReleaseDC(&dc);
-	return 1;
+
+	return TRUE;
 }
 
 void CPageWnd::OnSize(UINT nType, int cx, int cy) 
 {
 	CWnd::OnSize(nType, cx, cy);
-    m_bRefrash=TRUE; 
- 	m_nBeginX = 2*BOTTOM_HIGHT;	
 
-	m_barstartplace.x = cx; 
-	
+	m_bRefrash = TRUE; 
+	m_nBeginX = 2 * BOTTOM_HIGHT;
 
+	m_barstartplace.x = cx;
 }
-
 
 void CPageWnd::OnPaint() 
 {
-	CPaintDC dc(this); 
-	if(m_bRefrash)
+	CPaintDC dc(this);
+
+	if (m_bRefrash)
 	{
-		m_bRefrash=FALSE;
+		m_bRefrash = FALSE;
 		ShowAllPage(&dc);
 	}
-	ReleaseDC(&dc);
 
+	ReleaseDC(&dc);
 }
 
 
 void CPageWnd::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar) 
 {
-	
+
 	if(pScrollBar->m_hWnd==m_PageBtn.m_hWnd)
 	{	
 		m_PageBtn.EnableScrollBar(ESB_ENABLE_BOTH);
 		switch(nSBCode)
 		{
-			case SB_LINELEFT: 
-				m_bMove = false;
-				m_nFirstPage--;
-				if(m_nFirstPage<0)
-				{
-					m_nFirstPage=0;
-				
-					m_PageBtn.EnableScrollBar(ESB_DISABLE_LTUP);
-				}
-				else
-				{
-				
-					m_bRefrash=TRUE;
-					Invalidate();
-				}
-				break;
-			case SB_LINERIGHT:
-				m_bMove = false;
-				m_nFirstPage++; 
-				if(m_nFirstPage>m_nEndPage-1)
-				{
-					 m_nFirstPage=m_nEndPage-1;
-			
-                     m_PageBtn.EnableScrollBar(ESB_DISABLE_RTDN);
-				}
-				else
-				{
-				
-					m_bRefrash=TRUE;
-					Invalidate();
-				}
-				break;
+		case SB_LINELEFT: 
+			m_bMove = false;
+			m_nFirstPage--;
+			if(m_nFirstPage<0)
+			{
+				m_nFirstPage=0;
+
+				m_PageBtn.EnableScrollBar(ESB_DISABLE_LTUP);
+			}
+			else
+			{
+
+				m_bRefrash=TRUE;
+				Invalidate();
+			}
+			break;
+		case SB_LINERIGHT:
+			m_bMove = false;
+			m_nFirstPage++; 
+			if(m_nFirstPage>m_nEndPage-1)
+			{
+				m_nFirstPage=m_nEndPage-1;
+
+				m_PageBtn.EnableScrollBar(ESB_DISABLE_RTDN);
+			}
+			else
+			{
+
+				m_bRefrash=TRUE;
+				Invalidate();
+			}
+			break;
 		}
 	}
 	CWnd::OnHScroll(nSBCode, nPos, pScrollBar);
@@ -252,67 +244,67 @@ CString CPageWnd::GetPageTitle(int nPage)
 {
 
 
-    CString Result;
-    CTaiShanReportView* pView = (CTaiShanReportView*)GetParent();
-    CTaiShanDoc *pDoc = pView->GetDocument();
-    CString ShMenuStr[]={"上证指数","上证A股","上证B股","上证债券","上证基金"};
-    CString SzMenuStr[]={"深证指数","深证A股","深证B股","深证债券","深证基金"};
-    CString SzEbMenuStr[]={"创业指数","创业股"};
-    switch(nPage)
+	CString Result;
+	CTaiShanReportView* pView = (CTaiShanReportView*)GetParent();
+	CTaiShanDoc *pDoc = pView->GetDocument();
+	CString ShMenuStr[]={"上证指数","上证A股","上证B股","上证债券","上证基金"};
+	CString SzMenuStr[]={"深证指数","深证A股","深证B股","深证债券","深证基金"};
+	CString SzEbMenuStr[]={"创业指数","创业股"};
+	switch(nPage)
 	{
 	case  SHPAGE:   switch(pDoc->m_nSharesSh)
 					{
-						case 0:  Result=ShMenuStr[0];
-						         SetPageTitle(Result,SHPAGE);
-							     break;
-						case 1:  Result=ShMenuStr[1];
-						         SetPageTitle(Result,SHPAGE);
-							     break;
-						case 2:  Result=ShMenuStr[2];
-						         SetPageTitle(Result,SHPAGE);
-							     break;
-						case 3:  Result=ShMenuStr[3];
-						         SetPageTitle(Result,SHPAGE);
-							     break;
-						case 4:  Result=ShMenuStr[4];
-						         SetPageTitle(Result,SHPAGE);
-							     break;
+	case 0:  Result=ShMenuStr[0];
+		SetPageTitle(Result,SHPAGE);
+		break;
+	case 1:  Result=ShMenuStr[1];
+		SetPageTitle(Result,SHPAGE);
+		break;
+	case 2:  Result=ShMenuStr[2];
+		SetPageTitle(Result,SHPAGE);
+		break;
+	case 3:  Result=ShMenuStr[3];
+		SetPageTitle(Result,SHPAGE);
+		break;
+	case 4:  Result=ShMenuStr[4];
+		SetPageTitle(Result,SHPAGE);
+		break;
 					}
-	                return Result;
-		            break;
+					return Result;
+					break;
 	case  SZPAGE:   switch(pDoc->m_nSharesSz)
 					{
-						case 0:  Result=SzMenuStr[0];
-						         SetPageTitle(Result,SZPAGE);
-							     break;
-						case 1:  Result=SzMenuStr[1];
-						         SetPageTitle(Result,SZPAGE);
-							     break;
-						case 2:  Result=SzMenuStr[2];
-						         SetPageTitle(Result,SZPAGE);
-							     break;
-						case 3:  Result=SzMenuStr[3];
-						         SetPageTitle(Result,SZPAGE);
-							     break;
-						case 4:  Result=SzMenuStr[4];
-						         SetPageTitle(Result,SZPAGE);
-							     break;
+	case 0:  Result=SzMenuStr[0];
+		SetPageTitle(Result,SZPAGE);
+		break;
+	case 1:  Result=SzMenuStr[1];
+		SetPageTitle(Result,SZPAGE);
+		break;
+	case 2:  Result=SzMenuStr[2];
+		SetPageTitle(Result,SZPAGE);
+		break;
+	case 3:  Result=SzMenuStr[3];
+		SetPageTitle(Result,SZPAGE);
+		break;
+	case 4:  Result=SzMenuStr[4];
+		SetPageTitle(Result,SZPAGE);
+		break;
 					}
-	                return Result;
-		            break;
+					return Result;
+					break;
 	case  SZEBPAGE: switch(pDoc->m_nSharesSzEb)
 					{
-						case 0:  Result=SzEbMenuStr[0];
-						         SetPageTitle(Result,SZEBPAGE);
-							     break;
-						case 1:  Result=SzEbMenuStr[1];
-						         SetPageTitle(Result,SZEBPAGE);
-							     break;
+	case 0:  Result=SzEbMenuStr[0];
+		SetPageTitle(Result,SZEBPAGE);
+		break;
+	case 1:  Result=SzEbMenuStr[1];
+		SetPageTitle(Result,SZEBPAGE);
+		break;
 					}
-	                return Result;
-		            break;
+					return Result;
+					break;
 	}
-    Result=m_strPageTitle.GetAt(nPage);
+	Result=m_strPageTitle.GetAt(nPage);
 	return Result;
 }
 
@@ -320,7 +312,7 @@ CString CPageWnd::GetPageTitle(int nPage)
 void CPageWnd::ShowPageTitle(CDC *pDC, CString &str, LPRECT lpRect, UINT nFormat,int nPage)
 {
 	int nBackMode=pDC->GetBkMode();
-    if(nBackMode==OPAQUE) pDC->SetBkMode(TRANSPARENT);
+	if(nBackMode==OPAQUE) pDC->SetBkMode(TRANSPARENT);
 	pDC->SelectObject(&m_Font);
 	if(nPage==m_nActivePage)
 
@@ -328,14 +320,14 @@ void CPageWnd::ShowPageTitle(CDC *pDC, CString &str, LPRECT lpRect, UINT nFormat
 
 	else
 		pDC->SetTextColor (CMainFrame::m_taiShanDoc ->m_colorArray[1]);
- 	pDC->DrawText(str,lpRect,nFormat);
+	pDC->DrawText(str,lpRect,nFormat);
 	if(nBackMode==OPAQUE) pDC->SetBkMode(OPAQUE);
 }
 
 
 int CPageWnd::GetActivePage()
 {
-    return m_nActivePage;
+	return m_nActivePage;
 }
 
 
@@ -344,13 +336,13 @@ void CPageWnd::DrawPageBox(CDC *pDC, int x, int cx, BOOL bActive)
 	CPoint pPage[5];
 	double cxB=BOTTOM_HIGHT/3.464;
 
-    CPen BlackPen(PS_SOLID,1,CMainFrame::m_taiShanDoc ->m_colorArray[14]);//17
+	CPen BlackPen(PS_SOLID,1,CMainFrame::m_taiShanDoc ->m_colorArray[14]);//17
 	CPen *OldPen=pDC->SelectObject(&BlackPen);
 
-    pPage[0]=CPoint(x-cxB,0);
-    pPage[1]=CPoint(x+cxB,BOTTOM_HIGHT);
-    pPage[2]=CPoint(x+cx-cxB,BOTTOM_HIGHT);
-    pPage[3]=CPoint(x+cx+cxB,0); 
+	pPage[0]=CPoint(x-cxB,0);
+	pPage[1]=CPoint(x+cxB,BOTTOM_HIGHT);
+	pPage[2]=CPoint(x+cx-cxB,BOTTOM_HIGHT);
+	pPage[3]=CPoint(x+cx+cxB,0); 
 
 	CBrush FillBrush(CMainFrame::m_taiShanDoc ->m_colorArray[18]);
 	CBrush FrameBrush(CMainFrame::m_taiShanDoc ->m_colorArray[14]);
@@ -364,7 +356,7 @@ void CPageWnd::DrawPageBox(CDC *pDC, int x, int cx, BOOL bActive)
 	else
 	{
 		rgn.CreatePolygonRgn(pPage,4,ALTERNATE);
-	    pDC->FillRgn(&rgn,&ActiveBrush);
+		pDC->FillRgn(&rgn,&ActiveBrush);
 		pDC->FrameRgn(&rgn,&FrameBrush,1,1);
 
 		pDC->SelectObject(&pen);
@@ -382,22 +374,22 @@ void CPageWnd::ShowAllPage(CDC *pDC)
 {
 	if(!CMainFrame::m_taiShanDoc)
 		return;
-	
+
 	CDC dcMem;
 	CBitmap bmp;
 	CRect ClientRect;
 	GetClientRect(&ClientRect);
-    CRect m_DrawRect;
+	CRect m_DrawRect;
 	m_DrawRect.SetRect(/*LEFT_LENG+*/1 ,ClientRect.top,ClientRect.right,ClientRect.bottom);
-    dcMem.CreateCompatibleDC(pDC);
-    bmp.CreateCompatibleBitmap(pDC,m_DrawRect.Width(),m_DrawRect.Height()) ;
-    CBitmap *pbmOld=dcMem.SelectObject(&bmp);
+	dcMem.CreateCompatibleDC(pDC);
+	bmp.CreateCompatibleBitmap(pDC,m_DrawRect.Width(),m_DrawRect.Height()) ;
+	CBitmap *pbmOld=dcMem.SelectObject(&bmp);
 
 
- 	
+
 	CBrush brush(CMainFrame::m_taiShanDoc ->m_colorArray[18]);
 
-    CRect m_Draw;
+	CRect m_Draw;
 	m_Draw.SetRect(0 ,0,m_DrawRect.Width(),m_DrawRect.Height());
 
 	dcMem.FillRect(m_Draw,&brush);
@@ -406,52 +398,52 @@ void CPageWnd::ShowAllPage(CDC *pDC)
 	dcMem.MoveTo(m_DrawRect.left ,m_DrawRect.top );
 	dcMem.LineTo(m_DrawRect.right ,m_DrawRect.top);
 	dcMem.SelectObject(OldPen);
-	
-    int nPage=m_nFirstPage,bActivePage=-1;
-    CString Title;
+
+	int nPage=m_nFirstPage,bActivePage=-1;
+	CString Title;
 	CRect rect,bActiveRect;
 	int bActivex=-1;
 
 	int xBegin=0 ;
 
-	
+
 	m_nBeginX=2*BOTTOM_HIGHT;
 
 	int beginX = PageWidth[nPage] + PageWidth[nPage+1];
 	while(nPage < m_nActivePage && m_bMove == true)
 	{
-	  beginX += PageWidth[nPage+2];
-      if(beginX >= m_barstartplace.x)
-	  {
-		  nPage = m_nFirstPage+1;
-          m_nFirstPage = nPage;
-		  m_bMove=FALSE;
-		  break;
-	  }
-	  nPage++;
+		beginX += PageWidth[nPage+2];
+		if(beginX >= m_barstartplace.x)
+		{
+			nPage = m_nFirstPage+1;
+			m_nFirstPage = nPage;
+			m_bMove=FALSE;
+			break;
+		}
+		nPage++;
 	}
 	CString tt;
 	tt.Format("%d",m_nFirstPage);
 	TRACE(tt);
 	if(beginX < m_barstartplace.x)
 	{
-	   nPage=m_nFirstPage;	
+		nPage=m_nFirstPage;	
 	}
 	////////////////////////////////////////
 
-    if(m_nActivePage == 0 && m_bMove == true)
+	if(m_nActivePage == 0 && m_bMove == true)
 	{
-	  nPage = 0;
-	  m_nFirstPage = 0;
+		nPage = 0;
+		m_nFirstPage = 0;
 	}
 	while(nPage<m_nEndPage)
 	{
-	
+
 		Title=GetPageTitle(nPage);
-	
+
 		DrawPageBox(&dcMem,xBegin,PageWidth[nPage],FALSE);
 		rect.SetRect(xBegin,0,xBegin+PageWidth[nPage],BOTTOM_HIGHT);
-	
+
 		ShowPageTitle(&dcMem,Title,rect,DEFAULTFORMAT,nPage);
 		if(nPage==m_nActivePage)
 		{
@@ -459,7 +451,7 @@ void CPageWnd::ShowAllPage(CDC *pDC)
 			bActiveRect=rect;
 			bActivePage=nPage;
 		}
-	
+
 		xBegin+=PageWidth[nPage];
 		if(xBegin>ClientRect.right)break;
 		nPage++;
@@ -470,34 +462,34 @@ void CPageWnd::ShowAllPage(CDC *pDC)
 		DrawPageBox(&dcMem,bActivex,PageWidth[bActivePage],TRUE);
 		ShowPageTitle(&dcMem,Title,bActiveRect,DEFAULTFORMAT,bActivePage);
 	}
-   //////////////
-	
-	
-	
-	
-	
+	//////////////
+
+
+
+
+
 	////////////////////////////////////////////////////
 	pDC->BitBlt(LEFT_LENG+1 ,0,ClientRect.right,BOTTOM_HIGHT,&dcMem,0,0,SRCCOPY);
 
 	dcMem.SelectObject(pbmOld);
-	
+
 
 }
 
 
 void CPageWnd::ReplacePage(int nPage,CString ReplaceTitle)
 {
- 
+
 	int xBegin=m_nBeginX;
 	CRect rect;
 	CClientDC dc(this);    
 	m_strPageTitle.SetAt(nPage,ReplaceTitle);
-    int ss=ReplaceTitle.GetLength( );
-    if(ReplaceTitle.GetLength( )<5)
-       PageWidth[nPage]=5*DEFAULTFONTWIDTH;
+	int ss=ReplaceTitle.GetLength( );
+	if(ReplaceTitle.GetLength( )<5)
+		PageWidth[nPage]=5*DEFAULTFONTWIDTH;
 	else
-	   PageWidth[nPage]=ReplaceTitle.GetLength( )*DEFAULTFONTWIDTH;
- 	ShowAllPage(&dc);
+		PageWidth[nPage]=ReplaceTitle.GetLength( )*DEFAULTFONTWIDTH;
+	ShowAllPage(&dc);
 	ReleaseDC(&dc);
 }
 
@@ -505,80 +497,80 @@ void CPageWnd::ReplacePage(int nPage,CString ReplaceTitle)
 
 void CPageWnd::OnMouseMove(UINT nFlags, CPoint point) 
 {
-   if( m_nMovebar == 1)
-   {
-	  SetCursor(::LoadCursor(NULL,IDC_SIZEWE));
-	  SetCapture();
+	if( m_nMovebar == 1)
+	{
+		SetCursor(::LoadCursor(NULL,IDC_SIZEWE));
+		SetCapture();
 
-	  point.x = point.x + 3;
-	  m_nBarlength = m_nBarlength + (-point.x + m_barstartplace.x);
+		point.x = point.x + 3;
+		m_nBarlength = m_nBarlength + (-point.x + m_barstartplace.x);
 
-	  if(point.x <33)
-		  point.x=33;
-	  if(point.x +50 > m_barendplace.x)
-         point.x= m_barendplace.x -50;
-	  m_nBarlength = m_nBarlength + (-point.x + m_barstartplace.x);
+		if(point.x <33)
+			point.x=33;
+		if(point.x +50 > m_barendplace.x)
+			point.x= m_barendplace.x -50;
+		m_nBarlength = m_nBarlength + (-point.x + m_barstartplace.x);
 
-      MSG msg;
+		MSG msg;
 
-	  SetWindowPos(0,0,m_barstartplace.y,point.x,m_barendplace.y,SWP_NOREDRAW|SWP_SHOWWINDOW);
-	  m_bRefrash=TRUE;
-	  Invalidate();
-	  if(m_nBarLen > m_nBarlength)
-	  if(PeekMessage(&msg,this->GetSafeHwnd() ,WM_PAINT,WM_PAINT,PM_REMOVE))
-	  {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-	  }
+		SetWindowPos(0,0,m_barstartplace.y,point.x,m_barendplace.y,SWP_NOREDRAW|SWP_SHOWWINDOW);
+		m_bRefrash=TRUE;
+		Invalidate();
+		if(m_nBarLen > m_nBarlength)
+			if(PeekMessage(&msg,this->GetSafeHwnd() ,WM_PAINT,WM_PAINT,PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
 
-      CRect rc(point.x,m_barstartplace.y,m_barendplace.x,m_barendplace.y);
-	  m_scrollbar->SetWindowPos(0,point.x,m_barstartplace.y,rc.Width() ,rc.Height(),SWP_NOREDRAW);
-	  m_scrollbar->m_bRefrash=TRUE;
-	  m_scrollbar->Invalidate();
-	  if(PeekMessage(&msg,m_scrollbar->GetSafeHwnd() ,WM_PAINT,WM_PAINT,PM_REMOVE))
-	  {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-	  }
+			CRect rc(point.x,m_barstartplace.y,m_barendplace.x,m_barendplace.y);
+			m_scrollbar->SetWindowPos(0,point.x,m_barstartplace.y,rc.Width() ,rc.Height(),SWP_NOREDRAW);
+			m_scrollbar->m_bRefrash=TRUE;
+			m_scrollbar->Invalidate();
+			if(PeekMessage(&msg,m_scrollbar->GetSafeHwnd() ,WM_PAINT,WM_PAINT,PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
 
-	  m_barstartplace.x = point.x;
-      m_nBarLen = m_nBarlength;
+			m_barstartplace.x = point.x;
+			m_nBarLen = m_nBarlength;
 
-   }
-   else
-   {
+	}
+	else
+	{
 
-     if(point.x > m_barstartplace.x - 5)
-	 {
-	   SetCursor(::LoadCursor(NULL,IDC_SIZEWE));
-       
-	 }
-     else
-	 { 
-        m_nMovebar = 0;
-	 }
-   }
-   CWnd::OnMouseMove(nFlags, point);
+		if(point.x > m_barstartplace.x - 5)
+		{
+			SetCursor(::LoadCursor(NULL,IDC_SIZEWE));
+
+		}
+		else
+		{ 
+			m_nMovebar = 0;
+		}
+	}
+	CWnd::OnMouseMove(nFlags, point);
 }
 void CPageWnd::InitTypeMenu(int mode) 
 {
-    CTaiShanReportView* pView = (CTaiShanReportView*)GetParent();
-    CTaiShanDoc *pDoc = pView->GetDocument();
-    CString ShMenuStr[]={"上证指数","上证A股","上证B股","上证债券","上证基金"};
-    CString SzMenuStr[]={"深证指数","深证A股","深证B股","深证债券","深证基金"};
-    CString SzEbMenuStr[]={"创业指数","创业股"};
-	
+	CTaiShanReportView* pView = (CTaiShanReportView*)GetParent();
+	CTaiShanDoc *pDoc = pView->GetDocument();
+	CString ShMenuStr[]={"上证指数","上证A股","上证B股","上证债券","上证基金"};
+	CString SzMenuStr[]={"深证指数","深证A股","深证B股","深证债券","深证基金"};
+	CString SzEbMenuStr[]={"创业指数","创业股"};
 
 
-    POSITION pos=m_StockType.GetHeadPosition( );
+
+	POSITION pos=m_StockType.GetHeadPosition( );
 	while(pos)
 	{
-	    DynaMenuDef *m_pMenuDef;
+		DynaMenuDef *m_pMenuDef;
 		m_pMenuDef = m_StockType.GetNext( pos );
-        m_TypeMenu->DeleteMenu(m_pMenuDef->m_nID,MF_BYCOMMAND);
+		m_TypeMenu->DeleteMenu(m_pMenuDef->m_nID,MF_BYCOMMAND);
 		delete m_pMenuDef;
 	}
-    m_StockType.RemoveAll();
+	m_StockType.RemoveAll();
 
 	int index=9000;
 	int index2[]={9000,9001,9002,9003,9004};
@@ -591,7 +583,7 @@ void CPageWnd::InitTypeMenu(int mode)
 			int l_nCount=m_StockTypeNameArray.GetSize();
 			for(int i=0;i<l_nCount;i++)
 			{
-			    CString l_sStockType=m_StockTypeNameArray.GetAt(i);
+				CString l_sStockType=m_StockTypeNameArray.GetAt(i);
 				DynaMenuDef *m_pMenuDef;
 				m_pMenuDef=new DynaMenuDef;
 				m_pMenuDef->m_nString=l_sStockType;
@@ -651,27 +643,27 @@ void CPageWnd::InitTypeMenu(int mode)
 		}
 		break;
 	}
-    pos=m_StockType.GetHeadPosition( );
+	pos=m_StockType.GetHeadPosition( );
 	index=0;
 	while(pos)
 	{
-	    DynaMenuDef *m_pMenuDef;
+		DynaMenuDef *m_pMenuDef;
 		m_pMenuDef = m_StockType.GetNext( pos );
 		if(index%10==0&&index!=0)
 			m_TypeMenu->AppendMenu(MF_STRING|MF_MENUBARBREAK ,
-		         m_pMenuDef->m_nID, m_pMenuDef->m_nString);
+			m_pMenuDef->m_nID, m_pMenuDef->m_nString);
 		else
-            m_TypeMenu->AppendMenu(MF_STRING,
-		         m_pMenuDef->m_nID, m_pMenuDef->m_nString);
+			m_TypeMenu->AppendMenu(MF_STRING,
+			m_pMenuDef->m_nID, m_pMenuDef->m_nString);
 		index++;
 	}
 }
 
 BOOL CPageWnd::OnCmdMsg(UINT nID, int nCode, void* pExtra,
-							AFX_CMDHANDLERINFO* pHandlerInfo)
+						AFX_CMDHANDLERINFO* pHandlerInfo)
 {
-    CTaiShanReportView* pView = (CTaiShanReportView*)GetParent();
-    CTaiShanDoc *pDoc = pView->GetDocument();
+	CTaiShanReportView* pView = (CTaiShanReportView*)GetParent();
+	CTaiShanDoc *pDoc = pView->GetDocument();
 
 	if (pHandlerInfo == NULL)
 	{
@@ -684,52 +676,52 @@ BOOL CPageWnd::OnCmdMsg(UINT nID, int nCode, void* pExtra,
 				m_pMenuDef = m_StockType.GetNext( pos );
 				if(m_pMenuDef->m_nID==nID)
 				{
-				  if(GetActivePage()==m_nEndPage-2)
-				  {
-					 CString sStockTypeChoose;
-				     sStockTypeChoose=m_pMenuDef->m_nString;
-					 strcpy(pDoc->m_SystemInitData.StockTypeName,m_pMenuDef->m_nString.GetBuffer(0));
-				     pView->ChangeToStockType(pDoc, sStockTypeChoose);
-				  }
-				  else if(GetActivePage()==m_nEndPage-1)
-				  {
-				     CString sStockScreenChoose=m_pMenuDef->m_nString;
-                     strcpy(pDoc->m_SystemInitData.ScreenStockName,m_pMenuDef->m_nString.GetBuffer(0));
-				     pView->ChangeToTjxg(pDoc, sStockScreenChoose);
-				  }
-				  else if(GetActivePage()==m_nFirstPage)
-				  {
-				     pDoc->m_nSharesSh=m_pMenuDef->m_nID-9000;
-				     pView->ChangeToPage(m_nActivePage);;
-				  }
-				  else if(GetActivePage()==m_nFirstPage+1)
-				  {
-				     pDoc->m_nSharesSz=m_pMenuDef->m_nID-9000;
-				     pView->ChangeToPage(m_nActivePage);
-				  }
-				  else if(GetActivePage()==m_nFirstPage+2)
-				  {
-				     pDoc->m_nSharesSzEb=m_pMenuDef->m_nID-9000;
-				     pView->ChangeToPage(m_nActivePage);
-				  }
-				  ReplacePage(GetActivePage(),m_pMenuDef->m_nString);
+					if(GetActivePage()==m_nEndPage-2)
+					{
+						CString sStockTypeChoose;
+						sStockTypeChoose=m_pMenuDef->m_nString;
+						strcpy(pDoc->m_SystemInitData.StockTypeName,m_pMenuDef->m_nString.GetBuffer(0));
+						pView->ChangeToStockType(pDoc, sStockTypeChoose);
+					}
+					else if(GetActivePage()==m_nEndPage-1)
+					{
+						CString sStockScreenChoose=m_pMenuDef->m_nString;
+						strcpy(pDoc->m_SystemInitData.ScreenStockName,m_pMenuDef->m_nString.GetBuffer(0));
+						pView->ChangeToTjxg(pDoc, sStockScreenChoose);
+					}
+					else if(GetActivePage()==m_nFirstPage)
+					{
+						pDoc->m_nSharesSh=m_pMenuDef->m_nID-9000;
+						pView->ChangeToPage(m_nActivePage);;
+					}
+					else if(GetActivePage()==m_nFirstPage+1)
+					{
+						pDoc->m_nSharesSz=m_pMenuDef->m_nID-9000;
+						pView->ChangeToPage(m_nActivePage);
+					}
+					else if(GetActivePage()==m_nFirstPage+2)
+					{
+						pDoc->m_nSharesSzEb=m_pMenuDef->m_nID-9000;
+						pView->ChangeToPage(m_nActivePage);
+					}
+					ReplacePage(GetActivePage(),m_pMenuDef->m_nString);
 				}
 			}
 		}
-	
+
 	}
-	
+
 	return CWnd::OnCmdMsg(nID, nCode, pExtra, pHandlerInfo);
 }
 
 void CPageWnd::SetPageTitle(CString m_title,int index)
 {
-    m_strPageTitle.SetAt(index,m_title);
+	m_strPageTitle.SetAt(index,m_title);
 	CString	str=m_strPageTitle.GetAt(index);
 	int temp=str.GetLength( )*DEFAULTFONTWIDTH;
 	if(temp<5*DEFAULTFONTWIDTH)
 		temp=5*DEFAULTFONTWIDTH;
-    PageWidth[index]=temp;
+	PageWidth[index]=temp;
 }
 
 void CPageWnd::DoRButtonDown(UINT nFlags, CPoint point)
@@ -737,32 +729,32 @@ void CPageWnd::DoRButtonDown(UINT nFlags, CPoint point)
 	int nSplitx=m_nBeginX;
 	for(int i=m_nFirstPage;i<m_nEndPage;i++)
 	{
-		
+
 		if((point.x >nSplitx) && (point.x <nSplitx+PageWidth[i]))
 		{
 			if(i!=GetActivePage())
 				DoLButtonDown( nFlags,  point);
 			if(i==STKTYPEPAGE)
 			{
-	            ExecuteMenu(0);
+				ExecuteMenu(0);
 				break;
 			}
 			else 
-			if(i==TJXGPAGE)
-			{
-	            ExecuteMenu(1);
-				break;
-			}
-			else if(i==SHPAGE)
-			{
-	            ExecuteMenu(2);
-				break;
-			}
-			else if(i==SZPAGE)
-			{
-	            ExecuteMenu(3);
-				break;
-			}
+				if(i==TJXGPAGE)
+				{
+					ExecuteMenu(1);
+					break;
+				}
+				else if(i==SHPAGE)
+				{
+					ExecuteMenu(2);
+					break;
+				}
+				else if(i==SZPAGE)
+				{
+					ExecuteMenu(3);
+					break;
+				}
 
 		}
 		nSplitx+=PageWidth[i];

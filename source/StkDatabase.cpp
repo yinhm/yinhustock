@@ -111,3 +111,26 @@ CSharesBaseInfo* CStkDatabase::GetBaseInfoFile(WORD wMarket)
 
 	return pFile;
 }
+
+CString CStkDatabase::GetStockSymbol(char* szStock, int nKind)
+{
+	char szSymbol[10];
+
+	WORD wMarket = CSharesInformation::GetStockMarket(nKind);
+	memcpy(&szSymbol[0], &wMarket, sizeof(WORD));
+	szSymbol[2] = '\0';
+	strcat_s(szSymbol, szStock);
+
+	return CString(szSymbol);
+}
+
+void CStkDatabase::GetStockSymbol(SymbolKind& symbol, char* szSymbol)
+{
+	strcpy(symbol.m_szSymbol, szSymbol);
+	memcpy(&symbol.m_wMarket, szSymbol, sizeof(WORD));
+
+	CString strSymbol(szSymbol);
+	strcpy(symbol.m_chSymbol, strSymbol.Right(strSymbol.GetLength() - 2));
+
+	symbol.m_nSymbolKind = CSharesInformation::GetStockKind(symbol.m_wMarket, symbol.m_chSymbol);
+}

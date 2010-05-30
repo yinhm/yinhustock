@@ -79,14 +79,14 @@ public:
 	CPoint pt[6];//
 	CString m_tipStr;//
 	CTaiShanDoc* pDoc;		
- 	CTaiShanKlineShowView* pView;	
+	CTaiShanKlineShowView* pView;	
 	int	m_lineBgn;	
-					
+
 	int m_step[5];				
 
 	bool	  m_bToCacl;	
 	int	  m_klinNumDefault;	
-			
+
 	int   m_footBegin;		
 	int   m_footEnd;		
 	int	  m_klinNumDefaultOld;
@@ -104,18 +104,18 @@ public:
 	void DrawKlineHS(CDC* pDC);
 
 	void MoveDragMode(CPoint & pPre,CPoint& pNext);
-	
+
 
 	void OutBitmap(CDC *pDC,int id,CPoint & p);
-	
+
 
 	bool DrawRulorTextSelf(CDC * pDC,int wid);
-	
+
 
 	bool ShowFenshiRulor(CDC *pDC,int wid);
-	
+
 	void ShowVirtualLine(CDC* pDC,CPoint& p1,CPoint& p2);
-	
+
 
 	void ShowTjxgShow(CDC* pDC);
 	void DrawPower(CDC* pDC);//
@@ -124,34 +124,34 @@ public:
 	void WritePower(CString &symbol,int stkKind);//
 	//
 	int ReadPower(CString& symbol,int stkKind);//
-	
+
 	CTaiKlineShowKline();
 
 	void DrawKLineAddedPage(CDC *pDC);//
 	void CaclMaxMin(Kline* pKline,int b,int e);
 
 	int CaclEndFoot(int nKline);
-	
+
 	void CaclMaxAdded();//
 	int CaclBeginFoot(int nKline);
-	
+
 	int FindTimeK(int keyVlu,Kline* pKline,int max);
-	
+
 
 	void DeleteKlineAdded();
 	void AddKlineAdded(CString symbol,int stkKind);
-	
+
 	void CaclPercentMaxMin(float& maxPct,float& minPct);
 	void DrawBaseInfo(CDC* pDC);
 	void RestoreKLine();//
 	void ComputePower(CString symbol,int stkKind,Kline* pKline,int nKln);//
-	
+
 	int TransferKlineTypeDataToday(Kline*& pKline,CString symbol,int stkKind,int nFlags);//转换今天的数据
-	
+
 	int TransferKlineTypeData(CString symbol,int stkKind,Kline*& pKline,int nFlags=-1,int nKln=-1);//把日线等转换为其他类型
-	
+
 	float TongJi(CTaiKlineDialogShiDuanTJ* pTJ,int nFlags=0);//
-	
+
 	float ShowChengBen(CDC *pDC,int nFlags=0);//
 	void ShowCNP(CDC* pDC,int nFlags=0);
 	void ShowMultiPage(CDC* pDC);
@@ -159,15 +159,15 @@ public:
 	void ShowLittleRulor(CDC* pDC,int wid=0);//
 	void DrawRulorX(CDC *pDC);//
 	int DrawRulorTextLog(CDC *pDC,BYTE wid=0);//
-    int OnHome();//
-    int OnEnd();//
+	int OnHome();//
+	int OnEnd();//
 	int OnUp();//
 	int OnDown();//
 	int OnLeft();//
 	int OnRight();//
 	int TransferX(int x);
 	int OutString(int num, CPoint p);
-	
+
 	int MoveDisplays(int num);
 
 	int SetShowTotal(int num);//

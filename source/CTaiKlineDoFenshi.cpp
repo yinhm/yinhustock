@@ -1,12 +1,10 @@
-// CTaiKlineMin1.cpp: implementation of the CTaiKlineMin1 class.
-//
-//////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
 #include "CTaiShanApp.h"
+#include "CTaiKlineDoFenshi.h"
+
 #include "MainFrm.h"
 #include "CTaiKlineDoKline.h"
-#include "CTaiKlineDoFenshi.h"
 #include "CFormularCompute.h"
 #include "CTaiShanKlineShowView.h"
 #include "CTaiShanDoc.h"
@@ -20,33 +18,34 @@
 
 #ifdef _DEBUG
 #undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
+static char THIS_FILE[] = __FILE__;
 #define new DEBUG_NEW
 #endif
 
-
-
 IMPLEMENT_DYNCREATE(CTaiKlineMin1, CTaiKlineShowKline)
 
-static int flagbit=0;
 CTaiKlineMin1::CTaiKlineMin1()
 {
 }
-CTaiKlineMin1::CTaiKlineMin1(CTaiShanDoc* pDocI,CTaiShanKlineShowView* pViewI	)
+
+CTaiKlineMin1::CTaiKlineMin1(CTaiShanDoc* pDoci, CTaiShanKlineShowView* pViewi)
 {
-	memset(&m_dt,0,sizeof(CReportData));
-	m_sOldSymbol="";
+	memset(&m_dt, 0, sizeof(CReportData));
+
+	m_sOldSymbol = _T("");
 	m_sOldStkKind = 0;
-	m_bHist = false;
+
+	m_bHist = FALSE;
 
 	m_pMoveCB = NULL;
-	m_nTextBox=0;
+	m_nTextBox = 0;
 
 	m_nCnp = -1;
 	m_volPre = 0;
-	
-	pDoc=pDocI;
-	pView=pViewI;
+
+	pDoc = pDoci;
+	pView = pViewi;
+
 	m_nKlineCurrent=0;
 	m_lineBgn=0;
 	m_footBegin=0;
@@ -54,39 +53,41 @@ CTaiKlineMin1::CTaiKlineMin1(CTaiShanDoc* pDocI,CTaiShanKlineShowView* pViewI	)
 	m_footCurrent=0;
 	m_klinNumDefault=240;
 
-	for(int i=0;i<FIGUER_ALL_NUM;i++)
+
+	for (int i = 0; i < FIGUER_ALL_NUM; i++)
 	{
 		m_dataFormular[i].numLine = 0;
-		for(int j=0;j<6;j++)
+		for (int j = 0; j < 6; j++)
 		{
-			m_dataFormular[i].line [j].m_arrBE.line =new float[240];
-			memset(m_dataFormular[i].line [j].m_arrBE.line,0,4*240);
-			m_dataFormular[i].line [j].m_arrBE.b =0;
+			m_dataFormular[i].line[j].m_arrBE.line = new float[240];
+			memset(m_dataFormular[i].line[j].m_arrBE.line, 0, 4 * 240);
+			m_dataFormular[i].line[j].m_arrBE.b = 0;
 		}
-		for(int j=6;j<Total_Count_Line;j++)
-		{	
-			m_dataFormular[i].line [j].m_arrBE.line =NULL;
+		for (int j = 6; j < Total_Count_Line; j++)
+		{
+			m_dataFormular[i].line[j].m_arrBE.line = NULL;
 		}
 	}
 
-	m_lineDapan[0][0]=new float[240];
-	m_lineDapan[0][1]=new float[240];
-	m_lineDapan[0][2]=new float[240];
-	m_lineDapan[1][0]=new float[240];
-	m_lineDapan[1][1]=new float[240];
-	m_lineDapan[1][2]=new float[240];
 
-	for(int j=0;j<6;j++)
+	m_lineDapan[0][0] = new float[240];
+	m_lineDapan[0][1] = new float[240];
+	m_lineDapan[0][2] = new float[240];
+	m_lineDapan[1][0] = new float[240];
+	m_lineDapan[1][1] = new float[240];
+	m_lineDapan[1][2] = new float[240];
+
+	for (int j = 0; j < 6; j++)
 	{
-		m_pKlineAdd[j]=new Kline[2];
+		m_pKlineAdd[j] = new Kline[2];
 	}
 
-	for(int i=0;i<240;i++)
+	for (int i = 0; i < 240; i++)
 	{
-		m_hsMin1.AddHead(m_hsMin+i);
+		m_hsMin1.AddHead(m_hsMin + i);
 	}
+
 	m_pReportData = &m_dt;
-
 }
 
 CTaiKlineMin1::~CTaiKlineMin1()
@@ -94,67 +95,12 @@ CTaiKlineMin1::~CTaiKlineMin1()
 	pView->RemoveHs(0);
 	pView->RemoveHs(1);
 
-	delete[] m_lineDapan[0][0];
-	delete[] m_lineDapan[0][1];
-	delete[] m_lineDapan[0][2];
-	delete[] m_lineDapan[1][0];
-	delete[] m_lineDapan[1][1];
-	delete[] m_lineDapan[1][2];
-
-}
-
-
-
-
-
-void CTaiKlineMin1::DrawMin1Figuer(CDC *pDC)
-{
-	pView->DrawRectPer (pDC);
-	DrawRulorX(pDC);
-	pView->ShowTextRect(m_nTextBox,pDC);
-	pView->ShowTransferText(pDC);
-
-	InitMinuteLine();
-
-	for(int i=0;i<pView->m_infoInit.nCountMin1;i++)
-	{
-		m_nSon=i;
-		m_max_sun[m_nSon]=(float)-9.0E20;
-		m_min_sun[m_nSon]=(float)9.0E20;
-		DrawSon(pDC);
-
-		if(i == 0 && pView->m_isShowCross == false)
-		{
-			if(m_nCnp == 2)
-				ShowCNP(pDC,0);
-			else
-				ShowCNP(pDC,m_nCnp);
-		}
-	}
-
-	
-	if(m_bInvertRect == true)
-	{
-		CRect r;
-		pView->GetCurrClientRect(r);
-		int nb = m_nBeginFootTJ - this->m_footBegin;
-		if(nb<0)
-			nb = 0;
-		int ne =   m_nEndFootTJ - this->m_footBegin+1;
-		if(ne<0)
-			ne=0;
-		if(ne>m_klinNumDefault)
-			ne = m_klinNumDefault;
-		float f = (float)(pView->m_rtMin1.rightX-pView->m_rtMin1.leftX)/m_klinNumDefault;
-		r.left = pView->m_rtMin1.leftX+f*nb;
-		r.right = pView->m_rtMin1.leftX+f*ne;
-		r.top = 2;
-
-
-		pDC->InvertRect(r);
-	}
-
-
+	delete []m_lineDapan[0][0];
+	delete []m_lineDapan[0][1];
+	delete []m_lineDapan[0][2];
+	delete []m_lineDapan[1][0];
+	delete []m_lineDapan[1][1];
+	delete []m_lineDapan[1][2];
 }
 
 
@@ -163,16 +109,18 @@ void CTaiKlineMin1::DrawMin1Figuer(CDC *pDC)
 
 void CTaiKlineMin1::InitMinuteLine()
 {
-	this->m_pReportData = &m_dt;
+	m_pReportData = &m_dt;
+
 	CString symbol = pView->m_sharesSymbol;
-	m_lineBgn=0;
-	m_footBegin=0;
-	CString s=symbol ;
+	m_lineBgn = 0;
+	m_footBegin = 0;
+
+	CString s = symbol;
 	pDoc->m_sharesSymbol = s;
 
-	int isSz=0;
+	int isSz = 0;
 	CString sIndex = CSharesCompute::GetIndexSymbol(0);
-	
+
 	m_bHist = false;
 	if(pView->m_pDlgDealHistory !=NULL)
 	{
@@ -184,7 +132,7 @@ void CTaiKlineMin1::InitMinuteLine()
 	{
 		m_pFileHs=TSKDatabase()->GetTickFile (symbol,pView->m_stkKind );
 
-	
+
 		isSz=0;
 		if(CSharesCompute::GetMarketKind(pView->m_stkKind) == SZ_MARKET_EX) isSz=1;
 		CReportData * pdt= NULL;
@@ -200,14 +148,14 @@ void CTaiKlineMin1::InitMinuteLine()
 		if(b)
 		{
 			time_t mt = CTime::GetCurrentTime ().GetTime ();
-			 ((CMainFrame*)AfxGetMainWnd())->gSTOCKDLL.QueryMinData(symbol, CSharesCompute::GetMarketKind(pView->m_stkKind),mt);
+			((CMainFrame*)AfxGetMainWnd())->gSTOCKDLL.QueryMinData(symbol, CSharesCompute::GetMarketKind(pView->m_stkKind),mt);
 		}
 
 		if(pDoc->m_bInitDone ==FALSE)
 			m_footEnd=pDoc->m_nOldANT [0];
 		else
 			m_footEnd=pDoc->m_nANT [isSz];
-		
+
 		{
 			memcpy(&m_dt,pdt,sizeof(CReportData));
 		}
@@ -224,40 +172,45 @@ void CTaiKlineMin1::InitMinuteLine()
 				}
 				else
 				{
-					 if(m_pReportData->m_Kdata1[j].Price>0) m_hsMin[j].price = m_pReportData->m_Kdata1[j].Price;
-					 if(m_pReportData->m_Kdata1[j].Volume>f3) m_hsMin[j].vol = m_pReportData->m_Kdata1[j].Volume;
+					if(m_pReportData->m_Kdata1[j].Price>0) m_hsMin[j].price = m_pReportData->m_Kdata1[j].Price;
+					if(m_pReportData->m_Kdata1[j].Volume>f3) m_hsMin[j].vol = m_pReportData->m_Kdata1[j].Volume;
 				}
 			}
 		}
 #endif
 
-		int stkKind = SHZS;
-		pDoc->m_sharesInformation.GetIndexTidxd(m_Tidx); 
-		pDoc->m_sharesInformation.GetIndexRsdn(m_Nidx); 
+		pDoc->m_sharesInformation.GetIndexTidxd(m_Tidx);
+		pDoc->m_sharesInformation.GetIndexRsdn(m_Nidx);
+
 		m_pS0 = NULL;
 		m_pS1 = NULL;
-		if(pDoc->m_sharesInformation.Lookup(sIndex.GetBuffer (0),m_pS0,stkKind)==0)
+
+		int stkKind = /*SHZS*/SHAG;
+		if (pDoc->m_sharesInformation.Lookup(sIndex.GetBuffer(0), m_pS0, stkKind) == 0)
 			return;
 		sIndex = CSharesCompute::GetIndexSymbol(1);
 		stkKind = SZZS;
-		if(pDoc->m_sharesInformation.Lookup(sIndex.GetBuffer (0),m_pS1,stkKind)==0)
+		if (pDoc->m_sharesInformation.Lookup(sIndex.GetBuffer(0), m_pS1, stkKind) == 0)
 			m_pS1 = m_pS0;
-		m_volPre = m_pReportData->totv ;
-		if(pView->m_isShowCross==0)
-			m_footCurrent = m_footEnd;
 
+		m_volPre = m_pReportData->totv;
+		if (pView->m_isShowCross == 0)
+		{
+			m_footCurrent = m_footEnd;
+		}
 	}
 	else
 	{
 		m_footEnd = 239;
 		m_volPre = 10e15;
 	}
+
 	m_sOldSymbol = symbol;
 	m_sOldStkKind = pView->m_stkKind;
 
-	if(m_footEnd<0) m_footEnd = 0;
-	if(m_footEnd>239) m_footEnd = 0;
-	
+
+	if (m_footEnd < 0) m_footEnd = 0;
+	if (m_footEnd > 239) m_footEnd = 0;
 
 
 	CReportData* pS0=NULL;
@@ -384,13 +337,13 @@ void CTaiKlineMin1::InitMinuteLine()
 		}
 	}
 
-	
+
 
 	s=pdtInInit->name;
 	s=pView->m_sharesSymbol +s;
 	int j=0;
 	float* f0;
-	
+
 	f0=m_amount;
 
 	*f0=(pdtInInit->m_Kdata1)->Amount;
@@ -418,7 +371,7 @@ void CTaiKlineMin1::InitMinuteLine()
 		if((pdtInInit->m_Kdata1+j)->Volume<=0)
 			(pdtInInit->m_Kdata1+j)->Volume=(pdtInInit->m_Kdata1+j-1)->Volume;
 	}
-		
+
 	for(j=1;j<=m_footEnd;j++)
 	{
 		if(((pdtInInit->m_Kdata1)+j)->Volume>pdtInInit->totv && pdtInInit->kind != SZZS)
@@ -434,7 +387,7 @@ void CTaiKlineMin1::InitMinuteLine()
 
 	for(int i=0;i<pView->m_infoInit.nCountMin1;i++)
 	{
-		
+
 		for(int k=0;k<6;k++)
 		{
 			m_dataFormular[i].line[k].bNow=0;
@@ -452,195 +405,195 @@ void CTaiKlineMin1::InitMinuteLine()
 		switch(tmp)
 		{
 
-			case FS_LINXIAN:
-			case FS_ZOUSHI:
-				m_nameSon[i]="分时走势";
-				m_lineName[i][0]="分时走势";
-				m_lineName[i][1]="均线";
-				m_dataFormular[i].numLine=2;
+		case FS_LINXIAN:
+		case FS_ZOUSHI:
+			m_nameSon[i]="分时走势";
+			m_lineName[i][0]="分时走势";
+			m_lineName[i][1]="均线";
+			m_dataFormular[i].numLine=2;
 
-				f0=m_dataFormular[i].line [0].m_arrBE.line;
-				if((pdtInInit->m_Kdata1)->Price<=0)
-				{
-					if(pdtInInit->opnp >0)
-						*f0=pdtInInit->opnp;
-					else
-						*f0=m_close;
-				}
+			f0=m_dataFormular[i].line [0].m_arrBE.line;
+			if((pdtInInit->m_Kdata1)->Price<=0)
+			{
+				if(pdtInInit->opnp >0)
+					*f0=pdtInInit->opnp;
 				else
-					*f0=(pdtInInit->m_Kdata1)->Price;
-				for(j=1;j<=m_footEnd;j++)
+					*f0=m_close;
+			}
+			else
+				*f0=(pdtInInit->m_Kdata1)->Price;
+			for(j=1;j<=m_footEnd;j++)
+			{
+				if((pdtInInit->m_Kdata1+j)->Price>0)
+					*(f0+j)=(pdtInInit->m_Kdata1+j)->Price;
+				else
+					*(f0+j)=*(f0+j-1);
+			}
+
+			if(bZhiShu==true)
+			{
+
+				f0=m_dataFormular[i].line [1].m_arrBE.line;
+				f0[0] = m_dataFormular[i].line [0].m_arrBE.line[0];
+				for (j =1;j <=m_footEnd;j++)
 				{
-					if((pdtInInit->m_Kdata1+j)->Price>0)
-						*(f0+j)=(pdtInInit->m_Kdata1+j)->Price;
-					else
-						*(f0+j)=*(f0+j-1);
+					*(f0+j)=(f0[j-1]*j + m_dataFormular[i].line [0].m_arrBE.line[j])/(j+1);
 				}
+				break;
+			}
 
-				if(bZhiShu==true)
+			{
+				bool b1 = true;
+				f0=m_dataFormular[i].line [1].m_arrBE.line;
+				f0[0] = m_dataFormular[i].line [0].m_arrBE.line[0];
+				if((pdtInInit->m_Kdata1)->Volume > 0.01 )
+					f0[0] = (pdtInInit->m_Kdata1)->Amount /((pdtInInit->m_Kdata1)->Volume *100);
+				float totp = (pdtInInit->m_Kdata1)->Amount;
+				int rate = 100;
+				if(pdtInInit->totv>0 &&pdtInInit->lowp>0)
 				{
-
-					f0=m_dataFormular[i].line [1].m_arrBE.line;
-					f0[0] = m_dataFormular[i].line [0].m_arrBE.line[0];
+					if(pdtInInit->totp/pdtInInit->totv/pdtInInit->lowp>1000)
+						rate = 1000;
+				}
+				for (j =0;j <=m_footEnd;j++)
+				{
+					float f = 0;
+					if(m_vol[j]>0)
+					{
+						f = m_amount[j]/m_vol[j]/rate;
+						if(f > pdtInInit->higp || f < pdtInInit->lowp)
+						{
+							b1 = false;
+							break;
+						}
+					}
+				}
+				if(b1)
+				{
 					for (j =1;j <=m_footEnd;j++)
 					{
-						*(f0+j)=(f0[j-1]*j + m_dataFormular[i].line [0].m_arrBE.line[j])/(j+1);
-					}
-					break;
-				}
 
-				{
-					bool b1 = true;
-					f0=m_dataFormular[i].line [1].m_arrBE.line;
-					f0[0] = m_dataFormular[i].line [0].m_arrBE.line[0];
-					if((pdtInInit->m_Kdata1)->Volume > 0.01 )
-						f0[0] = (pdtInInit->m_Kdata1)->Amount /((pdtInInit->m_Kdata1)->Volume *100);
-					float totp = (pdtInInit->m_Kdata1)->Amount;
-					int rate = 100;
-					if(pdtInInit->totv>0 &&pdtInInit->lowp>0)
-					{
-						if(pdtInInit->totp/pdtInInit->totv/pdtInInit->lowp>1000)
-							rate = 1000;
-					}
-					for (j =0;j <=m_footEnd;j++)
-					{
-						float f = 0;
-						if(m_vol[j]>0)
 						{
-							f = m_amount[j]/m_vol[j]/rate;
-							if(f > pdtInInit->higp || f < pdtInInit->lowp)
+							if((pdtInInit->m_Kdata1+j)->Volume>0.01)
 							{
-								b1 = false;
-								break;
+								float f = 0;
+								pView->GetPriceAve(f,((pdtInInit->m_Kdata1+j)->Volume),(pdtInInit->m_Kdata1+j)->Amount);//(pdtInInit->m_Kdata1+j)->Amount /((pdtInInit->m_Kdata1+j)->Volume);
+								*(f0+j)= f;
+								if(*(f0+j)<0.01)
+									*(f0+j) = *(f0+j-1);
 							}
-						}
-					}
-					if(b1)
-					{
-						for (j =1;j <=m_footEnd;j++)
-						{
-	
-							{
-								if((pdtInInit->m_Kdata1+j)->Volume>0.01)
-								{
-									float f = 0;
-									pView->GetPriceAve(f,((pdtInInit->m_Kdata1+j)->Volume),(pdtInInit->m_Kdata1+j)->Amount);//(pdtInInit->m_Kdata1+j)->Amount /((pdtInInit->m_Kdata1+j)->Volume);
-									*(f0+j)= f;
-									if(*(f0+j)<0.01)
-										*(f0+j) = *(f0+j-1);
-								}
-								else
-									*(f0+j)=*(f0+j-1);
-							}
-							if(*(f0+j) > pdtInInit->higp || *(f0+j) < pdtInInit->lowp)
+							else
 								*(f0+j)=*(f0+j-1);
 						}
-					}
-					else
-					{
-						for (j =1;j <=m_footEnd;j++)
-						{
-							totp+=m_vol[j]*((pdtInInit->m_Kdata1+j)->Price)*rate;
-							{
-								if((pdtInInit->m_Kdata1+j)->Volume>0.01)
-								{
-									float f = 0;
-									pView->GetPriceAve(f,((pdtInInit->m_Kdata1+j)->Volume),totp);//(pdtInInit->m_Kdata1+j)->Amount /((pdtInInit->m_Kdata1+j)->Volume);
-									*(f0+j)= f;
-									if(*(f0+j)<0.01)
-										*(f0+j) = *(f0+j-1);
-								}
-								else
-									*(f0+j)=*(f0+j-1);
-							}
-							if(*(f0+j) > pdtInInit->higp || *(f0+j) < pdtInInit->lowp)
-								*(f0+j)=*(f0+j-1);
-						}
-					}
-					
-				}
-				break;
-			case FS_VOL:
-				m_nameSon[i]="";
-				m_lineName[i][0]="成交量";
-				m_dataFormular[i].numLine=1;
-
-				f0=m_dataFormular[i].line [0].m_arrBE.line; 
-				*f0=m_vol[0];
-				for(j=1;j<=m_footEnd;j++)
-				{
-					*(f0+j)=m_vol[j];
-				}
-				break;
-			case FS_MMLD:
-				m_nameSon[i]="买卖力道";
-				m_lineName[i][0]="买入";
-				m_lineName[i][1]="卖出";
-				m_lineName[i][2]="买卖差";
-				m_dataFormular[i].numLine=0;
-
-				break;
-			case FS_LB:
-				m_nameSon[i]="量比指标";
-				m_lineName[i][0]="量比";
-				m_dataFormular[i].numLine=1;
-
-
-				f0=m_dataFormular[i].line [0].m_arrBE.line; 
-				if((pdtInInit->volume5 )>0)
-					*f0=(pdtInInit->m_Kdata1)->Volume*240/(pdtInInit->volume5 );
-				else
-					*f0=0;
-				if((pdtInInit->volume5 )>0)
-				{
-					for(j=1;j<=m_footEnd;j++)
-					{
-						if((pdtInInit->m_Kdata1+j)->Volume>0)
-							*(f0+j)=(pdtInInit->m_Kdata1+j)->Volume*240/(j+1)/(pdtInInit->volume5 );
-						else
+						if(*(f0+j) > pdtInInit->higp || *(f0+j) < pdtInInit->lowp)
 							*(f0+j)=*(f0+j-1);
 					}
 				}
 				else
 				{
-					memset(f0,0,4*(m_footEnd+1));
-				}
-				break;
-
-			case FS_DUOKONG:
-				m_nameSon[i]="多空指标";
-				m_lineName[i][0]="多空";
-				m_dataFormular[i].numLine=1;
-
-
-				f0=m_dataFormular[i].line [0].m_arrBE.line;
-				
-				{
-					for(j=0;j<=m_footEnd;j++)
+					for (j =1;j <=m_footEnd;j++)
 					{
-						int r=0;
-						r=(m_Tidx [isSz][j].rp  -m_Tidx [isSz][j].dp);
-						*(m_dataFormular[i].line [0].m_arrBE.line+j)=(float)r;
+						totp+=m_vol[j]*((pdtInInit->m_Kdata1+j)->Price)*rate;
+						{
+							if((pdtInInit->m_Kdata1+j)->Volume>0.01)
+							{
+								float f = 0;
+								pView->GetPriceAve(f,((pdtInInit->m_Kdata1+j)->Volume),totp);//(pdtInInit->m_Kdata1+j)->Amount /((pdtInInit->m_Kdata1+j)->Volume);
+								*(f0+j)= f;
+								if(*(f0+j)<0.01)
+									*(f0+j) = *(f0+j-1);
+							}
+							else
+								*(f0+j)=*(f0+j-1);
+						}
+						if(*(f0+j) > pdtInInit->higp || *(f0+j) < pdtInInit->lowp)
+							*(f0+j)=*(f0+j-1);
 					}
 				}
 
-				break;
-			case FS_TONGLUO:
-				m_nameSon[i]="腾落指数";
-				m_lineName[i][0]="腾落指数";
-				m_dataFormular[i].numLine=1;
+			}
+			break;
+		case FS_VOL:
+			m_nameSon[i]="";
+			m_lineName[i][0]="成交量";
+			m_dataFormular[i].numLine=1;
 
+			f0=m_dataFormular[i].line [0].m_arrBE.line; 
+			*f0=m_vol[0];
+			for(j=1;j<=m_footEnd;j++)
+			{
+				*(f0+j)=m_vol[j];
+			}
+			break;
+		case FS_MMLD:
+			m_nameSon[i]="买卖力道";
+			m_lineName[i][0]="买入";
+			m_lineName[i][1]="卖出";
+			m_lineName[i][2]="买卖差";
+			m_dataFormular[i].numLine=0;
+
+			break;
+		case FS_LB:
+			m_nameSon[i]="量比指标";
+			m_lineName[i][0]="量比";
+			m_dataFormular[i].numLine=1;
+
+
+			f0=m_dataFormular[i].line [0].m_arrBE.line; 
+			if((pdtInInit->volume5 )>0)
+				*f0=(pdtInInit->m_Kdata1)->Volume*240/(pdtInInit->volume5 );
+			else
+				*f0=0;
+			if((pdtInInit->volume5 )>0)
+			{
+				for(j=1;j<=m_footEnd;j++)
 				{
-					*(m_dataFormular[i].line [0].m_arrBE.line)= (m_Nidx [isSz][0].rsn -m_Nidx [isSz][0].dnn );
-					for(j=1;j<=m_footEnd;j++)
-					{
-						*(m_dataFormular[i].line [0].m_arrBE.line+j)=*(m_dataFormular[i].line [0].m_arrBE.line+j-1) + (m_Nidx [isSz][j].rsn -m_Nidx [isSz][j].dnn );
-					}
+					if((pdtInInit->m_Kdata1+j)->Volume>0)
+						*(f0+j)=(pdtInInit->m_Kdata1+j)->Volume*240/(j+1)/(pdtInInit->volume5 );
+					else
+						*(f0+j)=*(f0+j-1);
 				}
+			}
+			else
+			{
+				memset(f0,0,4*(m_footEnd+1));
+			}
+			break;
 
-				break;
+		case FS_DUOKONG:
+			m_nameSon[i]="多空指标";
+			m_lineName[i][0]="多空";
+			m_dataFormular[i].numLine=1;
+
+
+			f0=m_dataFormular[i].line [0].m_arrBE.line;
+
+			{
+				for(j=0;j<=m_footEnd;j++)
+				{
+					int r=0;
+					r=(m_Tidx [isSz][j].rp  -m_Tidx [isSz][j].dp);
+					*(m_dataFormular[i].line [0].m_arrBE.line+j)=(float)r;
+				}
+			}
+
+			break;
+		case FS_TONGLUO:
+			m_nameSon[i]="腾落指数";
+			m_lineName[i][0]="腾落指数";
+			m_dataFormular[i].numLine=1;
+
+			{
+				*(m_dataFormular[i].line [0].m_arrBE.line)= (m_Nidx [isSz][0].rsn -m_Nidx [isSz][0].dnn );
+				for(j=1;j<=m_footEnd;j++)
+				{
+					*(m_dataFormular[i].line [0].m_arrBE.line+j)=*(m_dataFormular[i].line [0].m_arrBE.line+j-1) + (m_Nidx [isSz][j].rsn -m_Nidx [isSz][j].dnn );
+				}
+			}
+
+			break;
 		}
-	
+
 		if(i==0 && m_nKlineCurrent>0)
 		{
 			for(int nStk=0;nStk<m_nKlineCurrent;nStk++)
@@ -655,72 +608,72 @@ void CTaiKlineMin1::InitMinuteLine()
 
 void CTaiKlineMin1::DrawSon(CDC *pDC)
 {
-		SetRectDraw(m_nSon);
-	
-		if(m_nSon==0 && m_nKlineCurrent>0 && m_nKlineCurrent<6)
-			CaclMaxAdded();
-		for(int i=0;i<m_dataFormular[m_nSon].numLine ;i++)
-		{
-			CaclMaxFlt(m_dataFormular[m_nSon].line [i].m_arrBE.line,
-				m_footBegin);
-		}
+	SetRectDraw(m_nSon);
 
-		if(m_close<=0)
-		{
-			CPen pen_line(PS_SOLID ,1,pDoc->m_colorArray[2]);
+	if(m_nSon==0 && m_nKlineCurrent>0 && m_nKlineCurrent<6)
+		CaclMaxAdded();
+	for(int i=0;i<m_dataFormular[m_nSon].numLine ;i++)
+	{
+		CaclMaxFlt(m_dataFormular[m_nSon].line [i].m_arrBE.line,
+			m_footBegin);
+	}
 
-
-			DrawCapt(pDC);
-			return;
-		}
-
-		if(m_pFlg[m_nSon]==FS_ZOUSHI||m_pFlg[m_nSon]==FS_LINXIAN)
-		{
-
-			float cls;
-			if(m_pFlg[m_nSon]==FS_ZOUSHI)
-				cls=m_close;
-			else
-				cls=m_close_Dapan[0] ;
-
-			float maxPrice=(float)(FABSMY(m_max_sun[m_nSon]-cls)>FABSMY(m_min_sun[m_nSon]-cls)?
-				FABSMY(m_max_sun[m_nSon]-cls):FABSMY(m_min_sun[m_nSon]-cls));
-			m_max_sun[m_nSon]=maxPrice+cls;
-
-
-			m_min_sun[m_nSon]=cls-maxPrice;
-
-		
-			if(cls>0)
-			{
-				CPen pen_line(PS_SOLID ,1,pDoc->m_colorArray[2]);  
-				CPen* pOldpen=pDC->SelectObject(&pen_line);
-				int y=YTransfer((float)(cls));
-				pDC->MoveTo(m_rectDrawLine.left,y);
-				pDC->LineTo(m_rectDrawLine.right+1,y);
-				pDC->MoveTo(m_rectDrawLine.left,y-1);
-				pDC->LineTo(m_rectDrawLine.right+1,y-1);
-				pDC->SelectObject(pOldpen);
-			}
-		}
-
-		if(m_pFlg[m_nSon]==FS_VOL)
-		{
-			if(m_min_sun[m_nSon]>0)
-				m_min_sun[m_nSon]=0;
-
-		}
-
-
-		if(m_pFlg[m_nSon]==FS_ZOUSHI||m_pFlg[m_nSon]==FS_LINXIAN)
-			DrawRulorText(pDC,2);
-		else
-			DrawRulorText(pDC,3);
+	if(m_close<=0)
+	{
+		CPen pen_line(PS_SOLID ,1,pDoc->m_colorArray[2]);
 
 
 		DrawCapt(pDC);
+		return;
+	}
 
-		DrawLineIndex(pDC,true);
+	if(m_pFlg[m_nSon]==FS_ZOUSHI||m_pFlg[m_nSon]==FS_LINXIAN)
+	{
+
+		float cls;
+		if(m_pFlg[m_nSon]==FS_ZOUSHI)
+			cls=m_close;
+		else
+			cls=m_close_Dapan[0] ;
+
+		float maxPrice=(float)(FABSMY(m_max_sun[m_nSon]-cls)>FABSMY(m_min_sun[m_nSon]-cls)?
+			FABSMY(m_max_sun[m_nSon]-cls):FABSMY(m_min_sun[m_nSon]-cls));
+		m_max_sun[m_nSon]=maxPrice+cls;
+
+
+		m_min_sun[m_nSon]=cls-maxPrice;
+
+
+		if(cls>0)
+		{
+			CPen pen_line(PS_SOLID ,1,pDoc->m_colorArray[2]);  
+			CPen* pOldpen=pDC->SelectObject(&pen_line);
+			int y=YTransfer((float)(cls));
+			pDC->MoveTo(m_rectDrawLine.left,y);
+			pDC->LineTo(m_rectDrawLine.right+1,y);
+			pDC->MoveTo(m_rectDrawLine.left,y-1);
+			pDC->LineTo(m_rectDrawLine.right+1,y-1);
+			pDC->SelectObject(pOldpen);
+		}
+	}
+
+	if(m_pFlg[m_nSon]==FS_VOL)
+	{
+		if(m_min_sun[m_nSon]>0)
+			m_min_sun[m_nSon]=0;
+
+	}
+
+
+	if(m_pFlg[m_nSon]==FS_ZOUSHI||m_pFlg[m_nSon]==FS_LINXIAN)
+		DrawRulorText(pDC,2);
+	else
+		DrawRulorText(pDC,3);
+
+
+	DrawCapt(pDC);
+
+	DrawLineIndex(pDC,true);
 
 }
 
@@ -782,8 +735,8 @@ void CTaiKlineMin1::DrawCapt(CDC *pDC)
 
 		CString pnm=m_lineName[m_nSon][i];
 		pDC->SetTextColor( pDoc->m_colorArray [7+i]);
-	
-		
+
+
 		pDC->ExtTextOut (left+len+lf,m_rectDrawLine.top-pView->m_heightCaption-move,ETO_CLIPPED,rtFill,pnm,NULL);
 		len+=(pDC->GetOutputTextExtent(pnm)).cx;
 		CString vl="";
@@ -826,20 +779,20 @@ void CTaiKlineMin1::InitHs(bool bRemoveAll,bool bSkip)
 	{
 		if(this->m_pReportData->ystc ==0)
 		{
-		pView->RemoveHs(0);
-		pView->RemoveHs(1);
-		if(pView->m_tabNum<4)
-			pView->m_nBeginHS=0;
-		return;
+			pView->RemoveHs(0);
+			pView->RemoveHs(1);
+			if(pView->m_tabNum<4)
+				pView->m_nBeginHS=0;
+			return;
 		}
 	}
 
-    long addr = 0;
+	long addr = 0;
 	short Curr_Min;
 
 	Curr_Min=m_pFileHs->GetDataCount(pView->m_sharesSymbol);
 
- 	int first=0;
+	int first=0;
 	if(bRemoveAll==true)
 	{
 
@@ -860,16 +813,16 @@ void CTaiKlineMin1::InitHs(bool bRemoveAll,bool bSkip)
 	}
 
 
-   if(Curr_Min<0||Curr_Min>=480*16)
-   {
+	if(Curr_Min<0||Curr_Min>=480*16)
+	{
 		return;
-   }
+	}
 
 
- 
 
 
-    if(bSkip == false)
+
+	if(bSkip == false)
 #ifndef WIDE_NET_VERSION
 		m_pFileHs->ReadHS (pView->m_sharesSymbol ,pView->m_hs,bRemoveAll);
 #else
@@ -945,7 +898,7 @@ int CTaiKlineMin1::DrawHs(CDC *pDC,int nBegin,BYTE flag)
 			return 0; 
 		}
 
-	
+
 		int nShow=(int)((bottom-top)/RIGHTBOX_PERLINE+0.2);
 
 		int nHs=pView->m_hs.GetCount();
@@ -964,7 +917,7 @@ int CTaiKlineMin1::DrawHs(CDC *pDC,int nBegin,BYTE flag)
 				nBegin = 0;
 		}
 
-		
+
 		pView->m_scrollBar->SetScrollRange(0,nHs);
 
 		pView->m_scrollBar->SetScrollPos(nBegin);
@@ -978,8 +931,8 @@ int CTaiKlineMin1::DrawHs(CDC *pDC,int nBegin,BYTE flag)
 			TRADE_DETAIL_H_PER* pHsPre = NULL;
 			if(j>0)
 			{
-			pos=pView->m_hs.FindIndex(nHs - j  ) ;
-			pHsPre=pView->m_hs.GetAt( pos );
+				pos=pView->m_hs.FindIndex(nHs - j  ) ;
+				pHsPre=pView->m_hs.GetAt( pos );
 			}
 
 			CString s;
@@ -999,7 +952,7 @@ int CTaiKlineMin1::DrawHs(CDC *pDC,int nBegin,BYTE flag)
 				pDC->SetTextColor( pDoc->m_colorArray[1]);
 			pDC->TextOut(left2,top+RIGHTBOX_PERLINE*(j-nBegin)+modify,s);
 
-	
+
 			int nFlag ;
 			float fVol = CTaiKlineTransferKline::GetVolHs(pHs, pHsPre, nFlag);
 			CString sArrow="↑"  ;
@@ -1038,7 +991,7 @@ int CTaiKlineMin1::DrawHs(CDC *pDC,int nBegin,BYTE flag)
 			return 0; 
 		}
 
-	
+
 		int nShow=(int)((bottom-top)/RIGHTBOX_PERLINE+0.2);
 
 		int nHs=pView->m_fenjia.GetCount();
@@ -1060,7 +1013,7 @@ int CTaiKlineMin1::DrawHs(CDC *pDC,int nBegin,BYTE flag)
 		POSITION pos;
 		FENJIA* pf;
 		if( ( pos = pView->m_fenjia.GetHeadPosition() ) == NULL )
-				return 0;
+			return 0;
 		for(int j=0;j<nHs;j++)
 		{
 			pf=pView->m_fenjia.GetNext(pos);
@@ -1071,7 +1024,7 @@ int CTaiKlineMin1::DrawHs(CDC *pDC,int nBegin,BYTE flag)
 		}
 
 
-	
+
 		if(nBegin<0)
 			nBegin=0;
 		for(int j=nBegin;j<nHs;j++)
@@ -1132,7 +1085,7 @@ int CTaiKlineMin1::DrawHs(CDC *pDC,int nBegin,BYTE flag)
 
 	return nBegin;
 
- 
+
 }
 
 
@@ -1214,7 +1167,7 @@ void CTaiKlineMin1::DrawDapan(CDC *pDC,int nMarket,int flagFrame)
 			m_min_dapan[nMarket][num_sun]=*(pFlt+i);
 	}
 
-			m_min_dapan[nMarket][num_sun]=0;
+	m_min_dapan[nMarket][num_sun]=0;
 	tempNum=m_nSon;
 	m_nSon=1;
 	nFlags2=m_pFlg[m_nSon];
@@ -1262,7 +1215,7 @@ void CTaiKlineMin1::DrawLittleGegu(CDC *pDC)
 		m_min_sun[m_nSon]=(float)9.0E20;
 
 		DrawLittleFrame(pDC);
-	
+
 		for(int i=0;i<m_dataFormular[m_nSon].numLine ;i++)
 		{
 			CaclMaxFlt(m_dataFormular[m_nSon].line [i].m_arrBE.line,
@@ -1286,7 +1239,7 @@ void CTaiKlineMin1::DrawLittleGegu(CDC *pDC)
 
 				m_min_sun[m_nSon]=cls-maxPrice;
 
-			
+
 				if(m_close>0)
 				{
 					int y=YTransfer((float)(m_close));
@@ -1340,7 +1293,7 @@ void CTaiKlineMin1::DrawLittleDapan(CDC *pDC,int flagLine,int nMarket)
 	float cellWidth=(float)(rightf-leftf)/(m_klinNumDefault);
 
 
-	
+
 	float tempY=0;
 	CPen pen_line(PS_SOLID ,1,pDoc->m_colorArray[2]);
 	CPen* pOldpen=pDC->SelectObject(&pen_line);
@@ -1352,7 +1305,7 @@ void CTaiKlineMin1::DrawLittleDapan(CDC *pDC,int flagLine,int nMarket)
 			tempY=0;
 		else
 			tempY=((m_rectDrawLine.top-m_rectDrawLine.bottom)
-				/(m_max_dapan[nMarket][0]-m_min_dapan[nMarket][0]));
+			/(m_max_dapan[nMarket][0]-m_min_dapan[nMarket][0]));
 		y=(int)(tempY*(m_close_Dapan[nMarket]-m_min_dapan[nMarket][0])+m_rectDrawLine.bottom);
 		pDC->MoveTo(m_rectDrawLine.left,y);
 		pDC->LineTo(m_rectDrawLine.right+1,y);
@@ -1397,7 +1350,7 @@ void CTaiKlineMin1::DrawLittleDapan(CDC *pDC,int flagLine,int nMarket)
 				tempY=0;
 			else
 				tempY=((m_rectDrawLine.top-m_rectDrawLine.bottom)
-					/(m_max_dapan[nMarket][1]-m_min_dapan[nMarket][1]));
+				/(m_max_dapan[nMarket][1]-m_min_dapan[nMarket][1]));
 			for(int j=0; j<=m_footEnd; j++ )
 			{
 				pDC->MoveTo((int)(leftf+cellWidth/2+(j)*cellWidth),
@@ -1408,7 +1361,7 @@ void CTaiKlineMin1::DrawLittleDapan(CDC *pDC,int flagLine,int nMarket)
 		}
 	}
 	pDC->SelectObject(pOldpen);
- 
+
 
 
 }
@@ -1462,7 +1415,7 @@ void CTaiKlineMin1::DrawLittleFrame(CDC *pDC,int nMarket)
 			m_rectDrawLine.bottom=bott;
 		}
 
-	
+
 		CPen pen;
 		if (!pen.CreatePen(PS_SOLID,1,pDoc->m_colorArray[2]))
 			return;
@@ -1524,7 +1477,7 @@ void CTaiKlineMin1::DrawLittleFrame(CDC *pDC,int nMarket)
 			m_rectDrawLine.bottom=rt.bottom-5;//--
 		}
 
-		
+
 		CPen pen;
 		if (!pen.CreatePen(PS_SOLID,1,pDoc->m_colorArray[2]))
 			return;
@@ -1536,7 +1489,7 @@ void CTaiKlineMin1::DrawLittleFrame(CDC *pDC,int nMarket)
 		pDC->LineTo (m_rectDrawLine.left,rt.bottom-5);//--
 		pDC->LineTo (m_rectDrawLine.left,18*RIGHTBOX_PERLINE+7);
 
-	
+
 
 		pDC->MoveTo (m_rectDrawLine.left,(int)(18*RIGHTBOX_PERLINE+7+0.618
 			*(rt.bottom-18*RIGHTBOX_PERLINE-7-5)+2));
@@ -1618,66 +1571,66 @@ CString CTaiKlineMin1::TimeToString(int foot,bool bRight)
 
 int CTaiKlineMin1::OnLeft()
 {
-		if(m_klinNumDefault<=0)
-			return 0;
-		if(pView->m_isShowCross==0)
-		{
-			pView->m_nOldHitPos =-1;
-			pView->m_nOldHitY =-1;
-			m_footCurrent=m_footEnd;
-		
-			pView->m_isShowCross=1;
+	if(m_klinNumDefault<=0)
+		return 0;
+	if(pView->m_isShowCross==0)
+	{
+		pView->m_nOldHitPos =-1;
+		pView->m_nOldHitY =-1;
+		m_footCurrent=m_footEnd;
 
-			pView->RedrawWindow ();
-			if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE) pView->m_dlgShowCross->ShowWindow(SW_RESTORE);
-			pView->SetFocus ();
-		} 
-		else
+		pView->m_isShowCross=1;
+
+		pView->RedrawWindow ();
+		if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE) pView->m_dlgShowCross->ShowWindow(SW_RESTORE);
+		pView->SetFocus ();
+	} 
+	else
+	{
+		if(::GetKeyState(VK_SHIFT)&0x8000)
+			m_footCurrent=m_footCurrent-(m_footEnd-m_footBegin)/10;
+		else 
+			m_footCurrent--;
+	}
+
+	if(m_footCurrent>m_footEnd||m_footCurrent<m_footBegin )
+	{
+		m_footCurrent=m_footEnd;
+	}
+
+	m_currentValue=m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent];
+
+	m_nSon=0;
+	SetRectDraw(0);
+
+	int foot=m_footCurrent-m_footBegin;
+	int xNow=(int)((foot+0.5)*(m_rectDrawLine.right-m_rectDrawLine.left)/(float)m_klinNumDefault+0.5);
+	int yNow=YTransfer(m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent]);
+	xNow+=pView->m_rtMin1 .leftX;
+	pView->m_pointMove.x=xNow;
+	pView->m_pointMove.y=yNow;
+
+	POINT CurPos;
+	CurPos.x = xNow;
+	CurPos.y = yNow;
+	ClientToScreen(pView->m_hWnd,&CurPos);
+	if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE)
+	{
+		CRect dlgRect;
+		GetWindowRect(pView->m_dlgShowCross->m_hWnd,&dlgRect);
+		if(PtInRect(dlgRect,CurPos))
 		{
-			if(::GetKeyState(VK_SHIFT)&0x8000)
-				m_footCurrent=m_footCurrent-(m_footEnd-m_footBegin)/10;
-			else 
-				m_footCurrent--;
+			CRect ClientRect;
+			pView->GetClientRect(&ClientRect);
+			if(CurPos.x > ClientRect.Width()/2)
+				MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2 - dlgRect.Width(),CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
+			else
+				MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2,CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
 		}
+	}
+	SetCursorPos(CurPos.x,CurPos.y);
 
-		if(m_footCurrent>m_footEnd||m_footCurrent<m_footBegin )
-		{
-			m_footCurrent=m_footEnd;
-		}
-
-		m_currentValue=m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent];
-		
-		m_nSon=0;
-		SetRectDraw(0);
-
-		int foot=m_footCurrent-m_footBegin;
-		int xNow=(int)((foot+0.5)*(m_rectDrawLine.right-m_rectDrawLine.left)/(float)m_klinNumDefault+0.5);
-		int yNow=YTransfer(m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent]);
-		xNow+=pView->m_rtMin1 .leftX;
-		pView->m_pointMove.x=xNow;
-		pView->m_pointMove.y=yNow;
-
-		POINT CurPos;
-		CurPos.x = xNow;
-		CurPos.y = yNow;
-		ClientToScreen(pView->m_hWnd,&CurPos);
-		if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE)
-		{
-			CRect dlgRect;
-			GetWindowRect(pView->m_dlgShowCross->m_hWnd,&dlgRect);
-			if(PtInRect(dlgRect,CurPos))
-			{
-			  CRect ClientRect;
-			  pView->GetClientRect(&ClientRect);
-			  if(CurPos.x > ClientRect.Width()/2)
-				  MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2 - dlgRect.Width(),CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
-			  else
-				  MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2,CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
-			}
-		}
-		SetCursorPos(CurPos.x,CurPos.y);
-
-		return 1;
+	return 1;
 
 
 }
@@ -1685,124 +1638,124 @@ int CTaiKlineMin1::OnLeft()
 
 int CTaiKlineMin1::OnRight()
 {		if(m_klinNumDefault<=0)
-			return 0;
-		if(pView->m_isShowCross==0)
-		{
-			pView->m_nOldHitPos =-1;
-			pView->m_nOldHitY =-1;
-			m_footCurrent=m_footBegin;
-		
+return 0;
+if(pView->m_isShowCross==0)
+{
+	pView->m_nOldHitPos =-1;
+	pView->m_nOldHitY =-1;
+	m_footCurrent=m_footBegin;
 
-			pView->m_isShowCross=1;
 
-			pView->RedrawWindow ();
-			if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE) pView->m_dlgShowCross->ShowWindow(SW_RESTORE);
-			pView->SetFocus ();
-		}
+	pView->m_isShowCross=1;
+
+	pView->RedrawWindow ();
+	if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE) pView->m_dlgShowCross->ShowWindow(SW_RESTORE);
+	pView->SetFocus ();
+}
+else
+{
+	if(::GetKeyState(VK_SHIFT)&0x8000)
+		m_footCurrent=m_footCurrent+(m_footEnd-m_footBegin)/10;
+	else
+		m_footCurrent++;
+}
+
+if(m_footCurrent>m_footEnd||m_footCurrent<m_footBegin )
+{
+	m_footCurrent=m_footBegin;
+}
+
+m_currentValue=m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent];
+
+m_nSon=0;
+SetRectDraw(0);
+
+int foot=m_footCurrent-m_footBegin;
+int xNow=(int)((foot+0.5)*(m_rectDrawLine.right-m_rectDrawLine.left)/(float)(m_klinNumDefault)+0.5);
+int yNow=YTransfer(m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent]);
+
+xNow+=pView->m_rtMin1 .leftX;
+pView->m_pointMove.x=xNow;
+pView->m_pointMove.y=yNow;
+
+POINT CurPos;
+CurPos.x = xNow;
+CurPos.y = yNow;
+ClientToScreen(pView->m_hWnd,&CurPos);
+if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE)
+{
+	CRect dlgRect;
+	GetWindowRect(pView->m_dlgShowCross->m_hWnd,&dlgRect);
+	if(PtInRect(dlgRect,CurPos))
+	{
+		CRect ClientRect;
+		pView->GetClientRect(&ClientRect);
+		if(CurPos.x > ClientRect.Width()/2)
+			MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2 - dlgRect.Width(),CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
 		else
-		{
-			if(::GetKeyState(VK_SHIFT)&0x8000)
-				m_footCurrent=m_footCurrent+(m_footEnd-m_footBegin)/10;
-			else
-				m_footCurrent++;
-		}
+			MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2,CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
+	}
+}
+SetCursorPos(CurPos.x,CurPos.y);
 
-		if(m_footCurrent>m_footEnd||m_footCurrent<m_footBegin )
-		{
-			m_footCurrent=m_footBegin;
-		}
-
-		m_currentValue=m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent];
-	
-		m_nSon=0;
-		SetRectDraw(0);
-
-		int foot=m_footCurrent-m_footBegin;
-		int xNow=(int)((foot+0.5)*(m_rectDrawLine.right-m_rectDrawLine.left)/(float)(m_klinNumDefault)+0.5);
-		int yNow=YTransfer(m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent]);
-
-		xNow+=pView->m_rtMin1 .leftX;
-		pView->m_pointMove.x=xNow;
-		pView->m_pointMove.y=yNow;
-	
-		POINT CurPos;
-		CurPos.x = xNow;
-		CurPos.y = yNow;
-		ClientToScreen(pView->m_hWnd,&CurPos);
-		if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE)
-		{
-		CRect dlgRect;
-		GetWindowRect(pView->m_dlgShowCross->m_hWnd,&dlgRect);
-		if(PtInRect(dlgRect,CurPos))
-		{
-		  CRect ClientRect;
-		  pView->GetClientRect(&ClientRect);
-		  if(CurPos.x > ClientRect.Width()/2)
-			  MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2 - dlgRect.Width(),CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
-		  else
-              MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2,CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
-		}
-		}
-		SetCursorPos(CurPos.x,CurPos.y);
-		
-		return 1;
+return 1;
 
 
 }
 int CTaiKlineMin1::OnEnd()
 {
-		if(m_klinNumDefault<=0)
-			return 0;
-		if(pView->m_isShowCross==0)
-		{
-		
-			if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE) pView->m_dlgShowCross->ShowWindow(SW_RESTORE);
-			pView->m_isShowCross=1;
-		}
+	if(m_klinNumDefault<=0)
+		return 0;
+	if(pView->m_isShowCross==0)
+	{
 
-		m_footCurrent=m_footEnd;
+		if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE) pView->m_dlgShowCross->ShowWindow(SW_RESTORE);
+		pView->m_isShowCross=1;
+	}
 
-		m_currentValue=m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent];
-		
-		m_nSon=0;
-		SetRectDraw(0);
+	m_footCurrent=m_footEnd;
 
-		int foot=m_footCurrent-m_footBegin;
-		int xNow=(int)((foot+0.5)*(m_rectDrawLine.right-m_rectDrawLine.left)/m_klinNumDefault);
-		int yNow=YTransfer(m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent]);
+	m_currentValue=m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent];
 
-		xNow+=pView->m_rtMin1 .leftX;
-		pView->m_pointMove.x=xNow;
-		pView->m_pointMove.y=yNow;
-	    return 1;
+	m_nSon=0;
+	SetRectDraw(0);
+
+	int foot=m_footCurrent-m_footBegin;
+	int xNow=(int)((foot+0.5)*(m_rectDrawLine.right-m_rectDrawLine.left)/m_klinNumDefault);
+	int yNow=YTransfer(m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent]);
+
+	xNow+=pView->m_rtMin1 .leftX;
+	pView->m_pointMove.x=xNow;
+	pView->m_pointMove.y=yNow;
+	return 1;
 
 
 }
 
 int CTaiKlineMin1::OnHome()
 {
-		if(pView->m_isShowCross==0)
-		{
-		
-			if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE)pView->m_dlgShowCross->ShowWindow(SW_RESTORE);
-			pView->m_isShowCross=1;
-		}
-		
-		m_footCurrent=m_footBegin;
+	if(pView->m_isShowCross==0)
+	{
 
-		m_currentValue=m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent];
-	
-		m_nSon=0;
-		SetRectDraw(0);
+		if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE)pView->m_dlgShowCross->ShowWindow(SW_RESTORE);
+		pView->m_isShowCross=1;
+	}
 
-		int foot=m_footCurrent-m_footBegin;
-		int xNow=(int)((foot+0.5)*(m_rectDrawLine.right-m_rectDrawLine.left)/m_klinNumDefault);
-		int yNow=YTransfer(m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent]);
+	m_footCurrent=m_footBegin;
 
-		xNow+=pView->m_rtMin1 .leftX;
-		pView->m_pointMove.x=xNow;
-		pView->m_pointMove.y=yNow;
-	    return 1;
+	m_currentValue=m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent];
+
+	m_nSon=0;
+	SetRectDraw(0);
+
+	int foot=m_footCurrent-m_footBegin;
+	int xNow=(int)((foot+0.5)*(m_rectDrawLine.right-m_rectDrawLine.left)/m_klinNumDefault);
+	int yNow=YTransfer(m_dataFormular[0].line [0].m_arrBE.line[m_footCurrent]);
+
+	xNow+=pView->m_rtMin1 .leftX;
+	pView->m_pointMove.x=xNow;
+	pView->m_pointMove.y=yNow;
+	return 1;
 
 
 }
@@ -1826,9 +1779,9 @@ int CTaiKlineMin1::OutString(int num, CPoint p)
 	else foot=(p.x-pView->m_rtMin1.leftX)*m_klinNumDefault /(pView->m_rtMin1.rightX-pView->m_rtMin1.leftX);
 	foot+=m_footBegin;
 	if(foot>m_footEnd)
-			return 0;
+		return 0;
 
-	
+
 
 	if(m_klinNumDefault<=0)
 		return 0;
@@ -1874,7 +1827,7 @@ int CTaiKlineMin1::OutString(int num, CPoint p)
 		rgn.CreatePolygonRgn (pt,6,ALTERNATE);
 		if(rgn.PtInRegion (p)!=0)
 		{
-		
+
 			CString rStr;
 			rStr.Format (" %.3f\n",(float)m_dataFormular[m_nSon].line[i].m_arrBE.line[foot]);
 			m_tipStr=m_lineName[m_nSon][i]+rStr;
@@ -1949,19 +1902,19 @@ void CTaiKlineMin1::DrawRulorX(CDC *pDC)
 	p2.x=p1.x;
 	ShowVirtualLine(pDC,p1,p2);
 
-	
+
 	pDC->SetTextAlign( TA_RIGHT );
 	pDC->SetTextColor( pDoc->m_colorArray [2]);
 	pDC->SetBkMode(TRANSPARENT);
 	CFont ft;
 	LOGFONT lgf=pDoc->m_fontstr[0];
-	
+
 	ft.CreateFontIndirect (&lgf );
 	CFont* pOld=pDC->SelectObject(&ft);
 
 	CTime tm=CTime::GetCurrentTime ();
 	CTime tm1(tm.GetYear (),tm.GetMonth (),tm.GetDay (),pDoc->m_nDel_Start_A_hr[isSz]
-		,pDoc->m_nDel_Start_A_min[isSz],0);
+	,pDoc->m_nDel_Start_A_min[isSz],0);
 	s=tm1.Format ("%H:%M");
 	CRect r(pView->m_rtMin1 .leftX,top,pView->m_rtMin1 .rightX,top+pView->m_heightCaption);
 	foot=0;
@@ -2028,7 +1981,7 @@ void CTaiKlineMin1::ShowMultiFiguer(CDC *pDC,int flag)
 
 	pDC->SelectObject(pOldpen);
 
-	
+
 	if(flag==0)
 	{
 		pDC->SetTextAlign( TA_LEFT );
@@ -2036,7 +1989,7 @@ void CTaiKlineMin1::ShowMultiFiguer(CDC *pDC,int flag)
 		pDC->SetBkMode(TRANSPARENT);
 		CFont ft;
 		LOGFONT lgf=pDoc->m_fontstr[0];
-	
+
 		ft.CreateFontIndirect (&lgf );
 		CFont* pOld=pDC->SelectObject(&ft);
 
@@ -2085,20 +2038,20 @@ void CTaiKlineMin1::ShowMultiFiguer(CDC *pDC,int flag)
 
 	if(flag==0)
 	{
-	
+
 		float cls;
 		cls=m_close;
 
 		float maxPrice=(float)(FABSMY(m_max_sun[m_nSon]-cls)>FABSMY(m_min_sun[m_nSon]-cls)?
 			FABSMY(m_max_sun[m_nSon]-cls):FABSMY(m_min_sun[m_nSon]-cls));
 		m_max_sun[m_nSon]=maxPrice+cls;
-	
+
 
 		m_min_sun[m_nSon]=cls-maxPrice;
 	}
 
 
-	
+
 	ShowLittleRulor(pDC,2);
 
 
@@ -2133,15 +2086,15 @@ void CTaiKlineMin1::AddFenshiAdded(CString symbol,int stkKind,int nStock)
 	CReportData* pCdat1;
 	if(pDoc->m_sharesInformation.Lookup(s.GetBuffer (0),pCdat1,stkKind)==0)
 		return;
-	
+
 	int isSz=0;
 	if(CSharesCompute::GetMarketKind(stkKind) == SZ_MARKET_EX) isSz=1;
 
 	bool bZhiShu=false;
-	
+
 	m_dataFormular[0].numLine=1+m_nKlineCurrent;
 
-	
+
 	int j=0;
 	float* f0;
 	f0=m_dataFormular[0].line [nStock].m_arrBE.line;
@@ -2159,45 +2112,6 @@ void CTaiKlineMin1::AddFenshiAdded(CString symbol,int stkKind,int nStock)
 				*(f0+j)=*(f0+j-1);
 		}
 	}
-
-}
-
-void CTaiKlineMin1::CaclMaxAdded()
-{
-	if(m_close==0)
-	{	
-		m_dataFormular[0].numLine=1;
-		return;
-	}
-
-	for(int i=1;i<m_dataFormular[0].numLine ;i++)
-	{
-		CReportData* pCdat1;
-		if(pDoc->m_sharesInformation.Lookup(m_symbolAdd[i-1].GetBuffer (0),pCdat1,this->m_stkKindAdd[i-1])==0)
-		{	
-			m_dataFormular[0].numLine=1;
-			return;
-		}
-		float close=pCdat1->ystc ;
-		CString s=m_symbolAdd[i-1];
-
-		if(close==0)
-		{	
-			m_dataFormular[0].numLine=1;
-			return;
-		}
-
-	
-		for(int j=0;j<=m_footEnd;j++)
-		{
-			m_dataFormular[0].line [i].m_arrBE.line[j]=(m_dataFormular[0].line [i].m_arrBE.line[j]-close)*m_close/close+m_close;
-		}
-
-	}
-}
-
-void CTaiKlineMin1::DrawDapanOther(CDC *pDC)
-{
 
 }
 
@@ -2248,7 +2162,7 @@ void CTaiKlineMin1::ShowCNP(CDC *pDC,int nFlags)
 	m_nSon=0;
 	SetRectDraw(m_nSon);
 
-	
+
 	int n=m_rectDrawLine.bottom-m_rectDrawLine.top+1;
 	if(n<=0 || n>10000000)
 		return;
@@ -2256,7 +2170,7 @@ void CTaiKlineMin1::ShowCNP(CDC *pDC,int nFlags)
 
 	float max=0;
 
-	
+
 	int nHs=pView->m_hs.GetCount();
 	if(nHs<=0)
 		return;
@@ -2267,7 +2181,7 @@ void CTaiKlineMin1::ShowCNP(CDC *pDC,int nFlags)
 	TRADE_DETAIL_H_PER* pHsPre = NULL;
 
 	if( ( pos = pView->m_hs.GetHeadPosition() ) == NULL )
-			return ;
+		return ;
 
 	float* cnp=new  float[n];
 	memset(cnp,0,n*4);
@@ -2304,7 +2218,7 @@ void CTaiKlineMin1::ShowCNP(CDC *pDC,int nFlags)
 		pHsPre = pHs;
 	}
 
-	
+
 	CPen pen_line(PS_SOLID  ,1,pDoc->m_colorArray[6]); 
 	CPen* pOldpen=pDC->SelectObject(&pen_line);
 
@@ -2324,8 +2238,8 @@ void CTaiKlineMin1::ShowCNP(CDC *pDC,int nFlags)
 		CRect r(0,pView->m_heightCaption ,pView->m_rtMin1 .rightX ,pView->m_rtMin1 .rtBlw [0].m_yBottom );
 		if((m_footEnd-m_footBegin+1)!=0)
 		{
-		float widPer=(float)(m_rectDrawLine.right-m_rectDrawLine.left)/(m_footEnd-m_footBegin+1);
-		pDC->ExtTextOut (m_rectDrawLine.right/2,yCnp-len-2+pView->m_heightCaption,ETO_CLIPPED,r,s,NULL);
+			float widPer=(float)(m_rectDrawLine.right-m_rectDrawLine.left)/(m_footEnd-m_footBegin+1);
+			pDC->ExtTextOut (m_rectDrawLine.right/2,yCnp-len-2+pView->m_heightCaption,ETO_CLIPPED,r,s,NULL);
 		}
 	}
 
@@ -2352,36 +2266,36 @@ void CTaiKlineMin1::GetFenJia(int first,CBuySellList &buySellList, CFJList &fenj
 {
 	FENJIA* pf=new FENJIA();
 	int nCount = buySellList.GetCount();
- 	CFJList * fenjiaUse = &fenjiaUp;
+	CFJList * fenjiaUse = &fenjiaUp;
 	for(int i=first;i<nCount;i++)
 	{
-		
-		
+
+
 		POSITION pos=buySellList.FindIndex(nCount - i - 1 ) ;
 		TRADE_DETAIL_H_PER* pHs=buySellList.GetAt( pos );
 		TRADE_DETAIL_H_PER* pHsPre = NULL;
 		if(i>0)
 		{
-		pos=buySellList.FindIndex(nCount - i  ) ;
-		pHsPre=buySellList.GetAt( pos );
+			pos=buySellList.FindIndex(nCount - i  ) ;
+			pHsPre=buySellList.GetAt( pos );
 		}
 		int nFlag2;
 		pf->vol = CTaiKlineTransferKline::GetVolHs(pHs, pHsPre, nFlag2);
 
-		
+
 		pf->price =pHs->price ;
 		if(pHsPre==NULL)
 			pf->vol =(float)FABSMY(pHs->vol) ;
 		else
 		{
-		
+
 			if(FABSMY(pHs->vol)-FABSMY(pHsPre->vol)>=0)
 				pf->vol =(float)FABSMY(FABSMY(pHs->vol)-FABSMY(pHsPre->vol)) ;
 			else
 				pf->vol =0;
 		}
 
-	
+
 		int nFor = 1;
 		if(nFlag == 1)
 		{
@@ -2495,7 +2409,7 @@ float CTaiKlineMin1::TongJi(CTaiKlineDialogShiDuanTJ* pTJ,int nFlags)
 			tmB=pTJ->m_tmE;
 			tmE=pTJ->m_tmB;
 		}
-		
+
 		CTime tmAStart(tmB.GetYear(),tmB.GetMonth(),tmB.GetDay(),pDoc->m_nDel_Start_A_hr[0],pDoc->m_nDel_Start_A_min[0],0);
 		CTime tmAEnd(tmB.GetYear(),tmB.GetMonth(),tmB.GetDay(),pDoc->m_nDel_End_A_hr[0],pDoc->m_nDel_End_A_min[0],0);
 		CTime tmPStart(tmB.GetYear(),tmB.GetMonth(),tmB.GetDay(),pDoc->m_nDel_Start_B_hr[0],pDoc->m_nDel_Start_B_min[0],0);
@@ -2621,7 +2535,7 @@ float CTaiKlineMin1::TongJi(CTaiKlineDialogShiDuanTJ* pTJ,int nFlags)
 	}
 	pTJ->m_huanShou=s;		
 
-	
+
 	if(nFlags==0)
 	{
 		CTime tmB=m_hsMin[nBeginValid].time;
@@ -2646,12 +2560,92 @@ float CTaiKlineMin1::TongJi(CTaiKlineDialogShiDuanTJ* pTJ,int nFlags)
 	return 1;
 }
 
+void CTaiKlineMin1::CaclMaxAdded()
+{
+	if (m_close == 0)
+	{
+		m_dataFormular[0].numLine = 1;
+		return;
+	}
 
+	for (int i = 1; i < m_dataFormular[0].numLine; i++)
+	{
+		CReportData* pCdat1;
+		if (pDoc->m_sharesInformation.Lookup(m_symbolAdd[i-1].GetBuffer(0), pCdat1, m_stkKindAdd[i-1]) == 0)
+		{	
+			m_dataFormular[0].numLine = 1;
+			return;
+		}
+
+		float close = pCdat1->ystc;
+		CString s = m_symbolAdd[i-1];
+
+		if (close == 0)
+		{
+			m_dataFormular[0].numLine = 1;
+			return;
+		}
+
+		for (int j = 0; j <= m_footEnd; j++)
+		{
+			m_dataFormular[0].line[i].m_arrBE.line[j] = (m_dataFormular[0].line[i].m_arrBE.line[j] - close) * m_close / close + m_close;
+		}
+	}
+}
+
+void CTaiKlineMin1::DrawMin1Figuer(CDC* pDC)
+{
+	pView->DrawRectPer(pDC);
+	DrawRulorX(pDC);
+	pView->ShowTextRect(m_nTextBox, pDC);
+	pView->ShowTransferText(pDC);
+
+	InitMinuteLine();
+
+	for (int i = 0; i < pView->m_infoInit.nCountMin1; i++)
+	{
+		m_nSon=i;
+		m_max_sun[m_nSon]=(float)-9.0E20;
+		m_min_sun[m_nSon]=(float)9.0E20;
+		DrawSon(pDC);
+
+		if(i == 0 && pView->m_isShowCross == false)
+		{
+			if(m_nCnp == 2)
+				ShowCNP(pDC,0);
+			else
+				ShowCNP(pDC,m_nCnp);
+		}
+	}
+
+
+	if(m_bInvertRect == true)
+	{
+		CRect r;
+		pView->GetCurrClientRect(r);
+		int nb = m_nBeginFootTJ - this->m_footBegin;
+		if(nb<0)
+			nb = 0;
+		int ne =   m_nEndFootTJ - this->m_footBegin+1;
+		if(ne<0)
+			ne=0;
+		if(ne>m_klinNumDefault)
+			ne = m_klinNumDefault;
+		float f = (float)(pView->m_rtMin1.rightX-pView->m_rtMin1.leftX)/m_klinNumDefault;
+		r.left = pView->m_rtMin1.leftX+f*nb;
+		r.right = pView->m_rtMin1.leftX+f*ne;
+		r.top = 2;
+
+
+		pDC->InvertRect(r);
+	}
+
+
+}
 
 int CTaiKlineMin1::TransferX(int x)
 {
 	int rtn;
-	rtn=(int)((float)((x - pView->m_rtMin1.leftX)*m_klinNumDefault) /(pView->m_rtMin1 .rightX - pView->m_rtMin1.leftX ));
+	rtn = (int)((float)((x - pView->m_rtMin1.leftX) * m_klinNumDefault) / (pView->m_rtMin1.rightX - pView->m_rtMin1.leftX));
 	return rtn;
 }
-

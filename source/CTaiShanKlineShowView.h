@@ -1,6 +1,3 @@
-// CTaiShanKlineShowView.h : interface of the CTaiShanKlineShowView class
-	
-/////////////////////////////////////////////////////////////////////////////
 
 #if !defined(AFX_VWBASEVIEW_H__D69209B5_A1E6_11D1_B031_000021002C16__INCLUDED_)
 #define AFX_VWBASEVIEW_H__D69209B5_A1E6_11D1_B031_000021002C16__INCLUDED_
@@ -8,6 +5,7 @@
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
+
 #include "CFormularCompute.h"
 #include "StructKlineView.h"
 #include "CTaiShanDoc.h"
@@ -39,47 +37,47 @@ class CTaiKlineDC : public CDC
 {
 public:
 
-  
-    CTaiKlineDC(CWnd* pWnd,CBitmap* pBitmap,CRect* r = NULL) : CDC()
-    {
-        ASSERT(pWnd != NULL);
 
-        m_pDC = new CClientDC(pWnd);
-        m_pOldBitmap = NULL;
+	CTaiKlineDC(CWnd* pWnd,CBitmap* pBitmap,CRect* r = NULL) : CDC()
+	{
+		ASSERT(pWnd != NULL);
+
+		m_pDC = new CClientDC(pWnd);
+		m_pOldBitmap = NULL;
 		if(r==NULL)
 			pWnd->GetClientRect (m_rect);
 		else
 			m_rect = *r;
-              
-        this->CreateCompatibleDC(m_pDC);
-        m_pOldBitmap = SelectObject(pBitmap);
 
-    }
-    
-   
-    virtual ~CTaiKlineDC()
-    {
-        
-        ::BitBlt(m_pDC->m_hDC,m_rect.left, m_rect.top, m_rect.Width(), m_rect.Height(),
-                          this->m_hDC, m_rect.left, m_rect.top, SRCCOPY);
+		this->CreateCompatibleDC(m_pDC);
+		m_pOldBitmap = SelectObject(pBitmap);
 
-        
-        this->SelectObject(m_pOldBitmap);
+	}
+
+
+	virtual ~CTaiKlineDC()
+	{
+
+		::BitBlt(m_pDC->m_hDC,m_rect.left, m_rect.top, m_rect.Width(), m_rect.Height(),
+			this->m_hDC, m_rect.left, m_rect.top, SRCCOPY);
+
+
+		this->SelectObject(m_pOldBitmap);
 		delete m_pDC;
-    }
+	}
 
-  
-    CTaiKlineDC* operator->() {return this;}
-        
 
-    operator CTaiKlineDC*() {return this;}
+	CTaiKlineDC* operator->() {return this;}
+
+
+	operator CTaiKlineDC*() {return this;}
 
 private:
-    CBitmap  m_bitmap;     
-    CBitmap* m_pOldBitmap;  
-    CDC*     m_pDC;        
-    CRect    m_rect;       
-    BOOL     m_bMemDC;     
+	CBitmap  m_bitmap;     
+	CBitmap* m_pOldBitmap;  
+	CDC*     m_pDC;        
+	CRect    m_rect;       
+	BOOL     m_bMemDC;     
 };
 
 
@@ -93,14 +91,14 @@ struct PAGE_DATA_INFO
 	int nStock;
 	int nTotalStock;
 
-	
+
 	int kLineType;		
 
 	SUB_FIGUER_INIT_INFO	m_infoInit;	
 
 
 	int tabNum;			
- 	int infoFiguer;	
+	int infoFiguer;	
 	int m_bMultiFiguer;
 
 	bool bBaseInfo;
@@ -116,7 +114,7 @@ struct PAGE_DATA_INFO
 };
 struct KLINE_EXT_PER
 {
-	
+
 	int m_nCountKlineSelf;
 	Kline* m_pKlineSelf;
 	KLINE_EXT_PER()
@@ -125,6 +123,7 @@ struct KLINE_EXT_PER
 		m_pKlineSelf = 0;
 	};
 };
+
 class CTaiTestRichEditCtrl;
 class CTaiKlineFileKLine;
 class CTaiKlineDlgDealHistory;
@@ -132,6 +131,7 @@ class CTaiKlineDialogShiDuanTJ;
 class CTaiKlineDlgZhibiaoTongji;
 
 typedef CTypedPtrMap<CMapStringToPtr,CString,KLINE_EXT_PER*> CMapStringToKlineExt;
+
 class CTaiShanKlineShowView : public CView
 {
 protected:
@@ -142,7 +142,7 @@ protected:
 public:
 	void DoHistoryAStep() ;
 	float CaclMid(int i);
-   	void RemoveHs(int flag);
+	void RemoveHs(int flag);
 	int FindTimeK(int keyVlu);
 	int ReadKline5Min(CString fName,int stkKind, Kline *&pKline,int nRead=-1);
 	int ReadKLine(CString fName,int stkKind,Kline*& pKline,int nRead=-1);
@@ -154,7 +154,7 @@ public:
 
 
 	//{{AFX_VIRTUAL(CTaiShanKlineShowView)
-	public:
+public:
 	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual void OnInitialUpdate();
@@ -165,7 +165,7 @@ public:
 	virtual DROPEFFECT OnDragEnter(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
 	virtual DROPEFFECT OnDragOver(COleDataObject* pDataObject, DWORD dwKeyState, CPoint point);
 	virtual void OnDragLeave();
-	protected:
+protected:
 	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
 	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
 	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
@@ -173,7 +173,7 @@ public:
 	virtual void OnPrint(CDC* pDC, CPrintInfo* pInfo);
 	virtual void OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView);
 	//}}AFX_VIRTUAL
-     
+
 
 
 public:
@@ -216,8 +216,8 @@ public:
 	CString m_symbol9[9];
 	int m_stkKind9[9];
 	int m_nKline9[9];
-	
-	
+
+
 
 	CTaiKlineDlgDealHistory* m_pDlgDealHistory;
 	CArray<PAGE_DATA_INFO,PAGE_DATA_INFO>	m_pageInfoArray;
@@ -235,7 +235,6 @@ public:
 	int lineTypeDrawed;
 	int m_nOldnFgr;
 
-	bool m_bInited;
 	bool IsBarShow;
 	bool m_bKD;
 
@@ -252,7 +251,7 @@ public:
 	int m_midLen        ;	
 	int m_rightLength	  ;
 	bool m_GetFocus;  
-	
+
 	CTaiKlineDlgChangeIndexParam* m_pChangeIndexParam;
 
 
@@ -275,17 +274,13 @@ public:
 	CRect m_rectHitPos;
 	int m_nOldHitPos;
 	int m_nOldHitY;
-	CTaiKlineShowKline* pKlineDrawing;
-	CTaiKlineMin1* pMin1Drawing;
 	CTaiKlineDrawing* pDrawLine;
 	int m_hit;			
-    int m_tjxgshow;               
- 	int m_infoFiguer;	
+	int m_tjxgshow;               
+	int m_infoFiguer;	
 	int m_nMaxY;			
 	int m_nMaxX;				
 	CPoint m_pointMove;			
-
-	int m_nKlineKind2;	
 
 	CBitmap	m_bit;				
 	CDC*    dc;
@@ -298,7 +293,7 @@ public:
 	CTaiTestRichEditCtrl*  m_pRichEdit;	
 
 
-	
+
 	void DrawRightSheet(CDC* pDC,int Num,bool bShowScroll=true);
 	void DrawRightSheet(CDC* pDC,CPoint pt);
 
@@ -323,15 +318,15 @@ public:
 
 
 	void ReDrawSheet(BOOL UpOrDown);
-	
+
 	void OnPageDown(bool bDown,int nPer=1);
-	
+
 
 	void WriteKLine5min(int nFoot);
 
 
 	void OnPrintKLine(CDC* pDC);
-	
+
 
 	void WriteKLine(int nFoot,bool bOne,bool bDelete = false);
 	void OnMenu1fs();
@@ -341,7 +336,6 @@ public:
 	void ShowKlineBig(bool bBig=true);
 
 	void ShowTransferText(CDC* pDC);
-	void ShowTextRect(int n,CDC* pDC);
 	void CopyCaption();
 	void ShowCross(bool bKey=false,int x=-1,int y=-1);
 	void ClearCross();
@@ -384,7 +378,7 @@ public:
 	void RefreshChenben(CTaiKlineDC* pMemdc);
 	virtual ~CTaiShanKlineShowView();
 
-  
+
 
 
 #ifdef _DEBUG
@@ -552,16 +546,23 @@ private:
 	void GetPageData(bool bMovePre = true);
 	void CopyScrollBar(CDC* pMemDC);
 	void KlineReadTransferData();
+
+protected:
+	BOOL m_bInited;
+
+public:
+	CTaiKlineMin1* pMin1Drawing;		// 
+	CTaiKlineShowKline* pKlineDrawing;	// 
+
+public:
+	int m_nKlineKind2;					// 画线类型 分时、K线。。。
+
+public:
+	void ShowTextRect(int nItem, CDC* pDC);
 };
 
 #ifndef _DEBUG 
-inline CTaiShanDoc* CTaiShanKlineShowView::GetDocument()
-   { return (CTaiShanDoc*)m_pDocument; }
+inline CTaiShanDoc* CTaiShanKlineShowView::GetDocument() { return (CTaiShanDoc*)m_pDocument; }
 #endif
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_VWBASEVIEW_H__D69209B5_A1E6_11D1_B031_000021002C16__INCLUDED_)

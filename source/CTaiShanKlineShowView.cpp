@@ -1,5 +1,3 @@
-// CTaiShanKlineShowView.cpp : implementation of the CTaiShanKlineShowView class
-//
 
 #include "stdafx.h"
 #include "MainFrm.h"
@@ -248,7 +246,7 @@ BEGIN_MESSAGE_MAP(CTaiShanKlineShowView, CView)
 	ON_COMMAND(ID_FILE_PRINT, CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_DIRECT, CView::OnFilePrint)
 	ON_COMMAND(ID_FILE_PRINT_PREVIEW, CView::OnFilePrintPreview)
-	
+
 	ON_MESSAGE(WM_USER_TELL_CHANGE,OnDataChange)
 	ON_MESSAGE(WM_USER_DRAGDROP,OnDropDrag)
 
@@ -260,124 +258,124 @@ END_MESSAGE_MAP()
 CTaiShanKlineShowView::CTaiShanKlineShowView():m_screenStockShow(this)
 {
 
-		m_nOldnFgr = 0;
-		m_stkKind = 0;
-		m_pWideNet = NULL;
-		for(int i = 0;i<9;i++)
-		{
-			m_symbol9[i] = "";
-			m_stkKind9[i]=0;
-			m_nKline9[i] = 0;
-		}
+	m_nOldnFgr = 0;
+	m_stkKind = 0;
+	m_pWideNet = NULL;
+	for(int i = 0;i<9;i++)
+	{
+		m_symbol9[i] = "";
+		m_stkKind9[i]=0;
+		m_nKline9[i] = 0;
+	}
 
-		m_dlgFenshiTj = 0;
-		m_dlgKlineTj = 0;
-		m_dlgZhibiao = 0;
-
-
-		m_bActived = false;
-		m_nCurrentKlineKind=0;
-		m_pDlgDealHistory = NULL;
-		m_nPageCurrent = 0;
-		m_dlgShowCross = NULL;
-		m_MyToolTip = NULL;
+	m_dlgFenshiTj = 0;
+	m_dlgKlineTj = 0;
+	m_dlgZhibiao = 0;
 
 
-		m_sharesSymbol = CSharesCompute::GetIndexSymbol(0);
-		m_nCountKline = 0;
-		m_nCountKlineFile = 0;
-		m_pkline=new Kline;
-		m_infoInit.nCountIndex=2;
-		m_infoInit.initIndex[0].yFloatBottom=0.25;
-		m_infoInit.initIndex[1].yFloatBottom=0.25;
-		m_infoInit.initIndex[2].yFloatBottom=0.25;
-		m_infoInit.initIndex[3].yFloatBottom=0.25;
-		m_infoInit.initIndex[4].yFloatBottom=0.25;
-
-		m_infoInit.nCountMin1=3;
-		m_infoInit.initMin1[0].yFloatBottom=0.25;
-		m_infoInit.initMin1[1].yFloatBottom=0.25;
-		m_infoInit.initMin1[2].yFloatBottom=0.25;
-		m_infoInit.initMin1[3].yFloatBottom=0.25;
-		m_infoInit.initMin1[4].yFloatBottom=0.25;
-
-		
-		m_infoInit.flag[0]=0;
-		m_infoInit.flag[1]=1;
-		m_infoInit.flag[2]=2;
-		m_infoInit.flag[3]=1;
-		m_infoInit.flag[4]=0;
-		m_infoInit.flag_dapan[0]=0;
-		m_infoInit.flag_dapan[1]=1;
-		m_infoInit.flag_dapan[2]=1;
-		m_infoInit.flag_dapan[3]=1;
-		m_infoInit.flag_dapan[4]=1;
-
-		strcpy(m_infoInit.initIndex[0].nameIndex,"MA");
-		strcpy(m_infoInit.initIndex[1].nameIndex,"KDJ");
-		strcpy(m_infoInit.initIndex[2].nameIndex,"MACD");
-		strcpy(m_infoInit.initIndex[3].nameIndex,"RSI");
-		strcpy(m_infoInit.initIndex[4].nameIndex,"KDJ");
-		
-		m_infoInit.nIDRightSheet[0] = 0;
-		m_infoInit.nIDRightSheet[1] = 2;
-	
-
-		m_bInited = false;
-		IsBarShow = false;
-		m_bKD = false;
+	m_bActived = false;
+	m_nCurrentKlineKind=0;
+	m_pDlgDealHistory = NULL;
+	m_nPageCurrent = 0;
+	m_dlgShowCross = NULL;
+	m_MyToolTip = NULL;
 
 
-		m_hit=0;
-		m_nBeginHS=0;
+	m_sharesSymbol = CSharesCompute::GetIndexSymbol(0);
+	m_nCountKline = 0;
+	m_nCountKlineFile = 0;
+	m_pkline=new Kline;
+	m_infoInit.nCountIndex=2;
+	m_infoInit.initIndex[0].yFloatBottom=0.25;
+	m_infoInit.initIndex[1].yFloatBottom=0.25;
+	m_infoInit.initIndex[2].yFloatBottom=0.25;
+	m_infoInit.initIndex[3].yFloatBottom=0.25;
+	m_infoInit.initIndex[4].yFloatBottom=0.25;
 
-		pDrawLine=NULL;
-		pMin1Drawing=NULL;
-		pKlineDrawing=NULL;
-		m_scrollBar=NULL;
-
-		bTrackCurcorBgn=false;
-
-		m_minGridX=55;
-		m_minGrid=30;
-		m_heightCaption=15;
-		m_midLen=50;
-		m_rightLength=172;
-		
-		m_pChangeIndexParam=NULL;
-
-		m_bKeyUpDown=false;
-
-		m_bDoPower=true;
-		m_bBaseInfo=false;
-		pKlineMode=NULL;
-
-		CString s;
-		m_tabNum=0;
-
-		m_nKlineKind2 = ((CTaiShanApp *)AfxGetApp())->Line_mode;
-
-		if(m_nKlineKind2 > 5 && m_nKlineKind2 < 0)
-		{
-		  MessageBox("Kline mode error");
-		  m_nKlineKind2 = 0;
-		}
-		m_infoFiguer=1;
-		m_bMultiFiguer=0;
-
-		m_pointMove.x=0;
-		m_pointMove.y=0;
+	m_infoInit.nCountMin1=3;
+	m_infoInit.initMin1[0].yFloatBottom=0.25;
+	m_infoInit.initMin1[1].yFloatBottom=0.25;
+	m_infoInit.initMin1[2].yFloatBottom=0.25;
+	m_infoInit.initMin1[3].yFloatBottom=0.25;
+	m_infoInit.initMin1[4].yFloatBottom=0.25;
 
 
-		m_nOldHitPos=-1;
-		m_nOldHitY=-1;
+	m_infoInit.flag[0]=0;
+	m_infoInit.flag[1]=1;
+	m_infoInit.flag[2]=2;
+	m_infoInit.flag[3]=1;
+	m_infoInit.flag[4]=0;
+	m_infoInit.flag_dapan[0]=0;
+	m_infoInit.flag_dapan[1]=1;
+	m_infoInit.flag_dapan[2]=1;
+	m_infoInit.flag_dapan[3]=1;
+	m_infoInit.flag_dapan[4]=1;
 
-		m_isShowCross=0;
-		m_tjxgshow = 1;
-		m_AutoChange = false;
-		m_GetFocus = TRUE;
-		bExtend=false;
-		lineTypeDrawed=-1;
+	strcpy(m_infoInit.initIndex[0].nameIndex,"MA");
+	strcpy(m_infoInit.initIndex[1].nameIndex,"KDJ");
+	strcpy(m_infoInit.initIndex[2].nameIndex,"MACD");
+	strcpy(m_infoInit.initIndex[3].nameIndex,"RSI");
+	strcpy(m_infoInit.initIndex[4].nameIndex,"KDJ");
+
+	m_infoInit.nIDRightSheet[0] = 0;
+	m_infoInit.nIDRightSheet[1] = 2;
+
+
+	m_bInited = false;
+	IsBarShow = false;
+	m_bKD = false;
+
+
+	m_hit=0;
+	m_nBeginHS=0;
+
+	pDrawLine=NULL;
+	pMin1Drawing=NULL;
+	pKlineDrawing=NULL;
+	m_scrollBar=NULL;
+
+	bTrackCurcorBgn=false;
+
+	m_minGridX=55;
+	m_minGrid=30;
+	m_heightCaption=15;
+	m_midLen=50;
+	m_rightLength=172;
+
+	m_pChangeIndexParam=NULL;
+
+	m_bKeyUpDown=false;
+
+	m_bDoPower=true;
+	m_bBaseInfo=false;
+	pKlineMode=NULL;
+
+	CString s;
+	m_tabNum=0;
+
+	m_nKlineKind2 = ((CTaiShanApp *)AfxGetApp())->Line_mode;
+
+	if(m_nKlineKind2 > 5 && m_nKlineKind2 < 0)
+	{
+		MessageBox("Kline mode error");
+		m_nKlineKind2 = 0;
+	}
+	m_infoFiguer=1;
+	m_bMultiFiguer=0;
+
+	m_pointMove.x=0;
+	m_pointMove.y=0;
+
+
+	m_nOldHitPos=-1;
+	m_nOldHitY=-1;
+
+	m_isShowCross=0;
+	m_tjxgshow = 1;
+	m_AutoChange = false;
+	m_GetFocus = TRUE;
+	bExtend=false;
+	lineTypeDrawed=-1;
 }
 
 CTaiShanKlineShowView::~CTaiShanKlineShowView()
@@ -391,7 +389,7 @@ CTaiShanKlineShowView::~CTaiShanKlineShowView()
 	if( m_MyToolTip != NULL)
 		delete m_MyToolTip;
 
-	
+
 	if(m_bDoPower == false)
 	{
 		m_infoInit.nIDRightSheet [9] = 65798809	;
@@ -401,31 +399,31 @@ CTaiShanKlineShowView::~CTaiShanKlineShowView()
 	m_infoInit.nIDRightSheet[8] = m_rightLength;
 
 	memcpy(&pDoc->m_propertyInitiate2,&m_infoInit ,sizeof(SUB_FIGUER_INIT_INFO));
-	
+
 	if(m_pkline!=NULL)
-			delete[] m_pkline;
+		delete[] m_pkline;
 
 	CMainFrame* pMainWnd = (CMainFrame *)(AfxGetApp()->m_pMainWnd);
 	if(IsBarShow  == TRUE && pMainWnd->m_drawLineToolBar->IsWindowVisible() != 0 )
 	{
-      pMainWnd->ShowControlBar(pMainWnd->m_drawLineToolBar,FALSE, FALSE);
-	  IsBarShow = !IsBarShow;
+		pMainWnd->ShowControlBar(pMainWnd->m_drawLineToolBar,FALSE, FALSE);
+		IsBarShow = !IsBarShow;
 	}
 	if(m_bInited == false)
 		return;
-	
+
 	((CTaiShanApp *)AfxGetApp())->Line_mode = m_nKlineKind2;
 
 	if(pDrawLine!=NULL)
-	delete pDrawLine;
+		delete pDrawLine;
 
 	if(pMin1Drawing!=NULL)
-	delete pMin1Drawing;
+		delete pMin1Drawing;
 
 	if(pKlineDrawing!=NULL)
-	delete pKlineDrawing;
+		delete pKlineDrawing;
 	if(m_scrollBar!=NULL)
-	delete m_scrollBar;
+		delete m_scrollBar;
 
 	if(m_pRichEdit!=NULL)
 		delete m_pRichEdit;
@@ -436,7 +434,7 @@ CTaiShanKlineShowView::~CTaiShanKlineShowView()
 		delete m_pDlgDealHistory;
 		m_pDlgDealHistory = NULL;
 	}
-  
+
 	try
 	{
 		if(m_bs.IsOpen ())
@@ -452,7 +450,7 @@ CTaiShanKlineShowView::~CTaiShanKlineShowView()
 
 BOOL CTaiShanKlineShowView::PreCreateWindow(CREATESTRUCT& cs)
 {
-	
+
 	cs.style =cs.style|WS_MAXIMIZE;
 
 	return CView::PreCreateWindow(cs);
@@ -565,7 +563,7 @@ void CTaiShanKlineShowView::DrawRectPer(CDC* pDC)
 
 	CPen pen;
 	if (!pen.CreatePen(PS_SOLID,1,GetDocument()->m_colorArray[2]))
-			return;
+		return;
 	CPen* pOldpen=pDC->SelectObject(&pen);
 
 	if(m_nKlineKind2==0)
@@ -573,8 +571,8 @@ void CTaiShanKlineShowView::DrawRectPer(CDC* pDC)
 		int nm=m_infoInit.nCountMin1;
 		rt.right=m_rtMin1.rightX+m_midLen;
 		rt.bottom=m_rtMin1.rtBlw[nm-1].m_yBottom + m_heightCaption+2;
-	
-		
+
+
 		ClearBack(pDC, rt);
 
 		int	i;
@@ -629,11 +627,11 @@ void CTaiShanKlineShowView::DrawRectPer(CDC* pDC)
 	}
 	if(pDC->IsPrinting ())
 	{
-	pDC->MoveTo (0,0);
-	pDC->LineTo (rt.right-1,0);
-	pDC->LineTo (rt.right-1,rt.bottom-1);
-	pDC->LineTo (0,rt.bottom-1);
-	pDC->LineTo (0,0);
+		pDC->MoveTo (0,0);
+		pDC->LineTo (rt.right-1,0);
+		pDC->LineTo (rt.right-1,rt.bottom-1);
+		pDC->LineTo (0,rt.bottom-1);
+		pDC->LineTo (0,0);
 	}
 
 	pDC->SelectObject(pOldpen);
@@ -696,26 +694,26 @@ void CTaiShanKlineShowView::OnDraw(CDC* pDC)
 		return;
 
 	{
-	CTaiKlineDC dc2(this,&m_bit);
-	CTaiKlineDC* pMemDC = &dc2;
+		CTaiKlineDC dc2(this,&m_bit);
+		CTaiKlineDC* pMemDC = &dc2;
 
-	if(m_bMultiFiguer==1)
-	{
-		m_scrollBar->ShowScrollBar(false );	
-		if(m_nKlineKind2==0)
-			pMin1Drawing->ShowMultiPage(pMemDC);
-		else
-			pKlineDrawing->ShowMultiPage(pMemDC);
-		CRect rClt;
-		return;
-	}
-	TRACE("222\n");
+		if(m_bMultiFiguer==1)
+		{
+			m_scrollBar->ShowScrollBar(false );	
+			if(m_nKlineKind2==0)
+				pMin1Drawing->ShowMultiPage(pMemDC);
+			else
+				pKlineDrawing->ShowMultiPage(pMemDC);
+			CRect rClt;
+			return;
+		}
+		TRACE("222\n");
 
-	DrawRectPer(pMemDC);
+		DrawRectPer(pMemDC);
 
-	pKlineDrawing->DrawKlineFiguer(pMemDC);
-	DrawRightSheet(pMemDC,m_tabNum);
-	
+		pKlineDrawing->DrawKlineFiguer(pMemDC);
+		DrawRightSheet(pMemDC,m_tabNum);
+
 	}
 
 	ClearCross();
@@ -791,8 +789,8 @@ int CTaiShanKlineShowView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 
 	m_bit.CreateCompatibleBitmap( dc, 
-									m_nMaxX,
-									m_nMaxY );
+		m_nMaxX,
+		m_nMaxY );
 
 	ReleaseDC(dc);
 
@@ -828,11 +826,11 @@ int CTaiShanKlineShowView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	pf.bLineSpacingRule=0;
 	pf.dyLineSpacing=50;
 	m_pRichEdit->SetParaFormat(pf);
-	
+
 
 	int m_mbzq;
 	float m_mbly;
-    if(m_screenStockShow.LoadTjxgZsFile("SaveTjxg.dat",false))
+	if(m_screenStockShow.LoadTjxgZsFile("SaveTjxg.dat",false))
 	{
 		m_screenStockShow.m_bUseing=true;
 		CFile file;
@@ -845,23 +843,26 @@ int CTaiShanKlineShowView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 
-    SetWindowText("图形分析");
-	
-	pKlineDrawing=new CTaiKlineShowKline(this,pDoc);
-	if(pKlineDrawing==NULL)
-		AfxMessageBox("initial 3");
-	pMin1Drawing=new CTaiKlineMin1(pDoc,this);
-	if(pMin1Drawing==NULL)
-		AfxMessageBox("initial 4");
-	pDrawLine=new CTaiKlineDrawing(this,pDoc);
-		
 
-	ShowAll(this->m_sharesSymbol );
+	SetWindowText(m_sharesSymbol);
+
+	pMin1Drawing = new CTaiKlineMin1(pDoc, this);
+	if (pMin1Drawing == NULL)
+		AfxMessageBox("initial 4");
+	pMin1Drawing->m_nTextBox = m_infoInit.nCountMin1 >= 2 ? m_infoInit.nCountMin1 - 2 : 0;
+
+	pKlineDrawing = new CTaiKlineShowKline(this, pDoc);
+	if (pKlineDrawing == NULL)
+		AfxMessageBox("initial 3");
+	pKlineDrawing->m_nTextBox = m_infoInit.nCountIndex >= 2 ? m_infoInit.nCountIndex - 2 : 0;
+
+	pDrawLine = new CTaiKlineDrawing(this, pDoc);
+
+
+	ShowAll(m_sharesSymbol);
 	m_bInited = TRUE;
 
 	return 0;
-
-
 }
 
 
@@ -869,7 +870,7 @@ int CTaiShanKlineShowView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 BOOL CTaiShanKlineShowView::OnPreparePrinting(CPrintInfo* pInfo)
 {
-   pInfo->SetMaxPage(1);
+	pInfo->SetMaxPage(1);
 
 	return DoPreparePrinting(pInfo);
 }
@@ -881,9 +882,8 @@ void CTaiShanKlineShowView::OnBeginPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 
 void CTaiShanKlineShowView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 {
-	
-}
 
+}
 
 
 
@@ -903,8 +903,8 @@ CTaiShanDoc* CTaiShanKlineShowView::GetDocument()
 	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(CTaiShanDoc)));
 	return (CTaiShanDoc*)m_pDocument;
 }
-
 #endif 
+
 
 
 void CTaiShanKlineShowView::OnInitialUpdate() 
@@ -915,97 +915,97 @@ void CTaiShanKlineShowView::OnInitialUpdate()
 
 void CTaiShanKlineShowView::InitRect(int cx, int cy) 
 {
-			int flag=0;
-			if( m_infoFiguer>0)
-				flag=1;
+	int flag=0;
+	if( m_infoFiguer>0)
+		flag=1;
 
-			m_rtMin1.rightX=cx-m_rightLength*flag-m_midLen;
-			m_rtMin1.leftX=m_midLen;
+	m_rtMin1.rightX=cx-m_rightLength*flag-m_midLen;
+	m_rtMin1.leftX=m_midLen;
 
-			float	totalFlt=0;
-			int	i;
-			int nm=m_infoInit.nCountMin1;
-			for(i=0;i<nm;i++)
-				totalFlt+=m_infoInit.initMin1[i].yFloatBottom;
+	float	totalFlt=0;
+	int	i;
+	int nm=m_infoInit.nCountMin1;
+	for(i=0;i<nm;i++)
+		totalFlt+=m_infoInit.initMin1[i].yFloatBottom;
 
-			for(i=0;i<nm;i++)
+	for(i=0;i<nm;i++)
+	{
+		if(totalFlt == 0)
+		{
+			totalFlt = 0.4f;
+			for(int k=0;k<nm;k++)
 			{
-				if(totalFlt == 0)
-				{
-					totalFlt = 0.4f;
-					for(int k=0;k<nm;k++)
-					{
-						m_infoInit.initMin1[k].yFloatBottom = 0.4f/nm;
-					}
-				}
-				m_rtMin1.rtBlw[i].m_yBottom=(int)((cy-(nm+1)*m_heightCaption)*
-					m_infoInit.initMin1[i].yFloatBottom/totalFlt);
-				if(m_rtMin1.rtBlw[i].m_yBottom<0)
-					m_rtMin1.rtBlw[i].m_yBottom=0;
-				if(i>0)
-				{
-					m_rtMin1.rtBlw[i].m_yBottom+=m_rtMin1.rtBlw[i-1].m_yBottom + m_heightCaption;
-				}
-				else 
-				{
-					m_rtMin1.rtBlw[0].m_yBottom+=m_heightCaption;
-				}
+				m_infoInit.initMin1[k].yFloatBottom = 0.4f/nm;
 			}
+		}
+		m_rtMin1.rtBlw[i].m_yBottom=(int)((cy-(nm+1)*m_heightCaption)*
+			m_infoInit.initMin1[i].yFloatBottom/totalFlt);
+		if(m_rtMin1.rtBlw[i].m_yBottom<0)
+			m_rtMin1.rtBlw[i].m_yBottom=0;
+		if(i>0)
+		{
+			m_rtMin1.rtBlw[i].m_yBottom+=m_rtMin1.rtBlw[i-1].m_yBottom + m_heightCaption;
+		}
+		else 
+		{
+			m_rtMin1.rtBlw[0].m_yBottom+=m_heightCaption;
+		}
+	}
 
 
-	
-			flag=0;
-			if( m_infoFiguer>0)
-				flag=1;
 
-			m_rtKlineFiguer.rightX=cx-m_rightLength*flag-m_midLen;
+	flag=0;
+	if( m_infoFiguer>0)
+		flag=1;
 
-			totalFlt=0;
-			nm=m_infoInit.nCountIndex;
-			for(i=0;i<nm;i++)
-				totalFlt+=m_infoInit.initIndex[i].yFloatBottom;
+	m_rtKlineFiguer.rightX=cx-m_rightLength*flag-m_midLen;
 
-			for(i=0;i<nm;i++)
+	totalFlt=0;
+	nm=m_infoInit.nCountIndex;
+	for(i=0;i<nm;i++)
+		totalFlt+=m_infoInit.initIndex[i].yFloatBottom;
+
+	for(i=0;i<nm;i++)
+	{
+		if(totalFlt == 0)
+		{
+			totalFlt = 0.4f;
+			for(int k=0;k<nm;k++)
 			{
-				if(totalFlt == 0)
-				{
-					totalFlt = 0.4f;
-					for(int k=0;k<nm;k++)
-					{
-						m_infoInit.initIndex[k].yFloatBottom = 0.4f/nm;
-					}
-				}
-
-				{
-				m_rtKlineFiguer.rtBlw[i].m_yBottom=(int)((cy-(nm+1)*m_heightCaption)*
-					m_infoInit.initIndex[i].yFloatBottom/totalFlt);
-				if(m_rtKlineFiguer.rtBlw[i].m_yBottom<0)
-					m_rtKlineFiguer.rtBlw[i].m_yBottom=0;
-				}
-				if(i>0)
-				{
-					m_rtKlineFiguer.rtBlw[i].m_yBottom+=m_rtKlineFiguer.rtBlw[i-1].m_yBottom+m_heightCaption;
-				}
-				else 
-				{
-					m_rtKlineFiguer.rtBlw[0].m_yBottom+=m_heightCaption;
-				}
+				m_infoInit.initIndex[k].yFloatBottom = 0.4f/nm;
 			}
+		}
+
+		{
+			m_rtKlineFiguer.rtBlw[i].m_yBottom=(int)((cy-(nm+1)*m_heightCaption)*
+				m_infoInit.initIndex[i].yFloatBottom/totalFlt);
+			if(m_rtKlineFiguer.rtBlw[i].m_yBottom<0)
+				m_rtKlineFiguer.rtBlw[i].m_yBottom=0;
+		}
+		if(i>0)
+		{
+			m_rtKlineFiguer.rtBlw[i].m_yBottom+=m_rtKlineFiguer.rtBlw[i-1].m_yBottom+m_heightCaption;
+		}
+		else 
+		{
+			m_rtKlineFiguer.rtBlw[0].m_yBottom+=m_heightCaption;
+		}
+	}
 }
 void CTaiShanKlineShowView::OnSize(UINT nType, int cx, int cy) 
 {
 	CView::OnSize(nType, cx, cy);
-    if(cx == 0 && cy == 0)
+	if(cx == 0 && cy == 0)
 		return;
 	OnSizeMy(cx,cy);
-	
+
 	CMainFrame* pFm=(CMainFrame*)AfxGetMainWnd();
 
 }
 
 BOOL CTaiShanKlineShowView::OnEraseBkgnd(CDC* pDC) 
 {
-	
+
 	return TRUE;
 }
 
@@ -1021,7 +1021,7 @@ void CTaiShanKlineShowView::OnLButtonDown(UINT nFlags, CPoint point)
 		return;
 	}
 
-    CaclRulorMovable(point);
+	CaclRulorMovable(point);
 	CTaiShanDoc* pDoc = GetDocument();
 	CRect r;
 	int i;
@@ -1068,7 +1068,7 @@ void CTaiShanKlineShowView::OnLButtonDown(UINT nFlags, CPoint point)
 			}
 			break;
 		case REGION_RULER:
- 			if(TRUE)
+			if(TRUE)
 			{
 
 
@@ -1100,35 +1100,35 @@ void CTaiShanKlineShowView::OnLButtonDown(UINT nFlags, CPoint point)
 		case REGION_PICTTEXT4:
 		case REGION_PICTTEXT5:
 			{
-			i=m_hit-REGION_PICTTEXT2;
-			GetClientRect(r);
-			if(m_nKlineKind2==0)
-			{
-				if(i==pMin1Drawing->m_nTextBox)
-					break;
-				if(IsIndexStock3(m_sharesSymbol))
+				i=m_hit-REGION_PICTTEXT2;
+				GetClientRect(r);
+				if(m_nKlineKind2==0)
 				{
-					if(i == 0)
+					if(i==pMin1Drawing->m_nTextBox)
+						break;
+					if(IsIndexStock3(m_sharesSymbol))
 					{
-						break ;
+						if(i == 0)
+						{
+							break ;
+						}
 					}
+					r.left =m_rtMin1.rightX;
+					r.right =m_rtMin1.rightX+m_midLen;
 				}
-				r.left =m_rtMin1.rightX;
-				r.right =m_rtMin1.rightX+m_midLen;
-			}
-			else
-			{
-				if(i==pKlineDrawing->m_nTextBox)
-					break;
-				r.left =m_rtKlineFiguer.rightX;
-				r.right =m_rtKlineFiguer.rightX+m_midLen;
-			}
-			CTaiKlineDC memdc(this,&m_bit,&r);
-			if(m_nKlineKind2==0)
-				pMin1Drawing->m_nTextBox=i;
-			else
-				pKlineDrawing->m_nTextBox=i;
-			pKlineDrawing->DrawKlineFiguer(&memdc);
+				else
+				{
+					if(i==pKlineDrawing->m_nTextBox)
+						break;
+					r.left =m_rtKlineFiguer.rightX;
+					r.right =m_rtKlineFiguer.rightX+m_midLen;
+				}
+				CTaiKlineDC memdc(this,&m_bit,&r);
+				if(m_nKlineKind2==0)
+					pMin1Drawing->m_nTextBox=i;
+				else
+					pKlineDrawing->m_nTextBox=i;
+				pKlineDrawing->DrawKlineFiguer(&memdc);
 			}
 			break;
 		case REGION_SELFLINE_1:
@@ -1140,7 +1140,7 @@ void CTaiShanKlineShowView::OnLButtonDown(UINT nFlags, CPoint point)
 		case REGION_PICT3:
 		case REGION_PICT4:
 		case REGION_PICT5:
-		
+
 			if(m_pDlgDealHistory != NULL )
 			{
 				if(m_pDlgDealHistory->m_bHistorySynchrostep == true)
@@ -1153,9 +1153,9 @@ void CTaiShanKlineShowView::OnLButtonDown(UINT nFlags, CPoint point)
 			break;
 		case REGION_LITTLE_FIGUER:
 			{
-			CTaiKlineDC memdc(this,&m_bit);
-			m_scrollBar->SetScrollPos(0);
-			DrawRightSheet(&memdc, point);
+				CTaiKlineDC memdc(this,&m_bit);
+				m_scrollBar->SetScrollPos(0);
+				DrawRightSheet(&memdc, point);
 			}
 			break;
 		case REGION_INFO_TRANSFER:
@@ -1245,7 +1245,7 @@ void CTaiShanKlineShowView::CaclRulorMovable(CPoint point)
 		}
 		else if(point.x<m_rtMin1.rightX )
 		{
-			
+
 			if(point.y<m_heightCaption )
 			{
 				m_hit=REGION_PICTCAPTION1;
@@ -1269,7 +1269,7 @@ void CTaiShanKlineShowView::CaclRulorMovable(CPoint point)
 				if(point.y<m_rtMin1.rtBlw[i-1].m_yBottom+2 && point.y>=m_rtMin1.rtBlw[i-1].m_yBottom-2 )
 					m_hit=REGION_PICTBORDER1+i-1;
 			}
-		
+
 
 
 		}
@@ -1293,7 +1293,7 @@ void CTaiShanKlineShowView::CaclRulorMovable(CPoint point)
 				}
 			}
 
-		
+
 			if(point.y>m_rtMin1.rtBlw[nm-1].m_yBottom-1 )
 				m_hit=REGION_TRANSFER;
 		}
@@ -1327,7 +1327,7 @@ void CTaiShanKlineShowView::CaclRulorMovable(CPoint point)
 		int nm=m_infoInit.nCountIndex;
 		if(point.x<m_rtKlineFiguer.rightX )
 		{
-		
+
 			if(point.y<m_heightCaption )
 			{
 				m_hit=REGION_PICTCAPTION1;
@@ -1340,17 +1340,7 @@ void CTaiShanKlineShowView::CaclRulorMovable(CPoint point)
 
 				if(lineTypeDrawed == -1)
 				{
-				if(bTrackCurcorBgn==false)
-				{
-					int rtn= pDrawLine->IsOnSelfLineTotal(point);
-					if(rtn>=0)
-					{
-						m_hit=rtn+REGION_SELFLINE_1;
-					}
-				}
-				else
-				{
-					if(pDrawLine->m_bMoveZhongXian==1)
+					if(bTrackCurcorBgn==false)
 					{
 						int rtn= pDrawLine->IsOnSelfLineTotal(point);
 						if(rtn>=0)
@@ -1358,7 +1348,17 @@ void CTaiShanKlineShowView::CaclRulorMovable(CPoint point)
 							m_hit=rtn+REGION_SELFLINE_1;
 						}
 					}
-				}
+					else
+					{
+						if(pDrawLine->m_bMoveZhongXian==1)
+						{
+							int rtn= pDrawLine->IsOnSelfLineTotal(point);
+							if(rtn>=0)
+							{
+								m_hit=rtn+REGION_SELFLINE_1;
+							}
+						}
+					}
 				}
 			}
 			for(int i=1;i<nm;i++)
@@ -1375,7 +1375,7 @@ void CTaiShanKlineShowView::CaclRulorMovable(CPoint point)
 				if(point.y<m_rtKlineFiguer.rtBlw[i-1].m_yBottom+2 && point.y>=m_rtKlineFiguer.rtBlw[i-1].m_yBottom-2 )
 					m_hit=REGION_PICTBORDER1+i-1;
 			}
-			
+
 			if(point.y>m_rtKlineFiguer.rtBlw[nm-1].m_yBottom-1 )
 				m_hit=REGION_RULER;
 
@@ -1401,7 +1401,7 @@ void CTaiShanKlineShowView::CaclRulorMovable(CPoint point)
 				}
 			}
 
-	
+
 			if(point.y>m_rtKlineFiguer.rtBlw[nm-1].m_yBottom-1 )
 				m_hit=REGION_TRANSFER;
 		}
@@ -1448,7 +1448,7 @@ void CTaiShanKlineShowView::OnMouseMove(UINT nFlags, CPoint point)
 	if(m_bAppAuthorized > 1600)
 		Sleep(200);
 
-	
+
 
 	if(m_bMultiFiguer==1)
 	{
@@ -1534,7 +1534,7 @@ void CTaiShanKlineShowView::OnMouseMove(UINT nFlags, CPoint point)
 			if(m_nKlineKind2==0)
 				break;
 
- 			if(nFlags&MK_LBUTTON)
+			if(nFlags&MK_LBUTTON)
 			{
 				if((m_rtKlineFiguer.rightX-point.x)<=0)
 					break;
@@ -1586,7 +1586,7 @@ void CTaiShanKlineShowView::OnMouseMove(UINT nFlags, CPoint point)
 	}
 	else
 	{
-    	CaclRulorMovable(point);
+		CaclRulorMovable(point);
 		if(m_MyToolTip->IsWindowVisible())
 		{
 			CRect rt;
@@ -1638,8 +1638,8 @@ void CTaiShanKlineShowView::OnMouseMove(UINT nFlags, CPoint point)
 			}
 		}
 	}
-	
-	
+
+
 	CView* pView;
 	BOOL bf;
 	bf=FALSE;
@@ -1649,7 +1649,7 @@ void CTaiShanKlineShowView::OnMouseMove(UINT nFlags, CPoint point)
 	int posi=rect.right  ;	
 	if (posi-point.x<=5)
 	{
-		
+
 		while (pos != NULL)   
 		{
 			pView = ((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc->GetNextView(pos);
@@ -1673,7 +1673,7 @@ void CTaiShanKlineShowView::OnMouseMove(UINT nFlags, CPoint point)
 				break;
 			}
 		}   
-		
+
 	}
 
 
@@ -1690,14 +1690,14 @@ void CTaiShanKlineShowView::OnFileSaveAs()
 {
 
 
-	
+
 }
 
 
 void CTaiShanKlineShowView::DrawFenShi(CDC *pDC)
 {
 
-		DrawRectPer(pDC);
+	DrawRectPer(pDC);
 }
 
 
@@ -1831,7 +1831,7 @@ void CTaiShanKlineShowView::DrawRulorBoxX(int x,bool bKey)
 	pDC->SelectObject(pOldPen);
 	pDC->SelectObject(pOld);
 	ReleaseDC(pDC);
-	
+
 
 }
 
@@ -1863,7 +1863,7 @@ void CTaiShanKlineShowView::DrawRulorBoxY(int y)
 		nHit = REGION_PICT1+nHit-REGION_PICTCAPTION1;
 
 	if((nHit<REGION_PICT1||nHit>REGION_PICT5))
-			return;
+		return;
 
 	CDC* pDC=GetDC();
 
@@ -1886,7 +1886,7 @@ void CTaiShanKlineShowView::DrawRulorBoxY(int y)
 	CBrush* pOldBrush = pDC->SelectObject(&brush2);
 	pDC->FrameRect(rtY,&brush2);
 
-	
+
 	float max;
 	float min;
 	int top;
@@ -1976,7 +1976,7 @@ void CTaiShanKlineShowView::CalcCursorShape(CPoint pt)
 	case REGION_PICTTEXT1:
 		SetCursor(LoadCursor(  AfxGetInstanceHandle( ),MAKEINTRESOURCE(IDC_REDARROW) )); 
 		break;
-	
+
 	case REGION_INFO_TRANSFER:
 		SetCursor(LoadCursor(  AfxGetInstanceHandle( ),MAKEINTRESOURCE(IDC_CURSOR_INFO) )); 
 		break;
@@ -2004,8 +2004,8 @@ void CTaiShanKlineShowView::CalcCursorShape(CPoint pt)
 	case REGION_PICT5:
 		if(this->m_nKlineKind2 >0 && pKlineDrawing->m_kLine_mode == 1)
 		{
-		SetCursor(LoadCursor( AfxGetInstanceHandle( ),MAKEINTRESOURCE(IDC_CURSOR_DRAG) )); 
-		break;
+			SetCursor(LoadCursor( AfxGetInstanceHandle( ),MAKEINTRESOURCE(IDC_CURSOR_DRAG) )); 
+			break;
 		}
 	default:
 		SetCursor(LoadCursor(  NULL, IDC_ARROW )); 
@@ -2090,16 +2090,16 @@ void CTaiShanKlineShowView::DrawRightbox(CDC *pDC,bool bClearAll)
 
 	ClearBack(pDC, rt1,pMin1Drawing->m_bHist);
 
-	
+
 	CPen pen_line(PS_SOLID  ,1,GetDocument()->m_colorArray[2]); 
 	CPen* pOldpen=pDC->SelectObject(&pen_line);
 	if(pDC->IsPrinting ())
 	{
-	pDC->MoveTo (0,0);
-	pDC->LineTo (rt.right-1,0);
-	pDC->LineTo (rt.right-1,rt.bottom);
-	pDC->LineTo (0,rt.bottom);
-	pDC->LineTo (0,0);
+		pDC->MoveTo (0,0);
+		pDC->LineTo (rt.right-1,0);
+		pDC->LineTo (rt.right-1,rt.bottom);
+		pDC->LineTo (0,rt.bottom);
+		pDC->LineTo (0,0);
 	}
 
 	pDC->MoveTo(rt.right-m_rightLength,RIGHTBOX_PERLINE);
@@ -2208,7 +2208,7 @@ void CTaiShanKlineShowView::DrawRightbox(CDC *pDC,bool bClearAll)
 	if(pMin1Drawing->m_pReportData->accb+pMin1Drawing->m_pReportData->accs>0)
 	{
 		f1=(pMin1Drawing->m_pReportData->accb-pMin1Drawing->m_pReportData->accs)*100/
-		(pMin1Drawing->m_pReportData->accb+pMin1Drawing->m_pReportData->accs);
+			(pMin1Drawing->m_pReportData->accb+pMin1Drawing->m_pReportData->accs);
 		if(f1>0)
 			pDC->SetTextColor( GetDocument()->m_colorArray[13]);
 		else if(f1<0)
@@ -2376,17 +2376,17 @@ void CTaiShanKlineShowView::DrawRightbox(CDC *pDC,bool bClearAll)
 		f1=(pMin1Drawing->m_pReportData->nowv);
 		if(f1>0)
 		{
-				int nFlag = pMin1Drawing->m_pReportData->InOut ;
-				if(nFlag==0)
-					pDC->SetTextColor( GetDocument()->m_colorArray[13]);
-				else if(nFlag==1)
-				{
-					pDC->SetTextColor( GetDocument()->m_colorArray[XIA_DIE_WORD]);
-				}
-				else
-				{
-					pDC->SetTextColor( GetDocument()->m_colorArray[PING_PAN_WORD]);
-				}
+			int nFlag = pMin1Drawing->m_pReportData->InOut ;
+			if(nFlag==0)
+				pDC->SetTextColor( GetDocument()->m_colorArray[13]);
+			else if(nFlag==1)
+			{
+				pDC->SetTextColor( GetDocument()->m_colorArray[XIA_DIE_WORD]);
+			}
+			else
+			{
+				pDC->SetTextColor( GetDocument()->m_colorArray[PING_PAN_WORD]);
+			}
 
 			DrawRightText(pDC,f1,rt.right-m_rightLength/2,16,1);
 		}
@@ -2416,10 +2416,10 @@ void CTaiShanKlineShowView::DrawRightbox(CDC *pDC,bool bClearAll)
 	{
 		int nFoot = pMin1Drawing->m_footEnd;
 		{
-		if(m_isShowCross!=0 && this->m_nKlineKind2 == 0)
-			nFoot = pMin1Drawing->m_footCurrent;
-		if(nFoot > pMin1Drawing->m_footEnd)
-			nFoot = pMin1Drawing->m_footEnd;
+			if(m_isShowCross!=0 && this->m_nKlineKind2 == 0)
+				nFoot = pMin1Drawing->m_footCurrent;
+			if(nFoot > pMin1Drawing->m_footEnd)
+				nFoot = pMin1Drawing->m_footEnd;
 		}
 
 		if(nFoot>0)
@@ -2443,8 +2443,8 @@ void CTaiShanKlineShowView::DrawRightbox(CDC *pDC,bool bClearAll)
 			TRADE_DETAIL_H_PER* pHsPre = NULL;
 			if(j>0)
 			{
-			pos=m_hs.FindIndex(nHs - j  ) ;
-			pHsPre=m_hs.GetAt( pos );
+				pos=m_hs.FindIndex(nHs - j  ) ;
+				pHsPre=m_hs.GetAt( pos );
 			}
 
 			CString s;
@@ -2470,9 +2470,9 @@ void CTaiShanKlineShowView::DrawRightbox(CDC *pDC,bool bClearAll)
 	pDC->SetTextColor( GetDocument()->m_colorArray[XIA_DIE_WORD]);
 	DrawRightText(pDC,f1,rt.right-lf,18,1);
 	pDC->SetTextAlign( TA_LEFT );
- 
 
-	
+
+
 	pDC->SelectObject(pOldpen);
 	pDC->SelectObject(pOld);
 
@@ -2487,7 +2487,7 @@ void CTaiShanKlineShowView::OnLineself()
 
 void CTaiShanKlineShowView::OnLButtonUp(UINT nFlags, CPoint point) 
 {
-	
+
 	if(m_bMultiFiguer==1)
 	{
 		CView::OnLButtonUp(nFlags, point);
@@ -2504,7 +2504,7 @@ void CTaiShanKlineShowView::OnLButtonUp(UINT nFlags, CPoint point)
 		CRect r;
 		GetClientRect(r);
 		CPoint p(point);	
-		
+
 		switch(m_hit)
 		{
 		case REGION_PICTBORDER1:
@@ -2603,7 +2603,7 @@ void CTaiShanKlineShowView::OnLButtonUp(UINT nFlags, CPoint point)
 				}
 			}
 		}
-	CView::OnLButtonUp(nFlags, point);
+		CView::OnLButtonUp(nFlags, point);
 
 }
 
@@ -2662,7 +2662,7 @@ void CTaiShanKlineShowView::OnTimer(UINT nIDEvent)
 		if(m_nKlineKind2==0)
 			return;
 		if(m_infoFiguer>0)
-				r.right-=m_rightLength;
+			r.right-=m_rightLength;
 		if(m_pointMove.x>m_rtKlineFiguer.rightX-8)
 		{
 			pKlineDrawing->MoveDisplays(-pKlineDrawing->m_klinNumDefault/5);
@@ -2672,20 +2672,20 @@ void CTaiShanKlineShowView::OnTimer(UINT nIDEvent)
 			pKlineDrawing->MoveDisplays(pKlineDrawing->m_klinNumDefault/5);
 		}
 		{
-		CTaiKlineDC memdc(this,&m_bit,&r);
-		pKlineDrawing->DrawKlineFiguer(&memdc);
+			CTaiKlineDC memdc(this,&m_bit,&r);
+			pKlineDrawing->DrawKlineFiguer(&memdc);
 		}
 		break;
 	case 12:
-        if(m_bMultiFiguer == 0)	
-		  OnPageDown(TRUE);
-	    else
-          OnPageDown(TRUE,4);
+		if(m_bMultiFiguer == 0)	
+			OnPageDown(TRUE);
+		else
+			OnPageDown(TRUE,4);
 		return;
 	case TM_TIP:
 		KillTimer(TM_TIP);
 		if(m_hit<REGION_PICT1||m_hit>REGION_PICT5)
-				return;
+			return;
 		if(m_nKlineKind2>0)
 		{
 			i = m_hit<=REGION_PICT5 ? m_hit-REGION_PICT1 : 0;
@@ -2724,7 +2724,7 @@ void CTaiShanKlineShowView::OnTimer(UINT nIDEvent)
 		pKlineDrawing->m_footBeginOld=pKlineDrawing->m_footBegin;
 		(pKlineDrawing->OnUp());
 		bExtend=TRUE;
-	
+
 		break;
 	case TM_DOWN_K:
 		KillTimer(TM_DOWN_K);//6.17
@@ -2735,7 +2735,7 @@ void CTaiShanKlineShowView::OnTimer(UINT nIDEvent)
 		pDrawLine->m_lineTypeOld=-1;
 
 		(pKlineDrawing->OnDown());
-	
+
 		break;
 	case TM_MOVE_K:
 		KillTimer(TM_MOVE_K);//6.17
@@ -2777,7 +2777,7 @@ void CTaiShanKlineShowView::OnTimer(UINT nIDEvent)
 		ShowDlgCross(m_bActived);
 
 	default:
-			break;
+		break;
 	}
 
 	CWnd* pWnd = GetFocus();
@@ -2796,7 +2796,7 @@ void CTaiShanKlineShowView::OnShowWindow(BOOL bShow, UINT nStatus)
 
 BOOL CTaiShanKlineShowView::DestroyWindow() 
 {
-	
+
 	return CView::DestroyWindow();
 }
 
@@ -2816,11 +2816,11 @@ void CTaiShanKlineShowView::DrawRightBoxDapan(CDC *pDC,bool bClearAll)
 	CPen* pOldpen=pDC->SelectObject(&pen_line);
 	if(pDC->IsPrinting ())
 	{
-	pDC->MoveTo (0,0);
-	pDC->LineTo (rt.right-1,0);
-	pDC->LineTo (rt.right-1,rt.bottom);
-	pDC->LineTo (0,rt.bottom);
-	pDC->LineTo (0,0);
+		pDC->MoveTo (0,0);
+		pDC->LineTo (rt.right-1,0);
+		pDC->LineTo (rt.right-1,rt.bottom);
+		pDC->LineTo (0,rt.bottom);
+		pDC->LineTo (0,0);
 	}
 
 	pDC->MoveTo(rt.right-m_rightLength,RIGHTBOX_PERLINE);
@@ -2893,7 +2893,7 @@ void CTaiShanKlineShowView::DrawRightBoxDapan(CDC *pDC,bool bClearAll)
 
 		return;
 	}
-	
+
 	float f1;
 	int isSz=0;
 	if(CSharesCompute::GetMarketKind(m_stkKind) == SZ_MARKET_EX) isSz=1;
@@ -2963,8 +2963,8 @@ void CTaiShanKlineShowView::DrawRightBoxDapan(CDC *pDC,bool bClearAll)
 	if(isSz==1)
 	{
 		f1=GetDocument()->m_sharesInformation.GetValueUpDown( 1, isSz,  0)
-		+GetDocument()->m_sharesInformation.GetValueUpDown( 1, isSz,  1)
-		+GetDocument()->m_sharesInformation.GetValueUpDown( 1, isSz,  2);
+			+GetDocument()->m_sharesInformation.GetValueUpDown( 1, isSz,  1)
+			+GetDocument()->m_sharesInformation.GetValueUpDown( 1, isSz,  2);
 
 	}
 
@@ -3143,21 +3143,21 @@ void CTaiShanKlineShowView::ClearBack(CDC *pDC, CRect &rt,bool bHist)
 
 void CTaiShanKlineShowView::DrawRightSheet(CDC *pDC, CPoint pt)
 {
-		int len=m_rightLength;
+	int len=m_rightLength;
 
-		CRect rt;
-		GetClientRect(rt);
+	CRect rt;
+	GetClientRect(rt);
 
-		if(len==0)
-			return;
-		m_tabNum=(pt.x-rt.right +m_rightLength)*7/(len);
-		m_nBeginHS=-1;
-		if(IsIndexStock(m_sharesSymbol))
-			if(m_tabNum<4)
-				m_tabNum = 0;
+	if(len==0)
+		return;
+	m_tabNum=(pt.x-rt.right +m_rightLength)*7/(len);
+	m_nBeginHS=-1;
+	if(IsIndexStock(m_sharesSymbol))
+		if(m_tabNum<4)
+			m_tabNum = 0;
 
 
-		DrawRightSheet(pDC,m_tabNum);
+	DrawRightSheet(pDC,m_tabNum);
 }
 
 
@@ -3210,7 +3210,7 @@ void CTaiShanKlineShowView::SetPictYPos(int which, int y)
 	OnSizeMy(rt.right-rt.left,rt.bottom-rt.top);
 	if(m_infoFiguer>0)
 		rt.right-=m_rightLength;
-	
+
 
 }
 
@@ -3236,7 +3236,7 @@ void CTaiShanKlineShowView::OnSizeMy(int cx, int cy)
 
 	if(m_scrollBar->m_hWnd!=NULL)
 		m_scrollBar->MoveWindow(rtScroll.left  ,rtScroll.top ,19,rtScroll.bottom-rtScroll.top,TRUE);  
-	
+
 
 }
 
@@ -3257,7 +3257,7 @@ void CTaiShanKlineShowView::OnRButtonDown(UINT nFlags, CPoint point)
 		return;
 	}
 
-   	CaclRulorMovable(point);
+	CaclRulorMovable(point);
 	CTaiShanDoc* pDoc = GetDocument();
 	if(::GetCapture()==NULL)
 	{
@@ -3270,7 +3270,7 @@ void CTaiShanKlineShowView::OnRButtonDown(UINT nFlags, CPoint point)
 				r.right = m_rtKlineFiguer.rightX;
 				r.top = m_rtKlineFiguer.rtBlw[m_infoInit.nCountIndex-1].m_yBottom;
 				r.bottom = m_rtKlineFiguer.rtBlw[m_infoInit.nCountIndex-1].m_yBottom+m_heightCaption;
-	
+
 				m_nOldHitPos = point.x;
 				SetCapture();
 				ClientToScreen(r);
@@ -3310,7 +3310,7 @@ void CTaiShanKlineShowView::OnRButtonUp(UINT nFlags, CPoint point)
 		CView::OnRButtonUp(nFlags, point);
 		return;
 	}
-	
+
 	if(::GetCapture()==m_hWnd && !(nFlags&(MK_LBUTTON|MK_RBUTTON)))
 	{
 		::ClipCursor(NULL);
@@ -3433,7 +3433,7 @@ void CTaiShanKlineShowView::TrackCursorBgn(CPoint point)
 	pDrawLine->m_bSelected=false;
 	if(m_hit>=REGION_SELFLINE_1 && m_hit<=REGION_SELFLINE_BODY)
 	{
-	
+
 		KillTimer(TM_TIP);
 		if(m_nKlineKind2==0)
 			return;
@@ -3442,7 +3442,7 @@ void CTaiShanKlineShowView::TrackCursorBgn(CPoint point)
 		pDrawLine->m_bDrawLine=TRUE;
 
 		bTrackCurcorBgn=TRUE;
-	
+
 		pDrawLine->m_pt[0].x=pDrawLine->m_ptOldDrawing[0].x;
 		pDrawLine->m_pt[0].y=pDrawLine->m_ptOldDrawing[0].y;
 		pDrawLine->m_pt[1].x=pDrawLine->m_ptOldDrawing[1].x;
@@ -3452,7 +3452,7 @@ void CTaiShanKlineShowView::TrackCursorBgn(CPoint point)
 		pDrawLine->m_lineType=pDrawLine->m_nLineTypeChanging;
 		pDrawLine->m_nCurrentLineClicked=pDrawLine->m_nCurrentLine;
 
-	if(pDrawLine->m_lineType==TEXT_KIND||pDrawLine->m_lineType==UP_ARROW||pDrawLine->m_lineType==DOWN_ARROW)
+		if(pDrawLine->m_lineType==TEXT_KIND||pDrawLine->m_lineType==UP_ARROW||pDrawLine->m_lineType==DOWN_ARROW)
 		{
 			int typ=pDrawLine->m_lineType;
 			CPoint p1;
@@ -3492,7 +3492,7 @@ void CTaiShanKlineShowView::TrackCursorBgn(CPoint point)
 
 			break;
 		}
-	
+
 		pDrawLine->m_ptOldDrawing[0].x=pDrawLine->m_pt[0].x;
 		pDrawLine->m_ptOldDrawing[0].y=pDrawLine->m_pt[0].y;
 		pDrawLine->m_ptOldDrawing[1].x=pDrawLine->m_pt[1].x;
@@ -3509,7 +3509,7 @@ void CTaiShanKlineShowView::TrackCursorBgn(CPoint point)
 		m_rectHitPos.right = point.x;
 		m_rectHitPos.bottom = point.y;
 
-	
+
 		if(m_nKlineKind2==0||m_hit!=REGION_PICT1)
 			return;
 		if(pDrawLine->m_bDrawLine==false)
@@ -3518,7 +3518,7 @@ void CTaiShanKlineShowView::TrackCursorBgn(CPoint point)
 		pDrawLine->m_lineType=lineTypeDrawed;
 		if(pDrawLine->m_lineType==-1)
 			return ;
-		
+
 		bTrackCurcorBgn=TRUE;
 		if(pDrawLine->m_lineType!=ZHONG_XIAN && pDrawLine->m_lineType!=BAG_LINE)
 		{
@@ -3527,7 +3527,7 @@ void CTaiShanKlineShowView::TrackCursorBgn(CPoint point)
 				pDrawLine->m_nPointCurrent=j;
 				pDrawLine->SetPointPos(point);
 			}
-		
+
 			pDrawLine->m_ptOldDrawing[0].x=pDrawLine->m_pt[0].x;
 			pDrawLine->m_ptOldDrawing[0].y=pDrawLine->m_pt[0].y;
 			pDrawLine->m_ptOldDrawing[1].x=pDrawLine->m_pt[1].x;
@@ -3565,7 +3565,7 @@ void CTaiShanKlineShowView::TrackCursorBgn(CPoint point)
 		{
 			m_toScreen.x=pDrawLine->m_pt[0].x;
 			m_toScreen.y=pDrawLine->m_pt[0].y;
-		
+
 			pDrawLine->m_ptOldDrawing[0].x=pDrawLine->m_pt[0].x;
 			pDrawLine->m_ptOldDrawing[0].y=pDrawLine->m_pt[0].y;
 
@@ -3592,7 +3592,7 @@ void CTaiShanKlineShowView::TrackCursorBgn(CPoint point)
 
 		if(pDrawLine->m_lineType==UP_ARROW||pDrawLine->m_lineType==DOWN_ARROW)
 		{
-		
+
 		}
 
 
@@ -3624,7 +3624,7 @@ void CTaiShanKlineShowView::TrackCursorGoOn(CPoint p)
 	{
 		if(m_nKlineKind2==0)
 			return;
-	
+
 		pDrawLine->m_pt[0].x=pDrawLine->m_ptOldDrawing[0].x;
 		pDrawLine->m_pt[0].y=pDrawLine->m_ptOldDrawing[0].y;
 		pDrawLine->m_pt[1].x=pDrawLine->m_ptOldDrawing[1].x;
@@ -3647,14 +3647,14 @@ void CTaiShanKlineShowView::TrackCursorGoOn(CPoint p)
 			pDrawLine->DrawSelfLine(pDC);
 
 			pDrawLine->DrawPointBE(pDC);
-		
+
 			pDrawLine->m_ptOldDrawing[0].x=pDrawLine->m_pt[0].x;
 			pDrawLine->m_ptOldDrawing[0].y=pDrawLine->m_pt[0].y;
 
 			return;
 		}
 		pDrawLine->DrawPointBE(pDC);
-	
+
 		int oldROP = pDC->SetROP2(R2_NOT   );
 		switch(m_hit)
 		{
@@ -3667,7 +3667,7 @@ void CTaiShanKlineShowView::TrackCursorGoOn(CPoint p)
 				pDrawLine->DrawSelfLine(pDC);
 				if(i==0)
 					pDrawLine->SetPointMoved(p.x-m_rectHitPos.left
-						, p.y-m_rectHitPos.top);
+					, p.y-m_rectHitPos.top);
 			}
 			break;
 		case REGION_SELFLINE_1:
@@ -3686,7 +3686,7 @@ void CTaiShanKlineShowView::TrackCursorGoOn(CPoint p)
 		pDC->SetROP2(oldROP);
 		pDrawLine->DrawPointBE(pDC);
 
-	
+
 		pDrawLine->m_ptOldDrawing[0].x=pDrawLine->m_pt[0].x;
 		pDrawLine->m_ptOldDrawing[0].y=pDrawLine->m_pt[0].y;
 		pDrawLine->m_ptOldDrawing[1].x=pDrawLine->m_pt[1].x;
@@ -3721,7 +3721,7 @@ void CTaiShanKlineShowView::TrackCursorGoOn(CPoint p)
 					pDC->LineTo(m_rectHitPos.right,m_rectHitPos.bottom);
 					pDC->LineTo(m_rectHitPos.left,m_rectHitPos.bottom);
 					pDC->LineTo(m_rectHitPos.left,m_rectHitPos.top);
-		
+
 					m_rectHitPos.right = p.x;
 					m_rectHitPos.bottom = p.y;
 					pDC->SetROP2(oldROP);
@@ -3730,7 +3730,7 @@ void CTaiShanKlineShowView::TrackCursorGoOn(CPoint p)
 		}
 		else
 		{
-			
+
 			if(m_nKlineKind2==0)
 				return;
 			if(m_hit<REGION_PICT1||m_hit>REGION_PICT1)
@@ -3738,7 +3738,7 @@ void CTaiShanKlineShowView::TrackCursorGoOn(CPoint p)
 				return;
 			}
 
-		
+
 			pDrawLine->m_lineType=lineTypeDrawed;
 
 			if(pDrawLine->m_lineType==TEXT_KIND||pDrawLine->m_lineType==UP_ARROW||pDrawLine->m_lineType==DOWN_ARROW)
@@ -3750,11 +3750,11 @@ void CTaiShanKlineShowView::TrackCursorGoOn(CPoint p)
 
 			if(pDrawLine->m_lineType==PING_XING || pDrawLine->m_lineType==GAN_SHI || pDrawLine->m_lineType==HUANG_JIN_HU)
 				return ;
-		
+
 			if((pDrawLine->m_lineType==ZHONG_XIAN || pDrawLine->m_lineType==BAG_LINE) && pDrawLine->m_nZhongXianDrawing!=0)
 				return;
 
-	
+
 			pDrawLine->m_pt[0].x=pDrawLine->m_ptOldDrawing[0].x;
 			pDrawLine->m_pt[0].y=pDrawLine->m_ptOldDrawing[0].y;
 			pDrawLine->m_pt[1].x=pDrawLine->m_ptOldDrawing[1].x;
@@ -3768,7 +3768,7 @@ void CTaiShanKlineShowView::TrackCursorGoOn(CPoint p)
 				pDrawLine->m_nPointCurrent=1;
 				pDrawLine->SetPointPos(p);
 			}
-			
+
 			pDrawLine->m_ptOldDrawing[0].x=pDrawLine->m_pt[0].x;
 			pDrawLine->m_ptOldDrawing[0].y=pDrawLine->m_pt[0].y;
 			pDrawLine->m_ptOldDrawing[1].x=pDrawLine->m_pt[1].x;
@@ -3787,256 +3787,256 @@ void CTaiShanKlineShowView::TrackCursorGoOn(CPoint p)
 void CTaiShanKlineShowView::TrackCursorEnd(CPoint point, BOOL flag)
 {
 
-		WPARAM wParam;
-		LPARAM lParam;
-		m_rectHitPos.right = point.x;
-		m_rectHitPos.bottom = point.y;
-		if(m_rectHitPos.right<0)
-			m_rectHitPos.right=0;
-		if(m_rectHitPos.left<0)
-			m_rectHitPos.left=0;
+	WPARAM wParam;
+	LPARAM lParam;
+	m_rectHitPos.right = point.x;
+	m_rectHitPos.bottom = point.y;
+	if(m_rectHitPos.right<0)
+		m_rectHitPos.right=0;
+	if(m_rectHitPos.left<0)
+		m_rectHitPos.left=0;
 
-		CRect r;
-		GetClientRect(r);
-		int rgt = r.right - (this->m_infoFiguer > 0 ?m_rightLength:0)-m_midLen;
+	CRect r;
+	GetClientRect(r);
+	int rgt = r.right - (this->m_infoFiguer > 0 ?m_rightLength:0)-m_midLen;
 
-		if(m_rectHitPos.right>rgt )
-			m_rectHitPos.right=rgt;
-		if(m_rectHitPos.left>rgt)
-			m_rectHitPos.left=rgt;
+	if(m_rectHitPos.right>rgt )
+		m_rectHitPos.right=rgt;
+	if(m_rectHitPos.left>rgt)
+		m_rectHitPos.left=rgt;
 
-		bTrackCurcorBgn=false;
+	bTrackCurcorBgn=false;
 
-	
-		if(flag==false)
+
+	if(flag==false)
+	{
+		if(m_hit>=REGION_SELFLINE_1 && m_hit<=REGION_SELFLINE_BODY)
 		{
-			if(m_hit>=REGION_SELFLINE_1 && m_hit<=REGION_SELFLINE_BODY)
+
+			if(m_nKlineKind2==0)
 			{
-			
+				RedrawWindowNoCacl();
+				return;
+			}
+
+			pDrawLine->m_pt[0].x=pDrawLine->m_ptOldDrawing[0].x;
+			pDrawLine->m_pt[0].y=pDrawLine->m_ptOldDrawing[0].y;
+			pDrawLine->m_pt[1].x=pDrawLine->m_ptOldDrawing[1].x;
+			pDrawLine->m_pt[1].y=pDrawLine->m_ptOldDrawing[1].y;
+			pDrawLine->m_pt[2].x=pDrawLine->m_ptOldDrawing[2].x;
+			pDrawLine->m_pt[2].y=pDrawLine->m_ptOldDrawing[2].y;
+			pDrawLine->m_lineType=pDrawLine->m_nLineTypeChanging;
+
+			if(pDrawLine->m_lineType==TEXT_KIND||pDrawLine->m_lineType==UP_ARROW||pDrawLine->m_lineType==DOWN_ARROW)
+			{
+				pDrawLine->AddLine();
+				pDrawLine->m_bSelected=TRUE;
+
+				RedrawWindow();
+			}
+			else
+			{
+				if(pDrawLine->m_nCurrentLineClicked>=0)
+				{
+					pDrawLine->ScreenToFile(pDrawLine->m_nCurrentLineClicked, TRUE);
+					pDrawLine->SetAlarmFlag(pDrawLine->m_nCurrentLineClicked, (BYTE) 0);
+					pDrawLine->WriteLineself();
+				}
+
+				int typ=pDrawLine->m_lineType;
+
+
+				RedrawWindow();
+
+			}
+
+		}
+		else
+		{
+
+			if(pDrawLine->m_bDrawLine==false)
+			{
 				if(m_nKlineKind2==0)
+				{
+					lParam=0;
+					wParam=ID_SHIDUAN_TJ;
+					DoOnCommand(wParam, lParam);
+					return;
+				}
+				else
+				{
+					if(pKlineDrawing->m_kLine_mode == 0)
+						ShowKlineBig();
+				}
+			}
+
+			else
+			{
+
+				if(m_nKlineKind2==0||m_hit!=REGION_PICT1)
 				{
 					RedrawWindowNoCacl();
 					return;
 				}
-			
+				if(pDrawLine->m_lineType==-1)
+				{
+					RedrawWindowNoCacl();
+					return;
+				}
+
+				pDrawLine->m_bSelected=false;
+
+
+				pDrawLine->m_lineType=lineTypeDrawed;
+
 				pDrawLine->m_pt[0].x=pDrawLine->m_ptOldDrawing[0].x;
 				pDrawLine->m_pt[0].y=pDrawLine->m_ptOldDrawing[0].y;
 				pDrawLine->m_pt[1].x=pDrawLine->m_ptOldDrawing[1].x;
 				pDrawLine->m_pt[1].y=pDrawLine->m_ptOldDrawing[1].y;
 				pDrawLine->m_pt[2].x=pDrawLine->m_ptOldDrawing[2].x;
 				pDrawLine->m_pt[2].y=pDrawLine->m_ptOldDrawing[2].y;
-				pDrawLine->m_lineType=pDrawLine->m_nLineTypeChanging;
 
-				if(pDrawLine->m_lineType==TEXT_KIND||pDrawLine->m_lineType==UP_ARROW||pDrawLine->m_lineType==DOWN_ARROW)
+
+				if(pDrawLine->m_lineType==TEXT_KIND)
 				{
-					pDrawLine->AddLine();
-					pDrawLine->m_bSelected=TRUE;
-
+					lineTypeDrawed=-1;
 					RedrawWindow();
-				}
-				else
-				{
-					if(pDrawLine->m_nCurrentLineClicked>=0)
-					{
-						pDrawLine->ScreenToFile(pDrawLine->m_nCurrentLineClicked, TRUE);
-						pDrawLine->SetAlarmFlag(pDrawLine->m_nCurrentLineClicked, (BYTE) 0);
-						pDrawLine->WriteLineself();
-					}
-
-					int typ=pDrawLine->m_lineType;
-
-
-					RedrawWindow();
-
+					return;
 				}
 
-			}
-			else
-			{
-			
-				if(pDrawLine->m_bDrawLine==false)
+				if(pDrawLine->m_lineType!=ZHONG_XIAN && pDrawLine->m_lineType!=BAG_LINE)
 				{
-					if(m_nKlineKind2==0)
+					if(pDrawLine->m_lineType==GAN_SHI || pDrawLine->m_lineType==HUANG_JIN_HU)//HUANG_JIN_HU
+						pDrawLine->m_bLineValidate=TRUE;
+					if(pDrawLine->m_bLineValidate==TRUE)
 					{
-						lParam=0;
-						wParam=ID_SHIDUAN_TJ;
-						DoOnCommand(wParam, lParam);
-						return;
-					}
-					else
-					{
-						if(pKlineDrawing->m_kLine_mode == 0)
-							ShowKlineBig();
-					}
-				}
-				
-				else
-				{
-				
-					if(m_nKlineKind2==0||m_hit!=REGION_PICT1)
-					{
-						RedrawWindowNoCacl();
-						return;
-					}
-					if(pDrawLine->m_lineType==-1)
-					{
-						RedrawWindowNoCacl();
-						return;
-					}
-					
-					pDrawLine->m_bSelected=false;
 
-				
-					pDrawLine->m_lineType=lineTypeDrawed;
-				
-					pDrawLine->m_pt[0].x=pDrawLine->m_ptOldDrawing[0].x;
-					pDrawLine->m_pt[0].y=pDrawLine->m_ptOldDrawing[0].y;
-					pDrawLine->m_pt[1].x=pDrawLine->m_ptOldDrawing[1].x;
-					pDrawLine->m_pt[1].y=pDrawLine->m_ptOldDrawing[1].y;
-					pDrawLine->m_pt[2].x=pDrawLine->m_ptOldDrawing[2].x;
-					pDrawLine->m_pt[2].y=pDrawLine->m_ptOldDrawing[2].y;
-
-
-					if(pDrawLine->m_lineType==TEXT_KIND)
-					{
-						lineTypeDrawed=-1;
-						RedrawWindow();
-						return;
-					}
-
-					if(pDrawLine->m_lineType!=ZHONG_XIAN && pDrawLine->m_lineType!=BAG_LINE)
-					{
-						if(pDrawLine->m_lineType==GAN_SHI || pDrawLine->m_lineType==HUANG_JIN_HU)//HUANG_JIN_HU
-							pDrawLine->m_bLineValidate=TRUE;
-						if(pDrawLine->m_bLineValidate==TRUE)
+						if(pDrawLine->m_lineType==XIAN_DUAN ||pDrawLine->m_lineType==QU_SHI)
 						{
-						
-							if(pDrawLine->m_lineType==XIAN_DUAN ||pDrawLine->m_lineType==QU_SHI)
+							pDrawLine->m_ptOldPingXing[0].x=pDrawLine->m_pt[0].x ;
+							pDrawLine->m_ptOldPingXing[0].y=pDrawLine->m_pt[0].y ;
+							pDrawLine->m_ptOldPingXing[1].x=pDrawLine->m_pt[1].x ;
+							pDrawLine->m_ptOldPingXing[1].y=pDrawLine->m_pt[1].y ;
+							pDrawLine->m_lineTypeOld=pDrawLine->m_lineType;
+						}
+						else if(pDrawLine->m_lineType==PING_XING )
+						{
+							CPoint ptIn;
+							ptIn.x=(pDrawLine->m_pt[0].x*2-(pDrawLine->m_ptOldPingXing[1].x-pDrawLine->m_ptOldPingXing[0].x))/2;
+							ptIn.y=(pDrawLine->m_pt[0].y*2-(pDrawLine->m_ptOldPingXing[1].y-pDrawLine->m_ptOldPingXing[0].y))/2;
+							pDrawLine->m_pt[1].x=(pDrawLine->m_pt[0].x*2+(pDrawLine->m_ptOldPingXing[1].x-pDrawLine->m_ptOldPingXing[0].x))/2;
+							pDrawLine->m_pt[1].y=(pDrawLine->m_pt[0].y*2+(pDrawLine->m_ptOldPingXing[1].y-pDrawLine->m_ptOldPingXing[0].y))/2;
+							pDrawLine->m_pt[0].x=ptIn.x;
+							pDrawLine->m_pt[0].y=ptIn.y;
+							if(pDrawLine->m_pt[0].x>pDrawLine->m_pt[1].x)
 							{
-								pDrawLine->m_ptOldPingXing[0].x=pDrawLine->m_pt[0].x ;
-								pDrawLine->m_ptOldPingXing[0].y=pDrawLine->m_pt[0].y ;
-								pDrawLine->m_ptOldPingXing[1].x=pDrawLine->m_pt[1].x ;
-								pDrawLine->m_ptOldPingXing[1].y=pDrawLine->m_pt[1].y ;
-								pDrawLine->m_lineTypeOld=pDrawLine->m_lineType;
-							}
-							else if(pDrawLine->m_lineType==PING_XING )
-							{
-								CPoint ptIn;
-								ptIn.x=(pDrawLine->m_pt[0].x*2-(pDrawLine->m_ptOldPingXing[1].x-pDrawLine->m_ptOldPingXing[0].x))/2;
-								ptIn.y=(pDrawLine->m_pt[0].y*2-(pDrawLine->m_ptOldPingXing[1].y-pDrawLine->m_ptOldPingXing[0].y))/2;
-								pDrawLine->m_pt[1].x=(pDrawLine->m_pt[0].x*2+(pDrawLine->m_ptOldPingXing[1].x-pDrawLine->m_ptOldPingXing[0].x))/2;
-								pDrawLine->m_pt[1].y=(pDrawLine->m_pt[0].y*2+(pDrawLine->m_ptOldPingXing[1].y-pDrawLine->m_ptOldPingXing[0].y))/2;
-								pDrawLine->m_pt[0].x=ptIn.x;
-								pDrawLine->m_pt[0].y=ptIn.y;
-								if(pDrawLine->m_pt[0].x>pDrawLine->m_pt[1].x)
-								{
 								ptIn.x=pDrawLine->m_pt[0].x;
 								ptIn.y=pDrawLine->m_pt[0].y;
 								pDrawLine->m_pt[0].x=pDrawLine->m_pt[1].x;
 								pDrawLine->m_pt[0].y=pDrawLine->m_pt[1].y;
 								pDrawLine->m_pt[1].x=ptIn.x;
 								pDrawLine->m_pt[1].y=ptIn.y;
-								}
-								if(pDrawLine->m_lineTypeOld!=QU_SHI && pDrawLine->m_lineTypeOld!=XIAN_DUAN)
-									pDrawLine->m_lineTypeOld=QU_SHI;
-								pDrawLine->m_lineType=pDrawLine->m_lineTypeOld;
 							}
-					
-							else
-								pDrawLine->m_lineTypeOld=lineTypeDrawed;
+							if(pDrawLine->m_lineTypeOld!=QU_SHI && pDrawLine->m_lineTypeOld!=XIAN_DUAN)
+								pDrawLine->m_lineTypeOld=QU_SHI;
+							pDrawLine->m_lineType=pDrawLine->m_lineTypeOld;
+						}
 
-							if(pDrawLine->m_lineType==GAN_SHI )
-							{
-								float widthPer =(m_rtKlineFiguer.rightX )/(float)(pKlineDrawing->m_klinNumDefault);// klineWidthPer + 2 * klineSide;//每格的宽度
-								if(widthPer<2)
-									widthPer=10;
-								pDrawLine->m_pt[1].y=pDrawLine->m_pt[0].y-(int)(10*widthPer);
-								pDrawLine->m_pt[1].x=pDrawLine->m_pt[0].x+(int)(10*widthPer);
-								pDrawLine->m_bLineValidate=false;
-							}
-							if(pDrawLine->m_lineType==HUANG_JIN_HU )//
-							{
-								float widthPer =(m_rtKlineFiguer.rightX )/(float)(pKlineDrawing->m_klinNumDefault);// klineWidthPer + 2 * klineSide;//每格的宽度
-								if(widthPer<2)
-									widthPer=10;
-								pDrawLine->m_pt[1].y=pDrawLine->m_pt[0].y+(int)(10*widthPer);
-								pDrawLine->m_pt[1].x=pDrawLine->m_pt[0].x+(int)(10*widthPer);
-								pDrawLine->m_bLineValidate=false;
-							}
+						else
+							pDrawLine->m_lineTypeOld=lineTypeDrawed;
+
+						if(pDrawLine->m_lineType==GAN_SHI )
+						{
+							float widthPer =(m_rtKlineFiguer.rightX )/(float)(pKlineDrawing->m_klinNumDefault);// klineWidthPer + 2 * klineSide;//每格的宽度
+							if(widthPer<2)
+								widthPer=10;
+							pDrawLine->m_pt[1].y=pDrawLine->m_pt[0].y-(int)(10*widthPer);
+							pDrawLine->m_pt[1].x=pDrawLine->m_pt[0].x+(int)(10*widthPer);
+							pDrawLine->m_bLineValidate=false;
+						}
+						if(pDrawLine->m_lineType==HUANG_JIN_HU )//
+						{
+							float widthPer =(m_rtKlineFiguer.rightX )/(float)(pKlineDrawing->m_klinNumDefault);// klineWidthPer + 2 * klineSide;//每格的宽度
+							if(widthPer<2)
+								widthPer=10;
+							pDrawLine->m_pt[1].y=pDrawLine->m_pt[0].y+(int)(10*widthPer);
+							pDrawLine->m_pt[1].x=pDrawLine->m_pt[0].x+(int)(10*widthPer);
+							pDrawLine->m_bLineValidate=false;
+						}
+
+						pDrawLine->AddLine();
+						CTaiKlineDC memdc(this,&m_bit,&pDrawLine->m_rtDrawLine);
+						pKlineDrawing->DrawKlineFiguer(&memdc);
+						lineTypeDrawed=-1;
+					}
+				}
+				else
+				{//		
+					pDrawLine->m_nZhongXian=pDrawLine->m_nZhongXianDrawing;
+
+					pDrawLine->m_lineTypeOld=lineTypeDrawed;
+					if(pDrawLine->m_nZhongXianDrawing==0)
+					{
+						bTrackCurcorBgn = TRUE;
+						pDrawLine->m_nZhongXianDrawing=1;
+						pDrawLine->m_nZhongXian=1;
+						pDrawLine->m_bMoveZhongXian=0;
+
+					}
+					else
+					{
+						bTrackCurcorBgn = false;
+						if(pDrawLine->m_bLineValidate==TRUE)
+						{
+							pDrawLine->m_pt[0].x=pDrawLine->m_ptOldDrawing[0].x;
+							pDrawLine->m_pt[0].y=pDrawLine->m_ptOldDrawing[0].y;
+							pDrawLine->m_pt[1].x=pDrawLine->m_ptOldDrawing[1].x;
+							pDrawLine->m_pt[1].y=pDrawLine->m_ptOldDrawing[1].y;
+							pDrawLine->m_pt[2].x=pDrawLine->m_ptOldDrawing[2].x;
+							pDrawLine->m_pt[2].y=pDrawLine->m_ptOldDrawing[2].y;
 
 							pDrawLine->AddLine();
 							CTaiKlineDC memdc(this,&m_bit,&pDrawLine->m_rtDrawLine);
 							pKlineDrawing->DrawKlineFiguer(&memdc);
+							pDrawLine->m_bMoveZhongXian=1;
+
+							pDrawLine->m_nZhongXianDrawing=0;
+							pDrawLine->m_nZhongXian=0;
 							lineTypeDrawed=-1;
 						}
 					}
-					else
-					{//		
-						pDrawLine->m_nZhongXian=pDrawLine->m_nZhongXianDrawing;
-
-						pDrawLine->m_lineTypeOld=lineTypeDrawed;
-						if(pDrawLine->m_nZhongXianDrawing==0)
-						{
-							bTrackCurcorBgn = TRUE;
-							pDrawLine->m_nZhongXianDrawing=1;
-							pDrawLine->m_nZhongXian=1;
-							pDrawLine->m_bMoveZhongXian=0;
-							
-						}
-						else
-						{
-							bTrackCurcorBgn = false;
-							if(pDrawLine->m_bLineValidate==TRUE)
-							{
-								pDrawLine->m_pt[0].x=pDrawLine->m_ptOldDrawing[0].x;
-								pDrawLine->m_pt[0].y=pDrawLine->m_ptOldDrawing[0].y;
-								pDrawLine->m_pt[1].x=pDrawLine->m_ptOldDrawing[1].x;
-								pDrawLine->m_pt[1].y=pDrawLine->m_ptOldDrawing[1].y;
-								pDrawLine->m_pt[2].x=pDrawLine->m_ptOldDrawing[2].x;
-								pDrawLine->m_pt[2].y=pDrawLine->m_ptOldDrawing[2].y;
-
-								pDrawLine->AddLine();
-								CTaiKlineDC memdc(this,&m_bit,&pDrawLine->m_rtDrawLine);
-								pKlineDrawing->DrawKlineFiguer(&memdc);
-								pDrawLine->m_bMoveZhongXian=1;
-						
-								pDrawLine->m_nZhongXianDrawing=0;
-								pDrawLine->m_nZhongXian=0;
-								lineTypeDrawed=-1;
-							}
-						}
-					}
 				}
 			}
 		}
-	
+	}
+
+	else
+	{
+
+		if(m_rtKlineFiguer.rightX==0)
+		{
+			RedrawWindow();
+			return;
+		}
+		if(abs(m_rectHitPos.right-m_rectHitPos.left)*pKlineDrawing->m_klinNumDefault/(m_rtKlineFiguer.rightX )<=1)
+		{
+			if(m_nKlineKind2==0)
+			{
+				if(m_hit==REGION_PICT2)
+					ShowMyMenu(IDR_POPKLINE,4);
+			}
+			else if(m_hit>=REGION_PICT1&&m_hit<=REGION_PICT5)
+				ShowMyMenu(IDR_POPKLINE,2);
+		}
 		else
 		{
-
-			if(m_rtKlineFiguer.rightX==0)
-			{
-				RedrawWindow();
-				return;
-			}
-			if(abs(m_rectHitPos.right-m_rectHitPos.left)*pKlineDrawing->m_klinNumDefault/(m_rtKlineFiguer.rightX )<=1)
-			{
-				if(m_nKlineKind2==0)
-				{
-					if(m_hit==REGION_PICT2)
-						ShowMyMenu(IDR_POPKLINE,4);
-				}
-				else if(m_hit>=REGION_PICT1&&m_hit<=REGION_PICT5)
-					ShowMyMenu(IDR_POPKLINE,2);
-			}
-			else
-			{
-					ShowMyMenu(IDR_POPKLINE,1);
-			}
-			return;
-
+			ShowMyMenu(IDR_POPKLINE,1);
 		}
-	
-		RedrawWindow();
+		return;
+
+	}
+
+	RedrawWindow();
 
 }
 
@@ -4120,15 +4120,15 @@ void CTaiShanKlineShowView::ShowMyMenu(UINT id,int subM)//6.1
 		}
 		else
 			pMnu->EnableMenuItem (ID_CHANGE_DATA, MF_GRAYED);
-			
+
 #ifdef OEM
 		pMnu->EnableMenuItem (ID_MODIFY_JISHU_POP, MF_GRAYED);
 		pMnu->EnableMenuItem (ID_PARAM_YH, MF_GRAYED);
 #endif
-	
+
 		pMnu->AppendMenu(MF_STRING | MF_ENABLED, IDM_POP_CHANGE_PARAM, "调整指标参数");
-		
-	
+
+
 		{
 			pMnu->AppendMenu(  MF_SEPARATOR);
 
@@ -4155,10 +4155,10 @@ void CTaiShanKlineShowView::ShowMyMenu(UINT id,int subM)//6.1
 			pMnu->AppendMenu(MF_STRING | MF_ENABLED, ID_DELETE_ADDED_INDICATOR, "取消指标叠加");
 		}
 
-		
+
 		if(m_hit>=REGION_PICT1&&m_hit<=REGION_PICT5)
 		{
-		
+
 			CStringArray m_zhiBiaoOften;
 			for(int i=0;i<GetDocument()->m_formuar_index .GetSize ();i++)
 			{
@@ -4179,7 +4179,7 @@ void CTaiShanKlineShowView::ShowMyMenu(UINT id,int subM)//6.1
 			if(pKlineDrawing->m_kLine_mode == 1 )
 				pMnu->CheckMenuItem (IDM_POP_DRAG_MODE,MF_BYCOMMAND|MF_CHECKED );
 
-		
+
 			for(int nPos = 0 ; nPos < m_zhiBiaoOften.GetSize() ; ++nPos)
 			{
 				int n = (nPos)%10;
@@ -4215,15 +4215,15 @@ void CTaiShanKlineShowView::ShowMyMenu(UINT id,int subM)//6.1
 		{
 			if(IsIndexStock3(m_sharesSymbol))
 			{
-			  pMnu->EnableMenuItem (ID_L_FENSHI, MF_GRAYED); 
+				pMnu->EnableMenuItem (ID_L_FENSHI, MF_GRAYED); 
 			}
 			if(IsIndexStock(m_sharesSymbol))
 			{
-			pMnu->EnableMenuItem (ID_L_CHENG_JIAO_L, MF_GRAYED);
-			pMnu->EnableMenuItem (ID_L_MMLD, MF_GRAYED);
-			pMnu->EnableMenuItem (ID_L_LB, MF_GRAYED);
-			pMnu->EnableMenuItem (ID_L_DUOKONG, MF_GRAYED);
-			pMnu->EnableMenuItem (ID_L_TENGLUO, MF_GRAYED);
+				pMnu->EnableMenuItem (ID_L_CHENG_JIAO_L, MF_GRAYED);
+				pMnu->EnableMenuItem (ID_L_MMLD, MF_GRAYED);
+				pMnu->EnableMenuItem (ID_L_LB, MF_GRAYED);
+				pMnu->EnableMenuItem (ID_L_DUOKONG, MF_GRAYED);
+				pMnu->EnableMenuItem (ID_L_TENGLUO, MF_GRAYED);
 			}
 			else
 			{
@@ -4300,7 +4300,7 @@ void CTaiShanKlineShowView::OnMenu1fs()
 	InvalidateRect(r);
 	if(m_isShowCross==1)
 		m_dlgShowCross->RedrawWindow();
-	
+
 }
 
 
@@ -4308,9 +4308,9 @@ void CTaiShanKlineShowView::OnMenu1fs()
 void CTaiShanKlineShowView::OnDayKline() 
 {
 	m_nKlineKind2=5;
-	
+
 	bTrackCurcorBgn=false;
-	
+
 	CRect r;
 	GetClientRect(r);
 	OnSizeMy(r.right-r.left,r.bottom-r.top);
@@ -4357,7 +4357,7 @@ void CTaiShanKlineShowView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 			return;
 		case VK_NEXT :
 			OnPageDown(TRUE,nFiguer);
-	
+
 			return;
 		case VK_F5:
 			if(m_nKlineKind2 == 0)
@@ -4367,7 +4367,7 @@ void CTaiShanKlineShowView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 			}
 			else 
 			{
-			  OnMenu1fs();
+				OnMenu1fs();
 			}
 			break; 
 		}//
@@ -4376,7 +4376,7 @@ void CTaiShanKlineShowView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 	m_MyToolTip->Hide();
 
-	
+
 	if(nChar == VK_ESCAPE)
 	{
 		if(m_isShowCross==1)
@@ -4388,15 +4388,15 @@ void CTaiShanKlineShowView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		}
 		else
 		{
-		
+
 			CMainFrame* pMainWnd = (CMainFrame *)(AfxGetApp()->m_pMainWnd);
 			if(IsBarShow  == TRUE && pMainWnd->m_drawLineToolBar->IsWindowVisible() != 0 )
 			{
-              pMainWnd->ShowControlBar(pMainWnd->m_drawLineToolBar,FALSE, FALSE);
-			  IsBarShow = !IsBarShow;
-			  return;
+				pMainWnd->ShowControlBar(pMainWnd->m_drawLineToolBar,FALSE, FALSE);
+				IsBarShow = !IsBarShow;
+				return;
 			}
-	
+
 			this->m_GetFocus = false;
 			this->m_AutoChange = false;
 			KillTimer(12);
@@ -4412,7 +4412,7 @@ void CTaiShanKlineShowView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 	if(nChar == VK_INSERT)
 	{
-	
+
 		if(::GetKeyState(VK_CONTROL)&0x8000)
 		{
 			if(m_pWideNet) m_pWideNet->AddStockKlineDataAll( m_sharesSymbol,  this->m_nKlineKind2 ,  true);
@@ -4427,7 +4427,7 @@ void CTaiShanKlineShowView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	{
 		switch(nChar)
 		{
-	
+
 		case 190:
 			{
 				static int nIndicator = 0;
@@ -4464,8 +4464,8 @@ void CTaiShanKlineShowView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		case VK_LEFT:
 			if(m_AutoChange == TRUE)
 			{
-			 m_AutoChange = false;
-			 KillTimer(12);
+				m_AutoChange = false;
+				KillTimer(12);
 			}
 			(pKlineDrawing->OnLeft());
 			DoHistoryAStep() ;
@@ -4474,8 +4474,8 @@ void CTaiShanKlineShowView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		case VK_RIGHT:
 			if(m_AutoChange == TRUE)
 			{
-			 m_AutoChange = false;
-			 KillTimer(12);
+				m_AutoChange = false;
+				KillTimer(12);
 			}
 			(pKlineDrawing->OnRight());
 			DoHistoryAStep() ;
@@ -4602,15 +4602,15 @@ void CTaiShanKlineShowView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		case VK_F5:
 			if(m_nKlineKind2 == 0)
 			{
-			  OnDayKline();
+				OnDayKline();
 			}
 			else 
 			{
-			  OnMenu1fs();
+				OnMenu1fs();
 			}
 			goto END_ROW;
 		case 107:             
-            ReDrawSheet(TRUE);
+			ReDrawSheet(TRUE);
 			break;
 		}
 	}
@@ -4621,8 +4621,8 @@ void CTaiShanKlineShowView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		case VK_LEFT:
 			if(m_AutoChange == TRUE)
 			{
-			 m_AutoChange = false;
-			 KillTimer(12);
+				m_AutoChange = false;
+				KillTimer(12);
 			}
 			(pMin1Drawing->OnLeft());
 
@@ -4631,8 +4631,8 @@ void CTaiShanKlineShowView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 		case VK_RIGHT:
 			if(m_AutoChange == TRUE)
 			{
-			 m_AutoChange = false;
-			 KillTimer(12);
+				m_AutoChange = false;
+				KillTimer(12);
 			}			
 			(pMin1Drawing->OnRight());
 
@@ -4675,7 +4675,7 @@ void CTaiShanKlineShowView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 				OnPageDown(false,4);
 
 			m_bKeyUpDown=TRUE;
-	
+
 			goto END_ROW;
 		case VK_NEXT :
 			if(m_bKeyUpDown==false)
@@ -4693,11 +4693,11 @@ void CTaiShanKlineShowView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 			}
 			else 
 			{
-			  OnMenu1fs();
+				OnMenu1fs();
 			}
 			goto END_ROW;
 		case 107:             
-            ReDrawSheet(TRUE);
+			ReDrawSheet(TRUE);
 			break;
 		}//
 	}
@@ -4730,7 +4730,7 @@ void CTaiShanKlineShowView::ShowShiZi(int x, int y,int flag)
 	CClientDC dc(this);
 	CPen pen;
 	if (!pen.CreatePen(PS_SOLID,1,GetDocument()->m_colorArray[2]))
-			return;
+		return;
 	CPen* pOldpen=dc.SelectObject(&pen);
 	int oldROP = dc.SetROP2(R2_NOT);
 	if( dc.GetDeviceCaps (RASTERCAPS ) == 0 )
@@ -4740,7 +4740,7 @@ void CTaiShanKlineShowView::ShowShiZi(int x, int y,int flag)
 	CRect r;
 	GetClientRect(r);
 	if(m_nKlineKind2==0)
-	lft=m_rtMin1.leftX+1;
+		lft=m_rtMin1.leftX+1;
 	m_nOldHitPos = x;
 	m_nOldHitY = y;
 	if(m_nOldHitPos>=0)
@@ -4798,7 +4798,7 @@ void CTaiShanKlineShowView::ShowCross(bool bKey,int x,int y)//6.17
 {
 	if(bKey == TRUE)
 		m_bKD = TRUE;
-	
+
 	int x2=m_pointMove.x;
 	int y2=m_pointMove.y;
 	m_pointMove.y=y;
@@ -4968,17 +4968,17 @@ void CTaiShanKlineShowView::CopyCaption()//6.17
 	{
 		int nm=m_infoInit.nCountMin1;
 		CRect rIn(0,0,r.right-m_midLen,m_heightCaption);
-		
-		{
-		CTaiKlineDC memdc3(this,&m_bit,&rIn);
-		CTaiKlineDC* pMemdc = &memdc3;
 
-		for(int j=0;j<nm;j++)
 		{
-			pMin1Drawing->m_nSon =j;
-			pMin1Drawing->SetRectDraw(j);
-			pMin1Drawing->DrawCapt(pMemdc);
-		}
+			CTaiKlineDC memdc3(this,&m_bit,&rIn);
+			CTaiKlineDC* pMemdc = &memdc3;
+
+			for(int j=0;j<nm;j++)
+			{
+				pMin1Drawing->m_nSon =j;
+				pMin1Drawing->SetRectDraw(j);
+				pMin1Drawing->DrawCapt(pMemdc);
+			}
 		}
 
 		for(int i=1;i<nm;i++)
@@ -4994,12 +4994,12 @@ void CTaiShanKlineShowView::CopyCaption()//6.17
 		}
 		else
 		{
-		rIn=CRect(r.right ,0,r.right+m_rightLength,r.bottom );
-		CTaiKlineDC memdc3(this,&m_bit,&rIn);
-		CTaiKlineDC* pMemdc = &memdc3;
-		CopyScrollBar(pMemdc);
+			rIn=CRect(r.right ,0,r.right+m_rightLength,r.bottom );
+			CTaiKlineDC memdc3(this,&m_bit,&rIn);
+			CTaiKlineDC* pMemdc = &memdc3;
+			CopyScrollBar(pMemdc);
 
-		DrawRightSheet( pMemdc,m_tabNum,true);
+			DrawRightSheet( pMemdc,m_tabNum,true);
 		}
 	}
 	else
@@ -5015,7 +5015,7 @@ void CTaiShanKlineShowView::CopyCaption()//6.17
 			{
 				pKlineDrawing->m_nSon =j;
 				pKlineDrawing->SetRectCurrent(j);
-				
+
 				pKlineDrawing->DrawCaption(pMemdc);
 			}
 		}
@@ -5028,7 +5028,7 @@ void CTaiShanKlineShowView::CopyCaption()//6.17
 			CopyRect(r2);
 		}
 
-	
+
 		if(m_nKlineKind2 ==HS_K_LINE ||m_nKlineKind2 ==MINUTE_1_K_LINE)
 		{
 			rIn=CRect(r.right ,0,r.right+m_rightLength,r.bottom );
@@ -5043,56 +5043,6 @@ void CTaiShanKlineShowView::CopyCaption()//6.17
 }
 
 
-
-void CTaiShanKlineShowView::ShowTextRect(int n,CDC * pDC)
-{
-	CPen pen_line(PS_SOLID ,1,GetDocument()->m_colorArray[1]);   
-
-	if(m_nKlineKind2==0)
-	{
-		if(m_infoInit.nCountMin1==1)
-			return;
-		if(n>m_infoInit.nCountMin1-2)
-			n=m_infoInit.nCountMin1-2;
-		pMin1Drawing->m_nTextBox=n;
-
-		CPen* pOldpen=pDC->SelectObject(&pen_line);
-
-		pDC->MoveTo(m_rtMin1.rightX+2,m_rtMin1.rtBlw[n].m_yBottom+2);
-		pDC->LineTo(m_rtMin1.rightX+m_midLen-2,m_rtMin1.rtBlw[n].m_yBottom+2);
-		pDC->LineTo(m_rtMin1.rightX+m_midLen-2,m_rtMin1.rtBlw[n+1].m_yBottom-2);
-		pDC->LineTo(m_rtMin1.rightX+2,m_rtMin1.rtBlw[n+1].m_yBottom-2);
-		pDC->LineTo(m_rtMin1.rightX+2,m_rtMin1.rtBlw[n].m_yBottom+2);
-
-		pDC->SelectObject(pOldpen);
-
-
-	}
-	else
-	{
-		if(m_infoInit.nCountIndex==1)
-			return;
-		if(n>m_infoInit.nCountIndex-2)
-			n=m_infoInit.nCountIndex-2;
-		pKlineDrawing->m_nTextBox=n;
-
-
-		CPen* pOldpen=pDC->SelectObject(&pen_line);
-
-		pDC->MoveTo(m_rtKlineFiguer.rightX+2,m_rtKlineFiguer.rtBlw[n].m_yBottom+2);
-		pDC->LineTo(m_rtKlineFiguer.rightX+m_midLen-2,m_rtKlineFiguer.rtBlw[n].m_yBottom+2);
-		pDC->LineTo(m_rtKlineFiguer.rightX+m_midLen-2,m_rtKlineFiguer.rtBlw[n+1].m_yBottom-2);
-		pDC->LineTo(m_rtKlineFiguer.rightX+2,m_rtKlineFiguer.rtBlw[n+1].m_yBottom-2);
-		pDC->LineTo(m_rtKlineFiguer.rightX+2,m_rtKlineFiguer.rtBlw[n].m_yBottom+2);
-
-		pDC->SelectObject(pOldpen);
-
-
-	}
-
-
-
-}
 
 void CTaiShanKlineShowView::ShowTransferText(CDC *pDC)
 {
@@ -5140,7 +5090,7 @@ void CTaiShanKlineShowView::ShowTransferText(CDC *pDC)
 				s = s1+"日线";
 			else
 				s = s1 + "分钟线";
-		break;
+			break;
 		}
 	case HS_K_LINE:
 		s="分笔线";
@@ -5182,7 +5132,7 @@ void CTaiShanKlineShowView::ShowTransferText(CDC *pDC)
 void CTaiShanKlineShowView::OnXianduan() 
 {
 
-	
+
 }
 void CTaiShanKlineShowView::DoDrawLine(UINT nID) 
 {
@@ -5276,11 +5226,11 @@ void CTaiShanKlineShowView::DoDrawLine(UINT nID)
 		break;
 	}
 
-	
+
 }
 void CTaiShanKlineShowView::DoDrawLineUpdate(CCmdUI* pCmdUI) 
 {
-	
+
 	if(m_nKlineKind2>0)
 	{
 		if(pCmdUI->m_nID==ID_PING_XING&&(pDrawLine->m_lineTypeOld==XIAN_DUAN||pDrawLine->m_lineTypeOld==QU_SHI||pDrawLine->m_lineTypeOld==PING_XING))
@@ -5362,9 +5312,9 @@ void CTaiShanKlineShowView::OnLButtonDblClk(UINT nFlags, CPoint point)
 		GetDocument()->m_sharesInformation .GetStockItem(m_nSharesBegin,n,pStockData);
 		if(pStockData!=NULL)
 		{
-		m_sharesSymbol=pStockData->id ;
-		m_stkKind = pStockData->kind ;
-		ASSERT(m_sharesSymbol.GetLength()>3);
+			m_sharesSymbol=pStockData->id ;
+			m_stkKind = pStockData->kind ;
+			ASSERT(m_sharesSymbol.GetLength()>3);
 		}
 
 	}
@@ -5401,7 +5351,7 @@ void CTaiShanKlineShowView::ShowKlineBig(bool bBig)
 			first=scd;
 			scd=tmp;
 		}
-	
+
 		pKlineDrawing->m_klinNumDefaultOld=pKlineDrawing->m_klinNumDefault;
 		pKlineDrawing->m_footEndOld=pKlineDrawing->m_footEnd;
 		pKlineDrawing->m_footBeginOld=pKlineDrawing->m_footBegin;
@@ -5455,7 +5405,7 @@ void CTaiShanKlineShowView::ShowKlineBig(bool bBig)
 	CRect r;
 	GetClientRect(r);
 	if(m_infoFiguer>0)
-			r.right-=m_rightLength;
+		r.right-=m_rightLength;
 
 	CTaiKlineDC memdc(this,&m_bit,&r);
 	pKlineDrawing->ValidDoKline(true);
@@ -5528,8 +5478,8 @@ void CTaiShanKlineShowView::OnPrintKLine(CDC *pDC)
 void CTaiShanKlineShowView::OnPrepareDC(CDC* pDC, CPrintInfo* pInfo) 
 {
 	if(pDC->IsPrinting() && pInfo != NULL)
-	   pInfo->SetMaxPage(1);
-	
+		pInfo->SetMaxPage(1);
+
 	CView::OnPrepareDC(pDC, pInfo);
 }
 
@@ -5540,7 +5490,7 @@ void CTaiShanKlineShowView::OnPrint(CDC* pDC, CPrintInfo* pInfo) //6.18
 	CRect r2;
 	GetClientRect(r2);
 
-    pDC->SetMapMode(MM_TEXT);
+	pDC->SetMapMode(MM_TEXT);
 	CRgn rgn;
 
 
@@ -5548,88 +5498,88 @@ void CTaiShanKlineShowView::OnPrint(CDC* pDC, CPrintInfo* pInfo) //6.18
 		return ;
 	pDC->SelectClipRgn (&rgn);
 
-	
-		pDC->SetMapMode(MM_ANISOTROPIC);
-		int cx=pDC->GetDeviceCaps(LOGPIXELSX);
-		int cy=pDC->GetDeviceCaps(LOGPIXELSY);
-	
-		int x=pInfo->m_rectDraw.Width();
-		int y=pInfo->m_rectDraw.Height();
-		m_xPrinter=x;
-		m_yPrinter=y;
+
+	pDC->SetMapMode(MM_ANISOTROPIC);
+	int cx=pDC->GetDeviceCaps(LOGPIXELSX);
+	int cy=pDC->GetDeviceCaps(LOGPIXELSY);
+
+	int x=pInfo->m_rectDraw.Width();
+	int y=pInfo->m_rectDraw.Height();
+	m_xPrinter=x;
+	m_yPrinter=y;
 
 
-		pDC->SetViewportExt(x, y);
+	pDC->SetViewportExt(x, y);
 
-		if(x==0||y==0)
-		{
-			pDC->SetWindowExt(800, 600);
-			m_cxExt=800;
-			m_cyExt=600;
-		
-			CFont ft2;
-			LOGFONT lgf2=GetDocument()->m_fontstr[0];
-			ft2.CreateFontIndirect (&lgf2 );
-			CFont* pOld=pDC->SelectObject(&ft2);
+	if(x==0||y==0)
+	{
+		pDC->SetWindowExt(800, 600);
+		m_cxExt=800;
+		m_cyExt=600;
 
-			CString name="上证指数jjj55";
-			int y2=(pDC->GetOutputTextExtent(name)).cy+2;
-			m_heightCaption=y2;
+		CFont ft2;
+		LOGFONT lgf2=GetDocument()->m_fontstr[0];
+		ft2.CreateFontIndirect (&lgf2 );
+		CFont* pOld=pDC->SelectObject(&ft2);
 
-			name="111222";
-			int x2=(pDC->GetOutputTextExtent(name)).cx;
-			m_midLen=x2;
-			pDC->SelectObject(pOld);
+		CString name="上证指数jjj55";
+		int y2=(pDC->GetOutputTextExtent(name)).cy+2;
+		m_heightCaption=y2;
 
-			OnSizeMy(800,600);
-		}
-		else
-		{
-			int y1=800;
-			int x1=x*y1/y;
-			m_cxExt=x1;
-			m_cyExt=y1;
-			pDC->SetWindowExt(x1,y1);
-	
-			CFont ft2;
-			LOGFONT lgf2=GetDocument()->m_fontstr[0];
-			ft2.CreateFontIndirect (&lgf2 );
-			CFont* pOld=pDC->SelectObject(&ft2);
+		name="111222";
+		int x2=(pDC->GetOutputTextExtent(name)).cx;
+		m_midLen=x2;
+		pDC->SelectObject(pOld);
 
-			CString name="上证指数jjj55";
-			int y2=(pDC->GetOutputTextExtent(name)).cy+2;
-			m_heightCaption=y2;
+		OnSizeMy(800,600);
+	}
+	else
+	{
+		int y1=800;
+		int x1=x*y1/y;
+		m_cxExt=x1;
+		m_cyExt=y1;
+		pDC->SetWindowExt(x1,y1);
 
-			name="111222";
-			int x2=(pDC->GetOutputTextExtent(name)).cx;
-			m_midLen=x2;
-			pDC->SelectObject(pOld);
+		CFont ft2;
+		LOGFONT lgf2=GetDocument()->m_fontstr[0];
+		ft2.CreateFontIndirect (&lgf2 );
+		CFont* pOld=pDC->SelectObject(&ft2);
 
-			OnSizeMy(x1,y1);
-		}
+		CString name="上证指数jjj55";
+		int y2=(pDC->GetOutputTextExtent(name)).cy+2;
+		m_heightCaption=y2;
+
+		name="111222";
+		int x2=(pDC->GetOutputTextExtent(name)).cx;
+		m_midLen=x2;
+		pDC->SelectObject(pOld);
+
+		OnSizeMy(x1,y1);
+	}
 
 
-		OnPrintKLine(pDC);
-    	pDC->SetMapMode(MM_TEXT);
+	OnPrintKLine(pDC);
+	pDC->SetMapMode(MM_TEXT);
 
-		pDC->SelectClipRgn (NULL);
-		rgn.DeleteObject ();
+	pDC->SelectClipRgn (NULL);
+	rgn.DeleteObject ();
 
-		SetConstant();
-		OnSizeMy(r2.Width(),r2.Height());
+	SetConstant();
+	OnSizeMy(r2.Width(),r2.Height());
 
-		RedrawWindow();
+	RedrawWindow();
 
 
 }
 
 void CTaiShanKlineShowView::OnKlineMode() 
 {
-	
+
 	if(m_AutoChange == TRUE)
 	{
-	 m_AutoChange = false;
-     KillTimer(12);
+		m_AutoChange = false;
+		KillTimer(12);
 	}
 	if(pKlineMode==NULL)  
 	{
@@ -5677,7 +5627,7 @@ void CTaiShanKlineShowView::OnPowerDo()
 	{
 		m_bDoPower=false;
 
-	
+
 		KlineReadTransferData();
 		pKlineDrawing->m_bToCacl=TRUE;
 		pKlineDrawing ->m_bInitFoot =false;//
@@ -5698,16 +5648,16 @@ void CTaiShanKlineShowView::OnZhutuDiejia()
 	if(pDlg.DoModal()==IDOK)
 	{
 		s = pDlg.m_strStockCode;
-		
+
 		int nStkKind = pDlg.m_stkKind;
 		CReportData* pdt;	
-  	    CTaiShanDoc* pDoc = GetDocument();
+		CTaiShanDoc* pDoc = GetDocument();
 		if(pDoc->m_sharesInformation.Lookup(s.GetBuffer (0),pdt,nStkKind)!=0)
 		{
 			AddNewStock(s,nStkKind);
 		}
 	}
-	
+
 }
 void CTaiShanKlineShowView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags) 
 {
@@ -5717,53 +5667,53 @@ void CTaiShanKlineShowView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 	CView::OnKeyUp(nChar, nRepCnt, nFlags);
 }
 static int g_stcID[12] = {ID_MENU_1FS,ID_KLINE_HS,ID_KLINE_1_MINU,
-				  ID_KLINE_5,ID_KLINE_15,ID_KLINE_30,ID_KLINE_60,
-				  ID_DAY_KLINE,ID_KLINE_ZHOU2,ID_KLINE_YUE2,ID_KLINE_NIAN,
-				  ID_KLINE_MANY_DAY};
+ID_KLINE_5,ID_KLINE_15,ID_KLINE_30,ID_KLINE_60,
+ID_DAY_KLINE,ID_KLINE_ZHOU2,ID_KLINE_YUE2,ID_KLINE_NIAN,
+ID_KLINE_MANY_DAY};
 
 BOOL CTaiShanKlineShowView::PreTranslateMessage(MSG* pMsg) 
 {
 
 
-	
+
 	CTaiShanDoc* pDoc=(CTaiShanDoc*)GetDocument();
-    if(pMsg->message == WM_KEYDOWN || pMsg->message == WM_LBUTTONDOWN  
-		 || pMsg->message == WM_LBUTTONDBLCLK || pMsg->message == WM_RBUTTONDOWN ||
-		 pMsg->message == WM_COMMAND|| pMsg->message == WM_MOUSEMOVE
-		 || pMsg->message == WM_SYSKEYDOWN)
+	if(pMsg->message == WM_KEYDOWN || pMsg->message == WM_LBUTTONDOWN  
+		|| pMsg->message == WM_LBUTTONDBLCLK || pMsg->message == WM_RBUTTONDOWN ||
+		pMsg->message == WM_COMMAND|| pMsg->message == WM_MOUSEMOVE
+		|| pMsg->message == WM_SYSKEYDOWN)
 	{
-	  pDoc->m_GetFocus = false;
+		pDoc->m_GetFocus = false;
 	}
 
 	if(pMsg->message == WM_KEYDOWN )
 		bTrackCurcorBgn=false;
 
-    if(pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F8)
+	if(pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F8)
 	{
 
 
-			  if(this->m_nKlineKind2 == 0)
-				  m_nCurrentKlineKind = 1;
-			  if(this->m_nKlineKind2 == HS_K_LINE)
-				  m_nCurrentKlineKind = 2;
-			  if(this->m_nKlineKind2 == MINUTE_1_K_LINE)
-				  m_nCurrentKlineKind = 3;
-			  if(this->m_nKlineKind2 >0 &&  m_nKlineKind2<8)
-				  m_nCurrentKlineKind = 3+m_nKlineKind2;
-			  if(this->m_nKlineKind2==8)
-				  m_nCurrentKlineKind = 11;
-			  if(this->m_nKlineKind2==MANY_DAY_K_LINE)
-				  m_nCurrentKlineKind = 0;
-			  m_nCurrentKlineKind%=12;
-			  DoOnCommand((WPARAM )g_stcID[m_nCurrentKlineKind], 0);
+		if(this->m_nKlineKind2 == 0)
+			m_nCurrentKlineKind = 1;
+		if(this->m_nKlineKind2 == HS_K_LINE)
+			m_nCurrentKlineKind = 2;
+		if(this->m_nKlineKind2 == MINUTE_1_K_LINE)
+			m_nCurrentKlineKind = 3;
+		if(this->m_nKlineKind2 >0 &&  m_nKlineKind2<8)
+			m_nCurrentKlineKind = 3+m_nKlineKind2;
+		if(this->m_nKlineKind2==8)
+			m_nCurrentKlineKind = 11;
+		if(this->m_nKlineKind2==MANY_DAY_K_LINE)
+			m_nCurrentKlineKind = 0;
+		m_nCurrentKlineKind%=12;
+		DoOnCommand((WPARAM )g_stcID[m_nCurrentKlineKind], 0);
 
-			  return TRUE;
+		return TRUE;
 	}
 
 	{
 	}
-   	
-	
+
+
 	if(pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_F4)
 	{
 		DoF4();
@@ -5772,20 +5722,20 @@ BOOL CTaiShanKlineShowView::PreTranslateMessage(MSG* pMsg)
 
 	if(pMsg->message==WM_CHAR&&((pMsg->wParam>='0'&&pMsg->wParam<='9')||(pMsg->wParam>='A'&&pMsg->wParam<='z')))
 	{
-			CTaiKeyBoardAngelDlg m_diakeybrode(this);
-			if(pMsg->wParam>='a'&&pMsg->wParam<='z')
-				pMsg->wParam-=32;
-			char input=pMsg->wParam;
-			m_diakeybrode.input=input;
-			if(pMsg->wParam>='0'&&pMsg->wParam<='9')
-				m_diakeybrode.ischar=false;
-			else
-				m_diakeybrode.ischar=TRUE;
+		CTaiKeyBoardAngelDlg m_diakeybrode(this);
+		if(pMsg->wParam>='a'&&pMsg->wParam<='z')
+			pMsg->wParam-=32;
+		char input=pMsg->wParam;
+		m_diakeybrode.input=input;
+		if(pMsg->wParam>='0'&&pMsg->wParam<='9')
+			m_diakeybrode.ischar=false;
+		else
+			m_diakeybrode.ischar=TRUE;
 
 		if(m_diakeybrode.DoModal() != IDOK)
 			return TRUE;
-	    
-	
+
+
 		if(m_diakeybrode.isresultok ==false)
 		{
 			CString sRtn(m_diakeybrode.inputpre );
@@ -5823,90 +5773,90 @@ BOOL CTaiShanKlineShowView::PreTranslateMessage(MSG* pMsg)
 			}
 			return TRUE;
 		}
-	
-        CString sKeys(m_diakeybrode.result);
+
+		CString sKeys(m_diakeybrode.result);
 		if(sKeys.GetLength()==2&&!m_diakeybrode.ischar)
 		{
-		  if(sKeys == "01")
-		  {
-			  {
-			  CTaiKlineDC memdc(this,&m_bit);
-			  DrawRightSheet(&memdc,0);
-			  }
-              return TRUE;
-		  }
-		  if(sKeys == "03")
-		  {
-			  if(m_bMultiFiguer == 1) m_bMultiFiguer = 0;
-			  m_nKlineKind2 = 0;
-			  m_stkKind = SHZS;
-			  this->ShowAll(CSharesCompute::GetIndexSymbol(0));
-			  
-              return TRUE;
-		  }
-		  if(sKeys == "04")
-		  {
-			  if(m_bMultiFiguer == 1) m_bMultiFiguer = 0;
-			  m_nKlineKind2 = 0;
-			  m_stkKind = SZZS;
-			  this->ShowAll(CSharesCompute::GetIndexSymbol(1));
-              return TRUE;
-		  }
-		  if(sKeys == "09")
-		  {
-			  OnToolDrawline();
-              return TRUE;
-		  }
-		  if(sKeys == "02")
-		  {
-			  {
-			  CTaiKlineDC memdc(this,&m_bit);
-			  DrawRightSheet(&memdc,1);
- 			  }
-              return TRUE;
-		  }
-		  if(sKeys == "08")
-		  {
-			  if(this->m_nKlineKind2 == 0)
-				  m_nCurrentKlineKind = 1;
-			  if(this->m_nKlineKind2 == HS_K_LINE)
-				  m_nCurrentKlineKind = 2;
-			  if(this->m_nKlineKind2 == MINUTE_1_K_LINE)
-				  m_nCurrentKlineKind = 3;
-			  if(this->m_nKlineKind2 >0 &&  m_nKlineKind2<8)
-				  m_nCurrentKlineKind = 3+m_nKlineKind2;
-			  if(this->m_nKlineKind2==8)
-				  m_nCurrentKlineKind = 11;
-			  if(this->m_nKlineKind2==MANY_DAY_K_LINE)
-				  m_nCurrentKlineKind = 0;
-			  m_nCurrentKlineKind%=12;
-			  DoOnCommand((WPARAM )g_stcID[m_nCurrentKlineKind], 0);
-		      this->SetFocus();
-			  return TRUE;
-		  }
-		  if(sKeys == "10")
-		  {
-		    CTaiShanDoc *pDoc = GetDocument();
-			pDoc->m_GetFocus = false;
-			CWnd * pMainWnd = AfxGetApp()->m_pMainWnd;
-	        ((CMainFrame *)pMainWnd)->OnCompanyinfo();
-			return TRUE;
-		  }
-		  if(sKeys == "05")
-		  {
-		   	 if(m_nKlineKind2 == 0)
-				 OnDayKline();
-			 else
-				 OnMenu1fs();
-			 this->SetFocus();
-			 return TRUE;
-		  }
+			if(sKeys == "01")
+			{
+				{
+					CTaiKlineDC memdc(this,&m_bit);
+					DrawRightSheet(&memdc,0);
+				}
+				return TRUE;
+			}
+			if(sKeys == "03")
+			{
+				if(m_bMultiFiguer == 1) m_bMultiFiguer = 0;
+				m_nKlineKind2 = 0;
+				m_stkKind = SHZS;
+				this->ShowAll(CSharesCompute::GetIndexSymbol(0));
+
+				return TRUE;
+			}
+			if(sKeys == "04")
+			{
+				if(m_bMultiFiguer == 1) m_bMultiFiguer = 0;
+				m_nKlineKind2 = 0;
+				m_stkKind = SZZS;
+				this->ShowAll(CSharesCompute::GetIndexSymbol(1));
+				return TRUE;
+			}
+			if(sKeys == "09")
+			{
+				OnToolDrawline();
+				return TRUE;
+			}
+			if(sKeys == "02")
+			{
+				{
+					CTaiKlineDC memdc(this,&m_bit);
+					DrawRightSheet(&memdc,1);
+				}
+				return TRUE;
+			}
+			if(sKeys == "08")
+			{
+				if(this->m_nKlineKind2 == 0)
+					m_nCurrentKlineKind = 1;
+				if(this->m_nKlineKind2 == HS_K_LINE)
+					m_nCurrentKlineKind = 2;
+				if(this->m_nKlineKind2 == MINUTE_1_K_LINE)
+					m_nCurrentKlineKind = 3;
+				if(this->m_nKlineKind2 >0 &&  m_nKlineKind2<8)
+					m_nCurrentKlineKind = 3+m_nKlineKind2;
+				if(this->m_nKlineKind2==8)
+					m_nCurrentKlineKind = 11;
+				if(this->m_nKlineKind2==MANY_DAY_K_LINE)
+					m_nCurrentKlineKind = 0;
+				m_nCurrentKlineKind%=12;
+				DoOnCommand((WPARAM )g_stcID[m_nCurrentKlineKind], 0);
+				this->SetFocus();
+				return TRUE;
+			}
+			if(sKeys == "10")
+			{
+				CTaiShanDoc *pDoc = GetDocument();
+				pDoc->m_GetFocus = false;
+				CWnd * pMainWnd = AfxGetApp()->m_pMainWnd;
+				((CMainFrame *)pMainWnd)->OnCompanyinfo();
+				return TRUE;
+			}
+			if(sKeys == "05")
+			{
+				if(m_nKlineKind2 == 0)
+					OnDayKline();
+				else
+					OnMenu1fs();
+				this->SetFocus();
+				return TRUE;
+			}
 		}
 
-        if(m_diakeybrode.ischar && m_diakeybrode.isresultstock == FALSE)
+		if(m_diakeybrode.ischar && m_diakeybrode.isresultstock == FALSE)
 		{
-		  DrawZhibiao(m_diakeybrode.result);
-		  return TRUE;
+			DrawZhibiao(m_diakeybrode.result);
+			return TRUE;
 		}
 
 		{
@@ -5921,9 +5871,9 @@ BOOL CTaiShanKlineShowView::PreTranslateMessage(MSG* pMsg)
 				}
 				else
 				{
-				m_sharesSymbol = m_diakeybrode.result;
-				m_stkKind = m_diakeybrode.m_stkKind;
-				ShowAll(m_sharesSymbol);
+					m_sharesSymbol = m_diakeybrode.result;
+					m_stkKind = m_diakeybrode.m_stkKind;
+					ShowAll(m_sharesSymbol);
 
 
 				}
@@ -5932,12 +5882,12 @@ BOOL CTaiShanKlineShowView::PreTranslateMessage(MSG* pMsg)
 			CString sKey(m_diakeybrode.result);
 			if(sKey.GetLength()==2&&!m_diakeybrode.ischar)
 			{
-			
+
 				pDoc->m_WsStock2000View->GetParentFrame()->ActivateFrame();
 				int m_key=atoi(sKey);
 				if(m_key == 3) this->m_stkKind = SHZS;
 				if(m_key == 4) this->m_stkKind = SZZS;
-				
+
 				::SendMessage(pDoc->m_WsStock2000View->m_hWnd,WM_USER_FROM_KLINE,0,m_key); 
 			}
 			else if(sKey.GetLength()==1)
@@ -5946,18 +5896,18 @@ BOOL CTaiShanKlineShowView::PreTranslateMessage(MSG* pMsg)
 				{
 					int nn = sKey[0] - '0';
 					int nID[] = {ID_KLINE_HS,ID_KLINE_1_MINU,
-									  ID_KLINE_5,ID_KLINE_15,ID_KLINE_30,ID_KLINE_60,
-									  ID_DAY_KLINE,ID_KLINE_ZHOU2,ID_KLINE_YUE2,
-									  ID_KLINE_MANY_DAY};
+						ID_KLINE_5,ID_KLINE_15,ID_KLINE_30,ID_KLINE_60,
+						ID_DAY_KLINE,ID_KLINE_ZHOU2,ID_KLINE_YUE2,
+						ID_KLINE_MANY_DAY};
 					DoOnCommand((WPARAM )nID[nn], 0);
 				}
 			}
 			return TRUE;
-				
+
 		}
-		
+
 	}
-	
+
 	return CView::PreTranslateMessage(pMsg);
 }
 void CTaiShanKlineShowView::OnViewGpHuanQuan() 
@@ -5967,7 +5917,7 @@ void CTaiShanKlineShowView::OnViewGpHuanQuan()
 void CTaiShanKlineShowView::OnUpdateViewGphq(CCmdUI* pCmdUI) 
 {
 
-	
+
 }
 
 
@@ -6074,7 +6024,7 @@ void CTaiShanKlineShowView::CaclStockPos()
 
 void CTaiShanKlineShowView::ReadDataMultiFiguer(int nItem)
 {
-	
+
 	CTaiShanDoc* pDoc = GetDocument();
 	int n;
 	m_sharesSymbol = GetMultiSymbol(nItem,m_stkKind);
@@ -6176,7 +6126,7 @@ void CTaiShanKlineShowView::OnDestroy()
 		m_dlgZhibiao->DestroyWindow();
 
 
-	
+
 }
 
 void CTaiShanKlineShowView::BuySell()
@@ -6185,26 +6135,26 @@ void CTaiShanKlineShowView::BuySell()
 		m_infoFiguer=0;
 	else
 		m_infoFiguer=1;
-	  CRect r;
-	  GetClientRect(r);
-	  OnSizeMy(r.right -r.left , r.bottom -r.top );
-	  RedrawWindow();
+	CRect r;
+	GetClientRect(r);
+	OnSizeMy(r.right -r.left , r.bottom -r.top );
+	RedrawWindow();
 }
 
 void CTaiShanKlineShowView::OnViewBuysell() 
 {
-    BuySell();	
+	BuySell();	
 }
 
 void CTaiShanKlineShowView::OnRealTime() 
 {
-	
+
 	OnMenu1fs();
 }
 
 void CTaiShanKlineShowView::OnDayLine() 
 {
-  OnDayKline();
+	OnDayKline();
 }
 
 
@@ -6214,7 +6164,7 @@ void CTaiShanKlineShowView::OnUpdateBsInfoShow(CCmdUI* pCmdUI)
 	if(m_nKlineKind2 == 0)
 		pCmdUI->Enable(false);
 	else
-	pCmdUI->SetCheck(m_bBaseInfo == TRUE?1:0);	
+		pCmdUI->SetCheck(m_bBaseInfo == TRUE?1:0);	
 }
 
 void CTaiShanKlineShowView::OnUpdateViewBuysell(CCmdUI* pCmdUI) 
@@ -6238,8 +6188,8 @@ void CTaiShanKlineShowView::OnUpdateViewDszb(CCmdUI* pCmdUI)
 	}
 	else
 	{
-	pCmdUI->Enable(m_nKlineKind2 == 0?false:TRUE);
-	pCmdUI->SetCheck(pKlineDrawing->m_axisType == 2?1:0);	
+		pCmdUI->Enable(m_nKlineKind2 == 0?false:TRUE);
+		pCmdUI->SetCheck(pKlineDrawing->m_axisType == 2?1:0);	
 
 	}
 }
@@ -6252,11 +6202,11 @@ void CTaiShanKlineShowView::OnUpdateViewSimple(CCmdUI* pCmdUI)
 	}
 	else
 	{
-    pCmdUI->Enable(m_nKlineKind2 == 0?false:TRUE);
-	pCmdUI->SetCheck(pKlineDrawing->m_axisType == 0?1:0);
+		pCmdUI->Enable(m_nKlineKind2 == 0?false:TRUE);
+		pCmdUI->SetCheck(pKlineDrawing->m_axisType == 0?1:0);
 
 	}
-	
+
 }
 
 void CTaiShanKlineShowView::OnUpdateViewPersent(CCmdUI* pCmdUI) 
@@ -6267,19 +6217,19 @@ void CTaiShanKlineShowView::OnUpdateViewPersent(CCmdUI* pCmdUI)
 	}
 	else
 	{
-	pCmdUI->Enable(m_nKlineKind2 == 0?false:TRUE);
-	pCmdUI->SetCheck(pKlineDrawing->m_axisType == 1?1:0);	
+		pCmdUI->Enable(m_nKlineKind2 == 0?false:TRUE);
+		pCmdUI->SetCheck(pKlineDrawing->m_axisType == 1?1:0);	
 
 	}
 }
 
 void CTaiShanKlineShowView::OnViewOne() 
 {
-     if(m_bMultiFiguer == 0)
-		 return;
-	 CClientDC dc(this);
-	 m_bMultiFiguer=0;
-	 ShowAll(m_sharesSymbol);
+	if(m_bMultiFiguer == 0)
+		return;
+	CClientDC dc(this);
+	m_bMultiFiguer=0;
+	ShowAll(m_sharesSymbol);
 }
 
 
@@ -6297,29 +6247,29 @@ void CTaiShanKlineShowView::OnViewFourstock()
 void CTaiShanKlineShowView::OnUpdateViewFourstock(CCmdUI* pCmdUI) 
 {
 	pCmdUI->SetCheck(m_bMultiFiguer == 1?1:0);	
-	
+
 }
 
 void CTaiShanKlineShowView::OnViewLine() 
 {
-   OnMenu1fs();	
+	OnMenu1fs();	
 }
 
 void CTaiShanKlineShowView::OnUpdateViewLine(CCmdUI* pCmdUI) 
 {
-   pCmdUI->SetCheck(m_nKlineKind2 == 0?1:0);	
+	pCmdUI->SetCheck(m_nKlineKind2 == 0?1:0);	
 }
 
 void CTaiShanKlineShowView::OnViewDayline() 
 {
-  OnDayKline();	
+	OnDayKline();	
 }
 
 
 void CTaiShanKlineShowView::OnUpdateViewDayline(CCmdUI* pCmdUI) 
 {
 	pCmdUI->SetCheck(m_nKlineKind2 == 5?1:0);
-	
+
 }
 
 void CTaiShanKlineShowView::OnViewFifteenmin() 
@@ -6329,7 +6279,7 @@ void CTaiShanKlineShowView::OnViewFifteenmin()
 
 void CTaiShanKlineShowView::OnUpdateViewFifteenmin(CCmdUI* pCmdUI) 
 {
-   pCmdUI->SetCheck(m_nKlineKind2 == 2?1:0);	
+	pCmdUI->SetCheck(m_nKlineKind2 == 2?1:0);	
 }
 
 void CTaiShanKlineShowView::OnViewThirtymin() 
@@ -6340,7 +6290,7 @@ void CTaiShanKlineShowView::OnViewThirtymin()
 
 void CTaiShanKlineShowView::OnUpdateViewThirtymin(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(m_nKlineKind2 == 3?1:0);		
+	pCmdUI->SetCheck(m_nKlineKind2 == 3?1:0);		
 }
 
 void CTaiShanKlineShowView::OnViewSixtymin() 
@@ -6351,7 +6301,7 @@ void CTaiShanKlineShowView::OnViewSixtymin()
 
 void CTaiShanKlineShowView::OnUpdateViewSixtymin(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(m_nKlineKind2 == 4?1:0);
+	pCmdUI->SetCheck(m_nKlineKind2 == 4?1:0);
 }
 
 void CTaiShanKlineShowView::OnViewMonthline() 
@@ -6361,7 +6311,7 @@ void CTaiShanKlineShowView::OnViewMonthline()
 
 void CTaiShanKlineShowView::OnUpdateViewMonthline(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(m_nKlineKind2 == 7?1:0);	
+	pCmdUI->SetCheck(m_nKlineKind2 == 7?1:0);	
 }
 
 void CTaiShanKlineShowView::OnViewWeekline() 
@@ -6372,7 +6322,7 @@ void CTaiShanKlineShowView::OnViewWeekline()
 
 void CTaiShanKlineShowView::OnUpdateViewWeekline(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(m_nKlineKind2 == 6?1:0);	
+	pCmdUI->SetCheck(m_nKlineKind2 == 6?1:0);	
 }
 
 void CTaiShanKlineShowView::OnView5min() 
@@ -6383,7 +6333,7 @@ void CTaiShanKlineShowView::OnView5min()
 
 void CTaiShanKlineShowView::OnUpdateView5min(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(m_nKlineKind2 == 1?1:0);
+	pCmdUI->SetCheck(m_nKlineKind2 == 1?1:0);
 }
 
 void CTaiShanKlineShowView::OnViewOneitem() 
@@ -6448,94 +6398,95 @@ void CTaiShanKlineShowView::OnUpdateZhutuDiejia(CCmdUI* pCmdUI)
 
 void CTaiShanKlineShowView::ShowAll(CString sharesymbol,bool bCaclStockPos,	bool bInitFoot)
 {
-		
-		CReportData* pdt;
-  	    CTaiShanDoc* pDoc = GetDocument();
-		if(pDoc->m_sharesInformation.Lookup(sharesymbol.GetBuffer (0),pdt,m_stkKind)==0)
-		{
-			sharesymbol.ReleaseBuffer ();
-			sharesymbol = CSharesCompute::GetIndexSymbol(0);
-		}
+
+	CReportData* pdt;
+	CTaiShanDoc* pDoc = GetDocument();
+	if(pDoc->m_sharesInformation.Lookup(sharesymbol.GetBuffer (0),pdt,m_stkKind)==0)
+	{
+		sharesymbol.ReleaseBuffer ();
+		sharesymbol = CSharesCompute::GetIndexSymbol(0);
+	}
+	else
+		sharesymbol.ReleaseBuffer ();
+
+
+	m_sharesSymbol = sharesymbol;
+	SetWindowText(m_sharesSymbol);
+	if(m_bMultiFiguer==1)
+	{
+		int nFiguer;
+		if(pDoc->m_systemOption.fourgraph==FALSE)//kline
+			nFiguer=4;
 		else
-			sharesymbol.ReleaseBuffer ();
-	
-
-	    m_sharesSymbol = sharesymbol;
-		if(m_bMultiFiguer==1)
+			nFiguer=9;
+		for(int j= 0;j<nFiguer;j++)
 		{
-			int nFiguer;
-			if(pDoc->m_systemOption.fourgraph==FALSE)//kline
-				nFiguer=4;
-			else
-				nFiguer=9;
-			for(int j= 0;j<nFiguer;j++)
-			{
-				this->m_symbol9 [j] = GetMultiSymbol(j,m_stkKind9[j]);
-			}
+			this->m_symbol9 [j] = GetMultiSymbol(j,m_stkKind9[j]);
 		}
-		
-		if(m_pWideNet) m_pWideNet->AddStockFirst(m_sharesSymbol,m_stkKind);
+	}
 
-		ASSERT(m_sharesSymbol.GetLength()>3);
-		pMin1Drawing->InitMinuteLine();
+	if(m_pWideNet) m_pWideNet->AddStockFirst(m_sharesSymbol,m_stkKind);
 
-		if(m_nKlineKind2==0)
-		{
-			RedrawWindow();
-			if(bCaclStockPos==true)
-				CaclStockPos();
-			return;
-		}
-		if(m_bBaseInfo==TRUE)
-		{
-			CString s,s1,s2;
-			if(CSharesCompute::GetMarketKind(m_stkKind) == SH_MARKET_EX)
-				s2="'1A0001'";
-			else
-				s2="'2A01'";
-			m_bs.m_strFilter="Sheet1.symbol = "+s2+" OR Sheet1.symbol = '"+m_sharesSymbol+"' ";
-			try
-			{
-				if(m_bs.IsOpen())
-					m_bs.Requery ();
-				else
-					m_bs.Open ();
-			}
-			catch (CDaoException* e)
-			{
-				e->Delete();
-			}
-		}
+	ASSERT(m_sharesSymbol.GetLength()>3);
+	pMin1Drawing->InitMinuteLine();
 
-
-		this->KlineReadTransferData ();
-		pKlineDrawing->m_bToCacl =TRUE;
-
-		pKlineDrawing ->m_bInitFoot =bInitFoot;//
-		pDrawLine->m_lineTypeOld=-1;
-		if(bCaclStockPos==true)
-		{
-			pKlineDrawing->m_klinNumDefault=82;
-			pKlineDrawing->m_bNewStock = true;
-		}
+	if(m_nKlineKind2==0)
+	{
 		RedrawWindow();
 		if(bCaclStockPos==true)
 			CaclStockPos();
+		return;
+	}
+	if(m_bBaseInfo==TRUE)
+	{
+		CString s,s1,s2;
+		if(CSharesCompute::GetMarketKind(m_stkKind) == SH_MARKET_EX)
+			s2="'1A0001'";
+		else
+			s2="'2A01'";
+		m_bs.m_strFilter="Sheet1.symbol = "+s2+" OR Sheet1.symbol = '"+m_sharesSymbol+"' ";
+		try
+		{
+			if(m_bs.IsOpen())
+				m_bs.Requery ();
+			else
+				m_bs.Open ();
+		}
+		catch (CDaoException* e)
+		{
+			e->Delete();
+		}
+	}
 
-		if(m_isShowCross==1)
-			m_dlgShowCross->RedrawWindow();
+
+	this->KlineReadTransferData ();
+	pKlineDrawing->m_bToCacl =TRUE;
+
+	pKlineDrawing ->m_bInitFoot =bInitFoot;//
+	pDrawLine->m_lineTypeOld=-1;
+	if(bCaclStockPos==true)
+	{
+		pKlineDrawing->m_klinNumDefault=82;
+		pKlineDrawing->m_bNewStock = true;
+	}
+	RedrawWindow();
+	if(bCaclStockPos==true)
+		CaclStockPos();
+
+	if(m_isShowCross==1)
+		m_dlgShowCross->RedrawWindow();
 
 }
 
 void CTaiShanKlineShowView::OnKillFocus(CWnd* pNewWnd) 
 {
-   CTaiShanDoc *pDoc = GetDocument();
+	CTaiShanDoc *pDoc = GetDocument();
 	if(pDoc->m_GetFocus == TRUE)
 	{
 		this->SetFocus();
 		return;
-		
-    }
+
+	}
 	CView::OnKillFocus(pNewWnd);
 
 }
@@ -6555,8 +6506,8 @@ void CTaiShanKlineShowView::OnTjxgTjxgts()
 
 	if(m_AutoChange == TRUE)
 	{
-	 m_AutoChange = false;
-     KillTimer(12);
+		m_AutoChange = false;
+		KillTimer(12);
 	}
 }
 
@@ -6569,21 +6520,21 @@ void CTaiShanKlineShowView::OnUpdateTjxgTjxgts(CCmdUI* pCmdUI)
 	}
 	else
 	{
-    if(m_nKlineKind2 == 0)
-	{
-	  pCmdUI->Enable(FALSE);
-	  return;
-	}
-	pCmdUI->SetCheck(m_tjxgshow == 1?0:1);	
+		if(m_nKlineKind2 == 0)
+		{
+			pCmdUI->Enable(FALSE);
+			return;
+		}
+		pCmdUI->SetCheck(m_tjxgshow == 1?0:1);	
 
 	}
 }
 void CTaiShanKlineShowView::OnToolCursor() 
 {
-    if(m_AutoChange == TRUE)
+	if(m_AutoChange == TRUE)
 	{
-	 m_AutoChange = false;
-     KillTimer(12);
+		m_AutoChange = false;
+		KillTimer(12);
 	}
 	if(m_isShowCross==0)
 	{
@@ -6615,7 +6566,7 @@ void CTaiShanKlineShowView::OnUpdateToolCursor(CCmdUI* pCmdUI)
 	}
 	else
 	{
-	   pCmdUI->SetCheck(m_isShowCross == 0?0:1);	
+		pCmdUI->SetCheck(m_isShowCross == 0?0:1);	
 		pCmdUI->Enable (TRUE);
 	}
 }
@@ -6623,7 +6574,7 @@ void CTaiShanKlineShowView::OnUpdateToolCursor(CCmdUI* pCmdUI)
 void CTaiShanKlineShowView::OnUpdatePowerDo(CCmdUI* pCmdUI) 
 {
 	if(m_nKlineKind2 == 0)
-      pCmdUI->Enable(false);	
+		pCmdUI->Enable(false);	
 	else
 		pCmdUI->SetCheck(m_bDoPower == TRUE?1:0);	
 }
@@ -6640,182 +6591,182 @@ void CTaiShanKlineShowView::OnViewJszb()
 
 void CTaiShanKlineShowView::DrawRightSheet(CDC* pDC,int Num,bool bShowScroll)
 {      
-		if(m_infoFiguer==0)
+	if(m_infoFiguer==0)
+	{
+		m_scrollBar->ShowScrollBar(FALSE );	
+		m_pRichEdit->ShowWindow(SW_HIDE);
+		return;
+	}
+
+
+
+	if(m_tabNum<4)
+		DrawRightbox(pDC);
+	else if(m_infoInit.nIDRightSheet [m_tabNum-4]==0 || IsIndexStock(m_sharesSymbol))
+		DrawRightbox(pDC);
+
+	int len=m_rightLength;
+	CRect rt;
+	GetCurrClientRect(rt);
+	if(len==0)
+		return;
+	m_tabNum = Num;
+	if (m_tabNum!=6)
+	{
+		if (m_pRichEdit->IsWindowVisible())
+			m_pRichEdit->ShowWindow(SW_HIDE);
+	}
+
+	if(m_infoFiguer!=1)
+	{
+		if(IsIndexStock(m_sharesSymbol))
 		{
 			m_scrollBar->ShowScrollBar(FALSE );	
-			m_pRichEdit->ShowWindow(SW_HIDE);
-			return;
-		}
-
-
-
-		if(m_tabNum<4)
-			DrawRightbox(pDC);
-		else if(m_infoInit.nIDRightSheet [m_tabNum-4]==0 || IsIndexStock(m_sharesSymbol))
-			DrawRightbox(pDC);
-
-	    int len=m_rightLength;
-		CRect rt;
-		GetCurrClientRect(rt);
-		if(len==0)
-			return;
-		m_tabNum = Num;
-		if (m_tabNum!=6)
-		{
-			if (m_pRichEdit->IsWindowVisible())
-				m_pRichEdit->ShowWindow(SW_HIDE);
-		}
-
-		if(m_infoFiguer!=1)
-		{
-			if(IsIndexStock(m_sharesSymbol))
+			DrawLineCurve(pDC);
+			switch(m_tabNum)
 			{
-				m_scrollBar->ShowScrollBar(FALSE );	
-				DrawLineCurve(pDC);
-				switch(m_tabNum)
-				{
-					case 4:
-					case 5:
-						switch(m_infoInit.nIDRightSheet [m_tabNum-4])
-						{
-							case 0:
-								DrawFinace(pDC,m_nBeginHS);
-								break;
-							case 1:
-								pKlineDrawing->m_pMoveCB->BuySellFiguer(pDC);
-								break;
-							case 2:
-							{
-								CRect r(rt.right -m_rightLength+1,0,rt.right ,rt.bottom -gScrollBott-5);
-								ClearBack(pDC,r);
-									pKlineDrawing->m_pMoveCB->ShowFxjMoveCB(pDC);
-									break;
-							}
-							case 3:
-							case 4:
-							case 5:
-								{
-									CRect r(rt.right -m_rightLength+1,0,rt.right ,rt.bottom -gScrollBott-5);
-									ClearBack(pDC,r);
-									pKlineDrawing->m_pMoveCB->ShowMoveCB(pDC,m_infoInit.nIDRightSheet [m_tabNum-4]-2);
-								}
-								break;
-						}
-						break;
-					case 6:
-						CRect r(rt.right-m_rightLength+1,0,rt.right,rt.bottom-gScrollBott-5);
-						ClearBack(pDC,r);
-						DrawPingCe(pDC,r);
-						break;
-				}
-				return;
-			}
-			else m_infoFiguer=1;
-		}
-
-		DrawLineCurve(pDC);
-		switch(m_tabNum)
-		{
-			case 0:
-			case 1:
-				pMin1Drawing->DrawHs(pDC,m_nBeginHS, m_tabNum);
-				break;
-			case 2:
-				pMin1Drawing->DrawDapan(pDC);
-				break;
-			case 3:
-				pMin1Drawing->DrawLittleGegu(pDC);
-				break;
 			case 4:
 			case 5:
 				switch(m_infoInit.nIDRightSheet [m_tabNum-4])
 				{
-					case 0:
-						DrawFinace(pDC,m_nBeginHS);
+				case 0:
+					DrawFinace(pDC,m_nBeginHS);
+					break;
+				case 1:
+					pKlineDrawing->m_pMoveCB->BuySellFiguer(pDC);
+					break;
+				case 2:
+					{
+						CRect r(rt.right -m_rightLength+1,0,rt.right ,rt.bottom -gScrollBott-5);
+						ClearBack(pDC,r);
+						pKlineDrawing->m_pMoveCB->ShowFxjMoveCB(pDC);
 						break;
-					case 1:
-						{
-							CRect r(rt.right -m_rightLength+1,0,rt.right ,rt.bottom -gScrollBott-5);
-							ClearBack(pDC,r);
-							pKlineDrawing->m_pMoveCB->BuySellFiguer(pDC);
-						}
-						break;
-					case 2:
-						{
-							CRect r(rt.right -m_rightLength+1,0,rt.right ,rt.bottom -gScrollBott-5);
-							ClearBack(pDC,r);
-								pKlineDrawing->m_pMoveCB->ShowFxjMoveCB(pDC);
-								break;
-						}
-					case 3:
-					case 4:
-					case 5:
-						{
-							CRect r(rt.right -m_rightLength+1,0,rt.right ,rt.bottom -gScrollBott-5);
-							ClearBack(pDC,r);
-							pKlineDrawing->m_pMoveCB->ShowMoveCB(pDC,m_infoInit.nIDRightSheet [m_tabNum-4]-2);
-						}
-						break;
-					case 6:
-						{
-							CRect r(rt.right -m_rightLength+1,0,rt.right ,rt.bottom -gScrollBott-5);
-							ClearBack(pDC,r);
-							ByjDrawRightRect byj(this,CMainFrame::m_taiShanDoc );
-							byj.CalcSonFiguer(pDC,r);
-						}
-						break;
+					}
+				case 3:
+				case 4:
+				case 5:
+					{
+						CRect r(rt.right -m_rightLength+1,0,rt.right ,rt.bottom -gScrollBott-5);
+						ClearBack(pDC,r);
+						pKlineDrawing->m_pMoveCB->ShowMoveCB(pDC,m_infoInit.nIDRightSheet [m_tabNum-4]-2);
+					}
+					break;
 				}
 				break;
 			case 6:
 				CRect r(rt.right-m_rightLength+1,0,rt.right,rt.bottom-gScrollBott-5);
+				ClearBack(pDC,r);
 				DrawPingCe(pDC,r);
 				break;
-		}
-
-		if(bShowScroll==false)
+			}
 			return;
-
-		CRect rt1(rt.right-m_rightLength+1,19*RIGHTBOX_PERLINE+3,rt.right,rt.bottom);
-
-
-		if(m_scrollBar->m_hWnd !=NULL)
-		{
-			if(m_tabNum==0||m_tabNum==1)
-			{
-				m_scrollBar->ShowScrollBar(TRUE );
-			}
-			else if(m_tabNum>3)
-			{
-				if(m_infoInit.nIDRightSheet [m_tabNum-4]==0)
-					m_scrollBar->ShowScrollBar(TRUE );
-				else
-					m_scrollBar->ShowScrollBar(FALSE );	
-			}
-			else m_scrollBar->ShowScrollBar(FALSE );	
 		}
+		else m_infoFiguer=1;
+	}
 
-		CopyScrollBar(pDC);
+	DrawLineCurve(pDC);
+	switch(m_tabNum)
+	{
+	case 0:
+	case 1:
+		pMin1Drawing->DrawHs(pDC,m_nBeginHS, m_tabNum);
+		break;
+	case 2:
+		pMin1Drawing->DrawDapan(pDC);
+		break;
+	case 3:
+		pMin1Drawing->DrawLittleGegu(pDC);
+		break;
+	case 4:
+	case 5:
+		switch(m_infoInit.nIDRightSheet [m_tabNum-4])
+		{
+		case 0:
+			DrawFinace(pDC,m_nBeginHS);
+			break;
+		case 1:
+			{
+				CRect r(rt.right -m_rightLength+1,0,rt.right ,rt.bottom -gScrollBott-5);
+				ClearBack(pDC,r);
+				pKlineDrawing->m_pMoveCB->BuySellFiguer(pDC);
+			}
+			break;
+		case 2:
+			{
+				CRect r(rt.right -m_rightLength+1,0,rt.right ,rt.bottom -gScrollBott-5);
+				ClearBack(pDC,r);
+				pKlineDrawing->m_pMoveCB->ShowFxjMoveCB(pDC);
+				break;
+			}
+		case 3:
+		case 4:
+		case 5:
+			{
+				CRect r(rt.right -m_rightLength+1,0,rt.right ,rt.bottom -gScrollBott-5);
+				ClearBack(pDC,r);
+				pKlineDrawing->m_pMoveCB->ShowMoveCB(pDC,m_infoInit.nIDRightSheet [m_tabNum-4]-2);
+			}
+			break;
+		case 6:
+			{
+				CRect r(rt.right -m_rightLength+1,0,rt.right ,rt.bottom -gScrollBott-5);
+				ClearBack(pDC,r);
+				ByjDrawRightRect byj(this,CMainFrame::m_taiShanDoc );
+				byj.CalcSonFiguer(pDC,r);
+			}
+			break;
+		}
+		break;
+	case 6:
+		CRect r(rt.right-m_rightLength+1,0,rt.right,rt.bottom-gScrollBott-5);
+		DrawPingCe(pDC,r);
+		break;
+	}
+
+	if(bShowScroll==false)
+		return;
+
+	CRect rt1(rt.right-m_rightLength+1,19*RIGHTBOX_PERLINE+3,rt.right,rt.bottom);
+
+
+	if(m_scrollBar->m_hWnd !=NULL)
+	{
+		if(m_tabNum==0||m_tabNum==1)
+		{
+			m_scrollBar->ShowScrollBar(TRUE );
+		}
+		else if(m_tabNum>3)
+		{
+			if(m_infoInit.nIDRightSheet [m_tabNum-4]==0)
+				m_scrollBar->ShowScrollBar(TRUE );
+			else
+				m_scrollBar->ShowScrollBar(FALSE );	
+		}
+		else m_scrollBar->ShowScrollBar(FALSE );	
+	}
+
+	CopyScrollBar(pDC);
 }
 
 void CTaiShanKlineShowView::ReDrawSheet(BOOL UpOrDown)
 {
 
-  if(UpOrDown == TRUE)
-  {
-	  m_tabNum++;
-	  if(m_tabNum > 6)
-		  m_tabNum = 0;
-  }
-  else
-  {
-    m_tabNum--;
-    if(m_tabNum < 0)
-	   m_tabNum = 6;
-  }
-  {
-	CTaiKlineDC memdc(this,&m_bit);
-	DrawRightSheet(&memdc,m_tabNum);
-  }
+	if(UpOrDown == TRUE)
+	{
+		m_tabNum++;
+		if(m_tabNum > 6)
+			m_tabNum = 0;
+	}
+	else
+	{
+		m_tabNum--;
+		if(m_tabNum < 0)
+			m_tabNum = 6;
+	}
+	{
+		CTaiKlineDC memdc(this,&m_bit);
+		DrawRightSheet(&memdc,m_tabNum);
+	}
 }
 
 
@@ -6833,15 +6784,15 @@ void CTaiShanKlineShowView::DrawZhibiao(CString ZhibiaoName,int nFiguer)
 	}
 	else
 		nFgr = nFiguer;
-		
-	
+
+
 	if(ZhibiaoName=="QLDJ"||ZhibiaoName=="HLDJ"||ZhibiaoName=="QEDJ"||ZhibiaoName=="HEDJ")
 	{
 		strcpy(m_infoInit.initIndex[0].nameIndex,ZhibiaoName);
 		RedrawWindow();
 		return;
 	}
-	
+
 	if(ZhibiaoName=="TWR")
 	{
 		GetDocument()->m_systemOption.kline=2;
@@ -6861,61 +6812,61 @@ void CTaiShanKlineShowView::DrawZhibiao(CString ZhibiaoName,int nFiguer)
 		return;
 	}
 
-   for(int i=0;i<GetDocument()->m_formuar_index.GetSize ();i++)
-   {
-			CFormularContent * jishu;
-			jishu=GetDocument()->m_formuar_index.GetAt(i);
-			if(jishu->name == ZhibiaoName)
+	for(int i=0;i<GetDocument()->m_formuar_index.GetSize ();i++)
+	{
+		CFormularContent * jishu;
+		jishu=GetDocument()->m_formuar_index.GetAt(i);
+		if(jishu->name == ZhibiaoName)
+		{
+			if(jishu->bRightBox )
 			{
-				if(jishu->bRightBox )
-				{
-					ByjDrawRightRect byj(this,GetDocument());
-					byj.SaveName (jishu->name);
-					if(this->m_tabNum !=4 && this->m_tabNum !=5)
-						m_tabNum = 4;
-					m_infoInit.nIDRightSheet [m_tabNum-4] = IDM_POP_FINANCE+6;
-					DoOnCommand(IDM_POP_FINANCE+6, 0);
-					return;
-				}
-				CString sName(jishu->name);
-				sName.MakeUpper();
-	
-
-				if(::GetKeyState(VK_CONTROL)&0x8000)
-				{
-					if(m_hit == REGION_PICTTEXT1 || m_hit == REGION_PICT1) nFgr = 0 ;//
-					if(pKlineDrawing->m_sIndicatorAdded[nFgr] == sName)
-						pKlineDrawing->m_sIndicatorAdded[nFgr] = "";
-					else
-						pKlineDrawing->m_sIndicatorAdded[nFgr] = sName;
-				}
-				else
-				{
-					if(jishu->isMainFiguer ==0)
-					{
-						int nm = m_infoInit.nCountIndex;
-						if(nm == 1)
-							return;
-				
-						if(nFgr>0)
-							strcpy(m_infoInit.initIndex[nFgr].nameIndex,ZhibiaoName);
-					}
-					else if(jishu->isMainFiguer == 1)
-					{
-						if(strcmp(m_infoInit.initIndex[0].nameIndex,ZhibiaoName) == 0)
-							m_infoInit.initIndex[0].nameIndex[0] = '\0';
-						else
-							strcpy(m_infoInit.initIndex[0].nameIndex,ZhibiaoName);
-					}
-					else
-						return;
-				}
-				pKlineDrawing->m_bToCacl =TRUE;
-				pKlineDrawing ->m_bInitFoot =false;
-				RedrawWindow();
+				ByjDrawRightRect byj(this,GetDocument());
+				byj.SaveName (jishu->name);
+				if(this->m_tabNum !=4 && this->m_tabNum !=5)
+					m_tabNum = 4;
+				m_infoInit.nIDRightSheet [m_tabNum-4] = IDM_POP_FINANCE+6;
+				DoOnCommand(IDM_POP_FINANCE+6, 0);
 				return;
 			}
-   }
+			CString sName(jishu->name);
+			sName.MakeUpper();
+
+
+			if(::GetKeyState(VK_CONTROL)&0x8000)
+			{
+				if(m_hit == REGION_PICTTEXT1 || m_hit == REGION_PICT1) nFgr = 0 ;//
+				if(pKlineDrawing->m_sIndicatorAdded[nFgr] == sName)
+					pKlineDrawing->m_sIndicatorAdded[nFgr] = "";
+				else
+					pKlineDrawing->m_sIndicatorAdded[nFgr] = sName;
+			}
+			else
+			{
+				if(jishu->isMainFiguer ==0)
+				{
+					int nm = m_infoInit.nCountIndex;
+					if(nm == 1)
+						return;
+
+					if(nFgr>0)
+						strcpy(m_infoInit.initIndex[nFgr].nameIndex,ZhibiaoName);
+				}
+				else if(jishu->isMainFiguer == 1)
+				{
+					if(strcmp(m_infoInit.initIndex[0].nameIndex,ZhibiaoName) == 0)
+						m_infoInit.initIndex[0].nameIndex[0] = '\0';
+					else
+						strcpy(m_infoInit.initIndex[0].nameIndex,ZhibiaoName);
+				}
+				else
+					return;
+			}
+			pKlineDrawing->m_bToCacl =TRUE;
+			pKlineDrawing ->m_bInitFoot =false;
+			RedrawWindow();
+			return;
+		}
+	}
 
 }
 void CTaiShanKlineShowView::SetConstant()
@@ -6945,8 +6896,8 @@ void CTaiShanKlineShowView::SetConstant()
 
 void CTaiShanKlineShowView::OnViewstockdetail() 
 {	
-    CDiaStockdetail m_stockdetail(NULL,this,TRUE);
-    m_stockdetail.DoModal();
+	CDiaStockdetail m_stockdetail(NULL,this,TRUE);
+	m_stockdetail.DoModal();
 }
 
 LRESULT CTaiShanKlineShowView::OnDataChange(WPARAM wParam, LPARAM lParam)
@@ -6974,7 +6925,7 @@ LRESULT CTaiShanKlineShowView::OnDataChange(WPARAM wParam, LPARAM lParam)
 		return 0;
 
 	if(pdt->totv<=pMin1Drawing->m_volPre)
-			return 0;
+		return 0;
 
 	pKlineDrawing->m_bToCacl=TRUE;
 
@@ -6999,7 +6950,7 @@ LRESULT CTaiShanKlineShowView::OnDataChange(WPARAM wParam, LPARAM lParam)
 void CTaiShanKlineShowView::OnF2() 
 {
 	CDiaStockdetail m_stockdetail(NULL,this,false);
-    m_stockdetail.DoModal();
+	m_stockdetail.DoModal();
 }
 void CTaiShanKlineShowView::OnViewYearkline() 
 {
@@ -7008,7 +6959,7 @@ void CTaiShanKlineShowView::OnViewYearkline()
 
 void CTaiShanKlineShowView::OnUpdateViewYearkline(CCmdUI* pCmdUI) 
 {
-   pCmdUI->SetCheck(m_nKlineKind2 == 8?1:0);	
+	pCmdUI->SetCheck(m_nKlineKind2 == 8?1:0);	
 }
 
 void CTaiShanKlineShowView::OnUpdateKlineMd(CCmdUI* pCmdUI) 
@@ -7020,42 +6971,42 @@ void CTaiShanKlineShowView::OnUpdateKlineMd(CCmdUI* pCmdUI)
 	else
 	{
 #ifdef OEM
-	pCmdUI->Enable(FALSE);
-	return;
+		pCmdUI->Enable(FALSE);
+		return;
 
 #endif
 
-	if(m_nKlineKind2 == 0)
-	{
-		pCmdUI->Enable(FALSE);	
-	}
-	else
-	{
-		pCmdUI->SetCheck(pKlineMode == NULL?0:1);	
-	}
+		if(m_nKlineKind2 == 0)
+		{
+			pCmdUI->Enable(FALSE);	
+		}
+		else
+		{
+			pCmdUI->SetCheck(pKlineMode == NULL?0:1);	
+		}
 
 	}
 }
 
 void CTaiShanKlineShowView::OnToolDrawline() 
 {
-  if(m_AutoChange == TRUE)
-  {
-	m_AutoChange = false;
-    KillTimer(12);
-  }
+	if(m_AutoChange == TRUE)
+	{
+		m_AutoChange = false;
+		KillTimer(12);
+	}
 	CMainFrame* pMainWnd = (CMainFrame *)(AfxGetApp()->m_pMainWnd);
 	if(IsBarShow  == TRUE && pMainWnd->m_drawLineToolBar->IsWindowVisible() != 0 )
 	{
-	  pMainWnd->ShowControlBar(pMainWnd->m_drawLineToolBar,FALSE, FALSE);
-	  IsBarShow = !IsBarShow;
-	  return;
+		pMainWnd->ShowControlBar(pMainWnd->m_drawLineToolBar,FALSE, FALSE);
+		IsBarShow = !IsBarShow;
+		return;
 	}
 	else
 	{
-	  if(IsBarShow == false)
-	   IsBarShow = !IsBarShow;
-	  ((CMainFrame *)(AfxGetApp()->m_pMainWnd))->Drawline();
+		if(IsBarShow == false)
+			IsBarShow = !IsBarShow;
+		((CMainFrame *)(AfxGetApp()->m_pMainWnd))->Drawline();
 	}
 }
 
@@ -7064,18 +7015,18 @@ void CTaiShanKlineShowView::OnHldjLmb()
 
 	if(m_nKlineKind2>0)
 	{
-	CString s0(m_infoInit.initIndex[0].nameIndex);
-	if(s0!="HLDJ")
-	{
-		DrawZhibiao("HLDJ");
-	}
-	else
-	{
-		strcpy(m_infoInit.initIndex[0].nameIndex,pKlineDrawing->m_zhiBiao0);
-		pKlineDrawing->m_bToCacl=TRUE;
-		pKlineDrawing ->m_bInitFoot =false;//
-		RedrawWindow();
-	}
+		CString s0(m_infoInit.initIndex[0].nameIndex);
+		if(s0!="HLDJ")
+		{
+			DrawZhibiao("HLDJ");
+		}
+		else
+		{
+			strcpy(m_infoInit.initIndex[0].nameIndex,pKlineDrawing->m_zhiBiao0);
+			pKlineDrawing->m_bToCacl=TRUE;
+			pKlineDrawing ->m_bInitFoot =false;//
+			RedrawWindow();
+		}
 	}
 	else
 	{
@@ -7097,30 +7048,30 @@ void CTaiShanKlineShowView::OnUpdateHldjLmb(CCmdUI* pCmdUI)
 	}
 	else
 	{
-	if(m_nKlineKind2 == 0)
-	{
-		if(pMin1Drawing->m_nCnp == 1)
-			pCmdUI->SetCheck(1);
-		else
+		if(m_nKlineKind2 == 0)
+		{
+			if(pMin1Drawing->m_nCnp == 1)
+				pCmdUI->SetCheck(1);
+			else
+				pCmdUI->SetCheck(0);
+			return;
+		}
+		CString s0(m_infoInit.initIndex[0].nameIndex);
+		if(s0!="HLDJ")
+		{
 			pCmdUI->SetCheck(0);
-	  return;
-	}
-	CString s0(m_infoInit.initIndex[0].nameIndex);
-	if(s0!="HLDJ")
-	{
-		pCmdUI->SetCheck(0);
-	}
-	else
-	{
-		pCmdUI->SetCheck(1);
-	}
+		}
+		else
+		{
+			pCmdUI->SetCheck(1);
+		}
 
 	}
 }
 
 void CTaiShanKlineShowView::OnHedjLmb() 
 {
-	
+
 	CString s0(m_infoInit.initIndex[0].nameIndex);
 	if(s0!="HEDJ")
 	{
@@ -7133,84 +7084,84 @@ void CTaiShanKlineShowView::OnHedjLmb()
 		pKlineDrawing ->m_bInitFoot =false;//
 		RedrawWindow();
 	}
-	
+
 }
 
 void CTaiShanKlineShowView::OnUpdateHedjLmb(CCmdUI* pCmdUI) 
 {
-	
+
 	if(m_bMultiFiguer==1 )
 	{
 		pCmdUI->Enable (FALSE);
 	}
 	else
 	{
-	if(m_nKlineKind2 == 0)
-	{
-	  pCmdUI->Enable(FALSE);
-	  return;
-	}
-	CString s0(m_infoInit.initIndex[0].nameIndex);
-	if(s0!="HEDJ")
-	{
-		pCmdUI->SetCheck(0);
-	}
-	else
-	{
-		pCmdUI->SetCheck(1);
-	}
+		if(m_nKlineKind2 == 0)
+		{
+			pCmdUI->Enable(FALSE);
+			return;
+		}
+		CString s0(m_infoInit.initIndex[0].nameIndex);
+		if(s0!="HEDJ")
+		{
+			pCmdUI->SetCheck(0);
+		}
+		else
+		{
+			pCmdUI->SetCheck(1);
+		}
 
 	}
-	
+
 }
 void CTaiShanKlineShowView::OnUpdateViewJszb(CCmdUI* pCmdUI) 
 {
-  if(m_nKlineKind2 == 0)
-	  pCmdUI->Enable(false);
-  else
-  {
-	if(m_bMultiFiguer==1 )
-	{
-		pCmdUI->Enable (FALSE);
-	}
+	if(m_nKlineKind2 == 0)
+		pCmdUI->Enable(false);
 	else
 	{
-		pCmdUI->Enable (TRUE);
+		if(m_bMultiFiguer==1 )
+		{
+			pCmdUI->Enable (FALSE);
+		}
+		else
+		{
+			pCmdUI->Enable (TRUE);
+		}
 	}
-  }
 }
 
 void CTaiShanKlineShowView::OnUpdateToolDrawline(CCmdUI* pCmdUI) 
 {
-   if(m_nKlineKind2 == 0)	
-	   pCmdUI->Enable(false);
-   else
-   {
-	if(m_bMultiFiguer==1 )
-	{
-		pCmdUI->Enable (FALSE);
-	}
+	if(m_nKlineKind2 == 0)	
+		pCmdUI->Enable(false);
 	else
 	{
-		pCmdUI->Enable (TRUE);
-	}
+		if(m_bMultiFiguer==1 )
+		{
+			pCmdUI->Enable (FALSE);
+		}
+		else
+		{
+			pCmdUI->Enable (TRUE);
+		}
 
-	if(IsBarShow)
-		pCmdUI->SetCheck(TRUE);
-	else
-		pCmdUI->SetCheck(FALSE);
-   }
+		if(IsBarShow)
+			pCmdUI->SetCheck(TRUE);
+		else
+			pCmdUI->SetCheck(FALSE);
+	}
 }
 
 void CTaiShanKlineShowView::OnViewSimple() 
 {
-  	pKlineDrawing->m_axisType=0;
+	pKlineDrawing->m_axisType=0;
 	RedrawWindow();	
 }
 
 void CTaiShanKlineShowView::OnViewPersent() 
 {
-  	pKlineDrawing->m_axisType=1;
+	pKlineDrawing->m_axisType=1;
 	RedrawWindow();	
 }
 
@@ -7226,9 +7177,9 @@ void CTaiShanKlineShowView::OnCopyFile()
 	CDiaCopy *m_dia;
 	m_dia = new CDiaCopy;
 	m_dia->Create(IDD_DIACOPY,NULL);
-    m_dia->ShowWindow(SW_SHOW);
+	m_dia->ShowWindow(SW_SHOW);
 	m_dia->FileCopy("e:/day.dat","e:/wsstock2000/data/shanghai/day.dat");
-    m_dia->ShowWindow(SW_HIDE);
+	m_dia->ShowWindow(SW_HIDE);
 	m_dia->OnClose() ;
 }
 
@@ -7237,25 +7188,25 @@ void CTaiShanKlineShowView::OnLoopDisplay()
 	CTaiShanDoc *pDoc = GetDocument();
 	if(m_AutoChange == false)
 	{
-	
+
 		SetTimer(12,pDoc->m_systemdata.changepage*1000,NULL);
 		m_AutoChange = TRUE;
 	}
-    else
-    {
-	  KillTimer(12);
-      m_AutoChange = false;
+	else
+	{
+		KillTimer(12);
+		m_AutoChange = false;
 	}
 }
 
 void CTaiShanKlineShowView::OnUpdateLoopDisplay(CCmdUI* pCmdUI) 
 {
-  	pCmdUI->SetCheck(m_AutoChange == 1?1:0);	
+	pCmdUI->SetCheck(m_AutoChange == 1?1:0);	
 }
 
 void CTaiShanKlineShowView::OnDelZhutuL() 
 {
-	
+
 	if(m_nKlineKind2==0)
 	{
 		pMin1Drawing->m_nKlineCurrent=0;
@@ -7264,7 +7215,7 @@ void CTaiShanKlineShowView::OnDelZhutuL()
 	else
 		pKlineDrawing->DeleteKlineAdded();
 
-	
+
 }
 
 void CTaiShanKlineShowView::OnUpdateDelZhutuL(CCmdUI* pCmdUI) 
@@ -7275,13 +7226,13 @@ void CTaiShanKlineShowView::OnUpdateDelZhutuL(CCmdUI* pCmdUI)
 	}
 	else
 	{
-	if(m_nKlineKind2 == 0)
-	{
+		if(m_nKlineKind2 == 0)
+		{
 
-		pCmdUI->Enable(pMin1Drawing->m_nKlineCurrent == 0 ?false:TRUE);
-	    return;
-	}
-    pCmdUI->Enable(pKlineDrawing->m_nKlineCurrent == 0 ?false:TRUE);
+			pCmdUI->Enable(pMin1Drawing->m_nKlineCurrent == 0 ?false:TRUE);
+			return;
+		}
+		pCmdUI->Enable(pKlineDrawing->m_nKlineCurrent == 0 ?false:TRUE);
 	}
 }
 
@@ -7290,19 +7241,19 @@ void CTaiShanKlineShowView::OnQldjLmb()
 
 	if(m_nKlineKind2>0)
 	{
-	CString s0(m_infoInit.initIndex[0].nameIndex);
-	if(s0!="QLDJ")
-	{
-		DrawZhibiao("QLDJ");
-	}
-	else
-	{
-		strcpy(m_infoInit.initIndex[0].nameIndex,pKlineDrawing->m_zhiBiao0);
-		pKlineDrawing->m_bToCacl=TRUE;
-		pKlineDrawing ->m_bInitFoot =false;//
-		RedrawWindow();
-	}
-	
+		CString s0(m_infoInit.initIndex[0].nameIndex);
+		if(s0!="QLDJ")
+		{
+			DrawZhibiao("QLDJ");
+		}
+		else
+		{
+			strcpy(m_infoInit.initIndex[0].nameIndex,pKlineDrawing->m_zhiBiao0);
+			pKlineDrawing->m_bToCacl=TRUE;
+			pKlineDrawing ->m_bInitFoot =false;//
+			RedrawWindow();
+		}
+
 	}
 	else
 	{
@@ -7324,23 +7275,23 @@ void CTaiShanKlineShowView::OnUpdateQldjLmb(CCmdUI* pCmdUI)
 	}
 	else
 	{
-	if(m_nKlineKind2 == 0)
-	{
-		if(pMin1Drawing->m_nCnp == 2)
-			pCmdUI->SetCheck(1);
-		else
+		if(m_nKlineKind2 == 0)
+		{
+			if(pMin1Drawing->m_nCnp == 2)
+				pCmdUI->SetCheck(1);
+			else
+				pCmdUI->SetCheck(0);
+			return;
+		}
+		CString s0(m_infoInit.initIndex[0].nameIndex);
+		if(s0!="QLDJ")
+		{
 			pCmdUI->SetCheck(0);
-	  return;
-	}
-	CString s0(m_infoInit.initIndex[0].nameIndex);
-	if(s0!="QLDJ")
-	{
-		pCmdUI->SetCheck(0);
-	}
-	else
-	{
-		pCmdUI->SetCheck(1);
-	}
+		}
+		else
+		{
+			pCmdUI->SetCheck(1);
+		}
 
 	}
 }
@@ -7360,7 +7311,7 @@ void CTaiShanKlineShowView::OnQedjLmb()
 		pKlineDrawing ->m_bInitFoot =false;//
 		RedrawWindow();
 	}
-	
+
 }
 
 void CTaiShanKlineShowView::OnUpdateQedjLmb(CCmdUI* pCmdUI) 
@@ -7372,29 +7323,29 @@ void CTaiShanKlineShowView::OnUpdateQedjLmb(CCmdUI* pCmdUI)
 	}
 	else
 	{
-	if(m_nKlineKind2 == 0)
-	{
-	  pCmdUI->Enable(FALSE);
-	  return;
-	}
-	CString s0(m_infoInit.initIndex[0].nameIndex);
-	if(s0!="QEDJ")
-	{
-		pCmdUI->SetCheck(0);
-	}
-	else
-	{
-		pCmdUI->SetCheck(1);
-	}
+		if(m_nKlineKind2 == 0)
+		{
+			pCmdUI->Enable(FALSE);
+			return;
+		}
+		CString s0(m_infoInit.initIndex[0].nameIndex);
+		if(s0!="QEDJ")
+		{
+			pCmdUI->SetCheck(0);
+		}
+		else
+		{
+			pCmdUI->SetCheck(1);
+		}
 
 	}
-	
+
 }
 
 void CTaiShanKlineShowView::OnDropFiles(HDROP hDropInfo) 
 {
 
-	
+
 	CView::OnDropFiles(hDropInfo);
 }
 LRESULT  CTaiShanKlineShowView::OnDropDrag(WPARAM wParam, LPARAM lParam)
@@ -7471,7 +7422,7 @@ void CTaiShanKlineShowView::AddNewStock(CString &symbol,int nStkKind)
 			return;
 	}
 
-    CTaiShanDoc* pDoc = (CTaiShanDoc*)GetDocument();
+	CTaiShanDoc* pDoc = (CTaiShanDoc*)GetDocument();
 	CString m_CurStockSymbol;
 	m_CurStockSymbol = m_sharesSymbol;
 	int curStkKind = m_stkKind;
@@ -7489,9 +7440,9 @@ void CTaiShanKlineShowView::AddNewStock(CString &symbol,int nStkKind)
 
 		if(!IsIndexStock(symbol))
 		{
-		if(pdt->nowp <=0 ||pdt->ystc<=0
-			||pdt->totv<=0||pdt->higp<=0)
-			return;
+			if(pdt->nowp <=0 ||pdt->ystc<=0
+				||pdt->totv<=0||pdt->higp<=0)
+				return;
 		}
 		pMin1Drawing->m_nameAdd[pMin1Drawing->m_nKlineCurrent] = sNameAdd ;
 		pMin1Drawing->m_symbolAdd[pMin1Drawing->m_nKlineCurrent] = symbol;
@@ -7502,7 +7453,7 @@ void CTaiShanKlineShowView::AddNewStock(CString &symbol,int nStkKind)
 		RedrawWindow();
 		return;
 	}
-	
+
 	if(pKlineDrawing->m_nKlineCurrent==0 && pKlineDrawing->m_axisType!=1)
 	{
 		int rtn=AfxMessageBox("使用百分比坐标吗？",MB_YESNO|MB_ICONQUESTION );
@@ -7514,7 +7465,7 @@ void CTaiShanKlineShowView::AddNewStock(CString &symbol,int nStkKind)
 	pKlineDrawing->m_symbolAdd[pKlineDrawing->m_nKlineCurrent] = symbol;
 	pKlineDrawing->m_stkKindAdd[pKlineDrawing->m_nKlineCurrent] = nStkKind;
 	pKlineDrawing->AddKlineAdded(pKlineDrawing->m_symbolAdd[pKlineDrawing->m_nKlineCurrent],pKlineDrawing->m_stkKindAdd[pKlineDrawing->m_nKlineCurrent]);
-	
+
 	pDoc->m_sharesInformation.Lookup(m_CurStockSymbol.GetBuffer (0),pMin1Drawing->m_pReportData,curStkKind);
 	RedrawWindow();
 }
@@ -7524,13 +7475,13 @@ void CTaiShanKlineShowView::OnKlineHs()
 
 	int i=ID_KLINE_HS;
 	DoOnCommand((WPARAM) i, (LPARAM) 0);	
-	
+
 }
 
 void CTaiShanKlineShowView::OnUpdateKlineHs(CCmdUI* pCmdUI) 
 {
-  pCmdUI->SetCheck(m_nKlineKind2 == HS_K_LINE ?1:0);
-	
+	pCmdUI->SetCheck(m_nKlineKind2 == HS_K_LINE ?1:0);
+
 }
 
 void CTaiShanKlineShowView::OnKlineManyDay() 
@@ -7538,19 +7489,19 @@ void CTaiShanKlineShowView::OnKlineManyDay()
 
 	int i=ID_KLINE_MANY_DAY;
 	DoOnCommand((WPARAM) i, (LPARAM) 0);	
-	
+
 }
 
 void CTaiShanKlineShowView::OnUpdateKlineManyDay(CCmdUI* pCmdUI) 
 {
 
 
-  pCmdUI->SetCheck(m_nKlineKind2 == MANY_DAY_K_LINE ?1:0);
+	pCmdUI->SetCheck(m_nKlineKind2 == MANY_DAY_K_LINE ?1:0);
 }
 
 void CTaiShanKlineShowView::OnKline1Minu() 
 {
-	
+
 	int i=ID_KLINE_1_MINU;
 	DoOnCommand((WPARAM) i, (LPARAM) 0);	
 }
@@ -7558,8 +7509,8 @@ void CTaiShanKlineShowView::OnKline1Minu()
 void CTaiShanKlineShowView::OnUpdateKline1Minu(CCmdUI* pCmdUI) 
 {
 
-  pCmdUI->SetCheck(m_nKlineKind2 == MINUTE_1_K_LINE ?1:0);
-	
+	pCmdUI->SetCheck(m_nKlineKind2 == MINUTE_1_K_LINE ?1:0);
+
 }
 
 BOOL CTaiShanKlineShowView::DoOnCommand(WPARAM wParam, LPARAM lParam)
@@ -7573,7 +7524,7 @@ BOOL CTaiShanKlineShowView::DoOnCommand(WPARAM wParam, LPARAM lParam)
 	CTaiShanDoc* pDoc = GetDocument();
 	if(nCode!=0)	
 		return bRet;
-	
+
 	if(i==ID_ADD_TO_SELF)
 	{
 		CString m_zqdm = this->m_sharesSymbol;
@@ -7583,7 +7534,7 @@ BOOL CTaiShanKlineShowView::DoOnCommand(WPARAM wParam, LPARAM lParam)
 
 	if(i>=IDM_Index__OFTEN_1&&i<IDM_Index__OFTEN_1+600)
 	{
-	
+
 		CString zhiBiaoOften;
 		CFormularContent * jishu;
 		int j=0;
@@ -7611,7 +7562,7 @@ BOOL CTaiShanKlineShowView::DoOnCommand(WPARAM wParam, LPARAM lParam)
 			{
 				if(j==i-IDM_Index__OFTEN_1-nBegin)
 				{
-			
+
 					if(jishu->isMainFiguer ==0)
 					{
 						if(m_hit-REGION_PICT1>0)
@@ -7644,7 +7595,7 @@ BOOL CTaiShanKlineShowView::DoOnCommand(WPARAM wParam, LPARAM lParam)
 		CString* sp = NULL;
 		CString s;
 
-		
+
 		if(m_nKlineKind2>0)
 		{
 			int foot=pKlineDrawing->TransferX(m_pointMove.x);
@@ -7672,7 +7623,7 @@ BOOL CTaiShanKlineShowView::DoOnCommand(WPARAM wParam, LPARAM lParam)
 			{
 				m_dlgFenshiTj = new CTaiKlineDialogShiDuanTJ(this,1);
 				tj = m_dlgFenshiTj;
-				
+
 
 				if(pKlineDrawing->TongJi( tj)==-1)
 				{
@@ -7735,7 +7686,7 @@ BOOL CTaiShanKlineShowView::DoOnCommand(WPARAM wParam, LPARAM lParam)
 			{
 				m_dlgKlineTj = new CTaiKlineDialogShiDuanTJ(this);
 				tj = m_dlgKlineTj;
-			
+
 
 				if(pKlineDrawing->TongJi( tj)==-1)
 				{
@@ -7765,7 +7716,7 @@ BOOL CTaiShanKlineShowView::DoOnCommand(WPARAM wParam, LPARAM lParam)
 			}
 			CTaiKlineDlgZhibiaoTongji* tj = new CTaiKlineDlgZhibiaoTongji(this);
 			m_dlgZhibiao = tj;
-		
+
 			tj->Create (IDD_DIALOG_tongji_zb,this);
 			tj->ShowWindow (SW_SHOW);
 			RedrawWindow();
@@ -7899,7 +7850,7 @@ BOOL CTaiShanKlineShowView::DoOnCommand(WPARAM wParam, LPARAM lParam)
 			RedrawWindow();
 		}
 		return TRUE;
-	
+
 	case ID_MODIFY_JISHU_POP://
 		{
 			CFormularContent * pJishuCurrent = NULL;
@@ -7954,13 +7905,13 @@ BOOL CTaiShanKlineShowView::DoOnCommand(WPARAM wParam, LPARAM lParam)
 			bool  bAlarm;
 			if(this->pDrawLine ->GetCurrentLineProp(rgb, nLineType, nLineThick, bAlarm))
 			{
-			CColorDialog colordia(rgb,CC_RGBINIT,this);
-			if(colordia.DoModal())
-			{
-				rgb=colordia.GetColor();
-				this->pDrawLine ->SetCurrentLineProp(rgb);
-				RedrawWindow();
-			}
+				CColorDialog colordia(rgb,CC_RGBINIT,this);
+				if(colordia.DoModal())
+				{
+					rgb=colordia.GetColor();
+					this->pDrawLine ->SetCurrentLineProp(rgb);
+					RedrawWindow();
+				}
 			}
 		}
 		return TRUE;
@@ -8038,27 +7989,27 @@ int CTaiShanKlineShowView::ReadKLine(CString fName,int stkKind,Kline*& pKline,in
 
 	int rtnK = pFile->ReadKLine (fName,pKline,nRead,1);
 
-	
+
 	if(GetDocument()->m_bInitDone==TRUE && GetDocument()->m_bCloseWorkDone==false)
 	{
 		CReportData* pData ;
 		GetDocument()->m_sharesInformation .Lookup(fName.GetBuffer (0),pData,stkKind);
 		if(pData!=NULL)
-		if(pData->nowp>0 && rtnK>0)
-		{
-			CTime tm = CTime::GetCurrentTime();
-			CTime tm2(pKline[rtnK-1].day);
-			CString s = tm.Format ("%Y%m%d");
-			CString s2 = tm2.Format ("%Y%m%d");
-			if(s == s2)
+			if(pData->nowp>0 && rtnK>0)
 			{
-				rtnK --;
+				CTime tm = CTime::GetCurrentTime();
+				CTime tm2(pKline[rtnK-1].day);
+				CString s = tm.Format ("%Y%m%d");
+				CString s2 = tm2.Format ("%Y%m%d");
+				if(s == s2)
+				{
+					rtnK --;
+				}
 			}
-		}
 	}
 
-	 time_t mt = 0;
-	 if(rtnK>0) mt= pKline[rtnK-1].day;
+	time_t mt = 0;
+	if(rtnK>0) mt= pKline[rtnK-1].day;
 	((CMainFrame*)AfxGetMainWnd())->gSTOCKDLL.QueryKData(fName, CSharesCompute::GetMarketKind(stkKind),mt);
 	return rtnK;
 }
@@ -8134,259 +8085,259 @@ int CTaiShanKlineShowView::ReadKline5Min(CString fName,int stkKind, Kline *&pKli
 }
 bool CTaiShanKlineShowView::CreateSplitMy(int bVert,int * pInt)
 {
-//	try
+	//	try
 	{
-	if(bVert<2)
-	{
-	CWnd* pWnd = this->GetParent();
-	int nKind = 0;
-	if(pWnd->IsKindOf (RUNTIME_CLASS(CChildFrame)))
-		nKind = 1;
-	if(pWnd->IsKindOf (RUNTIME_CLASS(CTaiKlineSplitWnd)))
-		nKind = 2;
-	if(nKind == 0)
-		return false;
-
-	CTaiKlineSplitWnd * wndSplitter=new CTaiKlineSplitWnd;
-   	CView* pOldActiveView = this;
-	CWnd * pMainWnd = AfxGetApp()->m_pMainWnd;
-	CChildFrame* pFrameWnd=(CChildFrame*)((CMainFrame*)pMainWnd)->MDIGetActive();
-
-
-
-	CRect rc;
-	GetClientRect(&rc);
-	
-	if(bVert == 1)
-	{
-		if(nKind == 1)
+		if(bVert<2)
 		{
-			if (!wndSplitter->CreateStatic(pWnd, 1, 2))
+			CWnd* pWnd = this->GetParent();
+			int nKind = 0;
+			if(pWnd->IsKindOf (RUNTIME_CLASS(CChildFrame)))
+				nKind = 1;
+			if(pWnd->IsKindOf (RUNTIME_CLASS(CTaiKlineSplitWnd)))
+				nKind = 2;
+			if(nKind == 0)
+				return false;
+
+			CTaiKlineSplitWnd * wndSplitter=new CTaiKlineSplitWnd;
+			CView* pOldActiveView = this;
+			CWnd * pMainWnd = AfxGetApp()->m_pMainWnd;
+			CChildFrame* pFrameWnd=(CChildFrame*)((CMainFrame*)pMainWnd)->MDIGetActive();
+
+
+
+			CRect rc;
+			GetClientRect(&rc);
+
+			if(bVert == 1)
+			{
+				if(nKind == 1)
+				{
+					if (!wndSplitter->CreateStatic(pWnd, 1, 2))
+					{
+						TRACE0("Failed to CreateStaticSplitter\n");
+						delete wndSplitter;
+						return false;
+					}
+
+
+					if (!wndSplitter->CreateView(0, 0,
+						RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()), pFrameWnd->m_pContext))
+					{
+						TRACE0("Failed to create first pane\n");
+						delete wndSplitter;
+						return false;
+					}
+					if (!wndSplitter->CreateView(0, 1,
+						RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()), pFrameWnd->m_pContext))
+					{
+						TRACE0("Failed to create first pane\n");
+						delete wndSplitter;
+						return false;
+					}
+				}
+				else
+				{
+					int row,col;
+					CWnd* pW = ((CTaiKlineSplitWnd*)pWnd)-> GetActivePane(&row, &col);
+					if(pW==NULL ||row<0||row>100||col<0||col>100)
+					{
+						delete wndSplitter;
+						return false;
+					}
+
+					if (!wndSplitter->CreateStatic((CTaiKlineSplitWnd*)pWnd, 1, 2,
+						WS_CHILD | WS_VISIBLE | WS_BORDER, 
+						((CTaiKlineSplitWnd*)pWnd)->IdFromRowCol(row, col)))
+					{
+						TRACE0("Failed to CreateStaticSplitter\n");
+						delete wndSplitter;
+						return false;
+					}
+
+					if (!wndSplitter->CreateView(0, 0,
+						RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()),
+						pFrameWnd->m_pContext ))
+					{
+						TRACE0("Failed to create first pane\n");
+						delete wndSplitter;
+						return false;
+					}
+					if (!wndSplitter->CreateView(0, 1,
+						RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()),
+						pFrameWnd->m_pContext ))
+					{
+						TRACE0("Failed to create first pane\n");
+						delete wndSplitter;
+						return false;
+					}
+				}
+			}
+			else
+			{
+				if(nKind == 1)
+				{
+					if (!wndSplitter->CreateStatic(pWnd, 2, 1))
+					{
+						TRACE0("Failed to CreateStaticSplitter\n");
+						delete wndSplitter;
+						return false;
+					}
+
+
+					if (!wndSplitter->CreateView(0, 0,
+						RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()), pFrameWnd->m_pContext))
+					{
+						TRACE0("Failed to create first pane\n");
+						delete wndSplitter;
+						return false;
+					}
+					if (!wndSplitter->CreateView(1, 0,
+						RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()), pFrameWnd->m_pContext))
+					{
+						TRACE0("Failed to create first pane\n");
+						delete wndSplitter;
+						return false;
+					}
+				}
+				else
+				{
+					int row,col;
+					CWnd* pW = ((CTaiKlineSplitWnd*)pWnd)-> GetActivePane(&row, &col);
+					if(pW==NULL ||row<0||row>100||col<0||col>100)
+					{
+						delete wndSplitter;
+						return false;
+					}
+
+					if (!wndSplitter->CreateStatic((CTaiKlineSplitWnd*)pWnd, 2, 1,
+						WS_CHILD | WS_VISIBLE | WS_BORDER,  
+						((CTaiKlineSplitWnd*)pWnd)->IdFromRowCol(row, col)))
+					{
+						TRACE0("Failed to CreateStaticSplitter\n");
+						delete wndSplitter;
+						return false;
+					}
+
+					if (!wndSplitter->CreateView(0, 0,
+						RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width()  , rc.Height()/2),
+						pFrameWnd->m_pContext ))
+					{
+						TRACE0("Failed to create first pane\n");
+						delete wndSplitter;
+						return false;
+					}
+					if (!wndSplitter->CreateView(1, 0,
+						RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width()  , rc.Height()/2),
+						pFrameWnd->m_pContext ))
+					{
+						TRACE0("Failed to create first pane\n");
+						delete wndSplitter;
+						return false;
+					}
+				}
+			}
+			wndSplitter->RecalcLayout();
+			CRect r;
+			this->GetClientRect (r);
+			ClientToScreen(r);
+			pWnd->ScreenToClient (r);
+
+			r.left-=2;
+			r.top-=2;
+			r.right+=2;
+			r.bottom+=2;
+			wndSplitter->MoveWindow (r);
+
+			ASSERT(!wndSplitter->IsTracking());
+
+			bTrackCurcorBgn=true;
+
+			wndSplitter->DoKeyboardSplit();
+			wndSplitter->GetPane (0,0)->SetFocus ();
+
+			bTrackCurcorBgn=false;
+			pOldActiveView->DestroyWindow ();
+
+
+			return true;
+		}
+		else
+		{
+			CWnd* pWnd = this->GetParent();
+
+			CTaiKlineSplitWnd * wndSplitter=new CTaiKlineSplitWnd;
+			CView* pOldActiveView = this;
+			CWnd * pMainWnd = AfxGetApp()->m_pMainWnd;
+			CChildFrame* pFrameWnd=(CChildFrame*)((CMainFrame*)pMainWnd)->MDIGetActive();
+
+
+
+			CRect rc;
+			GetClientRect(&rc);
+
+			if (!wndSplitter->CreateStatic(pWnd, 2, 2))
 			{
 				TRACE0("Failed to CreateStaticSplitter\n");
 				delete wndSplitter;
 				return false;
 			}
 
-		
+
 			if (!wndSplitter->CreateView(0, 0,
-				RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()), pFrameWnd->m_pContext))
+				RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()/2), pFrameWnd->m_pContext))
 			{
 				TRACE0("Failed to create first pane\n");
 				delete wndSplitter;
 				return false;
 			}
 			if (!wndSplitter->CreateView(0, 1,
-				RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()), pFrameWnd->m_pContext))
+				RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()/2), pFrameWnd->m_pContext))
 			{
 				TRACE0("Failed to create first pane\n");
-				delete wndSplitter;
-				return false;
-			}
-		}
-		else
-		{
-			int row,col;
-			CWnd* pW = ((CTaiKlineSplitWnd*)pWnd)-> GetActivePane(&row, &col);
-			if(pW==NULL ||row<0||row>100||col<0||col>100)
-			{
 				delete wndSplitter;
 				return false;
 			}
 
-			if (!wndSplitter->CreateStatic((CTaiKlineSplitWnd*)pWnd, 1, 2,
-				WS_CHILD | WS_VISIBLE | WS_BORDER, 
-			((CTaiKlineSplitWnd*)pWnd)->IdFromRowCol(row, col)))
-			{
-				TRACE0("Failed to CreateStaticSplitter\n");
-				delete wndSplitter;
-				return false;
-			}
-
-			if (!wndSplitter->CreateView(0, 0,
-				RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()),
-				pFrameWnd->m_pContext ))
-			{
-				TRACE0("Failed to create first pane\n");
-				delete wndSplitter;
-				return false;
-			}
-			if (!wndSplitter->CreateView(0, 1,
-				RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()),
-				pFrameWnd->m_pContext ))
-			{
-				TRACE0("Failed to create first pane\n");
-				delete wndSplitter;
-				return false;
-			}
-		}
-	}
-	else
-	{
-		if(nKind == 1)
-		{
-			if (!wndSplitter->CreateStatic(pWnd, 2, 1))
-			{
-				TRACE0("Failed to CreateStaticSplitter\n");
-				delete wndSplitter;
-				return false;
-			}
-
-	
-			if (!wndSplitter->CreateView(0, 0,
-				RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()), pFrameWnd->m_pContext))
-			{
-				TRACE0("Failed to create first pane\n");
-				delete wndSplitter;
-				return false;
-			}
 			if (!wndSplitter->CreateView(1, 0,
-				RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()), pFrameWnd->m_pContext))
+				RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()/2), pFrameWnd->m_pContext))
 			{
 				TRACE0("Failed to create first pane\n");
 				delete wndSplitter;
 				return false;
 			}
+
+			if (!wndSplitter->CreateView(1, 1,
+				RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()/2), pFrameWnd->m_pContext))
+			{
+				TRACE0("Failed to create first pane\n");
+				delete wndSplitter;
+				return false;
+			}
+			wndSplitter->RecalcLayout();
+			rc.bottom +=4;
+			rc.right +=4;
+			wndSplitter->MoveWindow (rc);
+			pFrameWnd->RecalcLayout();
+			pOldActiveView->DestroyWindow ();
+			if(pInt!=NULL)
+			{
+				CTaiShanKlineShowView * pView = (CTaiShanKlineShowView *)wndSplitter->GetPane (0,0);
+				pView->m_nKlineKind2 = pInt[0];
+				pView->ShowAll(pView->m_sharesSymbol );
+				pView = (CTaiShanKlineShowView *)wndSplitter->GetPane (0,1);
+				pView->m_nKlineKind2 = pInt[1];
+				pView->ShowAll(pView->m_sharesSymbol );
+				pView = (CTaiShanKlineShowView *)wndSplitter->GetPane (1,0);
+				pView->m_nKlineKind2 = pInt[2];
+				pView->ShowAll(pView->m_sharesSymbol );
+				pView = (CTaiShanKlineShowView *)wndSplitter->GetPane (1,1);
+				pView->m_nKlineKind2 = pInt[3];
+				pView->ShowAll(pView->m_sharesSymbol );
+			}
+			wndSplitter->DoKeyboardSplit();
+			wndSplitter->GetPane (0,0)->SetFocus ();
+			return true;
 		}
-		else
-		{
-			int row,col;
-			CWnd* pW = ((CTaiKlineSplitWnd*)pWnd)-> GetActivePane(&row, &col);
-			if(pW==NULL ||row<0||row>100||col<0||col>100)
-			{
-				delete wndSplitter;
-				return false;
-			}
-
-			if (!wndSplitter->CreateStatic((CTaiKlineSplitWnd*)pWnd, 2, 1,
-				WS_CHILD | WS_VISIBLE | WS_BORDER,  
-			((CTaiKlineSplitWnd*)pWnd)->IdFromRowCol(row, col)))
-			{
-				TRACE0("Failed to CreateStaticSplitter\n");
-				delete wndSplitter;
-				return false;
-			}
-
-			if (!wndSplitter->CreateView(0, 0,
-				RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width()  , rc.Height()/2),
-				pFrameWnd->m_pContext ))
-			{
-				TRACE0("Failed to create first pane\n");
-				delete wndSplitter;
-				return false;
-			}
-			if (!wndSplitter->CreateView(1, 0,
-				RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width()  , rc.Height()/2),
-				pFrameWnd->m_pContext ))
-			{
-				TRACE0("Failed to create first pane\n");
-				delete wndSplitter;
-				return false;
-			}
-		}
-	}
-	wndSplitter->RecalcLayout();
-	CRect r;
-	this->GetClientRect (r);
-	ClientToScreen(r);
-	pWnd->ScreenToClient (r);
-
-	r.left-=2;
-	r.top-=2;
-	r.right+=2;
-	r.bottom+=2;
-	wndSplitter->MoveWindow (r);
-
-	ASSERT(!wndSplitter->IsTracking());
-
-	bTrackCurcorBgn=true;
-
-	wndSplitter->DoKeyboardSplit();
-	wndSplitter->GetPane (0,0)->SetFocus ();
-
-	bTrackCurcorBgn=false;
-	pOldActiveView->DestroyWindow ();
-
-
-	return true;
-	}
-	else
-	{
-	CWnd* pWnd = this->GetParent();
-
-	CTaiKlineSplitWnd * wndSplitter=new CTaiKlineSplitWnd;
-   	CView* pOldActiveView = this;
-	CWnd * pMainWnd = AfxGetApp()->m_pMainWnd;
-	CChildFrame* pFrameWnd=(CChildFrame*)((CMainFrame*)pMainWnd)->MDIGetActive();
-
-
-	
-	CRect rc;
-	GetClientRect(&rc);
-
-	if (!wndSplitter->CreateStatic(pWnd, 2, 2))
-	{
-		TRACE0("Failed to CreateStaticSplitter\n");
-		delete wndSplitter;
-		return false;
-	}
-
-
-	if (!wndSplitter->CreateView(0, 0,
-		RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()/2), pFrameWnd->m_pContext))
-	{
-		TRACE0("Failed to create first pane\n");
-		delete wndSplitter;
-		return false;
-	}
-	if (!wndSplitter->CreateView(0, 1,
-		RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()/2), pFrameWnd->m_pContext))
-	{
-		TRACE0("Failed to create first pane\n");
-		delete wndSplitter;
-		return false;
-	}
-
-	if (!wndSplitter->CreateView(1, 0,
-		RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()/2), pFrameWnd->m_pContext))
-	{
-		TRACE0("Failed to create first pane\n");
-		delete wndSplitter;
-		return false;
-	}
-
-	if (!wndSplitter->CreateView(1, 1,
-		RUNTIME_CLASS(CTaiShanKlineShowView), CSize(rc.Width() /2 , rc.Height()/2), pFrameWnd->m_pContext))
-	{
-		TRACE0("Failed to create first pane\n");
-		delete wndSplitter;
-		return false;
-	}
-	wndSplitter->RecalcLayout();
-	rc.bottom +=4;
-	rc.right +=4;
-	wndSplitter->MoveWindow (rc);
-	pFrameWnd->RecalcLayout();
-	pOldActiveView->DestroyWindow ();
-	if(pInt!=NULL)
-	{
-		CTaiShanKlineShowView * pView = (CTaiShanKlineShowView *)wndSplitter->GetPane (0,0);
-		pView->m_nKlineKind2 = pInt[0];
-		pView->ShowAll(pView->m_sharesSymbol );
-		pView = (CTaiShanKlineShowView *)wndSplitter->GetPane (0,1);
-		pView->m_nKlineKind2 = pInt[1];
-		pView->ShowAll(pView->m_sharesSymbol );
-		pView = (CTaiShanKlineShowView *)wndSplitter->GetPane (1,0);
-		pView->m_nKlineKind2 = pInt[2];
-		pView->ShowAll(pView->m_sharesSymbol );
-		pView = (CTaiShanKlineShowView *)wndSplitter->GetPane (1,1);
-		pView->m_nKlineKind2 = pInt[3];
-		pView->ShowAll(pView->m_sharesSymbol );
-	}
-	wndSplitter->DoKeyboardSplit();
-	wndSplitter->GetPane (0,0)->SetFocus ();
-	return true;
-	}
 	}
 
 	{
@@ -8396,10 +8347,10 @@ bool CTaiShanKlineShowView::CreateSplitMy(int bVert,int * pInt)
 
 void CTaiShanKlineShowView::OnLSplitV() 
 {
-	
+
 	__try
 	{
-	CreateSplitMy(1);	
+		CreateSplitMy(1);	
 	}
 	__except(1)
 	{
@@ -8412,7 +8363,7 @@ void CTaiShanKlineShowView::OnUpdateLSplitV(CCmdUI* pCmdUI)
 	CTaiShanDoc* pDoc=GetDocument();
 	if(pDoc->m_lmbViewArray .GetSize()>=6)
 		pCmdUI->Enable(FALSE);
-	
+
 }
 
 void CTaiShanKlineShowView::OnLSplitH() 
@@ -8420,12 +8371,12 @@ void CTaiShanKlineShowView::OnLSplitH()
 
 	__try
 	{
-	CreateSplitMy(0);	
+		CreateSplitMy(0);	
 	}
 	__except(1)
 	{
 	}
-	
+
 }
 
 void CTaiShanKlineShowView::OnLSplitDel() 
@@ -8453,7 +8404,7 @@ void CTaiShanKlineShowView::OnLSplitDel()
 	{
 		CTaiKlineSplitWnd * pSplit = (CTaiKlineSplitWnd*)pWnd;
 
-	
+
 		CTaiKlineSplitWnd * pSplParent = (CTaiKlineSplitWnd*)pWnd->GetParent ();
 
 		if(pWnd->GetParent ()->IsKindOf (RUNTIME_CLASS(CChildFrame)))//if CChildFrame
@@ -8509,13 +8460,13 @@ void CTaiShanKlineShowView::OnLSplitDel()
 			ViewSetFocus(pView2);
 		}
 	}
-	
+
 }
 
 void CTaiShanKlineShowView::OnUpdateLSplitDel(CCmdUI* pCmdUI) 
 {
 
-	
+
 }
 
 void CTaiShanKlineShowView::OnUpdateLSplitH(CCmdUI* pCmdUI) 
@@ -8524,7 +8475,7 @@ void CTaiShanKlineShowView::OnUpdateLSplitH(CCmdUI* pCmdUI)
 	CTaiShanDoc* pDoc=GetDocument();
 	if(pDoc->m_lmbViewArray .GetSize()>=6)
 		pCmdUI->Enable(FALSE);
-	
+
 }
 
 void CTaiShanKlineShowView::OnLSplit4() 
@@ -8535,58 +8486,58 @@ void CTaiShanKlineShowView::OnLSplit4()
 
 	for(int k = 0;k<2;k++)
 	{
-	pFile = CTaiKlineFileKLine::m_fileDaySh;
-	if(k==1) pFile = CTaiKlineFileKLine::m_fileDaySz;
-	CMap<int ,int ,int,int> map;
-	
-	int nStock = pFile->GetStockNumber ();
-	for(int i=0;i<nStock;i++)
-	{
-		int addr = 16+i*64;
-		pFile->Seek(addr,CTaiKlineFileKLine::begin);
-		KLINE_SMALLHEAD* pKlineSmallHead = (KLINE_SMALLHEAD*)pFile->GetFileCurrentPointer();
-		CString symbol (pKlineSmallHead->StockSign);
-		for(int j=0;j<26;j++)
+		pFile = CTaiKlineFileKLine::m_fileDaySh;
+		if(k==1) pFile = CTaiKlineFileKLine::m_fileDaySz;
+		CMap<int ,int ,int,int> map;
+
+		int nStock = pFile->GetStockNumber ();
+		for(int i=0;i<nStock;i++)
 		{
-			if(pKlineSmallHead->symBlock [j] == 0xffff) break;
-			int iData = -1;
-			int iIn = pKlineSmallHead->symBlock [j] ;
-			if(iIn == 2790)
-				iIn = iIn;
-			if(map.Lookup(iIn,iData))
+			int addr = 16+i*64;
+			pFile->Seek(addr,CTaiKlineFileKLine::begin);
+			KLINE_SMALLHEAD* pKlineSmallHead = (KLINE_SMALLHEAD*)pFile->GetFileCurrentPointer();
+			CString symbol (pKlineSmallHead->StockSign);
+			for(int j=0;j<26;j++)
 			{
-				CString s2;
-				s2.Format ("=%d  ",iIn);
-				s2=symbol+s2;
-				s+=s2;
+				if(pKlineSmallHead->symBlock [j] == 0xffff) break;
+				int iData = -1;
+				int iIn = pKlineSmallHead->symBlock [j] ;
+				if(iIn == 2790)
+					iIn = iIn;
+				if(map.Lookup(iIn,iData))
+				{
+					CString s2;
+					s2.Format ("=%d  ",iIn);
+					s2=symbol+s2;
+					s+=s2;
+				}
+				else
+					map[iIn] = iIn;
 			}
-			else
-				map[iIn] = iIn;
 		}
-	}
 
 	}
 	if(s.GetLength ()>0)
 	{
-	CFile fl;
-	if(fl.Open("blockTestReport.txt",CFile::modeCreate|CFile::modeWrite))
-	{
-		fl.Write(s.GetBuffer (s.GetLength ()),s.GetLength ());
-		fl.Close();
-	}
+		CFile fl;
+		if(fl.Open("blockTestReport.txt",CFile::modeCreate|CFile::modeWrite))
+		{
+			fl.Write(s.GetBuffer (s.GetLength ()),s.GetLength ());
+			fl.Close();
+		}
 	}
 
 	//
 	int nKind[4] = {5,4,1,6};
 	try
 	{
-	CreateSplitMy(2,nKind);
+		CreateSplitMy(2,nKind);
 	}
 
 	catch(...)
 	{
 	}
-	
+
 }
 
 void CTaiShanKlineShowView::OnUpdateLSplit4(CCmdUI* pCmdUI) 
@@ -8595,7 +8546,7 @@ void CTaiShanKlineShowView::OnUpdateLSplit4(CCmdUI* pCmdUI)
 	CTaiShanDoc* pDoc=GetDocument();
 	if(pDoc->m_lmbViewArray .GetSize()>=3)
 		pCmdUI->Enable(FALSE);
-	
+
 }
 
 void CTaiShanKlineShowView::KlineReadTransferData()
@@ -8777,7 +8728,7 @@ void CTaiShanKlineShowView::GetPageData(bool bMovePre)
 	}
 
 
-	
+
 	if(symbol != m_sharesSymbol)
 	{
 		pKlineDrawing->m_bNewStock = true;
@@ -8860,7 +8811,7 @@ void CTaiShanKlineShowView::DrawFinace(CDC *pDC,int nBegin)
 		clr[0]=RGB(r,g,b);
 	}
 	clr[1]=GetDocument()->m_colorArray [0];
-	
+
 	float* pf = &(pBase->zgb);
 	s.LoadString (IDS_ZGB);
 	int high = pDC->GetOutputTextExtent(s).cy ;
@@ -8869,7 +8820,7 @@ void CTaiShanKlineShowView::DrawFinace(CDC *pDC,int nBegin)
 
 	int nShow = (rt.bottom - 19*RIGHTBOX_PERLINE-gScrollBott-1)/highTot;
 	int NewBegin[]={0,6,20,29,22,5,7,8,9,10,11,12,13,14,15,16,17,18,19,21,23
-	                 ,24,25,26,27,28,30,31,32,33};
+		,24,25,26,27,28,30,31,32,33};
 	for(int i=0;i<nShow;i++)
 	{
 		if(i+nBegin>33)
@@ -8879,20 +8830,20 @@ void CTaiShanKlineShowView::DrawFinace(CDC *pDC,int nBegin)
 			if(i+nBegin<2)
 			{
 				pDC->FillSolidRect (left+1,19*RIGHTBOX_PERLINE+1+i*highTot,rt.right -left-1,highTot,clr[(i+1)%2]);
-			    s.LoadString (IDS_ZGB+NewBegin[i+nBegin]);
-			    s+=":";
-			    pDC->SetTextColor( GetDocument()->m_colorArray[FIGUER_WORD]);
-			    pDC->TextOut(left+1,19*RIGHTBOX_PERLINE+1+i*highTot,s);
-			    s.Format ("%.2f",(float)pf[NewBegin[i+nBegin]]);
-			    pDC->SetTextColor( GetDocument()->m_colorArray[13]);
-			    pDC->TextOut(left+1,19*RIGHTBOX_PERLINE+1+(i)*highTot+high+1,s);
+				s.LoadString (IDS_ZGB+NewBegin[i+nBegin]);
+				s+=":";
+				pDC->SetTextColor( GetDocument()->m_colorArray[FIGUER_WORD]);
+				pDC->TextOut(left+1,19*RIGHTBOX_PERLINE+1+i*highTot,s);
+				s.Format ("%.2f",(float)pf[NewBegin[i+nBegin]]);
+				pDC->SetTextColor( GetDocument()->m_colorArray[13]);
+				pDC->TextOut(left+1,19*RIGHTBOX_PERLINE+1+(i)*highTot+high+1,s);
 			}
 			else
 			{
 				if(i+nBegin==2)
 				{
 					pDC->FillSolidRect (left+1,19*RIGHTBOX_PERLINE+1+i*highTot,rt.right -left-1,highTot,clr[(i+1)%2]);
-			
+
 					s="市赢率:";
 					pDC->SetTextColor( GetDocument()->m_colorArray[FIGUER_WORD]);
 					pDC->TextOut(left+1,19*RIGHTBOX_PERLINE+1+i*highTot,s);
@@ -8900,23 +8851,23 @@ void CTaiShanKlineShowView::DrawFinace(CDC *pDC,int nBegin)
 					if(pf[29]==0)
 						Syll=0.0;
 					else
-					    Syll=pMin1Drawing->m_pReportData->ystc/(float)pf[29];
+						Syll=pMin1Drawing->m_pReportData->ystc/(float)pf[29];
 					if(Syll==0)
 						s="";
 					else
-					    s.Format ("%.2f",Syll);
+						s.Format ("%.2f",Syll);
 					pDC->SetTextColor( GetDocument()->m_colorArray[13]);
 					pDC->TextOut(left+1,19*RIGHTBOX_PERLINE+1+(i)*highTot+high+1,s);
-				    nShow--;
+					nShow--;
 				}
 				pDC->FillSolidRect (left+1,19*RIGHTBOX_PERLINE+1+(i+1)*highTot,rt.right -left-1,highTot,clr[(i+2)%2]);
-			    s.LoadString (IDS_ZGB+NewBegin[i+nBegin]);
-			    s+=":";
-			    pDC->SetTextColor( GetDocument()->m_colorArray[FIGUER_WORD]);
-			    pDC->TextOut(left+1,19*RIGHTBOX_PERLINE+1+(i+1)*highTot,s);
-			    s.Format ("%.2f",(float)pf[NewBegin[i+nBegin]]);
-			    pDC->SetTextColor( GetDocument()->m_colorArray[13]);
-			    pDC->TextOut(left+1,19*RIGHTBOX_PERLINE+1+(i+1)*highTot+high+1,s);
+				s.LoadString (IDS_ZGB+NewBegin[i+nBegin]);
+				s+=":";
+				pDC->SetTextColor( GetDocument()->m_colorArray[FIGUER_WORD]);
+				pDC->TextOut(left+1,19*RIGHTBOX_PERLINE+1+(i+1)*highTot,s);
+				s.Format ("%.2f",(float)pf[NewBegin[i+nBegin]]);
+				pDC->SetTextColor( GetDocument()->m_colorArray[13]);
+				pDC->TextOut(left+1,19*RIGHTBOX_PERLINE+1+(i+1)*highTot+high+1,s);
 			}
 		}
 		else
@@ -9037,7 +8988,7 @@ void CTaiShanKlineShowView::OutDataExcel(CMSFlexGrid *grid, int nFiguer)
 
 	CLongString longStr;
 
-	
+
 	int nPerLine = pKlineDrawing->m_footEnd - pKlineDrawing->m_footBegin +1;
 	if(nPerLine<=0)
 		return ;
@@ -9103,14 +9054,14 @@ void CTaiShanKlineShowView::OutDataExcel(CMSFlexGrid *grid, int nFiguer)
 			nFixed=1;
 
 			nOutLine = 1+pKlineDrawing->m_dataFormular[nInd].numLine;
-	
+
 			nBeginValid[j]=0;
 			for(k=0;k<nPerLine;k++)
-					pInt[k] = atoi(CTime(pKline[k].day ).Format (timeFormat));
+				pInt[k] = atoi(CTime(pKline[k].day ).Format (timeFormat));
 			for(j=1;j<nOutLine;j++)
 			{
 				pFloatArray[j] = pKlineDrawing->m_dataFormular[nInd].line[j-1].m_arrBE.line+pKlineDrawing->m_footBegin;
-			
+
 				if(pKlineDrawing->m_dataFormular[nInd].line[j-1].m_arrBE.b<=-1)
 					nBeginValid[j]=-1;
 				else if(pKlineDrawing->m_dataFormular[nInd].line[j-1].m_arrBE.b<pKlineDrawing->m_footBegin)
@@ -9127,7 +9078,7 @@ void CTaiShanKlineShowView::OutDataExcel(CMSFlexGrid *grid, int nFiguer)
 		nPerLine = pMin1Drawing->m_footEnd+1;
 
 		nOutLine = 1+pMin1Drawing->m_dataFormular[nInd].numLine;
-	
+
 		nBeginValid[j]=0;
 		CTime tm = CTime::GetCurrentTime ();
 		CTime tm2(tm.GetYear(),tm.GetMonth(),tm.GetDay(),9,30,0);
@@ -9144,7 +9095,7 @@ void CTaiShanKlineShowView::OutDataExcel(CMSFlexGrid *grid, int nFiguer)
 		for(j=1;j<nOutLine;j++)
 		{
 			pFloatArray[j] = pMin1Drawing->m_dataFormular[nInd].line[j-1].m_arrBE.line;
-		
+
 			if(pMin1Drawing->m_dataFormular[nInd].line[j-1].m_arrBE.b<=-1)
 				nBeginValid[j]=-1;
 			else if(pMin1Drawing->m_dataFormular[nInd].line[j-1].m_arrBE.b<pMin1Drawing->m_footBegin)
@@ -9161,7 +9112,7 @@ void CTaiShanKlineShowView::OutDataExcel(CMSFlexGrid *grid, int nFiguer)
 		grid->SetTextArray(j,sTitleArray[j]);
 	}
 
-	
+
 	for(int i =0;i<nOutLine;i++)
 	{
 		for(j=0;j<nPerLine;j++)
@@ -9177,7 +9128,7 @@ void CTaiShanKlineShowView::OutDataExcel(CMSFlexGrid *grid, int nFiguer)
 		}
 	}
 
-	
+
 	delete[] pInt;
 	for(j=1;j<nFixed;j++)
 		delete []pFloatArray[j];
@@ -9199,7 +9150,7 @@ void CTaiShanKlineShowView::RedrawWindowNoCacl()
 	GetCurrClientRect(r);
 	this->CopyRect(r);
 
-	
+
 	if (m_tabNum==6)
 	{
 		CRect rc(r.right-m_rightLength+1,0,r.right,r.bottom-gScrollBott-5);
@@ -9281,12 +9232,12 @@ void CTaiShanKlineShowView::SetKlineExt(Kline *pKlineIn, int nKline, int nFootWr
 		}
 		pExt->m_nCountKlineSelf += nKline;
 		if(pExt->m_pKlineSelf != NULL) delete pExt->m_pKlineSelf ;
-		
+
 		pExt->m_pKlineSelf = pKline;
 
 	}
 
-	
+
 }
 
 void CTaiShanKlineShowView::ClearKlineExt()
@@ -9369,7 +9320,7 @@ void CTaiShanKlineShowView::OnTjxgMmTestShow()
 	else 
 	{
 		m_screenStockShow.m_bUseing = false;
-	    CFile file;
+		CFile file;
 		file.Remove("SaveTjxg.dat");
 	}
 	RedrawWindow();
@@ -9452,7 +9403,7 @@ void CTaiShanKlineShowView::ShowDlgCross(BOOL bShow)
 
 void CTaiShanKlineShowView::OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView) 
 {
-	
+
 	m_bActived =bActivate;
 	CView::OnActivateView(bActivate, pActivateView, pDeactiveView);
 	SetTimer(TM_SHOW_DLG,50,NULL);
@@ -9488,7 +9439,7 @@ void CTaiShanKlineShowView::InvertFocusRect2(CDC* pDC)
 
 void CTaiShanKlineShowView::OnMoveChengben2() 
 {
-	
+
 	if(m_tabNum == 5 && m_infoInit.nIDRightSheet [5-4] == 2 && m_infoFiguer==1)
 		return;
 
@@ -9542,32 +9493,32 @@ bool CTaiShanKlineShowView::CheckDiskFreeSpace()
 {
 	try
 	{
-	void* pGetDiskFreeSpaceEx = (void*)GetProcAddress( GetModuleHandle("kernel32.dll"),
-							 "GetDiskFreeSpaceExA");
+		void* pGetDiskFreeSpaceEx = (void*)GetProcAddress( GetModuleHandle("kernel32.dll"),
+			"GetDiskFreeSpaceExA");
 
-	if (pGetDiskFreeSpaceEx)
-	{
-		char ch[256];
-		ULARGE_INTEGER i64FreeBytesToCaller,i64TotalBytes,i64FreeBytes;		
-		::GetCurrentDirectory(256,ch);
-		BOOL fResult = GetDiskFreeSpaceEx (ch,
-					(PULARGE_INTEGER)&i64FreeBytesToCaller,
-					(PULARGE_INTEGER)&i64TotalBytes,
-					(PULARGE_INTEGER)&i64FreeBytes);
+		if (pGetDiskFreeSpaceEx)
+		{
+			char ch[256];
+			ULARGE_INTEGER i64FreeBytesToCaller,i64TotalBytes,i64FreeBytes;		
+			::GetCurrentDirectory(256,ch);
+			BOOL fResult = GetDiskFreeSpaceEx (ch,
+				(PULARGE_INTEGER)&i64FreeBytesToCaller,
+				(PULARGE_INTEGER)&i64TotalBytes,
+				(PULARGE_INTEGER)&i64FreeBytes);
 
-	   if(fResult)
-	   {
-		   CString s;
-		   int nZhao = i64FreeBytesToCaller.QuadPart /(1024*1024);
-		   if(nZhao<50)
-		   {
-			   s.Format ("您的硬盘空间已经低于%d,\r\n请删除无用文件！",nZhao);
-			   AfxMessageBox(s);
-			   return false;
-		   }
-	   }
+			if(fResult)
+			{
+				CString s;
+				int nZhao = i64FreeBytesToCaller.QuadPart /(1024*1024);
+				if(nZhao<50)
+				{
+					s.Format ("您的硬盘空间已经低于%d,\r\n请删除无用文件！",nZhao);
+					AfxMessageBox(s);
+					return false;
+				}
+			}
 
-	}
+		}
 	}
 	catch(...)
 	{
@@ -9610,7 +9561,7 @@ void CTaiShanKlineShowView::OnNineShow()
 	GetDocument()->m_WsStock2000View->GetParentFrame()->ActivateFrame();
 	int m_key=81;
 	::SendMessage(GetDocument()->m_WsStock2000View->m_hWnd,WM_USER_FROM_KLINE,0,m_key); 
-	
+
 }
 
 float CTaiShanKlineShowView::GetCapital(CReportData *pdt)
@@ -9642,7 +9593,7 @@ void CTaiShanKlineShowView::HistoryAStep(int nFoot)
 		if(m_pDlgDealHistory->m_bHistorySynchrostep == true)
 		{		
 			int first=nFoot;
-		
+
 			if(first>pKlineDrawing->m_footEnd)
 				return;
 			if(m_pDlgDealHistory->HistoryAStep(this->m_pkline [first].day))
@@ -9650,7 +9601,7 @@ void CTaiShanKlineShowView::HistoryAStep(int nFoot)
 				m_pDlgDealHistory->m_bShowHistory = true;
 				m_pDlgDealHistory->m_oldSymbol = "";
 				pMin1Drawing->m_bHist =true;
-			
+
 				m_pDlgDealHistory->SetWindowText("历史回忆("+m_pDlgDealHistory->m_fileName+")");
 			}
 			else
@@ -9764,11 +9715,11 @@ void CTaiShanKlineShowView::WideNetRedraw(WPARAM wp, LPARAM lp)
 	{
 		if(m_bMultiFiguer==1)
 		{
-	
+
 			for(int k = 0;k<4;k++)
 			{
 				int nk = CTaiKlineFileKLine::GetKlineCount(m_symbol9 [k], m_stkKind9[k],CTaiKlineFileKLine::IsDayKline(m_nKlineKind2));
-			
+
 				if(m_nKline9[k]!=nk) 
 				{
 					RedrawWindow();
@@ -9795,10 +9746,10 @@ void CTaiShanKlineShowView::WideNetRedraw(WPARAM wp, LPARAM lp)
 			}
 			if(bChange == true)
 				RedrawWindow();
-		
+
 		}
 	}
-	
+
 }
 void CTaiShanKlineShowView::OnMoveFig()
 {
@@ -9818,11 +9769,11 @@ void CTaiShanKlineShowView::OnSaveBitmap()
 	CDC* dc=GetDC();
 	CRect r;
 	GetCurrClientRect(r);
-	
+
 	CBitmap bit;
 	bit.CreateCompatibleBitmap( dc, 
-									r.Width (),
-									r.Height () );
+		r.Width (),
+		r.Height () );
 	CDC dcmem;
 	dcmem.CreateCompatibleDC(dc);
 	CBitmap* pOld = dcmem.SelectObject (&m_bit);
@@ -9831,8 +9782,8 @@ void CTaiShanKlineShowView::OnSaveBitmap()
 	dcmem2.CreateCompatibleDC(dc);
 	CBitmap* pOld2 = dcmem2.SelectObject (&bit);
 
-    ::BitBlt(dcmem2.m_hDC,0, 0, r.Width(), r.Height(),
-                          dcmem.m_hDC,0,0, SRCCOPY);
+	::BitBlt(dcmem2.m_hDC,0, 0, r.Width(), r.Height(),
+		dcmem.m_hDC,0,0, SRCCOPY);
 	dcmem.SelectObject (pOld);
 	dcmem.DeleteDC ();
 	dcmem2.SelectObject (pOld2);
@@ -9842,12 +9793,12 @@ void CTaiShanKlineShowView::OnSaveBitmap()
 
 	CDIBSectionLite lite;
 	lite.SetBitmap((HBITMAP)(bit));
-	
+
 	CString DefExt="*.bmp";
 	CString FileName = "filebitmap.bmp";
-    CString NewFileName;  
+	CString NewFileName;  
 	CString Filter="bitmap file (*.bmp)|*.bmp||";  
-    CFileDialog bSaveFileDialog(FALSE,(LPCSTR)DefExt,
+	CFileDialog bSaveFileDialog(FALSE,(LPCSTR)DefExt,
 		(LPCTSTR)FileName,
 		OFN_HIDEREADONLY|OFN_OVERWRITEPROMPT|OFN_NOCHANGEDIR,
 		(LPCSTR)Filter,this);
@@ -9864,7 +9815,7 @@ void CTaiShanKlineShowView::OnSaveBitmap()
 			NewFileName += ".bmp";
 		lite.Save (NewFileName);
 	}
-	
+
 }
 
 void CTaiShanKlineShowView::ShowMark(CFormularContent *pJishu)
@@ -9888,7 +9839,7 @@ void CTaiShanKlineShowView::DoF4()
 	}
 	else
 	{
-        m_nKlineKind2 = 0;
+		m_nKlineKind2 = 0;
 		m_stkKind = SZZS;
 		this->ShowAll(CSharesCompute::GetIndexSymbol(1));
 	}
@@ -9924,8 +9875,8 @@ void CTaiShanKlineShowView::ShowKlineMode(CFormularContent *pJishu)
 {
 	if(m_AutoChange == TRUE)
 	{
-	 m_AutoChange = false;
-	 KillTimer(12);
+		m_AutoChange = false;
+		KillTimer(12);
 	}
 
 	if(pJishu)
@@ -9962,7 +9913,7 @@ void CTaiShanKlineShowView::ShowKlineMode(CFormularContent *pJishu)
 
 BOOL CTaiShanKlineShowView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt) 
 {
-	
+
 	bool bDown = true;
 	int nPer = 1;
 	int n = abs(zDelta)/120;
@@ -9983,7 +9934,7 @@ void CTaiShanKlineShowView::OnSwitchHistoryAcc()
 	{
 		m_pDlgDealHistory->SendMessage(WM_COMMAND,ID_HISTORY_SWITCH);
 	}
-	
+
 }
 
 void CTaiShanKlineShowView::OnAstepHist() 
@@ -10008,7 +9959,7 @@ void CTaiShanKlineShowView::OnUpdateSwitchHistoryAcc(CCmdUI* pCmdUI)
 		pCmdUI->Enable();
 	else
 		pCmdUI->Enable(FALSE);
-	
+
 }
 void CTaiShanKlineShowView::DoHistoryAStep() 
 {
@@ -10063,7 +10014,7 @@ void CTaiShanKlineShowView::DrawUpDown(CDC *pDC)
 	}
 	for(;nKind<4;nKind++)
 	{
-		
+
 		for(isDown = 0;isDown<5;isDown++)
 		{
 			pDC->SetTextColor( GetDocument()->m_colorArray[nColorFoot[isDown]]);
@@ -10101,7 +10052,7 @@ void CTaiShanKlineShowView::DrawUpDown(CDC *pDC)
 			CReportData* pp;
 			if(pDoc->m_sharesInformation.Lookup(pDoc->m_sharesCompute.m_dataArr[isSz][i].m_chSymbol,pp,pDoc->m_sharesCompute.m_dataArr[isSz][i].m_nSymbolKind))
 			{
-				
+
 				pDC->SetTextAlign( TA_LEFT);//
 				pDC->SetTextColor( pDoc->m_colorArray[1]);
 				pDC->TextOut (left+0*nEach ,top+(iLine)*RIGHTBOX_PERLINE, pp->name );
@@ -10149,3 +10100,57 @@ COLORREF CTaiShanKlineShowView::GetColor(CReportData *pp, bool isVol)
 	}
 }
 
+
+void CTaiShanKlineShowView::ShowTextRect(int nItem, CDC* pDC)
+{
+	CPen pen_line(PS_SOLID, 1, GetDocument()->m_colorArray[1]);
+
+	if (m_nKlineKind2 == 0)
+	{
+		if (m_infoInit.nCountMin1 == 1)
+			return;
+
+		if (nItem > m_infoInit.nCountMin1 - 2)
+			nItem = m_infoInit.nCountMin1 - 2;
+
+		pMin1Drawing->m_nTextBox = nItem;
+
+		CPen* pOldpen = pDC->SelectObject(&pen_line);
+
+		pDC->MoveTo(m_rtMin1.rightX + 2, m_rtMin1.rtBlw[nItem].m_yBottom + 2);
+		pDC->LineTo(m_rtMin1.rightX + m_midLen - 2, m_rtMin1.rtBlw[nItem].m_yBottom + 2);
+		pDC->LineTo(m_rtMin1.rightX + m_midLen - 2, m_rtMin1.rtBlw[nItem + 1].m_yBottom - 2);
+		pDC->LineTo(m_rtMin1.rightX + 2, m_rtMin1.rtBlw[nItem + 1].m_yBottom - 2);
+		pDC->LineTo(m_rtMin1.rightX + 2, m_rtMin1.rtBlw[nItem].m_yBottom + 2);
+
+		pDC->SelectObject(pOldpen);
+	}
+	else
+	{
+		if (m_infoInit.nCountIndex == 1)
+			return;
+
+		if (nItem > m_infoInit.nCountIndex - 2)
+			nItem = m_infoInit.nCountIndex - 2;
+
+		pKlineDrawing->m_nTextBox = nItem;
+
+		CPen* pOldpen = pDC->SelectObject(&pen_line);
+
+		pDC->MoveTo(m_rtKlineFiguer.rightX + 2, m_rtKlineFiguer.rtBlw[nItem].m_yBottom + 2);
+		pDC->LineTo(m_rtKlineFiguer.rightX + m_midLen - 2, m_rtKlineFiguer.rtBlw[nItem].m_yBottom + 2);
+		pDC->LineTo(m_rtKlineFiguer.rightX + m_midLen - 2, m_rtKlineFiguer.rtBlw[nItem + 1].m_yBottom - 2);
+		pDC->LineTo(m_rtKlineFiguer.rightX + 2, m_rtKlineFiguer.rtBlw[nItem + 1].m_yBottom - 2);
+		pDC->LineTo(m_rtKlineFiguer.rightX + 2, m_rtKlineFiguer.rtBlw[nItem].m_yBottom + 2);
+
+		pDC->SelectObject(pOldpen);
+	}
+}
+
+/* ============================================================================
+
+int m_nKlineKind2 修改为枚举类型
+
+
+
+//*/

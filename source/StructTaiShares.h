@@ -5,7 +5,7 @@
 #define FREE(x)        farfree(x)
 
 #define MaxRights 3
-#define MaxStockTYpe 102
+#define MaxStockTYpe 255
 #define MAXJISHUCOUNT 10
 
 
@@ -31,7 +31,7 @@ typedef struct tagBASEINFOHEAD
 	long FileExitDone;
 	long StockCount;
 	long MaxStockCount;
-    long FixedNumSplit;
+	long FixedNumSplit;
 	BYTE Res[28];
 } BASEINFOHEAD;
 typedef BASEINFOHEAD* PBASEINFOHEAD;
@@ -58,21 +58,21 @@ typedef Split* PSplit;
 
 typedef struct
 {
-		float 	Price;     
-		float 	Volume;   
-		float 	Amount;   
-    
+	float 	Price;     
+	float 	Volume;   
+	float 	Amount;   
+
 }Kdata1;
 typedef struct
 {
-		float 	Price;     
-		float 	Volume;    
-		float 	Amount;    
-        float   accb;      
-        float   accs;     
-	    float   bsspbas;  
-		float   dif_accb;  
-		float   dif_accs;   
+	float 	Price;     
+	float 	Volume;    
+	float 	Amount;    
+	float   accb;      
+	float   accs;     
+	float   bsspbas;  
+	float   dif_accb;  
+	float   dif_accs;   
 }DpKdata1;
 
 typedef struct tagBASEINFO
@@ -131,54 +131,57 @@ typedef struct
 	char Free[8];
 }MapFileAddr;
 
+
+// 板块文件头
 typedef struct
 {
-	long m_lFileTitle;        
-    long m_lFileExit;          
-	long m_lStockTypeCount;   
-    long m_lStockTypeMaxCount; 
-    long m_lStockCount;      
-    long m_lStockMaxCount;    
-	long m_lLastTime;         
+	long m_lFileTitle;
+	long m_lFileExit;
+	long m_lStockTypeCount;
+	long m_lStockTypeMaxCount;
+	long m_lStockCount;
+	long m_lStockMaxCount;
+	long m_lLastTime;
+} STOCKTYPEHEAD;
+typedef STOCKTYPEHEAD* PSTOCKTYPEHEAD;
 
-}STOCKTYPEHEAD;
-typedef STOCKTYPEHEAD *PSTOCKTYPEHEAD;
-
-
+// 板块类型
 typedef struct
 {
-    long m_lIsUse;        
-	char m_szCode[7];     
-    char m_szName[12];    
-	long m_lStockCount;    
-    float m_fTotalRight;   
-	float m_fNewIndex;     
-	float m_fYstIndex;    
+	long m_lIsUse;
+	char m_szCode[7];
+	char m_szName[12];
+	long m_lStockCount;
+	float m_fTotalRight;
+	float m_fNewIndex;
+	float m_fYstIndex;
 	float m_fOpenIndex;
-	float m_fHighIndex;   
-	float m_fLowIndex;    
-	float m_fTotP;      
-	float m_fTotV;        
-	float m_fTotRVol;   
-	float m_fTotDVol;     
-    int  m_iRightType;    
-    BOOL m_bIsDelete;      
-}STOCKTYPEINFO;
-typedef STOCKTYPEINFO *PSTOCKTYPEINFO;
+	float m_fHighIndex;
+	float m_fLowIndex;
+	float m_fTotP;
+	float m_fTotV;
+	float m_fTotRVol;
+	float m_fTotDVol;
+	int  m_iRightType;
+	BOOL m_bIsDelete;
+} STOCKTYPEINFO;
+typedef STOCKTYPEINFO* PSTOCKTYPEINFO;
+
 typedef struct
 {
-	char m_szSymbol[9];	
+	char m_szSymbol[10];
 	BOOL m_bDeleted;
 	int m_iPos;
 	float m_ClosePrice;
-    float m_fRight[MaxRights];    
-    BYTE  m_btStockType[MaxStockTYpe];    
-}STOCK_TYPE_INFO;
-typedef STOCK_TYPE_INFO *PSTOCK_TYPE_INFO;
+	float m_fRight[MaxRights];
+	BYTE m_btStockType[MaxStockTYpe];
+} STOCK_TYPE_INFO;
+typedef STOCK_TYPE_INFO* PSTOCK_TYPE_INFO;
+
 typedef struct
 {
-	STOCK_TYPE_INFO *pStockInfo;
-}STOCK_POINT_INFO;
+	STOCK_TYPE_INFO* pStockInfo;
+} STOCK_POINT_INFO;
 
 //======================
 typedef struct
@@ -187,8 +190,8 @@ typedef struct
 	BOOL m_bDeleted;
 	int m_iPos;
 	float m_ClosePrice;
-    float m_fRight[MaxRights];   
-    BYTE  m_btStockType[MaxStockTYpe];    
+	float m_fRight[MaxRights];   
+	BYTE  m_btStockType[MaxStockTYpe];    
 }STOCK_TYPE_INFO_OLD;
 
 
@@ -266,53 +269,53 @@ typedef STOCKDATASHOW* PSTOCKDATASHOW;
 
 typedef struct
 {
- char name[9];          
- float ystc;
- float nowp;            
- float nowb;            
- float nows;           
- float nowv;            
- BOOL InOut;
- char kind;
+	char name[9];          
+	float ystc;
+	float nowp;            
+	float nowb;            
+	float nows;           
+	float nowv;            
+	BOOL InOut;
+	char kind;
 }CUOHEDATA;
 
 
 typedef struct
 {
- float ystc;                
- float nowi;             
- float opni;             
- float higi;             
- float lowi;              
- float nowp;             
- float nowv;             
- float accb;             
- float accs;           
- float bsspbas;          
- float dif_accb;        
- float dif_accs;         
- float volume5;         
+	float ystc;                
+	float nowi;             
+	float opni;             
+	float higi;             
+	float lowi;              
+	float nowp;             
+	float nowv;             
+	float accb;             
+	float accs;           
+	float bsspbas;          
+	float dif_accb;        
+	float dif_accs;         
+	float volume5;         
 
- float StartP;            
- float EndP;         
+	float StartP;            
+	float EndP;         
 
 
- float totp;            
- float totv;             
- float lastaccb;         
- float lastaccs;         
- float lasttotb;                        
- float lasttots;
- float lasttotp;                      
- float lasttotv;               
+	float totp;            
+	float totv;             
+	float lastaccb;         
+	float lastaccs;         
+	float lasttotb;                        
+	float lasttots;
+	float lasttotp;                      
+	float lasttotv;               
 
- DpKdata1 *m_DpKdate;           
+	DpKdata1 *m_DpKdate;           
 } Aidx1;
 
 typedef struct
 {
- short rsn;       
- short dnn;
+	short rsn;       
+	short dnn;
 } Rsdn1;
 
 typedef Rsdn1 **PRsdn1;
@@ -321,10 +324,10 @@ typedef Rsdn1 **PRsdn1;
 
 typedef struct
 {
- short sec5;              
- short rp;              
- short dp;              
- short res;
+	short sec5;              
+	short rp;              
+	short dp;              
+	short res;
 } Tidxd;
 typedef Tidxd **PTidxd;
 
@@ -354,13 +357,13 @@ typedef struct _BIG_LISTHEAD
 	float BigSetGB[4];
 	float BigMaxSetGB[4];
 	float BigBillSetTypeGB[10];
-    long ItemCount ;
+	long ItemCount ;
 	long MaxItemCount;
 	long totalBigCount[4];
 	float totalBigVolumn[4];
 	long totalCount[10];
 	float totalVolumn[10];
-    float totalV;
+	float totalV;
 	BOOL IsCalc[4];
 	BOOL IsSaveData;
 }BIG_LISTHEAD;
@@ -376,10 +379,10 @@ typedef struct _SHARES_DATA_ADD
 
 typedef struct  NameSymbolStr 
 {
-        char   stocksymblo[7];
-		char   stockname[9];
-		char   stockhypy[5];
-		char   group;
+	char   stocksymblo[7];
+	char   stockname[9];
+	char   stockhypy[5];
+	char   group;
 }NAMESYMBOL;
 
 
@@ -402,15 +405,15 @@ typedef struct  tagDAY_TOTAL_STRUCTEx
 
 struct TAI_SHAN_DATA
 {
-		int	    nTime;
-		float	fOpen;	
-		float	fHigh;		
-		float	fLow ;	
-		float 	fClose;     
-		float 	fVolume;   
-		float	fAmount;    
-		WORD    wAdvance;  
-		WORD    wDecline;   
+	int	    nTime;
+	float	fOpen;	
+	float	fHigh;		
+	float	fLow ;	
+	float 	fClose;     
+	float 	fVolume;   
+	float	fAmount;    
+	WORD    wAdvance;  
+	WORD    wDecline;   
 };
 
 ////////////////////////////////////////////////
@@ -428,21 +431,21 @@ struct KLINESMALLHEAD
 
 typedef struct
 {
-  time_t day;
-  float opn;
-  float hig;
-  float low;
-  float clo;
-  float vol;
-  float amt;
-  short adv;
-  short dec;
+	time_t day;
+	float opn;
+	float hig;
+	float low;
+	float clo;
+	float vol;
+	float amt;
+	short adv;
+	short dec;
 } Misd;
 
 typedef struct
 {
-  char  m_zqdm[7]; 
-  float SortID;
+	char  m_zqdm[7]; 
+	float SortID;
 } SORTSTRUCT;
 
 
@@ -461,19 +464,19 @@ typedef struct _ADD_DATA_DAY_LINE
 
 typedef struct _tagIndex_Technique
 {
-       int  iKind;                   
-       char sIndex_name[50];          
-       int  iLine;                   
-       int  iDataType;                 
-       float fParam[8];               
-       float fSubParam1;            
-       float fSubParam2;              
-       int  iSunIndex;               
-	   char SubLineType[10];
+	int  iKind;                   
+	char sIndex_name[50];          
+	int  iLine;                   
+	int  iDataType;                 
+	float fParam[8];               
+	float fSubParam1;            
+	float fSubParam2;              
+	int  iSunIndex;               
+	char SubLineType[10];
 }Index_Technique;
 
 typedef struct _TECHNIQUE_COLUMN{ 
-    UINT     nID ;      
+	UINT     nID ;      
 	Index_Technique nIndex;
 	BOOL IsUse;
 } TECHNIQUE_COLUMN ,*PTECHNIQUE_COLUMN; 
@@ -488,22 +491,22 @@ typedef struct _NineViewData
 typedef struct _TotalNineViewData
 {
 	int NineInitDone;
-    NineViewData m_NineViewDate[9];
+	NineViewData m_NineViewDate[9];
 }TotalNineViewData;
 
 
 typedef struct _SystemInitData
 {
 	int InitComplete;
-    char StockTypeName[20];     
+	char StockTypeName[20];     
 	char ScreenStockName[20];    
 	int  ColumnIndex[30]; 
 	int  ColumnType;               
 	int  ColumnWidth[30];  
 	TECHNIQUE_COLUMN TechniqueColumn[MAXJISHUCOUNT];     
-    char NetAddr[255];               
+	char NetAddr[255];               
 	char KswtAddr[255];          
-    int  RealTime;                
+	int  RealTime;                
 	int  BlockTime;                    
 	TotalNineViewData m_TotalNineViewData;
 }SYSTEMINITDATA;	 

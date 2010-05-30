@@ -3089,11 +3089,11 @@ BOOL CDownLoadDlg::InstallStockDayLine(REQUEST_CONTEXT *pRequestContext)
 		int FileID=0;  
 		int NumStock=0;
 		fread(&FileID,4,1,fp);
-		if( FileID!=FILEID22)
-		{
-			AfxMessageBox("非"+g_strCompanyName+"数据格式。",MB_ICONSTOP);
-			return FALSE;
-		}
+		//if( FileID!=FILEID22)
+		//{
+		//	AfxMessageBox("非"+g_strCompanyName+"数据格式。",MB_ICONSTOP);
+		//	return FALSE;
+		//}
 		fread(&NumStock,sizeof(int),1,fp);
 		fseek(fp,16,SEEK_SET);
 		m_Progress.SetRange32(0,NumStock);

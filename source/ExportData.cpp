@@ -446,13 +446,13 @@ void CExportData::ProduceDayKline(CString DestFileName,int BeginDate,int EndDate
 			AssignDays(g_daysz, NumberOfStock,bFormat);  
 	}
 
-	if(bFormat==0)
-	{
-	    int FileID=FILEID22;
-		m_DestFile.SeekToBegin();
-		m_DestFile.Write(&FileID,4);
-		m_DestFile.Write(&NumberOfStock,4);
-	}
+	//if(bFormat==0)
+	//{
+	//    int FileID=FILEID22;
+	//	m_DestFile.SeekToBegin();
+	//	m_DestFile.Write(&FileID,4);
+	//	m_DestFile.Write(&NumberOfStock,4);
+	//}
 
 	if(bFormat!=3)
 		m_DestFile.Close();
@@ -1142,13 +1142,13 @@ void CExportData::ProduceMinuteData(int bFormat)
 		if(m_Shenzhen)
 			NumberOfStock += YieldMinuteFile(false,true,bFormat);
 	}
-	if(bFormat==0)
-	{
-        int FileID=FILEID22;
-		m_DestFile.SeekToBegin();
-		m_DestFile.Write(&FileID,       4  );
-		m_DestFile.Write(&NumberOfStock,4  );
-	}
+	//if(bFormat==0)
+	//{
+ //       int FileID=FILEID22;
+	//	m_DestFile.SeekToBegin();
+	//	m_DestFile.Write(&FileID,       4  );
+	//	m_DestFile.Write(&NumberOfStock,4  );
+	//}
 	m_DestFile.Close();
 
 	if(bFormat!=0)

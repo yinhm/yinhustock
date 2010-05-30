@@ -49,7 +49,6 @@ const char g_baseinfo[64] = "Data\\CompanyBase";
 const char g_stocktypeinfo[64] = "Data\\BlockInfomation";
 const char g_hzpy[64] = "Data\\languagedata";
 const char g_rate[64] = "Data\\stockrate";
-const char g_xtsx_hz[64] = "Data\\SystemSetting";
 const char g_kxzh_hz[64] = "Data\\KlineGroup";
 const char g_tixg_hz[64] = "Data\\ScreenData";
 const char g_zbgs_hz[64] = "Data\\IndexData";
@@ -75,9 +74,8 @@ enum {	SZEBPAGE=102};//STKINDEXPAGE =100,STKTYPEPAGE=101,
 
 
 
-// Codejock Software Components
-//#define _XTP_STATICLINK
-//#include <XTToolkitPro.h>
+#define _XTP_STATICLINK
+#include <XTToolkitPro.h>
 
 
 

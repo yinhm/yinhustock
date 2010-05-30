@@ -638,11 +638,11 @@ void CImportData::InstallWanshen(CString srcfilename, int BeginDate, int EndDate
 	int NumStock=0 ;             
 	int FileID; 
 	SourceFile.Read(&FileID,4);
-	if( FileID!=FILEID22)
-	{
-		AfxMessageBox("非"+g_strCompanyName+"日线数据格式!");
-		return;
-	}
+	//if( FileID!=FILEID22)
+	//{
+	//	AfxMessageBox("非"+g_strCompanyName+"日线数据格式!");
+	//	return;
+	//}
 	SourceFile.Read(&NumStock,sizeof(int));
 	SourceFile.Seek(16,CFile::begin);
 	
@@ -1351,11 +1351,11 @@ void CImportData::InstallMinteData()
 	int NumStock=0 ;             
 	int FileID;  
 	SourceFile.Read(&FileID,4);
-	if( FileID!=FILEID22)
-	{
-		AfxMessageBox("非"+g_strCompanyName+"五分钟数据格式!");
-		return;
-	}
+	//if( FileID!=FILEID22)
+	//{
+	//	AfxMessageBox("非"+g_strCompanyName+"五分钟数据格式!");
+	//	return;
+	//}
 	SourceFile.Read(&NumStock,sizeof(int));
 	
 	m_progress1.SetRange32(0,NumStock);
