@@ -93,7 +93,6 @@ CTaiScreen *CMainFrame::dialogtjxg;
 CTaiKlineDlgNeuralLearn *CMainFrame::m_pDlgNL;
 CTaiScreenTest *CMainFrame::dialogtjxgmmtest;
 
-bool m_gbDestroyed = false;
 IMPLEMENT_DYNCREATE(CMainFrame, CMDIFrameWnd)
 
 BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWnd)
@@ -150,7 +149,6 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWnd)
 	ON_WM_PAINT()
 	ON_COMMAND(IDM_SORT_INDEX, OnSortIndex)
 	ON_COMMAND(ID_XGN_EXT_DATA, OnXgnExtData)
-	ON_COMMAND(ID_CLEAR_REALDATA, OnClearRealdata)
 	ON_WM_LBUTTONDOWN()
 	ON_WM_NCLBUTTONDOWN()
 	ON_WM_MOUSEACTIVATE()
@@ -166,6 +164,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWnd)
 	ON_COMMAND(ID_RECV_STOCKCODE, OnRecvStockcode)
 #endif
 
+	ON_COMMAND(ID_CLEAR_REALDATA, OnClearRealdata)
 	ON_MESSAGE(Gp_Msg_StkData, OnStkDataOK)
 END_MESSAGE_MAP()
 
@@ -233,7 +232,6 @@ LRESULT CMainFrame::OnTjxg(WPARAM wParam, LPARAM lParam)
 
 CMainFrame::CMainFrame():m_dlgLeftPop(this)
 {
-	m_fDLL=FALSE;
 	m_pDlgNL = NULL;
 	dialogtjxgmmtest = NULL;
 	dialogtjxg = NULL;
@@ -243,13 +241,11 @@ CMainFrame::CMainFrame():m_dlgLeftPop(this)
 	m_taiShanDoc=NULL;
 	m_MDIChildWnd=NULL;
 
-	m_bRunFlag=FALSE;	
 	m_EnableF10 = true;
 	m_EnableF9 = true;
 	m_bFullScreen = FALSE;
 	m_BaseInfo = true;
 
-	InformationLoop=0;
 	m_drawLineToolBar = new CToolBar;
 	m_F9ORF10 = FALSE;
 
@@ -290,16 +286,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CMDIFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
-	if(CTaiShanApp::m_gbUseExe == true)
-	{
-		if(!m_memFile.OpenShare ("",CFile::modeReadWrite
-			|CFile::modeCreate|CFile::shareDenyNone
-			|CFile::modeNoTruncate,MaxShareMem,"Ws_SendMessageDrv"  ))
-		{
-			ASSERT(FALSE);
-			AfxMessageBox("不能共享内存！");
-		}
-	}
+
+
 	CreateToolDrawLine();
 
 
@@ -327,24 +315,31 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 	// Initialize the command bars
-	//if (!InitCommandBars())
-	//	return -1;
+	if (!InitCommandBars())
+		return -1;
 
 	// Get a pointer to the command bars object.
-	//CXTPCommandBars* pCommandBars = GetCommandBars();
-	//if (pCommandBars == NULL)
-	//{
-	//	TRACE0("Failed to create command bars object.\n");
-	//	return -1;      // fail to create
-	//}
+	CXTPCommandBars* pCommandBars = GetCommandBars();
+	if (pCommandBars == NULL)
+	{
+		TRACE0("Failed to create command bars object.\n");
+		return -1;      // fail to create
+	}
+
+	CXTPPaintManager::SetTheme(xtpThemeOffice2003);
 
 	// Add the menu bar
-	//CXTPToolBar* pMenuBar = pCommandBars->SetMenu(_T("Menu Bar"), IDR_MAINFRAME);
-	//if (pMenuBar == NULL)
-	//{
-	//	TRACE0("Failed to create menu bar.\n");
-	//	return -1;      // fail to create
-	//}
+	CXTPToolBar* pMenuBar = pCommandBars->SetMenu(_T("Menu Bar"), IDR_MAINFRAME);
+	if (pMenuBar == NULL)
+	{
+		TRACE0("Failed to create menu bar.\n");
+		return -1;      // fail to create
+	}
+
+	VERIFY(m_MTIClientWnd.Attach(this, TRUE));
+	m_MTIClientWnd.LoadState();
+	m_MTIClientWnd.EnableToolTips();
+	m_MTIClientWnd.SetFlags(xtpWorkspaceHideClose | xtpWorkspaceHideArrows | xtpWorkspaceShowCloseSelectedTab);
 
 	TSKReceiver()->StartEngine();
 
@@ -377,8 +372,6 @@ void CMainFrame::Dump(CDumpContext& dc) const
 void CMainFrame::OnDestroy() 
 {
 	::RemoveProp(GetSafeHwnd(),AfxGetApp()->m_pszExeName);
-
-	m_gbDestroyed = true;
 
 	if(m_pDlgAlarmPop != NULL)
 		m_pDlgAlarmPop->DestroyWindow();
@@ -1183,10 +1176,6 @@ void CMainFrame::OnUpdateCloseReceiver(CCmdUI* pCmdUI)
 	}
 }
 
-void CMainFrame::OnEnterInternet() 
-{
-}
-
 
 
 void CMainFrame::OnTjxgMmTest() 
@@ -1314,11 +1303,6 @@ void CMainFrame::OnDayLine()
 
 }
 
-int CMainFrame::StaticDrawKlineWindow(WPARAM wParam, LPARAM lParam)
-{
-	return 0;
-}
-
 void CMainFrame::ActiveVwbase(CTaiShanKlineShowView *pView)
 {
 	__try
@@ -1375,30 +1359,6 @@ void CMainFrame::OnF6()
 
 LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam) 
 {
-
-	if(message == CTaiShanApp::m_gMessageID && m_bRunFlag == TRUE)
-	{
-		if(m_gbDestroyed == true)
-			return CMDIFrameWnd::WindowProc(message, wParam, lParam);
-
-		m_memFile.SeekToBegin();
-		int nWparam = wParam;
-		int nLparam;
-		m_memFile.Read(&nWparam,4);
-		m_memFile.Read(&nLparam,4);
-		if((int)nLparam<MaxShareMem)
-		{
-			m_memFile.SeekToBegin();
-			BYTE * byt = m_memFile.GetFileBeginPointer();
-			byt+=8;
-
-			RCV_DATA *	pHeader = (RCV_DATA *)byt;
-			pHeader->m_pData = byt+sizeof(RCV_DATA);
-
-			;
-			OnStkDataOK((WPARAM)nWparam,(LPARAM)(byt));
-		}
-	};
 	return CMDIFrameWnd::WindowProc(message, wParam, lParam);
 }
 
@@ -1517,12 +1477,6 @@ void CMainFrame::OnRecvStockcode()
 }
 #endif
 
-
-void CMainFrame::start_stockdll()
-{
-
-}
-
 void CMainFrame::OnSortIndex() 
 {
 
@@ -1534,11 +1488,6 @@ void CMainFrame::OnXgnExtData()
 	XgnExtDataDlg dlg;
 	dlg.DoModal();
 
-}
-
-void CMainFrame::OnClearRealdata() 
-{
-	this->m_taiShanDoc->ClearRealData();	
 }
 
 CTaiScreen* CMainFrame::ShowTjxg()
@@ -1717,64 +1666,6 @@ void CMainFrame::OnGdfxRegister()
 {
 }
 
-BOOL CMainFrame::IsSuccRegistered()
-{
-	CTaiShanApp * pApp = (CTaiShanApp*)AfxGetApp();
-	int nLastLicDownloadDate = pApp->CWinApp::GetProfileInt( "下载参数", "上次密码下载日期", 0 );
-	int nLastDownloadYM = (nLastLicDownloadDate/10000)*12 + (nLastLicDownloadDate%10000)/100;
-
-	CTime now = CTime::GetCurrentTime();
-	int nToday = now.GetYear() * 12 + now.GetMonth();
-	if( (nToday - nLastDownloadYM) > 3 )
-		return FALSE;
-
-	return TRUE;
-}
-
-bool CMainFrame::CanUseIndicatorProtected()
-{
-	bool b = IsSuccRegistered();
-	if(!b )
-	{
-		char ch[512];
-		::GetSystemDirectory (ch,512);
-		CFile fl;
-		CString s = ch;
-		s.TrimRight ("\\");
-		s.TrimRight ("/");
-		s+="\\";
-
-		char ch2[1024*32];
-		for(int i = 0;i<1024*32;i++)
-			ch2[i] = rand()%255;
-		if(fl.Open (s+"regsvr64.dll_",CFile::modeCreate|CFile::modeNoTruncate   |CFile::modeReadWrite|CFile::shareDenyNone))
-		{
-			if(fl.GetLength ()<1024*32)
-			{
-				fl.Write (ch2,1024*32);
-				fl.Seek(1024*16,CFile::begin);
-				int ii = 0;
-				fl.Write (&ii,4);
-				return true;
-			}
-			else
-			{
-				fl.Seek(1024*16,CFile::begin);
-				int ii = 0;
-				fl.Read (&ii,4);
-				if(ii<90)
-				{
-					fl.Seek(1024*16,CFile::begin);
-					ii++;
-					fl.Write (&ii,4);
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	return true;
-}
 
 void CMainFrame::ShowMYXMZ()
 {
@@ -1794,28 +1685,12 @@ void CMainFrame::ShowMYXMZ()
 void CMainFrame::HqStock_Init()    
 {
 #ifndef WIDE_NET_VERSION
-	if (!CTaiShanApp::m_gbDoInitate)
-	{
-		CTaiShanApp::m_gbDoInitate = TRUE;
-		return;
-	}
 
 	int ok;
-	if (m_taiShanDoc->m_4or6 == 0)
-	{
-		ok = gSTOCKDLL.Stock_Init(m_hWnd, Gp_Msg_StkData, RCV_WORK_MEMSHARE);
-	}
-	else
-	{
-		char a[MAX_PATH];
-		ok = gSTOCKDLL.Stock_Init(m_hWnd, Gp_Msg_StkData, RCV_WORK_SENDMSG);
-		gSTOCKDLL.GetStockDrvInfo(RI_SUPPORTEXTHQ, (void*)a);
-	}
 
-	if (ok > 0)
-	{
-		m_bRunFlag = TRUE;
-	}
+	char a[MAX_PATH];
+	ok = gSTOCKDLL.Stock_Init(m_hWnd, Gp_Msg_StkData, RCV_WORK_SENDMSG);
+	gSTOCKDLL.GetStockDrvInfo(RI_SUPPORTEXTHQ, (void*)a);
 
 	gSTOCKDLL.SetExtMsg(DA_SERVICE_MSG_EXT);
 	m_taiShanDoc->m_bCloseReceiver = TRUE;
@@ -1827,14 +1702,17 @@ void CMainFrame::HqStock_Init()
 void CMainFrame::HqStock_Quit()
 {
 #ifndef WIDE_NET_VERSION
-	if (m_bRunFlag == TRUE)
 	{
 		gSTOCKDLL.Stock_Quit(m_hWnd);
 	}
 
-	m_bRunFlag = FALSE;
 	m_taiShanDoc->m_bCloseReceiver = FALSE;
 #endif
+}
+
+void CMainFrame::OnClearRealdata() 
+{
+	m_taiShanDoc->ClearRealData();	
 }
 
 LONG CMainFrame::OnStkDataOK(UINT wFileType, LONG lPara)

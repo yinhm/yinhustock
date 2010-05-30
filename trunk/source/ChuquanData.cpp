@@ -576,8 +576,8 @@ void CChuquanData::OutChuQuanData(CString FilePath)
 	POWER_1th Power_1th;
 	int nSplitMask=-1;
 
-	int FileId=FILEID22;
-	OutFile.Write(&FileId,4);
+	//int FileId=FILEID22;
+	//OutFile.Write(&FileId,4);
 	OutFile.Seek(8,CFile::begin);
 
 
@@ -651,12 +651,12 @@ BOOL CChuquanData::InstallPowerData(CString FilePath)
 	Split pSplit[80];
 	int nFlag=0;
 	InFile.Read(&nFlag,4);
-	if(nFlag!=FILEID22)
-	{
-		AfxMessageBox("不是"+g_strCompanyName+"除权数据格式!");
-		InFile.Close();
-		return FALSE;
-	}
+	//if(nFlag!=FILEID22)
+	//{
+	//	AfxMessageBox("不是"+g_strCompanyName+"除权数据格式!");
+	//	InFile.Close();
+	//	return FALSE;
+	//}
 	::ZeroMemory(pSplit,80*sizeof(Split));
 	InFile.Seek(8,CFile::begin);
 	BOOL bFirstTime=TRUE;

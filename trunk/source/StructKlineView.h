@@ -1,7 +1,6 @@
-#ifndef	_RECT_HEADER_
-#define	_RECT_HEADER_
-;
-// by ÓáÃ÷Â¼
+
+#pragma once
+
 #include <afxtempl.h>
 #include "CFormularContent.h"
 #include "lineRightBox.h"
@@ -148,7 +147,7 @@ struct INFO_LINESELF{
 
 typedef struct{
 	char ZhBName[20];	
- 	int  m_yBottom;			
+	int  m_yBottom;			
 }Index_BELLOW;
 
 typedef struct{
@@ -157,7 +156,7 @@ typedef struct{
 	Index_BELLOW rtBlw[5];	
 }RECTKLINE;
 
- typedef struct{
+typedef struct{
 	int  rightX;		
 	int  leftX;		
 	Index_BELLOW rtBlw[5];	
@@ -249,200 +248,200 @@ public:
 	};
 	bool Add(ARRAY_BE& in1,ARRAY_BE& in2 )
 	{
-		 b=max(in1.b,in2.b);
-		 e=min(in1.e,in2.e);
+		b=max(in1.b,in2.b);
+		e=min(in1.e,in2.e);
 		if(!in1.s.IsEmpty())
-			 s = in1.s;
+			s = in1.s;
 		if(!in2.s.IsEmpty())
-			 s = in2.s;
+			s = in2.s;
 
 		if(in1.kind == LineRt || in2.kind == LineRt)
 		{
-			 kind = LineRt;
-			 lineRight = in1.lineRight+in2.lineRight;
+			kind = LineRt;
+			lineRight = in1.lineRight+in2.lineRight;
 		}
 		else
 		{
-			 kind = in1.kind>in2.kind ? in1.kind : in2.kind ;
+			kind = in1.kind>in2.kind ? in1.kind : in2.kind ;
 
 			if(in1.line&&in2.line &&  line &&  b>=0)
 			{
 				for(int i =  b;i<= e;i++)
-					 line[i]=in1.line[i]+in2.line[i];
+					line[i]=in1.line[i]+in2.line[i];
 			}
 		}
 		return true;
 	};
 	bool Add(ARRAY_BE& in1,float fIn2 )
 	{
-		 b=in1.b;
-		 e=in1.e;
+		b=in1.b;
+		e=in1.e;
 		if(!in1.s.IsEmpty())
-			 s = in1.s;
+			s = in1.s;
 
-		 kind = in1.kind;
+		kind = in1.kind;
 		if(in1.kind == LineRt )
 		{
-			 lineRight = in1.lineRight+fIn2;
+			lineRight = in1.lineRight+fIn2;
 		}
 		else
 		{
 			if(in1.line &&  line &&  b>=0)
 			{
 				for(int i =  b;i<=e;i++)
-					 line[i]=in1.line[i]+fIn2;
+					line[i]=in1.line[i]+fIn2;
 			}
 		}
 		return true;
 	};
 	bool Sub(ARRAY_BE& in1,ARRAY_BE& in2 )
 	{
-		 b=max(in1.b,in2.b);
-		 e=min(in1.e,in2.e);
+		b=max(in1.b,in2.b);
+		e=min(in1.e,in2.e);
 		if(!in1.s.IsEmpty())
-			 s = in1.s;
+			s = in1.s;
 		if(!in2.s.IsEmpty())
-			 s = in2.s;
+			s = in2.s;
 
 		if(in1.kind == LineRt || in2.kind == LineRt)
 		{
-			 kind = LineRt;
-			 lineRight = in1.lineRight-in2.lineRight;
+			kind = LineRt;
+			lineRight = in1.lineRight-in2.lineRight;
 		}
 		else
 		{
-			 kind = in1.kind>in2.kind ? in1.kind : in2.kind ;
+			kind = in1.kind>in2.kind ? in1.kind : in2.kind ;
 
 			if(in1.line&&in2.line &&  line &&  b>=0)
 			{
 				for(int i =  b;i<=e;i++)
-					 line[i]=in1.line[i]-in2.line[i];
+					line[i]=in1.line[i]-in2.line[i];
 			}
 		}
 		return true;
 	};
 	bool Sub(ARRAY_BE& in1,float fIn2 )
 	{
-		 b=in1.b;
-		 e=in1.e;
+		b=in1.b;
+		e=in1.e;
 		if(!in1.s.IsEmpty())
-			 s = in1.s;
+			s = in1.s;
 
-		 kind = in1.kind;
+		kind = in1.kind;
 		if(in1.kind == LineRt )
 		{
-			 lineRight = in1.lineRight-fIn2;
+			lineRight = in1.lineRight-fIn2;
 		}
 		else
 		{
 			if(in1.line &&  line &&  b>=0)
 			{
 				for(int i =  b;i<=e;i++)
-					 line[i]=in1.line[i]-fIn2;
+					line[i]=in1.line[i]-fIn2;
 			}
 		}
 		return true;
 	};
 	bool Sub(float fIn2,ARRAY_BE& in1 )
 	{
-		 b=in1.b;
-		 e=in1.e;
+		b=in1.b;
+		e=in1.e;
 		if(!in1.s.IsEmpty())
-			 s = in1.s;
+			s = in1.s;
 
-		 kind = in1.kind;
+		kind = in1.kind;
 		if(in1.kind == LineRt )
 		{
-			 lineRight = fIn2 -in1.lineRight;
+			lineRight = fIn2 -in1.lineRight;
 		}
 		else
 		{
 			if(in1.line &&  line &&  b>=0)
 			{
 				for(int i =  b;i<=e;i++)
-					 line[i]=fIn2-in1.line[i];
+					line[i]=fIn2-in1.line[i];
 			}
 		}
 		return true;
 	};
 	bool Mult(ARRAY_BE& in1,ARRAY_BE& in2 )
 	{
-		 b=max(in1.b,in2.b);
-		 e=min(in1.e,in2.e);
+		b=max(in1.b,in2.b);
+		e=min(in1.e,in2.e);
 		if(!in1.s.IsEmpty())
-			 s = in1.s;
+			s = in1.s;
 		if(!in2.s.IsEmpty())
-			 s = in2.s;
+			s = in2.s;
 
 		if(in1.kind == LineRt || in2.kind == LineRt)
 		{
-			 kind = LineRt;
-			 lineRight = in1.lineRight*in2.lineRight;
+			kind = LineRt;
+			lineRight = in1.lineRight*in2.lineRight;
 		}
 		else
 		{
-			 kind = in1.kind>in2.kind ? in1.kind : in2.kind ;
+			kind = in1.kind>in2.kind ? in1.kind : in2.kind ;
 
 			if(in1.line&&in2.line &&  line &&  b>=0)
 			{
 				for(int i =  b;i<=e;i++)
-					 line[i]=in1.line[i]*in2.line[i];
+					line[i]=in1.line[i]*in2.line[i];
 			}
 		}
 		return true;
 	};
 	bool Mult(ARRAY_BE& in1,float fIn2 )
 	{
-		 b=in1.b;
-		 e=in1.e;
+		b=in1.b;
+		e=in1.e;
 		if(!in1.s.IsEmpty())
-			 s = in1.s;
+			s = in1.s;
 
-		 kind = in1.kind;
+		kind = in1.kind;
 		if(in1.kind == LineRt )
 		{
-			 lineRight = in1.lineRight*fIn2;
+			lineRight = in1.lineRight*fIn2;
 		}
 		else
 		{
 			if(in1.line &&  line &&  b>=0)
 			{
 				for(int i =  b;i<=e;i++)
-					 line[i]=in1.line[i]*fIn2;
+					line[i]=in1.line[i]*fIn2;
 			}
 		}
 		return true;
 	};
 	bool Div(ARRAY_BE& in1,ARRAY_BE& in2 )
 	{
-		 b=max(in1.b,in2.b);
-		 e=min(in1.e,in2.e);
+		b=max(in1.b,in2.b);
+		e=min(in1.e,in2.e);
 		if(!in1.s.IsEmpty())
-			 s = in1.s;
+			s = in1.s;
 		if(!in2.s.IsEmpty())
-			 s = in2.s;
+			s = in2.s;
 
 		if(in1.kind == LineRt || in2.kind == LineRt)
 		{
-			 kind = LineRt;
-			 lineRight = in1.lineRight/in2.lineRight;
+			kind = LineRt;
+			lineRight = in1.lineRight/in2.lineRight;
 		}
 		else
 		{
-			 kind = in1.kind>in2.kind ? in1.kind : in2.kind ;
+			kind = in1.kind>in2.kind ? in1.kind : in2.kind ;
 
 			if(in1.line&&in2.line &&  line &&  b>=0)
 			{
 				for(int i =  b;i<=e;i++)
 				{
 					if(in2.line[i]!=0)
-						 line[i]=in1.line[i]/in2.line[i];
+						line[i]=in1.line[i]/in2.line[i];
 					else
 					{
 						if(i>0)
-							 line[i] =  line[i-1];
+							line[i] =  line[i-1];
 						else
-							 line[i]= 0;
+							line[i]= 0;
 					}
 				}
 			}
@@ -451,15 +450,15 @@ public:
 	};
 	bool Div(ARRAY_BE& in1,float fIn2 )
 	{
-		 b=in1.b;
-		 e=in1.e;
+		b=in1.b;
+		e=in1.e;
 		if(!in1.s.IsEmpty())
-			 s = in1.s;
+			s = in1.s;
 
-		 kind = in1.kind;
+		kind = in1.kind;
 		if(in1.kind == LineRt )
 		{
-			 lineRight = in1.lineRight/fIn2;
+			lineRight = in1.lineRight/fIn2;
 		}
 		else
 		{
@@ -468,13 +467,13 @@ public:
 				for(int i =  b;i<=e;i++)
 				{
 					if(fIn2!=0)
-						 line[i]=in1.line[i]/fIn2;
+						line[i]=in1.line[i]/fIn2;
 					else
 					{
 						if(i>0)
-							 line[i] =  line[i-1];
+							line[i] =  line[i-1];
 						else
-							 line[i]= 0;
+							line[i]= 0;
 					}
 				}
 			}
@@ -483,15 +482,15 @@ public:
 	};
 	bool Div(float fIn2,ARRAY_BE& in1 )
 	{
-		 b=in1.b;
-		 e=in1.e;
+		b=in1.b;
+		e=in1.e;
 		if(!in1.s.IsEmpty())
-			 s = in1.s;
+			s = in1.s;
 
-		 kind = in1.kind;
+		kind = in1.kind;
 		if(in1.kind == LineRt )
 		{
-			 lineRight = fIn2 /in1.lineRight;
+			lineRight = fIn2 /in1.lineRight;
 		}
 		else
 		{
@@ -500,13 +499,13 @@ public:
 				for(int i =  b;i<=e;i++)
 				{
 					if(in1.line[i] != 0 )
-						 line[i]=fIn2/in1.line[i];
+						line[i]=fIn2/in1.line[i];
 					else
 					{
 						if(i>0)
-							 line[i] =  line[i-1];
+							line[i] =  line[i-1];
 						else
-							 line[i]= 0;
+							line[i]= 0;
 					}
 				}
 			}
@@ -526,12 +525,12 @@ typedef struct
 	float   amount;
 	union
 	{
-	struct
-	{
-	WORD    advance;
-	WORD    decline;
-	};
-	float   volPositive;
+		struct
+		{
+			WORD    advance;
+			WORD    decline;
+		};
+		float   volPositive;
 	};
 }Kline;
 typedef struct 
@@ -548,7 +547,7 @@ typedef struct
 
 struct ARRAY_BE_SHOW
 { 
- 	ARRAY_BE m_arrBE;
+	ARRAY_BE m_arrBE;
 	int bNow;
 	int type;
 	int lineThick;
@@ -558,11 +557,11 @@ struct ARRAY_BE_SHOW
 		clr = -1;
 		lineThick = 1;
 	};
-//	char name[10];
+	//	char name[10];
 };
 typedef struct{
-	 int numLine;
-	 ARRAY_BE_SHOW	line[64];
+	int numLine;
+	ARRAY_BE_SHOW	line[64];
 }ARRAY_JISHU;
 
 typedef struct{
@@ -581,13 +580,13 @@ typedef struct{
 }DATA_KLINE2;
 
 typedef struct{
-	 short time;
-	 float price;
-	 float vol;
+	short time;
+	float price;
+	float vol;
 }HS;
 typedef struct{
-	 float price;
-	 float vol;
+	float price;
+	float vol;
 }FENJIA;
 
 struct POWER    
@@ -716,25 +715,25 @@ typedef struct tagINPUT_INFO
 	int m_stkKind;
 } INPUT_INFO;
 
- struct SUB_FIGUER_INIT{
+struct SUB_FIGUER_INIT{
 	float	    yFloatBottom;		
 	char		nameIndex[20]	;
- };
+};
 
 
- typedef struct{
-		int				nCountIndex;			
-		SUB_FIGUER_INIT		initIndex[5];	
+typedef struct{
+	int				nCountIndex;			
+	SUB_FIGUER_INIT		initIndex[5];	
 
-		int				nCountMin1;			
-		SUB_FIGUER_INIT		initMin1[5];	
-		int		flag[5]	;
-						
-						
-		int		flag_dapan[5]	;
+	int				nCountMin1;			
+	SUB_FIGUER_INIT		initMin1[5];	
+	int		flag[5]	;
 
-		int nIDRightSheet[10];
- }SUB_FIGUER_INIT_INFO;
+
+	int		flag_dapan[5]	;
+
+	int nIDRightSheet[10];
+}SUB_FIGUER_INIT_INFO;
 
 struct  TRADE_DETAIL_BIG_LIST_PER
 {
@@ -743,55 +742,38 @@ struct  TRADE_DETAIL_BIG_LIST_PER
 	int   time;
 	float buyPrice[3];	
 	float buyVol[3];	
-    float sellPrice[3];		
+	float sellPrice[3];		
 	float sellVol[3];	
 };
 #define FABSMY(x) ((x)<0?-(x):(x))
+extern CString g_strCompanyName;
 
-typedef struct tagSymbolKind{
+
+
+
+
+
+typedef struct tagSymbolKind
+{
+	WORD m_wMarket;
 	char m_chSymbol[8];
-	int	 m_nSymbolKind;
+	int m_nSymbolKind;
+	char m_szSymbol[10];
 	tagSymbolKind()
 	{
-		memset(m_chSymbol,0,8);
+		m_wMarket = 0;
+		memset(m_chSymbol, 0, 8);
 		m_nSymbolKind = 0;
+		memset(m_szSymbol, 0, 10);
 	};
- }SymbolKind;
+	void tarSymbolKind(WORD wMarket, char* szCode)
+	{
+		m_wMarket = wMarket;
+		strcpy_s(m_chSymbol, szCode);
+		m_nSymbolKind = 0;
+		memcpy(m_szSymbol, &m_wMarket, sizeof(WORD));
+		strcat(m_szSymbol, m_chSymbol);
+	};
+} SymbolKind;
 
-typedef CArray<SymbolKind,SymbolKind&> SymbolKindArr;
-
-CString CombineSymbol(CString symbol,int stkKind)
-{
-	CString s = symbol;
-	int n = s.GetLength ();
-	ASSERT(n<=6);
-	for(int i = 0;i<10-n;i++)
-		s+=" ";
-
-	CString s2 ;
-	s2.Format ("%d",stkKind);
-	s+=s2;
-	s+="s";
-	return s;
-};
-
-int SeparateSymbol(CString symbol,CString & sOut)
-{
-	CString s = symbol;
-	int n = s.GetLength ();
-	sOut = "";
-	if(n<=0) return 0;
-
-	ASSERT(s[n-1] == 's');
-	s = s.Left (n-1);
-	n--;
-	sOut = s.Left (10);
-	sOut.TrimRight (" ");
-	CString s3 = s.Right (n-10);
-	n = atoi(s3);
-	ASSERT(n>0 && n<20);
-	return n;
-};
-extern CString g_strCompanyName;
-#define FILEID22	33133313
-#endif
+typedef CArray<SymbolKind, SymbolKind&> SymbolKindArr;

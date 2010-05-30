@@ -8,15 +8,15 @@
 #endif // _MSC_VER > 1000
 
 #ifndef __AFXWIN_H__
-	#error include 'stdafx.h' before including this file for PCH
+#error include 'stdafx.h' before including this file for PCH
 #endif
 
 #include "resource.h"  
 
 
-#define WM_USER_CUOHE (WM_USER + 1)
-#define WM_USER_CLEAR (WM_USER + 2)
-#define WM_USER_CUOHEDIALOG (WM_USER + 3)
+//#define WM_USER_CUOHE (WM_USER + 1)
+//#define WM_USER_CLEAR (WM_USER + 2)
+//#define WM_USER_CUOHEDIALOG (WM_USER + 3)
 #define WM_USER_HOTKEYPROGRESS (WM_USER + 4)
 #define WM_USER_HSCROLL (WM_USER + 5)
 #define WM_USER_ALERT   (WM_USER + 6)
@@ -69,35 +69,27 @@ class CTaiShanApp : public CWinApp
 {
 public:
 
-        virtual CString GetStkName( LPCSTR lpszLabel, WORD wMarket );
- 
-        virtual void * GetLineDayData( LPCSTR lpszLabel, WORD wMarket, CTime tm, BOOL bDoPowerSplit = FALSE );
+	virtual void * GetLineDayData( LPCSTR lpszLabel, WORD wMarket, CTime tm, BOOL bDoPowerSplit = FALSE );
 
-        virtual void * GetBaseInfoData( LPCSTR lpszLabel, WORD wMarket);
- 
+	virtual void * GetBaseInfoData( LPCSTR lpszLabel, WORD wMarket);
 
-        virtual void SwitchToReportView( LPCSTR lpszLabel, WORD wMarket);
- 
 
-        virtual void SwitchToKlineView( LPCSTR lpszLabel, WORD wMarket);
- 
+	virtual void SwitchToReportView( LPCSTR lpszLabel, WORD wMarket);
 
-        virtual void SwitchToF10View( LPCSTR lpszLabel, WORD wMarket);
 
-        virtual void  OnKeyboardGeniusCmd( LPCSTR lpszCmd );
-	 	virtual COLORREF GetColorScheme( int nColorIndex );
-		virtual BOOL GetFontScheme( int nFontIndex, LOGFONT & OutLogFont );
+	virtual void SwitchToKlineView( LPCSTR lpszLabel, WORD wMarket);
+
+
+	virtual void SwitchToF10View( LPCSTR lpszLabel, WORD wMarket);
+
+	virtual void  OnKeyboardGeniusCmd( LPCSTR lpszCmd );
 
 public:
-	void ToTerminateChildProcess();
-	static bool m_gbUseExe;
-	static bool m_gbDoInitate;
-	static int m_gMessageID ;
 	static void DispatchMessageEachTime();
-	
+
 	CTaiShanApp();
 	HANDLE hAppMutex;
-    CMultiDocTemplate* pDocTemplate;
+	CMultiDocTemplate* pDocTemplate;
 
 	CMultiDocTemplate* pDrawTemplate;
 	CMultiDocTemplate *m_pMyNewTemplate;
@@ -111,7 +103,7 @@ public:
 	BOOL m_bAppAuthorized;
 
 	//{{AFX_VIRTUAL(CTaiShanApp)
-	public:
+public:
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
 	virtual BOOL OnIdle(LONG lCount);
@@ -124,8 +116,6 @@ public:
 	afx_msg void OnUpdateAppAbout(CCmdUI* pCmdUI);
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-private:
-	void UpdateTheOEMInfo();
 };
 
 

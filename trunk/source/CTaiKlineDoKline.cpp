@@ -39,7 +39,6 @@ static char THIS_FILE[]=__FILE__;
 #define RIGHTBOX_PERLINE                    18
 
 
-extern CTime g_timeUseEnd;
 IMPLEMENT_DYNCREATE(CTaiKlineShowKline, CObject)
 
 CTaiKlineShowKline::CTaiKlineShowKline()
@@ -115,7 +114,7 @@ CTaiKlineShowKline::CTaiKlineShowKline(CTaiShanKlineShowView* bsView,CTaiShanDoc
 		m_pKlineAdd[j]=new Kline[2];
 	}
 
-	
+
 
 }
 CTaiKlineShowKline::~CTaiKlineShowKline()
@@ -267,7 +266,7 @@ void CTaiKlineShowKline::DrawLineIndex(CDC *pDC,bool bFenshi)//
 		if(bgnFoot<m_footBegin)
 			bgnFoot=m_footBegin;
 		if( i == m_nLineIndicator1[m_nSon] 
-			&& pView->m_nKlineKind2>0 && bFenshi == false)
+		&& pView->m_nKlineKind2>0 && bFenshi == false)
 		{
 			m_max_sun[m_nSon]=(float)-1.0E20;
 			m_min_sun[m_nSon]=(float)1.0E20;
@@ -337,7 +336,7 @@ void CTaiKlineShowKline::DrawLineIndex(CDC *pDC,bool bFenshi)//
 		int klineWidthPer,klineSide;
 		float widthPer;
 
-	
+
 		int xPre=-1;
 		float yPre=0;
 
@@ -352,7 +351,7 @@ void CTaiKlineShowKline::DrawLineIndex(CDC *pDC,bool bFenshi)//
 				int x= (int)(m_rectDrawLine.left+(cellWidth+1)/2+(j-m_footBegin)*cellWidth);
 
 
-					pDC->MoveTo(x,YTransfer((float)0));
+				pDC->MoveTo(x,YTransfer((float)0));
 
 				float y9 = (float)m_dataFormular[m_nSon].line[i].m_arrBE.line[j];
 
@@ -436,18 +435,18 @@ void CTaiKlineShowKline::DrawLineIndex(CDC *pDC,bool bFenshi)//
 						}
 						else if(k==0)
 						{
-								pDC->SelectObject (&p_yong);
-								pDC->MoveTo (x,volk);
-								pDC->LineTo (x,low);
+							pDC->SelectObject (&p_yong);
+							pDC->MoveTo (x,volk);
+							pDC->LineTo (x,low);
 						}
 					}
-							
+
 				}
 			else
 				for(k=bgnFoot; k<=m_footEnd; k++ )
 				{
 					int x= m_rectDrawLine.left +cellWidth/2+(int)( (k-(m_footBegin)) * (float)widthPer);
-	
+
 
 					open = pView->m_pkline[k].open;
 					close = pView->m_pkline[k].close;
@@ -461,7 +460,7 @@ void CTaiKlineShowKline::DrawLineIndex(CDC *pDC,bool bFenshi)//
 					if(volk<m_rectDrawLine.top) volk = m_rectDrawLine.top;
 
 					CRect rt(m_rectDrawLine.left +klineSide +(int)(  (k-(m_footBegin)) * (float)widthPer),volk,
-							m_rectDrawLine.left +klineSide + (int)( (k-(m_footBegin)) * (float)widthPer)+klineWidthPer,low);
+						m_rectDrawLine.left +klineSide + (int)( (k-(m_footBegin)) * (float)widthPer)+klineWidthPer,low);
 
 					if( open - close > 0 )
 						pDC->FillSolidRect (rt,pDoc->m_colorArray [4]);
@@ -501,9 +500,9 @@ void CTaiKlineShowKline::DrawLineIndex(CDC *pDC,bool bFenshi)//
 							pDC->LineTo (rt.left,rt.top);
 						}
 					}
-							
-					}
-			break;
+
+				}
+				break;
 
 		case STICK://
 			for(j=bgnFoot; j<=m_footEnd; j++ )
@@ -573,10 +572,10 @@ void CTaiKlineShowKline::DrawLineIndex(CDC *pDC,bool bFenshi)//
 
 
 				if((float)m_dataFormular[m_nSon].line[i].m_arrBE.line[j]
-					>pView->m_pkline[j].close)
+				>pView->m_pkline[j].close)
 				{
 
-				
+
 
 					int y=YTransfer((float)m_dataFormular[m_nSon].line[i].m_arrBE.line[j]);
 					if(y>low || y<m_high)
@@ -651,187 +650,137 @@ END_DRAWLINE:
 
 void CTaiKlineShowKline::DrawKLine(CDC *pDC)
 {
-		if(m_nSon==0)
+	if(m_nSon==0)
+	{
+		if(m_min_sun[m_nSon]<=0 || m_max_sun[m_nSon]<=0)
 		{
-			if(m_min_sun[m_nSon]<=0 || m_max_sun[m_nSon]<=0)
+			if(m_axisType==2)
 			{
-				if(m_axisType==2)
-				{
-					m_axisType=0;
-				}
+				m_axisType=0;
 			}
-			if(m_min_sun[m_nSon] == m_max_sun[m_nSon])
-				return;
 		}
-		if(m_rectDrawLine.bottom-m_rectDrawLine.top<2)
+		if(m_min_sun[m_nSon] == m_max_sun[m_nSon])
 			return;
-		if(!ValidDoKline()) return;
+	}
+	if(m_rectDrawLine.bottom-m_rectDrawLine.top<2)
+		return;
+	if(!ValidDoKline()) return;
 
 
-		int leftf=m_rectDrawLine.left;
-		int topf=m_rectDrawLine.top;
-		int bottomf=m_rectDrawLine.bottom;
-		int rightf=m_rectDrawLine.right;
+	int leftf=m_rectDrawLine.left;
+	int topf=m_rectDrawLine.top;
+	int bottomf=m_rectDrawLine.bottom;
+	int rightf=m_rectDrawLine.right;
 
-		
-		
-		CRgn rgn;
+
+
+	CRgn rgn;
+	if(!pDC->IsPrinting())
+	{
+		if(rgn.CreateRectRgn ( leftf, topf, rightf, bottomf+2 )==ERROR)
+			return ;
+		pDC->SelectClipRgn (&rgn);
+	}
+
+
+	int wdth=rightf-leftf;
+	int numberKline=m_klinNumDefault;
+
+	float widthPer =wdth/(float)(numberKline);
+	if(m_footBegin<pView->m_nCountKlineToday && m_footEnd>=pView->m_nCountKlineToday)
+	{//   
+		CPen pen(PS_DASHDOT,1,pDoc->m_colorArray[2]);
+		CPen* pOldp=pDC->SelectObject(&pen);
+		int x =(int)( (pView->m_nCountKlineToday - m_footBegin)*widthPer);
+		pDC->MoveTo(x,topf);
+		pDC->LineTo (x,bottomf);
+		pDC->SelectObject(pOldp);
+	}
+	//
+	if(pView->m_nKlineKind2 ==HS_K_LINE)//
+	{
+		DrawKlineHS(pDC);
 		if(!pDC->IsPrinting())
 		{
-			if(rgn.CreateRectRgn ( leftf, topf, rightf, bottomf+2 )==ERROR)
-				return ;
-			pDC->SelectClipRgn (&rgn);
+			pDC->SelectClipRgn (NULL);
+			rgn.DeleteObject ();
 		}
-
-		
-		int wdth=rightf-leftf;
-		int numberKline=m_klinNumDefault;
-	
-		float widthPer =wdth/(float)(numberKline);
-		if(m_footBegin<pView->m_nCountKlineToday && m_footEnd>=pView->m_nCountKlineToday)
-		{//   
-			CPen pen(PS_DASHDOT,1,pDoc->m_colorArray[2]);
-			CPen* pOldp=pDC->SelectObject(&pen);
-			int x =(int)( (pView->m_nCountKlineToday - m_footBegin)*widthPer);
-			pDC->MoveTo(x,topf);
-			pDC->LineTo (x,bottomf);
-			pDC->SelectObject(pOldp);
-		}
-		//
-		if(pView->m_nKlineKind2 ==HS_K_LINE)//
+		return;
+	}
+	if(pDoc->m_systemOption.kline==1)//
+	{
+		DrawKLineAmeric(pDC);
+		if(!pDC->IsPrinting())
 		{
-			DrawKlineHS(pDC);
-			if(!pDC->IsPrinting())
-			{
-				pDC->SelectClipRgn (NULL);
-				rgn.DeleteObject ();
-			}
-			return;
+			pDC->SelectClipRgn (NULL);
+			rgn.DeleteObject ();
 		}
-		if(pDoc->m_systemOption.kline==1)//
+		return;
+	}
+	if(pDoc->m_systemOption.kline==2)
+	{
+		DrawBTX(pDC);
+		if(!pDC->IsPrinting())
 		{
-			DrawKLineAmeric(pDC);
-			if(!pDC->IsPrinting())
-			{
-				pDC->SelectClipRgn (NULL);
-				rgn.DeleteObject ();
-			}
-			return;
+			pDC->SelectClipRgn (NULL);
+			rgn.DeleteObject ();
 		}
-		if(pDoc->m_systemOption.kline==2)
+		return;
+	}
+
+
+	int klineWidthPer = (int)(widthPer*3/10);
+
+	CPen pen_ping(PS_SOLID,1,pDoc->m_colorArray[2]);
+	CPen pen_yong(PS_SOLID,1,pDoc->m_colorArray[3]);
+	CPen pen_yin(PS_SOLID,1,pDoc->m_colorArray[4]);
+	CPen* pOldpen=pDC->SelectObject(&pen_yong);
+
+	CBrush brush_yong;
+	if (!brush_yong.CreateSolidBrush(pDoc->m_colorArray[3]))
+		ASSERT(FALSE);
+	CBrush* pOldBrush=pDC->SelectObject(&brush_yong);
+
+	for(int i=m_footBegin; i<=m_footEnd; i++ )
+	{
+		if( pView->m_pkline[i].close<=0||pView->m_pkline[i].high <= 0 )
 		{
-			DrawBTX(pDC);
-			if(!pDC->IsPrinting())
-			{
-				pDC->SelectClipRgn (NULL);
-				rgn.DeleteObject ();
-			}
-			return;
+			if(m_axisType==2)
+				break;
+			continue;
 		}
+		int x= leftf +(int)( (i-(m_footBegin)+0.5) * (float)widthPer);
+
+		float close,open,high,low;
+		open = pView->m_pkline[i].open;
+		close = pView->m_pkline[i].close;
+		high = pView->m_pkline[i].high;
+		low = pView->m_pkline[i].low;
+		int closek = (int)(YTransfer(close) );
+		int openk = (int)(YTransfer(open) );
+		int highk = (int)YTransfer(high);
+		int lowk = (int)YTransfer(low);
 
 
-		int klineWidthPer = (int)(widthPer*3/10);
+		CRect rt;
+		rt.top =closek;
+		rt.bottom =openk;
 
-		CPen pen_ping(PS_SOLID,1,pDoc->m_colorArray[2]);
-		CPen pen_yong(PS_SOLID,1,pDoc->m_colorArray[3]);
-		CPen pen_yin(PS_SOLID,1,pDoc->m_colorArray[4]);
-		CPen* pOldpen=pDC->SelectObject(&pen_yong);
-
-		CBrush brush_yong;
-		if (!brush_yong.CreateSolidBrush(pDoc->m_colorArray[3]))
-			ASSERT(FALSE);
-		CBrush* pOldBrush=pDC->SelectObject(&brush_yong);
-
-		for(int i=m_footBegin; i<=m_footEnd; i++ )
+		if(klineWidthPer<1)
 		{
-			if( pView->m_pkline[i].close<=0||pView->m_pkline[i].high <= 0 )
-			{
-				if(m_axisType==2)
-					break;
-				continue;
-			}
-			int x= leftf +(int)( (i-(m_footBegin)+0.5) * (float)widthPer);
-
-			float close,open,high,low;
-			open = pView->m_pkline[i].open;
-			close = pView->m_pkline[i].close;
-			high = pView->m_pkline[i].high;
-			low = pView->m_pkline[i].low;
-			int closek = (int)(YTransfer(close) );
-			int openk = (int)(YTransfer(open) );
-			int highk = (int)YTransfer(high);
-			int lowk = (int)YTransfer(low);
-
-
-			CRect rt;
-			rt.top =closek;
-			rt.bottom =openk;
-
-			if(klineWidthPer<1)
-			{
-				rt.left=leftf +(int)(  (i-(m_footBegin)+0.5) * (float)widthPer);
-				rt.right =leftf + (int)( (i-(m_footBegin)+0.5) * (float)widthPer);
-				if( open - close > 0 )
-				{
-					pDC->SelectObject (&pen_yin);
-					pDC->MoveTo (x,highk);
-					pDC->LineTo (x,lowk);
-				}
-				else if( open - close < 0 )
-				{
-					pDC->SelectObject (&pen_yong);
-					pDC->MoveTo (x,highk);
-					pDC->LineTo (x,lowk);
-				}
-				else 
-				{
-					if(i>0)
-					{
-						if(pView->m_pkline[i].close-pView->m_pkline[i-1].close>=0)
-							pDC->SelectObject (&pen_yong);
-						else
-							pDC->SelectObject (&pen_yin);
-					}
-					else if(i==0)
-						pDC->SelectObject (&pen_yong);
-					pDC->MoveTo (x,highk);
-					pDC->LineTo (x,lowk);
-				}
-				continue;
-			}
-
-			rt.left=leftf -klineWidthPer +(int)(  (i-(m_footBegin)+0.5) * (float)widthPer);
-			rt.right =leftf +klineWidthPer + (int)( (i-(m_footBegin)+0.5) * (float)widthPer);
+			rt.left=leftf +(int)(  (i-(m_footBegin)+0.5) * (float)widthPer);
+			rt.right =leftf + (int)( (i-(m_footBegin)+0.5) * (float)widthPer);
 			if( open - close > 0 )
 			{
 				pDC->SelectObject (&pen_yin);
-				pDC->MoveTo (x-(int)(klineWidthPer),openk);
-				pDC->LineTo (x-(int)(klineWidthPer),closek);
-				pDC->LineTo (x+(int)(klineWidthPer),closek);
-				pDC->LineTo (x+(int)(klineWidthPer),openk);
-				pDC->LineTo (x-(int)(klineWidthPer),openk);
-
-				pDC->MoveTo (x-(int)(klineWidthPer),openk);
-				pDC->LineTo (x+(int)(klineWidthPer),openk);
 				pDC->MoveTo (x,highk);
 				pDC->LineTo (x,lowk);
-				pDC->FillSolidRect (rt,pDoc->m_colorArray [4]);
 			}
 			else if( open - close < 0 )
 			{
-
-				pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
 				pDC->SelectObject (&pen_yong);
-				pDC->MoveTo (x-(int)(klineWidthPer),openk);
-				pDC->LineTo (x-(int)(klineWidthPer),closek);
-				pDC->LineTo (x+(int)(klineWidthPer),closek);
-				pDC->LineTo (x+(int)(klineWidthPer),openk);
-				pDC->LineTo (x-(int)(klineWidthPer),openk);
-
 				pDC->MoveTo (x,highk);
-				pDC->LineTo (x,closek);
-				pDC->MoveTo (x,lowk);
-				pDC->LineTo (x,openk-1);
+				pDC->LineTo (x,lowk);
 			}
 			else 
 			{
@@ -844,383 +793,433 @@ void CTaiKlineShowKline::DrawKLine(CDC *pDC)
 				}
 				else if(i==0)
 					pDC->SelectObject (&pen_yong);
-
 				pDC->MoveTo (x,highk);
 				pDC->LineTo (x,lowk);
-				pDC->MoveTo (x-(int)(klineWidthPer),openk);
-				pDC->LineTo (x+(int)(klineWidthPer),openk);
 			}
-
+			continue;
 		}
-		pDC->SelectObject (pOldBrush);
 
-		
-		CFont ft;
-		LOGFONT lgf=pDoc->m_fontstr[0];
-		ft.CreateFontIndirect (&lgf );
-		CFont* pftOld = pDC->SelectObject(&ft);
-		pDC->SetTextAlign( TA_RIGHT );
-		pDC->SetTextColor(  pDoc->m_colorArray [1]);
-		pDC->SetBkMode(TRANSPARENT);
-
-		int leftHL=(int)( (m_highFoot-(m_footBegin)+0.5) * (float)widthPer)+m_rectDrawLine.left;
-		int topHL=YTransfer(pView->m_pkline[m_highFoot].high);
-		CString sHL;
-		if(pView->m_pkline[m_highFoot].high>=10)
-			sHL.Format("%.2f",pView->m_pkline[m_highFoot].high);
-		else
-			sHL.Format("%.3f",pView->m_pkline[m_highFoot].high);
-		int nLenTxt = (pDC->GetOutputTextExtent(sHL)).cx;
-		leftHL -= 15;
-		if(leftHL - nLenTxt < 10) leftHL = 15+nLenTxt;
-
-		pDC->ExtTextOut (leftHL,topHL ,ETO_CLIPPED,m_rectDrawLine,sHL,NULL);
-
-		leftHL=(int)( (m_lowFoot-(m_footBegin)+0.5) * (float)widthPer)+m_rectDrawLine.left;
-		leftHL -= 15;
-		topHL=YTransfer(pView->m_pkline[m_lowFoot].low);
-		if(pView->m_pkline[m_lowFoot].low>=10)
-			sHL.Format("%.2f",pView->m_pkline[m_lowFoot].low);
-		else
-			sHL.Format("%.3f",pView->m_pkline[m_lowFoot].low);
-		nLenTxt = (pDC->GetOutputTextExtent(sHL)).cx;
-		if(leftHL - nLenTxt < 10) leftHL = 15+nLenTxt;
-
-		topHL-=((pDC->GetOutputTextExtent(sHL)).cy+3);
-		pDC->ExtTextOut (leftHL,topHL ,ETO_CLIPPED,m_rectDrawLine,sHL,NULL);
-		pDC->SelectObject(pftOld);
-		
-		if(!pDC->IsPrinting())
+		rt.left=leftf -klineWidthPer +(int)(  (i-(m_footBegin)+0.5) * (float)widthPer);
+		rt.right =leftf +klineWidthPer + (int)( (i-(m_footBegin)+0.5) * (float)widthPer);
+		if( open - close > 0 )
 		{
-			pDC->SelectClipRgn (NULL);
-			rgn.DeleteObject ();
+			pDC->SelectObject (&pen_yin);
+			pDC->MoveTo (x-(int)(klineWidthPer),openk);
+			pDC->LineTo (x-(int)(klineWidthPer),closek);
+			pDC->LineTo (x+(int)(klineWidthPer),closek);
+			pDC->LineTo (x+(int)(klineWidthPer),openk);
+			pDC->LineTo (x-(int)(klineWidthPer),openk);
+
+			pDC->MoveTo (x-(int)(klineWidthPer),openk);
+			pDC->LineTo (x+(int)(klineWidthPer),openk);
+			pDC->MoveTo (x,highk);
+			pDC->LineTo (x,lowk);
+			pDC->FillSolidRect (rt,pDoc->m_colorArray [4]);
 		}
-		pDC->SelectObject (pOldpen);
+		else if( open - close < 0 )
+		{
+
+			pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
+			pDC->SelectObject (&pen_yong);
+			pDC->MoveTo (x-(int)(klineWidthPer),openk);
+			pDC->LineTo (x-(int)(klineWidthPer),closek);
+			pDC->LineTo (x+(int)(klineWidthPer),closek);
+			pDC->LineTo (x+(int)(klineWidthPer),openk);
+			pDC->LineTo (x-(int)(klineWidthPer),openk);
+
+			pDC->MoveTo (x,highk);
+			pDC->LineTo (x,closek);
+			pDC->MoveTo (x,lowk);
+			pDC->LineTo (x,openk-1);
+		}
+		else 
+		{
+			if(i>0)
+			{
+				if(pView->m_pkline[i].close-pView->m_pkline[i-1].close>=0)
+					pDC->SelectObject (&pen_yong);
+				else
+					pDC->SelectObject (&pen_yin);
+			}
+			else if(i==0)
+				pDC->SelectObject (&pen_yong);
+
+			pDC->MoveTo (x,highk);
+			pDC->LineTo (x,lowk);
+			pDC->MoveTo (x-(int)(klineWidthPer),openk);
+			pDC->LineTo (x+(int)(klineWidthPer),openk);
+		}
+
+	}
+	pDC->SelectObject (pOldBrush);
+
+
+	CFont ft;
+	LOGFONT lgf=pDoc->m_fontstr[0];
+	ft.CreateFontIndirect (&lgf );
+	CFont* pftOld = pDC->SelectObject(&ft);
+	pDC->SetTextAlign( TA_RIGHT );
+	pDC->SetTextColor(  pDoc->m_colorArray [1]);
+	pDC->SetBkMode(TRANSPARENT);
+
+	int leftHL=(int)( (m_highFoot-(m_footBegin)+0.5) * (float)widthPer)+m_rectDrawLine.left;
+	int topHL=YTransfer(pView->m_pkline[m_highFoot].high);
+	CString sHL;
+	if(pView->m_pkline[m_highFoot].high>=10)
+		sHL.Format("%.2f",pView->m_pkline[m_highFoot].high);
+	else
+		sHL.Format("%.3f",pView->m_pkline[m_highFoot].high);
+	int nLenTxt = (pDC->GetOutputTextExtent(sHL)).cx;
+	leftHL -= 15;
+	if(leftHL - nLenTxt < 10) leftHL = 15+nLenTxt;
+
+	pDC->ExtTextOut (leftHL,topHL ,ETO_CLIPPED,m_rectDrawLine,sHL,NULL);
+
+	leftHL=(int)( (m_lowFoot-(m_footBegin)+0.5) * (float)widthPer)+m_rectDrawLine.left;
+	leftHL -= 15;
+	topHL=YTransfer(pView->m_pkline[m_lowFoot].low);
+	if(pView->m_pkline[m_lowFoot].low>=10)
+		sHL.Format("%.2f",pView->m_pkline[m_lowFoot].low);
+	else
+		sHL.Format("%.3f",pView->m_pkline[m_lowFoot].low);
+	nLenTxt = (pDC->GetOutputTextExtent(sHL)).cx;
+	if(leftHL - nLenTxt < 10) leftHL = 15+nLenTxt;
+
+	topHL-=((pDC->GetOutputTextExtent(sHL)).cy+3);
+	pDC->ExtTextOut (leftHL,topHL ,ETO_CLIPPED,m_rectDrawLine,sHL,NULL);
+	pDC->SelectObject(pftOld);
+
+	if(!pDC->IsPrinting())
+	{
+		pDC->SelectClipRgn (NULL);
+		rgn.DeleteObject ();
+	}
+	pDC->SelectObject (pOldpen);
 }
 
 
 void CTaiKlineShowKline::DrawKLineAmeric(CDC *pDC)
 {
-		int leftf=m_rectDrawLine.left;
-		int topf=m_rectDrawLine.top;
-		int bottomf=m_rectDrawLine.bottom;
-		int rightf=m_rectDrawLine.right;
+	int leftf=m_rectDrawLine.left;
+	int topf=m_rectDrawLine.top;
+	int bottomf=m_rectDrawLine.bottom;
+	int rightf=m_rectDrawLine.right;
 
-		if(m_rectDrawLine.bottom-m_rectDrawLine.top<2)
-			return;
-		if(!ValidDoKline()) return;
+	if(m_rectDrawLine.bottom-m_rectDrawLine.top<2)
+		return;
+	if(!ValidDoKline()) return;
 
-		int wdth=rightf-leftf;
-		int numberKline=m_klinNumDefault;
+	int wdth=rightf-leftf;
+	int numberKline=m_klinNumDefault;
 
-		float widthPer =wdth/(float)(numberKline);
-		int klineWidthPer = (int)(widthPer*3/10);
+	float widthPer =wdth/(float)(numberKline);
+	int klineWidthPer = (int)(widthPer*3/10);
 
-		float close,open,high,low;
-		CPen pen_yong(PS_SOLID,1,pDoc->m_colorArray[5]);
-		CPen* pOldpen=pDC->SelectObject(&pen_yong);
+	float close,open,high,low;
+	CPen pen_yong(PS_SOLID,1,pDoc->m_colorArray[5]);
+	CPen* pOldpen=pDC->SelectObject(&pen_yong);
 
-		for(int i=m_footBegin; i<=m_footEnd; i++ )
+	for(int i=m_footBegin; i<=m_footEnd; i++ )
+	{
+		int x= leftf +(int)( (i-(m_footBegin)+0.5) * (float)widthPer);
+
+		open = pView->m_pkline[i].open;
+		close = pView->m_pkline[i].close;
+		high = pView->m_pkline[i].high;
+		low = pView->m_pkline[i].low;
+
+		if( pView->m_pkline[i].close>0 && pView->m_pkline[i].high > 0 )
 		{
-			int x= leftf +(int)( (i-(m_footBegin)+0.5) * (float)widthPer);
+			int closek = (int)(YTransfer(close) );
+			int openk = (int)(YTransfer(open) );
+			int highk = (int)YTransfer(high); 
+			int lowk = (int)YTransfer(low);
 
-			open = pView->m_pkline[i].open;
-			close = pView->m_pkline[i].close;
-			high = pView->m_pkline[i].high;
-			low = pView->m_pkline[i].low;
 
-			if( pView->m_pkline[i].close>0 && pView->m_pkline[i].high > 0 )
+
+			CRect rt;
+			rt.top =closek;
+			rt.bottom =openk;
+
+			if(klineWidthPer<1)
 			{
-				int closek = (int)(YTransfer(close) );
-				int openk = (int)(YTransfer(open) );
-				int highk = (int)YTransfer(high); 
-				int lowk = (int)YTransfer(low);
-
-
-
-				CRect rt;
-				rt.top =closek;
-				rt.bottom =openk;
-
-				if(klineWidthPer<1)
-				{
-					rt.left=leftf +(int)(  (i-(m_footBegin)+0.5) * (float)widthPer);
-					rt.right =leftf + (int)( (i-(m_footBegin)+0.5) * (float)widthPer);
-					pDC->MoveTo (x,highk);
-					pDC->LineTo (x,lowk);
-				}
-				else
-				{
-					rt.left=leftf -klineWidthPer +(int)(  (i-(m_footBegin)+0.5) * (float)widthPer);
-					rt.right =leftf +klineWidthPer + (int)( (i-(m_footBegin)+0.5) * (float)widthPer);
-				
-					pDC->MoveTo (x-(int)(klineWidthPer),openk);
-					pDC->LineTo (x,openk);
-					pDC->MoveTo (x+(int)(klineWidthPer),closek);
-					pDC->LineTo (x,closek);
-
-					pDC->MoveTo (x,highk);
-					pDC->LineTo (x,lowk);
-				}
+				rt.left=leftf +(int)(  (i-(m_footBegin)+0.5) * (float)widthPer);
+				rt.right =leftf + (int)( (i-(m_footBegin)+0.5) * (float)widthPer);
+				pDC->MoveTo (x,highk);
+				pDC->LineTo (x,lowk);
 			}
 			else
 			{
-				if(m_axisType==2)
-					break;
+				rt.left=leftf -klineWidthPer +(int)(  (i-(m_footBegin)+0.5) * (float)widthPer);
+				rt.right =leftf +klineWidthPer + (int)( (i-(m_footBegin)+0.5) * (float)widthPer);
+
+				pDC->MoveTo (x-(int)(klineWidthPer),openk);
+				pDC->LineTo (x,openk);
+				pDC->MoveTo (x+(int)(klineWidthPer),closek);
+				pDC->LineTo (x,closek);
+
+				pDC->MoveTo (x,highk);
+				pDC->LineTo (x,lowk);
 			}
 		}
+		else
+		{
+			if(m_axisType==2)
+				break;
+		}
+	}
 
 
-		CFont ft;
-		LOGFONT lgf=pDoc->m_fontstr[0];
-		ft.CreateFontIndirect (&lgf );
-		CFont* pftOld = pDC->SelectObject(&ft);
+	CFont ft;
+	LOGFONT lgf=pDoc->m_fontstr[0];
+	ft.CreateFontIndirect (&lgf );
+	CFont* pftOld = pDC->SelectObject(&ft);
+	pDC->SetTextAlign( TA_LEFT );
+	pDC->SetTextColor(  pDoc->m_colorArray [1]);
+	pDC->SetBkMode(TRANSPARENT);
+
+	int leftHL=(int)( (m_highFoot-(m_footBegin)+0.5) * (float)widthPer);
+	int topHL=YTransfer(pView->m_pkline[m_highFoot].high);
+	CString sHL;
+	sHL.Format("%.2f",pView->m_pkline[m_highFoot].high);
+	if(leftHL>(m_rectDrawLine.right+m_rectDrawLine.left)/2)
+		pDC->SetTextAlign( TA_RIGHT );
+	else
 		pDC->SetTextAlign( TA_LEFT );
-		pDC->SetTextColor(  pDoc->m_colorArray [1]);
-		pDC->SetBkMode(TRANSPARENT);
+	pDC->ExtTextOut (leftHL,topHL ,ETO_CLIPPED,m_rectDrawLine,sHL,NULL);
 
-		int leftHL=(int)( (m_highFoot-(m_footBegin)+0.5) * (float)widthPer);
-		int topHL=YTransfer(pView->m_pkline[m_highFoot].high);
-		CString sHL;
-		sHL.Format("%.2f",pView->m_pkline[m_highFoot].high);
-		if(leftHL>(m_rectDrawLine.right+m_rectDrawLine.left)/2)
-			pDC->SetTextAlign( TA_RIGHT );
-		else
-			pDC->SetTextAlign( TA_LEFT );
-		pDC->ExtTextOut (leftHL,topHL ,ETO_CLIPPED,m_rectDrawLine,sHL,NULL);
+	leftHL=(int)( (m_lowFoot-(m_footBegin)+0.5) * (float)widthPer);
+	topHL=YTransfer(pView->m_pkline[m_lowFoot].low);
+	sHL.Format("%.2f",pView->m_pkline[m_lowFoot].low);
+	if(leftHL>(m_rectDrawLine.right+m_rectDrawLine.left)/2)
+		pDC->SetTextAlign( TA_RIGHT );
+	else
+		pDC->SetTextAlign( TA_LEFT );
+	topHL-=((pDC->GetOutputTextExtent(sHL)).cy+3);
+	pDC->ExtTextOut (leftHL,topHL ,ETO_CLIPPED,m_rectDrawLine,sHL,NULL);
+	pDC->SelectObject(pftOld);
 
-		leftHL=(int)( (m_lowFoot-(m_footBegin)+0.5) * (float)widthPer);
-		topHL=YTransfer(pView->m_pkline[m_lowFoot].low);
-		sHL.Format("%.2f",pView->m_pkline[m_lowFoot].low);
-		if(leftHL>(m_rectDrawLine.right+m_rectDrawLine.left)/2)
-			pDC->SetTextAlign( TA_RIGHT );
-		else
-			pDC->SetTextAlign( TA_LEFT );
-		topHL-=((pDC->GetOutputTextExtent(sHL)).cy+3);
-		pDC->ExtTextOut (leftHL,topHL ,ETO_CLIPPED,m_rectDrawLine,sHL,NULL);
-		pDC->SelectObject(pftOld);
-		
-		pDC->SelectObject (pOldpen);
+	pDC->SelectObject (pOldpen);
 
 }
 
 
 void CTaiKlineShowKline::DrawKLineAdded(CDC *pDC,int nKln)
 {
-		int leftf=0;
-		int topf=pView->m_heightCaption;
-		int bottomf=pView->m_rtKlineFiguer.rtBlw[0].m_yBottom - 3 ;
-		int rightf=pView->m_rtKlineFiguer.rightX;
-		if(bottomf-topf<2)
-			return;
-
-		
-		CRgn rgn;
-		if(!pDC->IsPrinting())
-		{
-			if(rgn.CreateRectRgn ( leftf, topf, rightf, bottomf )==ERROR)
-				return ;
-			pDC->SelectClipRgn (&rgn);
-		}
+	int leftf=0;
+	int topf=pView->m_heightCaption;
+	int bottomf=pView->m_rtKlineFiguer.rtBlw[0].m_yBottom - 3 ;
+	int rightf=pView->m_rtKlineFiguer.rightX;
+	if(bottomf-topf<2)
+		return;
 
 
-		if(pDoc->m_systemOption.kline==1)//
-		{
-			DrawKLineAmericaAdded(pDC,nKln);
-			if(!pDC->IsPrinting())
-			{
-				pDC->SelectClipRgn (NULL);
-				rgn.DeleteObject ();
-			}
-			return;
-		}
-		if(pDoc->m_systemOption.kline==2)//
-		{
-			DrawBTXAdded(pDC, nKln);
-			if(!pDC->IsPrinting())
-			{
-				pDC->SelectClipRgn (NULL);
-				rgn.DeleteObject ();
-			}
-			return;
-		}
-
-		int wdth=rightf-leftf;
-		int numberKline=m_klinNumDefault;
-	
-		float widthPer =wdth/(float)(numberKline);
-		int klineWidthPer =(int) (widthPer*3/10);
-
-		float close,open,high,low;
-
-		CPen pen_yong(PS_SOLID,1,pDoc->m_colorArray[7+nKln]);
-		CPen* pOldpen=pDC->SelectObject(&pen_yong);
-		CBrush brush_yong;
-		if (!brush_yong.CreateSolidBrush(pDoc->m_colorArray[3]))
-			ASSERT(FALSE);
-		CBrush* pOldBrush=pDC->SelectObject(&brush_yong);
-		
-		int bAdd=0;
-		int eAdd=0;
-		int i=0;
-		int j=0;
-		float moveVla=0;
-
-		bAdd=CaclBeginFoot(nKln);
-		if(bAdd==-1)
-			goto END_ADDED;
-
-		eAdd=CaclEndFoot(nKln);
-		if(eAdd==-1)
-			goto END_ADDED;
-
-		j=m_footBegin;
-		if(m_axisType==1)
-			moveVla=m_pKlineAdd[nKln][bAdd].open-pView->m_pkline[m_footBegin].open;
-		if(m_pKlineAdd[nKln][bAdd].open<=0)
-			goto END_ADDED;
+	CRgn rgn;
+	if(!pDC->IsPrinting())
+	{
+		if(rgn.CreateRectRgn ( leftf, topf, rightf, bottomf )==ERROR)
+			return ;
+		pDC->SelectClipRgn (&rgn);
+	}
 
 
-		for(i=bAdd; i<=eAdd; i++ )
-		{
-
-			if(m_axisType==1)
-			{
-				open = (m_pKlineAdd[nKln][i].open-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
-				close = (m_pKlineAdd[nKln][i].close-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
-				high = (m_pKlineAdd[nKln][i].high-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
-				low = (m_pKlineAdd[nKln][i].low-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
-			}
-			else
-			{
-				open = m_pKlineAdd[nKln][i].open;
-				close = m_pKlineAdd[nKln][i].close;
-				high = m_pKlineAdd[nKln][i].high;
-				low = m_pKlineAdd[nKln][i].low;
-			}
-
-			if( m_pKlineAdd[nKln][i].high > 0 )
-			{
-				int closek = (int)(YTransfer(close) );
-				int openk = (int)(YTransfer(open) );
-				int highk = (int)YTransfer(high);
-				int lowk = (int)YTransfer(low); 
-
-
-				CRect rt;
-				rt.top =closek;
-				rt.bottom =openk;
-
-				
-				if(pView->m_nKlineKind2 <5)
-				{
-					if(m_pKlineAdd[nKln][i].day<pView->m_pkline[j].day)
-						continue;
-					if(m_pKlineAdd[nKln][i].day>pView->m_pkline[j].day)
-					{
-						while(m_pKlineAdd[nKln][i].day>pView->m_pkline[j].day&&j<m_footEnd)
-						{
-							j++;
-						}
-						if(m_pKlineAdd[nKln][i].day<pView->m_pkline[j].day)
-							continue;
-					}
-				}
-				else
-				{
-					int daySec1=(int)(m_pKlineAdd[nKln][i].day+60)/(24*60*60);
-					int daySec2=(int)(pView->m_pkline[j].day+60)/(24*60*60);
-					if(daySec1<daySec2)
-						continue;
-
-					if(daySec1>daySec2)
-					{
-						while(daySec1>daySec2 
-							&&j<m_footEnd)
-						{
-							j++;
-							daySec2=(int)(pView->m_pkline[j].day+60)/(24*60*60);
-						}
-
-						if(j>=m_footEnd &&  daySec1>daySec2)
-							break;
-
-						if(daySec1<daySec2 || daySec1>daySec2)
-							continue;
-					}
-				}
-
-
-				if(j>m_footEnd)
-					break;
-		
-				int x= leftf +(int)( (j-m_footBegin+0.5) * (float)widthPer);
-				if(klineWidthPer<1)
-				{
-					rt.left=leftf +(int)(  (j-m_footBegin+0.5) * (float)widthPer);
-					rt.right =leftf + (int)( (j-m_footBegin+0.5) * (float)widthPer);
-					pDC->MoveTo (x,highk);
-					pDC->LineTo (x,lowk);
-				}
-				else
-				{
-					rt.left=leftf -klineWidthPer +(int)(  (j-m_footBegin+0.5) * (float)widthPer);
-					rt.right =leftf +klineWidthPer + (int)( (j-m_footBegin+0.5) * (float)widthPer);
-					
-					if( open - close > 0 )
-					{
-						pDC->FillSolidRect (rt,pDoc->m_colorArray [7+nKln]);
-						pDC->MoveTo (x-(int)(klineWidthPer),openk);
-						pDC->LineTo (x-(int)(klineWidthPer),closek);
-						pDC->LineTo (x+(int)(klineWidthPer),closek);
-						pDC->LineTo (x+(int)(klineWidthPer),openk);
-						pDC->LineTo (x-(int)(klineWidthPer),openk);
-
-						pDC->MoveTo (x-(int)(klineWidthPer),openk);
-						pDC->LineTo (x+(int)(klineWidthPer),openk);
-						pDC->MoveTo (x,highk);
-						pDC->LineTo (x,lowk);
-					}
-					else if( open - close < 0 )
-					{
-						pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
-						pDC->MoveTo (x-(int)(klineWidthPer),openk);
-						pDC->LineTo (x-(int)(klineWidthPer),closek);
-						pDC->LineTo (x+(int)(klineWidthPer),closek);
-						pDC->LineTo (x+(int)(klineWidthPer),openk);
-						pDC->LineTo (x-(int)(klineWidthPer),openk);
-
-						pDC->MoveTo (x,highk);
-						pDC->LineTo (x,closek);
-						pDC->MoveTo (x,lowk);
-						pDC->LineTo (x,openk-1);
-					}
-					else 
-					{
-						pDC->MoveTo (x,highk);
-						pDC->LineTo (x,lowk);
-						pDC->MoveTo (x-(int)(klineWidthPer),openk);
-						pDC->LineTo (x+(int)(klineWidthPer),openk);
-					}
-				}
-			}
-//		
-			j++;
-			if(j>m_footEnd)
-				break;
-
-		}
-
-
-END_ADDED:
+	if(pDoc->m_systemOption.kline==1)//
+	{
+		DrawKLineAmericaAdded(pDC,nKln);
 		if(!pDC->IsPrinting())
 		{
 			pDC->SelectClipRgn (NULL);
 			rgn.DeleteObject ();
 		}
+		return;
+	}
+	if(pDoc->m_systemOption.kline==2)//
+	{
+		DrawBTXAdded(pDC, nKln);
+		if(!pDC->IsPrinting())
+		{
+			pDC->SelectClipRgn (NULL);
+			rgn.DeleteObject ();
+		}
+		return;
+	}
 
-		pDC->SelectObject (pOldpen);
-		pDC->SelectObject (pOldBrush);
+	int wdth=rightf-leftf;
+	int numberKline=m_klinNumDefault;
+
+	float widthPer =wdth/(float)(numberKline);
+	int klineWidthPer =(int) (widthPer*3/10);
+
+	float close,open,high,low;
+
+	CPen pen_yong(PS_SOLID,1,pDoc->m_colorArray[7+nKln]);
+	CPen* pOldpen=pDC->SelectObject(&pen_yong);
+	CBrush brush_yong;
+	if (!brush_yong.CreateSolidBrush(pDoc->m_colorArray[3]))
+		ASSERT(FALSE);
+	CBrush* pOldBrush=pDC->SelectObject(&brush_yong);
+
+	int bAdd=0;
+	int eAdd=0;
+	int i=0;
+	int j=0;
+	float moveVla=0;
+
+	bAdd=CaclBeginFoot(nKln);
+	if(bAdd==-1)
+		goto END_ADDED;
+
+	eAdd=CaclEndFoot(nKln);
+	if(eAdd==-1)
+		goto END_ADDED;
+
+	j=m_footBegin;
+	if(m_axisType==1)
+		moveVla=m_pKlineAdd[nKln][bAdd].open-pView->m_pkline[m_footBegin].open;
+	if(m_pKlineAdd[nKln][bAdd].open<=0)
+		goto END_ADDED;
+
+
+	for(i=bAdd; i<=eAdd; i++ )
+	{
+
+		if(m_axisType==1)
+		{
+			open = (m_pKlineAdd[nKln][i].open-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
+			close = (m_pKlineAdd[nKln][i].close-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
+			high = (m_pKlineAdd[nKln][i].high-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
+			low = (m_pKlineAdd[nKln][i].low-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
+		}
+		else
+		{
+			open = m_pKlineAdd[nKln][i].open;
+			close = m_pKlineAdd[nKln][i].close;
+			high = m_pKlineAdd[nKln][i].high;
+			low = m_pKlineAdd[nKln][i].low;
+		}
+
+		if( m_pKlineAdd[nKln][i].high > 0 )
+		{
+			int closek = (int)(YTransfer(close) );
+			int openk = (int)(YTransfer(open) );
+			int highk = (int)YTransfer(high);
+			int lowk = (int)YTransfer(low); 
+
+
+			CRect rt;
+			rt.top =closek;
+			rt.bottom =openk;
+
+
+			if(pView->m_nKlineKind2 <5)
+			{
+				if(m_pKlineAdd[nKln][i].day<pView->m_pkline[j].day)
+					continue;
+				if(m_pKlineAdd[nKln][i].day>pView->m_pkline[j].day)
+				{
+					while(m_pKlineAdd[nKln][i].day>pView->m_pkline[j].day&&j<m_footEnd)
+					{
+						j++;
+					}
+					if(m_pKlineAdd[nKln][i].day<pView->m_pkline[j].day)
+						continue;
+				}
+			}
+			else
+			{
+				int daySec1=(int)(m_pKlineAdd[nKln][i].day+60)/(24*60*60);
+				int daySec2=(int)(pView->m_pkline[j].day+60)/(24*60*60);
+				if(daySec1<daySec2)
+					continue;
+
+				if(daySec1>daySec2)
+				{
+					while(daySec1>daySec2 
+						&&j<m_footEnd)
+					{
+						j++;
+						daySec2=(int)(pView->m_pkline[j].day+60)/(24*60*60);
+					}
+
+					if(j>=m_footEnd &&  daySec1>daySec2)
+						break;
+
+					if(daySec1<daySec2 || daySec1>daySec2)
+						continue;
+				}
+			}
+
+
+			if(j>m_footEnd)
+				break;
+
+			int x= leftf +(int)( (j-m_footBegin+0.5) * (float)widthPer);
+			if(klineWidthPer<1)
+			{
+				rt.left=leftf +(int)(  (j-m_footBegin+0.5) * (float)widthPer);
+				rt.right =leftf + (int)( (j-m_footBegin+0.5) * (float)widthPer);
+				pDC->MoveTo (x,highk);
+				pDC->LineTo (x,lowk);
+			}
+			else
+			{
+				rt.left=leftf -klineWidthPer +(int)(  (j-m_footBegin+0.5) * (float)widthPer);
+				rt.right =leftf +klineWidthPer + (int)( (j-m_footBegin+0.5) * (float)widthPer);
+
+				if( open - close > 0 )
+				{
+					pDC->FillSolidRect (rt,pDoc->m_colorArray [7+nKln]);
+					pDC->MoveTo (x-(int)(klineWidthPer),openk);
+					pDC->LineTo (x-(int)(klineWidthPer),closek);
+					pDC->LineTo (x+(int)(klineWidthPer),closek);
+					pDC->LineTo (x+(int)(klineWidthPer),openk);
+					pDC->LineTo (x-(int)(klineWidthPer),openk);
+
+					pDC->MoveTo (x-(int)(klineWidthPer),openk);
+					pDC->LineTo (x+(int)(klineWidthPer),openk);
+					pDC->MoveTo (x,highk);
+					pDC->LineTo (x,lowk);
+				}
+				else if( open - close < 0 )
+				{
+					pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
+					pDC->MoveTo (x-(int)(klineWidthPer),openk);
+					pDC->LineTo (x-(int)(klineWidthPer),closek);
+					pDC->LineTo (x+(int)(klineWidthPer),closek);
+					pDC->LineTo (x+(int)(klineWidthPer),openk);
+					pDC->LineTo (x-(int)(klineWidthPer),openk);
+
+					pDC->MoveTo (x,highk);
+					pDC->LineTo (x,closek);
+					pDC->MoveTo (x,lowk);
+					pDC->LineTo (x,openk-1);
+				}
+				else 
+				{
+					pDC->MoveTo (x,highk);
+					pDC->LineTo (x,lowk);
+					pDC->MoveTo (x-(int)(klineWidthPer),openk);
+					pDC->LineTo (x+(int)(klineWidthPer),openk);
+				}
+			}
+		}
+		//		
+		j++;
+		if(j>m_footEnd)
+			break;
+
+	}
+
+
+END_ADDED:
+	if(!pDC->IsPrinting())
+	{
+		pDC->SelectClipRgn (NULL);
+		rgn.DeleteObject ();
+	}
+
+	pDC->SelectObject (pOldpen);
+	pDC->SelectObject (pOldBrush);
 
 
 }
@@ -1343,17 +1342,15 @@ void CTaiKlineShowKline::InitDrawedLineBE()
 	}
 	else
 	{
-			m_klinNumDefault=82;
-			m_footBegin=0;
-			m_footEnd=0;
-			m_footCurrent=0;
+		m_klinNumDefault=82;
+		m_footBegin=0;
+		m_footEnd=0;
+		m_footCurrent=0;
 	}
 	if(m_footCurrent < 0) m_footCurrent = 0;
 
 	ValidDoKline(true);
 }
-
-int flagbit=0;
 
 
 
@@ -1385,7 +1382,7 @@ void CTaiKlineShowKline::DrawKlineFiguer(CDC *pDC)
 
 
 	TransferKlineTypeDataToday(pView->m_pkline,pView->m_sharesSymbol, pView->m_stkKind,-1);
-	
+
 	KLINE_EXT_PER* pExt;
 	if(CTaiShanKlineShowView::m_klineExtMap .Lookup(pView->m_sharesSymbol,pExt) )
 	{
@@ -1425,7 +1422,7 @@ void CTaiKlineShowKline::DrawKlineFiguer(CDC *pDC)
 	if(m_bToCacl==true&&pView->m_nCountKline>0)
 	{
 		bToCaclTjxgShow = true;
-	
+
 		for(int k=0;k<pView->m_nCountKline ;k++)
 		{
 			if(pView->m_pkline [k].day<0)
@@ -1455,13 +1452,13 @@ void CTaiKlineShowKline::DrawKlineFiguer(CDC *pDC)
 
 		if(m_bInitFoot==true)
 			InitDrawedLineBE();
-//
-		
+		//
+
 	}
 	else if(m_bToCacl==true&&pView->m_nCountKline<=0)
 	{
 		m_bToCacl=false;
-	
+
 		if(m_bInitFoot==true)
 			InitDrawedLineBE();
 	}
@@ -1488,7 +1485,7 @@ void CTaiKlineShowKline::DrawKlineFiguer(CDC *pDC)
 		pDC->SetTextColor(  pDoc->m_colorArray [1]);
 		pDC->SetBkMode(TRANSPARENT);
 
-	
+
 		CString title;
 		title=pView->pMin1Drawing->m_pReportData->name;
 		title=title+"(无K线数据)";
@@ -1519,9 +1516,9 @@ void CTaiKlineShowKline::DrawKlineFiguer(CDC *pDC)
 
 	if(	m_bNewStock == true || m_kLine_mode == 0 )
 	{
-	m_max_sun[m_nSon]=(float)-1.0E20;
-	m_min_sun[m_nSon]=(float)1.0E20;
-	CaclMaxFlt(pView->m_pkline,0);
+		m_max_sun[m_nSon]=(float)-1.0E20;
+		m_min_sun[m_nSon]=(float)1.0E20;
+		CaclMaxFlt(pView->m_pkline,0);
 	}
 
 	InitLineParam();
@@ -1557,62 +1554,62 @@ void CTaiKlineShowKline::DrawKlineFiguer(CDC *pDC)
 		}
 
 		if(bZj==0 && pView->m_infoInit.initIndex[0].nameIndex[0] !='\0')
-		for( i=0;i<m_nLineIndicator1[m_nSon] ;i++)
-		{
-			if(m_dataFormular[m_nSon].line [i].m_arrBE.b == -1)
-				continue;
+			for( i=0;i<m_nLineIndicator1[m_nSon] ;i++)
+			{
+				if(m_dataFormular[m_nSon].line [i].m_arrBE.b == -1)
+					continue;
 
-			if(m_bNewStock == true || m_kLine_mode == 0)
-				CaclMaxFlt(m_dataFormular[m_nSon].line [i].m_arrBE.line,
+				if(m_bNewStock == true || m_kLine_mode == 0)
+					CaclMaxFlt(m_dataFormular[m_nSon].line [i].m_arrBE.line,
 					m_dataFormular[m_nSon].line [i].bNow,i);
-		}
-
-
-			
-		SetRectCurrent(0);
-
-		DrawRulorText(pDC);
-
-
-		if(pView->m_isShowCross==0)
-		{
-			if(bZj==1)
-			{
-				ShowCNP (pDC);
 			}
-			if(bZj==2)
+
+
+
+			SetRectCurrent(0);
+
+			DrawRulorText(pDC);
+
+
+			if(pView->m_isShowCross==0)
 			{
-				ShowChengBen (pDC);
+				if(bZj==1)
+				{
+					ShowCNP (pDC);
+				}
+				if(bZj==2)
+				{
+					ShowChengBen (pDC);
+				}
 			}
-		}
-				
-		DrawKLine(pDC);
-		if(bZj==0)
-			DrawLineIndex(pDC);
 
-		pView->pDrawLine->DrawTotal(pDC);
-		if(!pDC->IsPrinting())
-			pDC->SelectClipRgn (NULL);//
-		
-		if(pView->pKlineMode!=NULL)
-			pView->pKlineMode->DrawKLineMode(pView,pDC);
-	
-		if(pView->m_bBaseInfo==true)
-			DrawBaseInfo(pDC);
+			DrawKLine(pDC);
+			if(bZj==0)
+				DrawLineIndex(pDC);
 
-	
-		if(pView->m_bDoPower ==true)
-			DrawPower(pDC);
+			pView->pDrawLine->DrawTotal(pDC);
+			if(!pDC->IsPrinting())
+				pDC->SelectClipRgn (NULL);//
 
-		if(pView->m_screenStockShow.m_bUseing == true)
-		{
-			if(bToCaclTjxgShow==true)
-				pView->m_screenStockShow.Calculate() ;
-			ShowTjxgShow(pDC);
-		}
+			if(pView->pKlineMode!=NULL)
+				pView->pKlineMode->DrawKLineMode(pView,pDC);
+
+			if(pView->m_bBaseInfo==true)
+				DrawBaseInfo(pDC);
 
 
-		DrawCaption(pDC);
+			if(pView->m_bDoPower ==true)
+				DrawPower(pDC);
+
+			if(pView->m_screenStockShow.m_bUseing == true)
+			{
+				if(bToCaclTjxgShow==true)
+					pView->m_screenStockShow.Calculate() ;
+				ShowTjxgShow(pDC);
+			}
+
+
+			DrawCaption(pDC);
 
 	}
 
@@ -1638,8 +1635,8 @@ void CTaiKlineShowKline::DrawKlineFiguer(CDC *pDC)
 		m_nSon=j;
 		if(	m_bNewStock == true || m_kLine_mode == 0 )
 		{
-		m_max_sun[m_nSon]=(float)-1.0E20;
-		m_min_sun[m_nSon]=(float)1.0E20;
+			m_max_sun[m_nSon]=(float)-1.0E20;
+			m_min_sun[m_nSon]=(float)1.0E20;
 		}
 		InitLineParam();
 
@@ -1651,7 +1648,7 @@ void CTaiKlineShowKline::DrawKlineFiguer(CDC *pDC)
 			bCalc=true;
 			if(	m_bNewStock == true || m_kLine_mode == 0 )
 				CaclMaxFlt(m_dataFormular[m_nSon].line [i].m_arrBE.line,
-					m_dataFormular[m_nSon].line [i].bNow,i);
+				m_dataFormular[m_nSon].line [i].bNow,i);
 		}
 		if(bCalc==false)
 		{
@@ -1746,7 +1743,7 @@ void CTaiKlineShowKline::DrawRulorText(CDC *pDC,BYTE wid)
 	}
 
 	int numLine=(m_rectDrawLine.bottom-m_rectDrawLine.top)/pView->m_minGrid+1;
-	
+
 	float valuePer;
 	valuePer=(m_max_sun[m_nSon]-m_min_sun[m_nSon])/numLine;
 
@@ -1793,7 +1790,7 @@ void CTaiKlineShowKline::DrawRulorText(CDC *pDC,BYTE wid)
 	CPen pen_solid(PS_SOLID ,1,pDoc->m_colorArray[2]); 
 	CPen* pOldpen=pDC->SelectObject(&pen_solid);
 
-//	int i;
+	//	int i;
 	int m=2;
 
 	//---	
@@ -1871,7 +1868,7 @@ void CTaiKlineShowKline::DrawRulorText(CDC *pDC,BYTE wid)
 	pDC->GetTextMetrics(&tm);
 
 	int width=pView->m_midLen;
- 	if( wid == 1)
+	if( wid == 1)
 		width=m_midLen_L;
 
 
@@ -1888,63 +1885,63 @@ void CTaiKlineShowKline::DrawRulorText(CDC *pDC,BYTE wid)
 			CString str;
 			int y=YTransfer((float)(valuePer*(num_b+i)));
 
-				if(wid!=2&&!(wid==1&&pView->pMin1Drawing->m_nSon==0))
-				{
-					str.Format("%.2f",(float)(valuePer*(num_b+i)));
-					str+=bck;
-					if(wid==3)
-						pDC->TextOut(m_rectDrawLine.left-m,y-tm.tmHeight/2,str);
-
-					if(y>m_rectDrawLine.bottom-5 || y<m_rectDrawLine.top)
-						continue;
-					pDC->TextOut(m_rectDrawLine.right+width-m,y-tm.tmHeight/2,str);
-
-				}
-			
-				else if(wid==1&&pView->pMin1Drawing->m_nSon==0)
-				{
-					if(y>m_rectDrawLine.bottom-5 || y<m_rectDrawLine.top)
-						continue;
-					float cls;
-					if(pView->m_tabNum ==3)
-						cls=pView->pMin1Drawing->m_close;
-					else
-						cls=pView->pMin1Drawing->m_close_Dapan[0];
-
-					float nw=(valuePer*(num_b+i));
-					str.Format("%.2f",nw);
-					if(nw>cls)
-						pDC->SetTextColor( pDoc->m_colorArray [13]);
-					else if(nw<cls)
-						pDC->SetTextColor( pDoc->m_colorArray [15]);
-					else
-						pDC->SetTextColor( pDoc->m_colorArray [14]);
-					pDC->TextOut(m_rectDrawLine.right+width-m,y-tm.tmHeight/2,str);
-
-				}
-			
-				else if(wid==2)
-				{
-					float cls=pView->pMin1Drawing->m_close;
-					float nw=(valuePer*(num_b+i));
-					str.Format("%.2f",nw);
-					if(nw>cls)
-						pDC->SetTextColor( pDoc->m_colorArray [13]);
-					else if(nw<cls)
-						pDC->SetTextColor( pDoc->m_colorArray [15]);
-					else
-						pDC->SetTextColor( pDoc->m_colorArray [PING_PAN_WORD]);
+			if(wid!=2&&!(wid==1&&pView->pMin1Drawing->m_nSon==0))
+			{
+				str.Format("%.2f",(float)(valuePer*(num_b+i)));
+				str+=bck;
+				if(wid==3)
 					pDC->TextOut(m_rectDrawLine.left-m,y-tm.tmHeight/2,str);
 
-					if(y>m_rectDrawLine.bottom-5 || y<m_rectDrawLine.top)
-						continue;
-					if(cls>0)
-					{
-						str.Format("%.1f",(float)(valuePer*(num_b+i)-cls)*100/cls);
-						str+="%";
-						pDC->TextOut(m_rectDrawLine.right+width-m,y-tm.tmHeight/2,str);
-					}
+				if(y>m_rectDrawLine.bottom-5 || y<m_rectDrawLine.top)
+					continue;
+				pDC->TextOut(m_rectDrawLine.right+width-m,y-tm.tmHeight/2,str);
+
+			}
+
+			else if(wid==1&&pView->pMin1Drawing->m_nSon==0)
+			{
+				if(y>m_rectDrawLine.bottom-5 || y<m_rectDrawLine.top)
+					continue;
+				float cls;
+				if(pView->m_tabNum ==3)
+					cls=pView->pMin1Drawing->m_close;
+				else
+					cls=pView->pMin1Drawing->m_close_Dapan[0];
+
+				float nw=(valuePer*(num_b+i));
+				str.Format("%.2f",nw);
+				if(nw>cls)
+					pDC->SetTextColor( pDoc->m_colorArray [13]);
+				else if(nw<cls)
+					pDC->SetTextColor( pDoc->m_colorArray [15]);
+				else
+					pDC->SetTextColor( pDoc->m_colorArray [14]);
+				pDC->TextOut(m_rectDrawLine.right+width-m,y-tm.tmHeight/2,str);
+
+			}
+
+			else if(wid==2)
+			{
+				float cls=pView->pMin1Drawing->m_close;
+				float nw=(valuePer*(num_b+i));
+				str.Format("%.2f",nw);
+				if(nw>cls)
+					pDC->SetTextColor( pDoc->m_colorArray [13]);
+				else if(nw<cls)
+					pDC->SetTextColor( pDoc->m_colorArray [15]);
+				else
+					pDC->SetTextColor( pDoc->m_colorArray [PING_PAN_WORD]);
+				pDC->TextOut(m_rectDrawLine.left-m,y-tm.tmHeight/2,str);
+
+				if(y>m_rectDrawLine.bottom-5 || y<m_rectDrawLine.top)
+					continue;
+				if(cls>0)
+				{
+					str.Format("%.1f",(float)(valuePer*(num_b+i)-cls)*100/cls);
+					str+="%";
+					pDC->TextOut(m_rectDrawLine.right+width-m,y-tm.tmHeight/2,str);
 				}
+			}
 		}
 		break;
 	case 1:
@@ -1960,13 +1957,13 @@ void CTaiKlineShowKline::DrawRulorText(CDC *pDC,BYTE wid)
 					str.Format("%d",(int)(valuePer*(num_b+i)));
 					str+=bck;
 					if(wid==3)
-							pDC->TextOut(m_rectDrawLine.left-m,y-tm.tmHeight/2,str);
+						pDC->TextOut(m_rectDrawLine.left-m,y-tm.tmHeight/2,str);
 
 					if(y>m_rectDrawLine.bottom-5 || y<m_rectDrawLine.top)
 						continue;
 					pDC->TextOut(m_rectDrawLine.right+width-m,y-tm.tmHeight/2,str);
 				}
-			
+
 				else if(wid==1&&pView->pMin1Drawing->m_nSon==0)
 				{
 					if(y>m_rectDrawLine.bottom-5 || y<m_rectDrawLine.top)
@@ -1988,7 +1985,7 @@ void CTaiKlineShowKline::DrawRulorText(CDC *pDC,BYTE wid)
 					pDC->TextOut(m_rectDrawLine.right+width-m,y-tm.tmHeight/2,str);
 
 				}
-				
+
 				else if(wid==2)
 				{
 					float cls=pView->pMin1Drawing->m_close;
@@ -2026,15 +2023,15 @@ void CTaiKlineShowKline::DrawRulorText(CDC *pDC,BYTE wid)
 		{
 			int y=YTransfer((float)(valuePer*(num_b+i)));
 
-			
+
 			str.Format("%d",(int)((float)(valuePer*(num_b+i))/m_step[m_nSon]));
 			str+=bck;
 			if(wid==3)
-					pDC->TextOut(m_rectDrawLine.left-m,y-tm.tmHeight/2,str);
+				pDC->TextOut(m_rectDrawLine.left-m,y-tm.tmHeight/2,str);
 			if(y>m_rectDrawLine.bottom-5  || y<m_rectDrawLine.top)
 				continue;
 			pDC->TextOut(m_rectDrawLine.right+width-m,y-tm.tmHeight/2,str);
-			
+
 		}
 		//---
 		str.Format("%d",m_step[m_nSon]);
@@ -2061,7 +2058,7 @@ void CTaiKlineShowKline::DrawRulorText(CDC *pDC,BYTE wid)
 		pDC->SetTextAlign( TA_LEFT );//
 		pDC->TextOut(lf+8,tp,str);
 		pDC->SetTextAlign( TA_RIGHT );//
-		
+
 		pDC->SelectObject(&pen_solid);
 		pDC->MoveTo(lf,tp);
 		pDC->LineTo(lf+width+2,tp);
@@ -2083,7 +2080,7 @@ void CTaiKlineShowKline::DrawRulorText(CDC *pDC,BYTE wid)
 	}
 	pDC->SelectObject(pOld);
 	pDC->SelectObject(pOldpen);
-	
+
 
 }
 
@@ -2093,57 +2090,57 @@ void CTaiKlineShowKline::DrawRulorText(CDC *pDC,BYTE wid)
 
 void CTaiKlineShowKline::DrawSonFiguer(CDC* pDC)
 {
-		SetRectCurrent(m_nSon);
+	SetRectCurrent(m_nSon);
 
-		if(pDC->IsPrinting () || m_kLine_mode == 1 )
+	if(pDC->IsPrinting () || m_kLine_mode == 1 )
+	{
+		CRect r9(1,m_rectDrawLine.top,m_rectDrawLine.right ,m_rectDrawLine.bottom-1 );
+
+	}
+
+
+	if(m_nSon>0 )
+	{
+
+		if(m_bDaPan[m_nSon-1]==1)
 		{
-			CRect r9(1,m_rectDrawLine.top,m_rectDrawLine.right ,m_rectDrawLine.bottom-1 );
-
-		}
-
-
-		if(m_nSon>0 )
-		{
-
-			if(m_bDaPan[m_nSon-1]==1)
+			if(!CTaiShanKlineShowView::IsIndexStock3(pView->m_sharesSymbol ))
 			{
-				if(!CTaiShanKlineShowView::IsIndexStock3(pView->m_sharesSymbol ))
-				{
-					CFont ft;
-					LOGFONT lgf=pDoc->m_fontstr[0];
-					
-					ft.CreateFontIndirect (&lgf );
-					CFont* pOld=pDC->SelectObject(&ft);
-					pDC->SetTextAlign( TA_LEFT );
-					pDC->SetTextColor(  pDoc->m_colorArray [1]);
-					pDC->SetBkMode(TRANSPARENT);
+				CFont ft;
+				LOGFONT lgf=pDoc->m_fontstr[0];
 
-					CString s(pView->m_infoInit.initIndex[m_nSon].nameIndex);
-					s=s+"指标只能用于大盘指数";
-					int len=(pDC->GetOutputTextExtent(s)).cx;
+				ft.CreateFontIndirect (&lgf );
+				CFont* pOld=pDC->SelectObject(&ft);
+				pDC->SetTextAlign( TA_LEFT );
+				pDC->SetTextColor(  pDoc->m_colorArray [1]);
+				pDC->SetBkMode(TRANSPARENT);
 
-					int left=(m_rectDrawLine.right-m_rectDrawLine.left)/2-len/2;
-					if(left<0)
-						left=0;
-					int top=(m_rectDrawLine.bottom+m_rectDrawLine.top)/2-10;
-					if(top<0)
-						top=0;
+				CString s(pView->m_infoInit.initIndex[m_nSon].nameIndex);
+				s=s+"指标只能用于大盘指数";
+				int len=(pDC->GetOutputTextExtent(s)).cx;
 
-					pDC->ExtTextOut (left,top,ETO_CLIPPED,m_rectDrawLine,s,NULL);
-					
-					pDC->SelectObject(pOld);
+				int left=(m_rectDrawLine.right-m_rectDrawLine.left)/2-len/2;
+				if(left<0)
+					left=0;
+				int top=(m_rectDrawLine.bottom+m_rectDrawLine.top)/2-10;
+				if(top<0)
+					top=0;
 
-					return;
-				}
+				pDC->ExtTextOut (left,top,ETO_CLIPPED,m_rectDrawLine,s,NULL);
+
+				pDC->SelectObject(pOld);
+
+				return;
 			}
 		}
+	}
 
-		
-		DrawRulorText(pDC);
 
-		DrawLineIndex(pDC);
+	DrawRulorText(pDC);
 
-		DrawCaption(pDC);
+	DrawLineIndex(pDC);
+
+	DrawCaption(pDC);
 
 
 }
@@ -2177,14 +2174,14 @@ void CTaiKlineShowKline::CalcSonFiguer(CString name)
 			}
 			return;
 		}
-		
+
 		m_nValidIndicator[m_nSon] = CTaiScreenParent::IsPeriodValid(pView->m_nKlineKind2 ,pIndex);
 
 		CString s ;
 		int j=0;
 		CString str = " ";
 
-	
+
 		if(m_nSon>0 && ii==0)
 			m_bDaPan[m_nSon-1]=0;
 
@@ -2220,10 +2217,10 @@ void CTaiKlineShowKline::CalcSonFiguer(CString name)
 				rtnLine = m_formuCompute->GetLine (nIn,m_dataFormular[m_nSon].line [i].m_arrBE,namePer);
 				if(rtnLine==1)
 					m_dataFormular[m_nSon].line [i].m_arrBE.b = -1;
-				
+
 				m_dataFormular[m_nSon].line [i].type = m_formuCompute->m_RlineType[i] ;
 				m_dataFormular[m_nSon].line [i].lineThick = m_formuCompute->m_RlineThick[i] ;
-			
+
 				if(namePer.GetLength()>Total_Count_Line)
 					m_lineName[m_nSon][i]="未知";
 				else
@@ -2233,7 +2230,7 @@ void CTaiKlineShowKline::CalcSonFiguer(CString name)
 			}
 			if(ii==0)
 				m_nLineIndicator1[m_nSon] = m_dataFormular[m_nSon].numLine;
-				
+
 		}
 		else
 			;
@@ -2382,14 +2379,14 @@ void CTaiKlineShowKline::DrawCaptionAdded(CDC *pDC)
 		return;
 	CFont ft;
 	LOGFONT lgf=pDoc->m_fontstr[0];
-	
+
 	ft.CreateFontIndirect (&lgf );
 	CFont* pOld=pDC->SelectObject(&ft);
 	pDC->SetTextAlign( TA_LEFT );
 	pDC->SetTextColor(  pDoc->m_colorArray [1]);
 	pDC->SetBkMode(TRANSPARENT);
 
-	
+
 	CString title;
 	title=pView->pMin1Drawing->m_pReportData->name;
 	CString name = pView->pMin1Drawing->m_pReportData->id ;
@@ -2532,7 +2529,7 @@ int CTaiKlineShowKline::MoveDisplays(int num)
 				int tot = m_footEnd-m_footBegin+1;
 				m_footBegin=0 ;
 				if(tot==m_klinNumDefault)
-						m_footEnd=m_footBegin+m_klinNumDefault-1;
+					m_footEnd=m_footBegin+m_klinNumDefault-1;
 				else
 				{
 					if(m_footEnd-m_footBegin+1>m_klinNumDefault)
@@ -2570,9 +2567,9 @@ int CTaiKlineShowKline::OutString(int num, CPoint p)
 	foot=TransferX(p.x);
 	foot+=m_footBegin;
 	if(foot>m_footEnd)
-			return 0;
+		return 0;
 
-	
+
 
 	float widper=pView->m_rtKlineFiguer .rightX/(float)m_klinNumDefault;
 	for(int i=0;i<m_dataFormular[m_nSon].numLine ;i++)
@@ -2620,7 +2617,7 @@ int CTaiKlineShowKline::OutString(int num, CPoint p)
 		rgn.CreatePolygonRgn (pt,6,ALTERNATE);
 		if(rgn.PtInRegion (p)!=0)
 		{
-		
+
 			CString rStr;
 			rStr.Format (" %.3f\n",(float)m_dataFormular[m_nSon].line[i].m_arrBE.line[foot]);
 			m_tipStr=m_lineName[m_nSon][i]+rStr;
@@ -2643,10 +2640,10 @@ int CTaiKlineShowKline::OutString(int num, CPoint p)
 	{
 		r.left =(int)((TransferX(p.x))*widper+widper/2)-7;
 		r.right =(int)((TransferX(p.x))*widper+widper/2)+7;
-	
+
 		CTime tmB(1970,1,1,9,30,0);
 
-	
+
 		while(pView->m_screenStockShow .m_bUseing == true)
 		{
 			if(pView->m_screenStockShow .m_testResultArray.GetSize()!=1)
@@ -2657,79 +2654,79 @@ int CTaiKlineShowKline::OutString(int num, CPoint p)
 			if(n<=0)
 				break;
 
-		
+
 			for(int j=0;j<n;j++)
 			{
 				SCREEN_DETAIL* pDetail = &(pResult->m_detail[j]);
-                int foot2;
+				int foot2;
 				if(pResult->nKindBuySell==1)
 					foot2 = pView->FindTimeK (pDetail->selltime);
 				else
-				    foot2 = pView->FindTimeK (pDetail->buytime);
+					foot2 = pView->FindTimeK (pDetail->buytime);
 				int posNow=(int)((foot2-m_footBegin+(float)0.5)*widper);
 				if(posNow>r.left && posNow<r.right)
 				{
 
 					CString sP="";
-                   
-							m_tipStr="买卖评测指示：\n实际最大收益 ";
-							sP.Format("%.2f",pDetail->profit);
-							m_tipStr+=sP;
-							m_tipStr=m_tipStr+"%"+"\n";
-							sP.Format("%d天目标收益%.2f",(int)pView->m_screenStockShow .m_mbzq,(float)pView->m_screenStockShow .m_mbly);
-							m_tipStr+=sP;
-							m_tipStr=m_tipStr+"%"+"\n";
 
-							if(pDetail->issuccess>=0 && pDetail->issuccess<=2)
-							{
-								CString s1[] = {"成功","没有成功","未完成收益计算"};
-								sP = s1[pDetail->issuccess ];
-								m_tipStr+=sP;
-								m_tipStr+="\n";
-							}
-							 
-							if(pResult->nKindBuySell>=0 && pResult->nKindBuySell<=2)
-							{
-								CString sKind[] = {"仅有买入条件\n","仅有卖出条件\n","同时有买入卖出条件\n"};
-								sP = sKind[pResult->nKindBuySell ];
-								m_tipStr+=sP;
-							}
-                            if(pResult->nKindBuySell==0)
-							{
-    							sP ="买入时间："+ CTime(pDetail->buytime  ).Format ("%Y%m%d  ");
-								m_tipStr+=sP;
-								sP.Format("买入价格：%.2f\n",pDetail->buyprice );
-								m_tipStr+=sP;
+					m_tipStr="买卖评测指示：\n实际最大收益 ";
+					sP.Format("%.2f",pDetail->profit);
+					m_tipStr+=sP;
+					m_tipStr=m_tipStr+"%"+"\n";
+					sP.Format("%d天目标收益%.2f",(int)pView->m_screenStockShow .m_mbzq,(float)pView->m_screenStockShow .m_mbly);
+					m_tipStr+=sP;
+					m_tipStr=m_tipStr+"%"+"\n";
 
-							}
-							else
-							{
-								sP ="卖出时间："+ CTime(pDetail->selltime  ).Format ("%Y%m%d  ");
-								m_tipStr+=sP;
-								sP.Format("卖出价格：%.2f\n",pDetail->sellprice );
-								m_tipStr+=sP;
-							}
-							if(pResult->nKindBuySell ==2)
-							{
-								if(pDetail->nKindSell ==0 || pDetail->nKindSell ==1)
-								{
-									CString sKindSell[] = {"卖出条件卖出","附加条件卖出"};
-									sP = sKindSell[pDetail->nKindSell ];
-									m_tipStr+=sP;
-									m_tipStr+="\n";
-								}
-							}
-							sP="";
-							for(int i=0;i<pView->m_screenStockShow .m_indexSaveArray.GetSize();i++)
-							{
-								IndexDataInfo index_save = pView->m_screenStockShow .m_indexSaveArray.GetAt(i);
-								CFormularContent * pIndex;
-								pIndex=(CFormularContent*)CTaiScreenParent::LookUpArray(index_save.iKind, index_save.sIndex_name,pDoc); 
-								if(pIndex==NULL) continue;
-								sP=sP+pIndex->name+"条件\n";
-						}
+					if(pDetail->issuccess>=0 && pDetail->issuccess<=2)
+					{
+						CString s1[] = {"成功","没有成功","未完成收益计算"};
+						sP = s1[pDetail->issuccess ];
 						m_tipStr+=sP;
-						
+						m_tipStr+="\n";
+					}
+
+					if(pResult->nKindBuySell>=0 && pResult->nKindBuySell<=2)
+					{
+						CString sKind[] = {"仅有买入条件\n","仅有卖出条件\n","同时有买入卖出条件\n"};
+						sP = sKind[pResult->nKindBuySell ];
+						m_tipStr+=sP;
+					}
+					if(pResult->nKindBuySell==0)
+					{
+						sP ="买入时间："+ CTime(pDetail->buytime  ).Format ("%Y%m%d  ");
+						m_tipStr+=sP;
+						sP.Format("买入价格：%.2f\n",pDetail->buyprice );
+						m_tipStr+=sP;
+
+					}
+					else
+					{
+						sP ="卖出时间："+ CTime(pDetail->selltime  ).Format ("%Y%m%d  ");
+						m_tipStr+=sP;
+						sP.Format("卖出价格：%.2f\n",pDetail->sellprice );
+						m_tipStr+=sP;
+					}
+					if(pResult->nKindBuySell ==2)
+					{
+						if(pDetail->nKindSell ==0 || pDetail->nKindSell ==1)
+						{
+							CString sKindSell[] = {"卖出条件卖出","附加条件卖出"};
+							sP = sKindSell[pDetail->nKindSell ];
+							m_tipStr+=sP;
+							m_tipStr+="\n";
+						}
+					}
+					sP="";
+					for(int i=0;i<pView->m_screenStockShow .m_indexSaveArray.GetSize();i++)
+					{
+						IndexDataInfo index_save = pView->m_screenStockShow .m_indexSaveArray.GetAt(i);
+						CFormularContent * pIndex;
+						pIndex=(CFormularContent*)CTaiScreenParent::LookUpArray(index_save.iKind, index_save.sIndex_name,pDoc); 
+						if(pIndex==NULL) continue;
+						sP=sP+pIndex->name+"条件\n";
+					}
+					m_tipStr+=sP;
+
 					m_tipStr.MakeUpper( );
 
 					return 1;
@@ -2757,7 +2754,7 @@ int CTaiKlineShowKline::OutString(int num, CPoint p)
 					if(r.PtInRect (p)!=0)
 					{
 						CString sP="";
-	
+
 						CString sP2 = "";
 						if(pwr.fGive>0)
 							sP.Format("送股数：%.1f\n",(float)(pwr.fGive*10));
@@ -2794,49 +2791,49 @@ int CTaiKlineShowKline::OutString(int num, CPoint p)
 
 			try
 			{
-			if(!pView->m_bs.IsOpen())
-				pView->m_bs.Open ();
-			pView->m_bs.MoveFirst ();
+				if(!pView->m_bs.IsOpen())
+					pView->m_bs.Open ();
+				pView->m_bs.MoveFirst ();
 
-			int footBs=TransferX(p.x)+m_footBegin;
-			r.top =pView->m_rtKlineFiguer.rtBlw[0].m_yBottom-18;
-			r.bottom =pView->m_rtKlineFiguer.rtBlw[0].m_yBottom-2;
+				int footBs=TransferX(p.x)+m_footBegin;
+				r.top =pView->m_rtKlineFiguer.rtBlw[0].m_yBottom-18;
+				r.bottom =pView->m_rtKlineFiguer.rtBlw[0].m_yBottom-2;
 
 
-			while(!pView->m_bs.IsEOF() )
-			{
-				
-				int nDay=pView->m_bs.m_time .GetDay ();
-				int nYear=pView->m_bs.m_time .GetYear ();
-				int nMonth=pView->m_bs.m_time .GetMonth  ();
-				CTime tmLib(nYear,nMonth,nDay,9,30,0);
-				CTimeSpan tmAll=tmLib-tmB;
-				int scds=tmAll.GetTotalSeconds ();
-				int foot2=pView->FindTimeK (scds);
-				if(foot2==-1)
+				while(!pView->m_bs.IsEOF() )
 				{
+
+					int nDay=pView->m_bs.m_time .GetDay ();
+					int nYear=pView->m_bs.m_time .GetYear ();
+					int nMonth=pView->m_bs.m_time .GetMonth  ();
+					CTime tmLib(nYear,nMonth,nDay,9,30,0);
+					CTimeSpan tmAll=tmLib-tmB;
+					int scds=tmAll.GetTotalSeconds ();
+					int foot2=pView->FindTimeK (scds);
+					if(foot2==-1)
+					{
+						pView->m_bs.MoveNext ();
+						continue;
+					}
+
+					foot2-=m_footBegin;
+
+					int posNow=(int)((foot2+(float)0.5)*widper);
+					if(posNow<r.left || posNow>r.right)
+					{
+						pView->m_bs.MoveNext ();
+						continue;
+					}
+
+					if(r.PtInRect (p)!=0)
+					{
+						m_tipStr=pView->m_bs.m_brief;
+						m_tipStr+="\n";
+						m_tipStr.MakeUpper( );
+						return 1;
+					}
 					pView->m_bs.MoveNext ();
-					continue;
 				}
-
-				foot2-=m_footBegin;
-
-				int posNow=(int)((foot2+(float)0.5)*widper);
-				if(posNow<r.left || posNow>r.right)
-				{
-					pView->m_bs.MoveNext ();
-					continue;
-				}
-
-				if(r.PtInRect (p)!=0)
-				{
-					m_tipStr=pView->m_bs.m_brief;
-					m_tipStr+="\n";
-					m_tipStr.MakeUpper( );
-					return 1;
-				}
-				pView->m_bs.MoveNext ();
-			}
 			}
 			catch (CDaoException* e)
 			{
@@ -2869,11 +2866,11 @@ int CTaiKlineShowKline::OutString(int num, CPoint p)
 	s+="\n收: ";
 	tmps.Format (fmt,pView->m_pkline[foot].close);
 	s+=tmps;
-	
+
 	s+="\n量: ";
 	tmps.Format ("%d",(int)pView->m_pkline[foot].vol);
 	s+=tmps;
-	
+
 	s+="\n额: ";
 	tmps.Format ("%.1f",pView->m_pkline[foot].amount/10000);
 	s+=tmps;
@@ -2882,7 +2879,7 @@ int CTaiKlineShowKline::OutString(int num, CPoint p)
 	m_tipStr=s;
 	m_tipStr.MakeUpper( );
 
-	
+
 	return  1;
 }
 
@@ -2953,7 +2950,7 @@ int CTaiKlineShowKline::OnDown()
 	if(!(::GetKeyState(VK_CONTROL)&0x8000))
 
 	{
-		
+
 		if(m_klinNumDefault>=pView->m_nCountKline +BLANK_KLINE)
 			return 0;
 
@@ -3022,7 +3019,7 @@ int CTaiKlineShowKline::OnDown()
 int CTaiKlineShowKline::OnLeft()
 {
 	if(m_klinNumDefault<=0 || pView->m_pkline == 0)
-			return 0;
+		return 0;
 	if(::GetKeyState(VK_CONTROL)&0x8000)
 	{
 
@@ -3048,7 +3045,7 @@ int CTaiKlineShowKline::OnLeft()
 			if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE) pView->m_dlgShowCross->ShowWindow(SW_SHOW);
 		}
 
-		
+
 		CRect r;
 		pView->GetClientRect (r);
 		r.right =pView->m_rtKlineFiguer.rightX+pView->m_midLen;
@@ -3076,7 +3073,7 @@ int CTaiKlineShowKline::OnLeft()
 			pView->m_pointMove.y=yNow;
 
 			pView->m_isShowCross=1;
-		
+
 			pView->RedrawWindow ();
 			if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE) pView->m_dlgShowCross->ShowWindow(SW_SHOW);
 			pView->SetFocus ();
@@ -3104,27 +3101,27 @@ int CTaiKlineShowKline::OnLeft()
 		int yNow=YTransfer(pView->m_pkline[m_footCurrent].close);
 		pView->m_pointMove.x=xNow;
 		pView->m_pointMove.y=yNow;
-	
+
 		POINT CurPos;
 		CurPos.x = xNow;
 		CurPos.y = yNow;
 		ClientToScreen(pView->m_hWnd,&CurPos);
 		if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE)
 		{
-		CRect dlgRect;
-		GetWindowRect(pView->m_dlgShowCross->m_hWnd,&dlgRect);
-		if(PtInRect(dlgRect,CurPos))
-		{
-		  CRect ClientRect;
-		  pView->GetClientRect(&ClientRect);
-		  if(CurPos.x > ClientRect.Width()/2)
-			  MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2 - dlgRect.Width(),CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
-		  else
-              MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2,CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
-		}
+			CRect dlgRect;
+			GetWindowRect(pView->m_dlgShowCross->m_hWnd,&dlgRect);
+			if(PtInRect(dlgRect,CurPos))
+			{
+				CRect ClientRect;
+				pView->GetClientRect(&ClientRect);
+				if(CurPos.x > ClientRect.Width()/2)
+					MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2 - dlgRect.Width(),CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
+				else
+					MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2,CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
+			}
 		}
 		SetCursorPos(CurPos.x,CurPos.y);
-	
+
 
 	}
 	ValidDoKline(true);
@@ -3137,7 +3134,7 @@ int CTaiKlineShowKline::OnLeft()
 int CTaiKlineShowKline::OnRight()
 {
 	if(m_klinNumDefault<=0 || pView->m_pkline == 0)
-			return 0;
+		return 0;
 
 	m_nSon=0;
 	SetRectCurrent(m_nSon);
@@ -3224,19 +3221,19 @@ int CTaiKlineShowKline::OnRight()
 		ClientToScreen(pView->m_hWnd,&CurPos);
 		if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE)
 		{
-		GetWindowRect(pView->m_dlgShowCross->m_hWnd,&dlgRect);
-		if(PtInRect(dlgRect,CurPos))
-		{
-		  CRect ClientRect;
-		  pView->GetClientRect(&ClientRect);
-		  if(CurPos.x > ClientRect.Width()/2)
-			  MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2 - dlgRect.Width(),CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
-		  else
-              MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2,CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
-		}
+			GetWindowRect(pView->m_dlgShowCross->m_hWnd,&dlgRect);
+			if(PtInRect(dlgRect,CurPos))
+			{
+				CRect ClientRect;
+				pView->GetClientRect(&ClientRect);
+				if(CurPos.x > ClientRect.Width()/2)
+					MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2 - dlgRect.Width(),CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
+				else
+					MoveWindow(pView->m_dlgShowCross->m_hWnd,ClientRect.Width()/2,CurPos.y,dlgRect.Width(),dlgRect.Height(),TRUE);
+			}
 		}
 		SetCursorPos(CurPos.x,CurPos.y);
-	
+
 	}
 	ValidDoKline(true);
 	return 1;
@@ -3247,59 +3244,59 @@ int CTaiKlineShowKline::OnRight()
 
 int CTaiKlineShowKline::OnEnd()
 {
-		if(m_klinNumDefault<=0)
-			return 0;
-		if(pView->m_isShowCross==0)
-		{
-			
-			if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE)pView->m_dlgShowCross->ShowWindow(SW_RESTORE);
-			pView->m_isShowCross=1;
-		}
+	if(m_klinNumDefault<=0)
+		return 0;
+	if(pView->m_isShowCross==0)
+	{
 
-		m_footCurrent=m_footEnd;
+		if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE)pView->m_dlgShowCross->ShowWindow(SW_RESTORE);
+		pView->m_isShowCross=1;
+	}
 
-		if(m_footCurrent<0) m_footCurrent=0;
-		m_currentValue=pView->m_pkline[m_footCurrent].close;
-		//---	
-		m_nSon=0;
-		SetRectCurrent(m_nSon);
+	m_footCurrent=m_footEnd;
 
-		int foot=m_footCurrent-m_footBegin;
-		int xNow=(int)((foot+0.5)*(m_rectDrawLine.right-m_rectDrawLine.left)/m_klinNumDefault);
-		int yNow=YTransfer(pView->m_pkline[m_footCurrent].close);
-		pView->m_pointMove.x=xNow;
-		pView->m_pointMove.y=yNow;
-		ValidDoKline(true);
-	    return 1;
+	if(m_footCurrent<0) m_footCurrent=0;
+	m_currentValue=pView->m_pkline[m_footCurrent].close;
+	//---	
+	m_nSon=0;
+	SetRectCurrent(m_nSon);
+
+	int foot=m_footCurrent-m_footBegin;
+	int xNow=(int)((foot+0.5)*(m_rectDrawLine.right-m_rectDrawLine.left)/m_klinNumDefault);
+	int yNow=YTransfer(pView->m_pkline[m_footCurrent].close);
+	pView->m_pointMove.x=xNow;
+	pView->m_pointMove.y=yNow;
+	ValidDoKline(true);
+	return 1;
 
 
 }
 int CTaiKlineShowKline::OnHome()
 {
-		if(m_klinNumDefault<=0 || pView->m_pkline == 0)
-			return 0;
-		if(pView->m_isShowCross==0)
-		{
-	
-			if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE)pView->m_dlgShowCross->ShowWindow(SW_RESTORE);
-			pView->m_isShowCross=1;
-		}
+	if(m_klinNumDefault<=0 || pView->m_pkline == 0)
+		return 0;
+	if(pView->m_isShowCross==0)
+	{
 
-		m_footCurrent=m_footBegin;
+		if(pDoc->m_propertyInitiate.bShowCrossDlg == TRUE)pView->m_dlgShowCross->ShowWindow(SW_RESTORE);
+		pView->m_isShowCross=1;
+	}
 
-		if(m_footCurrent<0) m_footCurrent=0;
-		m_currentValue=pView->m_pkline[m_footCurrent].close;
-		//---	
-		m_nSon=0;
-		SetRectCurrent(m_nSon);
+	m_footCurrent=m_footBegin;
 
-		int foot=m_footCurrent-m_footBegin;
-		int xNow=(int)((foot+0.5)*(m_rectDrawLine.right-m_rectDrawLine.left)/m_klinNumDefault);
-		int yNow=YTransfer(pView->m_pkline[m_footCurrent].close);
-		pView->m_pointMove.x=xNow;
-		pView->m_pointMove.y=yNow;
-		ValidDoKline(true);
-	    return 1;
+	if(m_footCurrent<0) m_footCurrent=0;
+	m_currentValue=pView->m_pkline[m_footCurrent].close;
+	//---	
+	m_nSon=0;
+	SetRectCurrent(m_nSon);
+
+	int foot=m_footCurrent-m_footBegin;
+	int xNow=(int)((foot+0.5)*(m_rectDrawLine.right-m_rectDrawLine.left)/m_klinNumDefault);
+	int yNow=YTransfer(pView->m_pkline[m_footCurrent].close);
+	pView->m_pointMove.x=xNow;
+	pView->m_pointMove.y=yNow;
+	ValidDoKline(true);
+	return 1;
 
 
 }
@@ -3356,13 +3353,13 @@ int CTaiKlineShowKline::DrawRulorTextLog(CDC *pDC,BYTE wid)
 
 	//---
 	int numLine=(m_rectDrawLine.bottom-m_rectDrawLine.top)/pView->m_minGrid+1;
-	
+
 	float valuePer;
-	
+
 	if(m_axisType==1)
 
 		valuePer=(m_max_sun[m_nSon]-m_min_sun[m_nSon])*100/pView->m_pkline[m_footBegin].open/numLine;
-	
+
 	else if(m_axisType==2)
 	{
 		if(m_max_sun[m_nSon]<=0||m_min_sun[m_nSon]<=0)
@@ -3404,7 +3401,7 @@ int CTaiKlineShowKline::DrawRulorTextLog(CDC *pDC,BYTE wid)
 
 		}
 	}
-	
+
 	int num_b;
 	int num_all;
 
@@ -3439,7 +3436,7 @@ int CTaiKlineShowKline::DrawRulorTextLog(CDC *pDC,BYTE wid)
 				break;
 		}
 		num_b=0;
-	
+
 	}
 
 	else if(m_axisType==2)
@@ -3473,7 +3470,7 @@ int CTaiKlineShowKline::DrawRulorTextLog(CDC *pDC,BYTE wid)
 	{
 		if(m_axisType==1)
 			gap=((m_rectDrawLine.bottom-m_rectDrawLine.top))*valuePer*pView->m_pkline[m_footBegin].open/100/(m_max_sun[m_nSon]-m_min_sun[m_nSon])/(flagGap+1);
-		
+
 		else
 			gap=(YTransfer((float)(m_max_sun[m_nSon]/valuePer))-YTransfer((float)(m_max_sun[m_nSon])))/(float)5.0;
 	}
@@ -3500,7 +3497,7 @@ int CTaiKlineShowKline::DrawRulorTextLog(CDC *pDC,BYTE wid)
 
 		if(y<m_rectDrawLine.bottom-3 && y>=m_rectDrawLine.top)
 		{
-			
+
 			if(!(pDoc->m_systemOption.showxline==FALSE && (pView->m_nKlineKind2>0 && wid !=1)))
 			{
 				CPoint p1,p2;
@@ -3571,12 +3568,12 @@ int CTaiKlineShowKline::DrawRulorTextLog(CDC *pDC,BYTE wid)
 
 				if(y<m_rectDrawLine.bottom-5)
 				{
-						if(m_axisType==1)
-							str.Format("%.0f",(float)(valuePer*i-100+fBegin*100/pView->m_pkline[m_footBegin].open));
-						else
-							str.Format("%.2f",(float)(m_max_sun[m_nSon]/(pow(valuePer,num_all-i-1))));
-						str+=bck;
-						pDC->TextOut(m_rectDrawLine.right+width-m,y-tm.tmHeight/2,str);
+					if(m_axisType==1)
+						str.Format("%.0f",(float)(valuePer*i-100+fBegin*100/pView->m_pkline[m_footBegin].open));
+					else
+						str.Format("%.2f",(float)(m_max_sun[m_nSon]/(pow(valuePer,num_all-i-1))));
+					str+=bck;
+					pDC->TextOut(m_rectDrawLine.right+width-m,y-tm.tmHeight/2,str);
 
 				}
 			}
@@ -3642,7 +3639,7 @@ int CTaiKlineShowKline::DrawRulorTextLog(CDC *pDC,BYTE wid)
 
 	str+="倍";
 	pDC->TextOut(lf+2,tp+pView->m_heightCaption,str);
-	
+
 	pDC->SelectObject(&pen_solid);
 	pDC->MoveTo(lf,tp);
 	pDC->LineTo(rg,tp);
@@ -3652,7 +3649,7 @@ int CTaiKlineShowKline::DrawRulorTextLog(CDC *pDC,BYTE wid)
 
 	pDC->SelectObject(pOld);
 	pDC->SelectObject(pOldpen);
-	
+
 	return 1;
 
 }
@@ -3757,7 +3754,7 @@ void CTaiKlineShowKline::DrawRulorX(CDC *pDC)
 					p2.y=top;
 					ShowVirtualLine(pDC,p1,p2);
 				}
-			
+
 				if(nYear!=tmNow.GetYear ())
 					s=tmNow.Format("%Y/%m/%d");
 				else if(tmNow.GetMonth ()!=nMonth)
@@ -3926,11 +3923,11 @@ void CTaiKlineShowKline::DrawRulorX(CDC *pDC)
 					pDC->MoveTo((int)(foot*widPer+widPer/2),top+pView->m_heightCaption);
 					pDC->LineTo((int)(foot*widPer+widPer/2),top);
 
-//			
+					//			
 					pDC->ExtTextOut ((int)(foot*widPer+widPer/2)+gap,top,ETO_CLIPPED,r,s,NULL);
 					len=(pDC->GetOutputTextExtent(s)).cx+gap;
 					len+=(int)(foot*widPer+widPer/2);
-//			
+					//			
 				}
 
 			}
@@ -3971,11 +3968,11 @@ void CTaiKlineShowKline::DrawRulorX(CDC *pDC)
 					pDC->MoveTo((int)(foot*widPer+widPer/2),top+pView->m_heightCaption);
 					pDC->LineTo((int)(foot*widPer+widPer/2),top);
 
-//			
+					//			
 					pDC->ExtTextOut ((int)(foot*widPer+widPer/2)+gap,top,ETO_CLIPPED,r,s,NULL);
 					len=(pDC->GetOutputTextExtent(s)).cx+gap;
 					len+=(int)(foot*widPer+widPer/2);
-//		
+					//		
 				}
 
 			}
@@ -3983,7 +3980,7 @@ void CTaiKlineShowKline::DrawRulorX(CDC *pDC)
 		break;
 	case 5:
 	case 6:
-		
+
 		tmNow=pView->m_pkline[m_footBegin].day;
 		s=tmNow.Format ("%m/%d-%H:%M");
 		pDC->TextOut ((int)(widPer/2)+gap,top,s);
@@ -4002,7 +3999,7 @@ void CTaiKlineShowKline::DrawRulorX(CDC *pDC)
 			if(nHour!=tmNow.GetHour ()||nMinu==30 && (abs(i-nDayOfWeek)>20))
 			{
 				nDayOfWeek = i;
-				
+
 				if(pDoc->m_systemOption.showyline==TRUE)
 				{
 					CPoint p1,p2;
@@ -4019,11 +4016,11 @@ void CTaiKlineShowKline::DrawRulorX(CDC *pDC)
 					pDC->MoveTo((int)(foot*widPer+widPer/2),top+pView->m_heightCaption);
 					pDC->LineTo((int)(foot*widPer+widPer/2),top);
 
-//		
+					//		
 					pDC->ExtTextOut ((int)(foot*widPer+widPer/2)+gap,top,ETO_CLIPPED,r,s,NULL);
 					len=(pDC->GetOutputTextExtent(s)).cx+gap;
 					len+=(int)(foot*widPer+widPer/2);
-//				
+					//				
 				}
 
 			}
@@ -4043,7 +4040,7 @@ void CTaiKlineShowKline::ShowLittleRulor(CDC *pDC,int wid)
 
 	if(m_rectDrawLine.bottom-m_rectDrawLine.top<2)
 		return;
-	
+
 	float max;
 	max=(float)(FABSMY(m_max_sun[m_nSon])>FABSMY(m_min_sun[m_nSon])?FABSMY(m_max_sun[m_nSon]):FABSMY(m_min_sun[m_nSon]));
 	m_step[m_nSon]=0;
@@ -4169,7 +4166,7 @@ void CTaiKlineShowKline::ShowLittleRulor(CDC *pDC,int wid)
 					str.Format("%d",(int)(valuePer*(i+1)+m_min_sun[m_nSon]));
 					pDC->TextOut(m_rectDrawLine.right+width-m,y-tm.tmHeight/2,str);
 					if(wid==3)
-							pDC->TextOut(m_rectDrawLine.left-m,y-tm.tmHeight/2,str);
+						pDC->TextOut(m_rectDrawLine.left-m,y-tm.tmHeight/2,str);
 				}
 				//-
 				else if(wid==2)
@@ -4221,11 +4218,11 @@ void CTaiKlineShowKline::ShowLittleRulor(CDC *pDC,int wid)
 		CRect rect1(lf,tp,rg,bm);
 		pDC->FillSolidRect (rect1,pDoc->m_colorArray [0]);
 
-//	
+		//	
 		pDC->SetTextAlign( TA_LEFT );//
 		pDC->TextOut(lf+8,tp,str);
 		pDC->SetTextAlign( TA_RIGHT );//
-		
+
 		pDC->SelectObject(&pen_solid);
 		pDC->MoveTo(lf,tp);
 		pDC->LineTo(lf+width+2,tp);
@@ -4240,7 +4237,7 @@ void CTaiKlineShowKline::ShowLittleRulor(CDC *pDC,int wid)
 	}
 	pDC->SelectObject(pOld);
 	pDC->SelectObject(pOldpen);
-	
+
 
 }
 
@@ -4265,7 +4262,7 @@ void CTaiKlineShowKline::ShowMultiFiguer(CDC *pDC,int flag)
 
 	pDC->SelectObject(pOldpen);
 
-	
+
 	if(flag==0)
 	{
 		pDC->SetTextAlign( TA_LEFT );
@@ -4273,7 +4270,7 @@ void CTaiKlineShowKline::ShowMultiFiguer(CDC *pDC,int flag)
 		pDC->SetBkMode(TRANSPARENT);
 		CFont ft;
 		LOGFONT lgf=pDoc->m_fontstr[0];
-	
+
 		ft.CreateFontIndirect (&lgf );
 		CFont* pOld=pDC->SelectObject(&ft);
 
@@ -4282,7 +4279,7 @@ void CTaiKlineShowKline::ShowMultiFiguer(CDC *pDC,int flag)
 		pDC->SelectObject(pOld);
 	}
 
-	
+
 	pView->m_pkline=pView->m_pkline ;
 
 	m_nSon=0;
@@ -4400,7 +4397,7 @@ void CTaiKlineShowKline::ShowMultiPage(CDC *pDC)
 	{
 		for(int j=0;j<n;j++)
 		{
-		
+
 			pView->ReadDataMultiFiguer((int)(i*n+j));
 
 			m_rectDrawLine.left=(int)(j*width+1);
@@ -4477,8 +4474,8 @@ void CTaiKlineShowKline::ShowCNP(CDC *pDC,int nFlags)
 			continue;
 
 		cnp[foot]+=FABSMY(pView->m_pkline[i].vol);
-//	
-			nVol++;
+		//	
+		nVol++;
 		if(cnp[foot]>max)
 			max=cnp[foot];
 	}
@@ -4528,7 +4525,7 @@ float CTaiKlineShowKline::ShowChengBen(CDC *pDC,int nFlags)
 	m_nSon=0;
 	SetRectCurrent(m_nSon);
 
-	
+
 	int n=m_rectDrawLine.bottom - m_rectDrawLine.top+1;
 	if(n<=0)
 		return 0;
@@ -4739,12 +4736,12 @@ float CTaiKlineShowKline::TongJi(CTaiKlineDialogShiDuanTJ* pTJ,int nFlags)
 
 	if(vol>0)
 	{
-			junJia_jiaQuan = 0;
-			for(int i=begin;i<=end;i++)
-			{
-				junJia_jiaQuan+=pView->m_pkline[i].vol *(pView->CaclMid (i));
-			}
-			junJia_jiaQuan=junJia_jiaQuan/vol;
+		junJia_jiaQuan = 0;
+		for(int i=begin;i<=end;i++)
+		{
+			junJia_jiaQuan+=pView->m_pkline[i].vol *(pView->CaclMid (i));
+		}
+		junJia_jiaQuan=junJia_jiaQuan/vol;
 	}
 	close=pView->m_pkline[end].close;
 	open=pView->m_pkline[begin].open;
@@ -4815,7 +4812,7 @@ float CTaiKlineShowKline::TongJi(CTaiKlineDialogShiDuanTJ* pTJ,int nFlags)
 	m_nBeginFootTJ = begin;
 	m_nEndFootTJ = end;
 
-	
+
 	if(begin>=0 && begin<pView->m_nCountKline 
 		&& end>=0 && end<pView->m_nCountKline )
 	{
@@ -4829,12 +4826,12 @@ float CTaiKlineShowKline::TongJi(CTaiKlineDialogShiDuanTJ* pTJ,int nFlags)
 			m_klinNumDefault = m_footEnd - m_footBegin + 1;
 		}
 
-			CTaiKlineDC* pMemDC = new CTaiKlineDC(pView,&pView->m_bit);
-			this->DrawKlineFiguer (pMemDC);
-			delete pMemDC;
+		CTaiKlineDC* pMemDC = new CTaiKlineDC(pView,&pView->m_bit);
+		this->DrawKlineFiguer (pMemDC);
+		delete pMemDC;
 
-			pView->RedrawWindowNoCacl ();
-		
+		pView->RedrawWindowNoCacl ();
+
 	}
 	ValidDoKline(true);
 	return 1;
@@ -4963,10 +4960,10 @@ void CTaiKlineShowKline::ComputePower(CString symbol,int stkKind,Kline* pKline,i
 	{
 		try
 		{
-		powerArr splitArr;
-		CTaiKlineTransferKline::ReadPower(pDoc,symbol,stkKind, splitArr);//m_PowerArray
-		CTaiKlineTransferKline::ComputePower(pKline , nKln, pView->m_nKlineKind2 ,splitArr);// this-> );
-		pView->m_bDoPower=true;
+			powerArr splitArr;
+			CTaiKlineTransferKline::ReadPower(pDoc,symbol,stkKind, splitArr);//m_PowerArray
+			CTaiKlineTransferKline::ComputePower(pKline , nKln, pView->m_nKlineKind2 ,splitArr);// this-> );
+			pView->m_bDoPower=true;
 		}
 		catch(...)
 		{
@@ -4994,47 +4991,47 @@ void CTaiKlineShowKline::DrawBaseInfo(CDC *pDC)
 		return;
 	try
 	{
-	if(!pView->m_bs.IsOpen())
-		pView->m_bs.Open ();
-	pView->m_bs.MoveFirst ();
+		if(!pView->m_bs.IsOpen())
+			pView->m_bs.Open ();
+		pView->m_bs.MoveFirst ();
 
-	int bgn=pView->pKlineDrawing ->m_footBegin;
-	int end=pView->pKlineDrawing ->m_footEnd;
-	CTime tmB(1970,1,1,9,30,0);
-	//---	
-	CBitmap       m_bitmap;
+		int bgn=pView->pKlineDrawing ->m_footBegin;
+		int end=pView->pKlineDrawing ->m_footEnd;
+		CTime tmB(1970,1,1,9,30,0);
+		//---	
+		CBitmap       m_bitmap;
 
-	CImageList imagelist;
-    imagelist.Create(15,15, ILC_MASK, 1, 2);
-    
-	m_bitmap.LoadBitmap(IDB_BITMAP_136);
-	imagelist.Add(&m_bitmap, (COLORREF)0x00ffFFFF);
-	m_bitmap.DeleteObject();
+		CImageList imagelist;
+		imagelist.Create(15,15, ILC_MASK, 1, 2);
 
-	while(!pView->m_bs.IsEOF() )
-	{
-		//--	
-		int nYear=pView->m_bs.m_time .GetYear ();
-		int nMonth=pView->m_bs.m_time .GetMonth  ();
-		int nDay=pView->m_bs.m_time .GetDay ();
-		CTime tmLib(nYear,nMonth,nDay,9,30,0);
-		CTimeSpan tmAll=tmLib-tmB;
-		int scds=tmAll.GetTotalSeconds ();
-		if(scds>=pView->m_pkline [m_footBegin].day&&scds<=pView->m_pkline [m_footEnd].day)
+		m_bitmap.LoadBitmap(IDB_BITMAP_136);
+		imagelist.Add(&m_bitmap, (COLORREF)0x00ffFFFF);
+		m_bitmap.DeleteObject();
+
+		while(!pView->m_bs.IsEOF() )
 		{
-			int rtn =pView->FindTimeK (scds);
-			if(rtn==-1)
-				continue;
-			POINT p;
-			p.y=pView->m_rtKlineFiguer.rtBlw[0].m_yBottom-18;
+			//--	
+			int nYear=pView->m_bs.m_time .GetYear ();
+			int nMonth=pView->m_bs.m_time .GetMonth  ();
+			int nDay=pView->m_bs.m_time .GetDay ();
+			CTime tmLib(nYear,nMonth,nDay,9,30,0);
+			CTimeSpan tmAll=tmLib-tmB;
+			int scds=tmAll.GetTotalSeconds ();
+			if(scds>=pView->m_pkline [m_footBegin].day&&scds<=pView->m_pkline [m_footEnd].day)
+			{
+				int rtn =pView->FindTimeK (scds);
+				if(rtn==-1)
+					continue;
+				POINT p;
+				p.y=pView->m_rtKlineFiguer.rtBlw[0].m_yBottom-18;
 
-			if(m_klinNumDefault<=0)
-				return ;
-			p.x=(int)((rtn-m_footBegin+0.5)*pView->m_rtKlineFiguer.rightX/m_klinNumDefault-8);
-			imagelist.Draw (pDC ,0,p,ILD_TRANSPARENT);
+				if(m_klinNumDefault<=0)
+					return ;
+				p.x=(int)((rtn-m_footBegin+0.5)*pView->m_rtKlineFiguer.rightX/m_klinNumDefault-8);
+				imagelist.Draw (pDC ,0,p,ILD_TRANSPARENT);
+			}
+			pView->m_bs.MoveNext ();
 		}
-		pView->m_bs.MoveNext ();
-	}
 	}
 	catch (CDaoException* e)
 	{
@@ -5164,7 +5161,7 @@ void CTaiKlineShowKline::CaclMaxAdded()
 					minPercent=min;
 			}
 
-		
+
 			m_max_sun[0]=maxPercent*pView->m_pkline[m_footBegin].open/100+pView->m_pkline[m_footBegin].open;
 			m_min_sun[0]=minPercent*pView->m_pkline[m_footBegin].open/100+pView->m_pkline[m_footBegin].open;
 
@@ -5216,16 +5213,16 @@ void CTaiKlineShowKline::DrawKLineAddedPage(CDC *pDC)
 {
 	m_nSon=0;
 	SetRectCurrent(m_nSon);
-	
+
 	if(	m_bNewStock == true || m_kLine_mode == 0 )
 		CaclMaxAdded();
-	
+
 	DrawRulorText(pDC);
 
 	DrawCaptionAdded(pDC);
-	
+
 	DrawKLine(pDC);
-	
+
 	for(int i=0;i<m_nKlineCurrent;i++)
 	{
 		DrawKLineAdded(pDC,i);
@@ -5235,7 +5232,7 @@ void CTaiKlineShowKline::DrawKLineAddedPage(CDC *pDC)
 
 int CTaiKlineShowKline::ReadPower(CString &symbol,int stkKind)
 {
-	
+
 	m_PowerArray.RemoveAll();
 	return CTaiKlineTransferKline::ReadPower(pDoc,symbol,stkKind, m_PowerArray);//m_PowerArray
 }
@@ -5272,133 +5269,133 @@ void CTaiKlineShowKline::WritePower(CString &symbol,int stkKind)
 
 void CTaiKlineShowKline::DrawKLineAmericaAdded(CDC *pDC, int nKln)
 {
-		int leftf=0;
-		int topf=pView->m_heightCaption;
-		int bottomf=pView->m_rtKlineFiguer.rtBlw[0].m_yBottom;
-		int rightf=pView->m_rtKlineFiguer.rightX;
+	int leftf=0;
+	int topf=pView->m_heightCaption;
+	int bottomf=pView->m_rtKlineFiguer.rtBlw[0].m_yBottom;
+	int rightf=pView->m_rtKlineFiguer.rightX;
 
-		if(bottomf-topf<2)
-			return;
+	if(bottomf-topf<2)
+		return;
 
 
-		int wdth=rightf-leftf;
-		int numberKline=m_klinNumDefault;
-	
-		float widthPer =wdth/(float)(numberKline);
-		int klineWidthPer =(int) (widthPer*3/10);
+	int wdth=rightf-leftf;
+	int numberKline=m_klinNumDefault;
 
-		float close,open,high,low;
-		CPen pen_yong(PS_SOLID,1,pDoc->m_colorArray[7+nKln]);
-		CPen* pOldpen=pDC->SelectObject(&pen_yong);
+	float widthPer =wdth/(float)(numberKline);
+	int klineWidthPer =(int) (widthPer*3/10);
 
-		CBrush brush_yong;
-		if (!brush_yong.CreateSolidBrush(pDoc->m_colorArray[3]))
-			ASSERT(FALSE);
-		CBrush* pOldBrush=pDC->SelectObject(&brush_yong);
-		
-		int bAdd=0;
-		int eAdd=0;
-		bAdd=CaclBeginFoot(nKln);
-		if(bAdd==-1)
-		{
-			pDC->SelectObject (pOldpen);
-			pDC->SelectObject (pOldBrush);
-			return;
-		}
-		eAdd=CaclEndFoot(nKln);
-		if(eAdd==-1)
-		{
-			pDC->SelectObject (pOldpen);
-			pDC->SelectObject (pOldBrush);
-			return;
-		}
+	float close,open,high,low;
+	CPen pen_yong(PS_SOLID,1,pDoc->m_colorArray[7+nKln]);
+	CPen* pOldpen=pDC->SelectObject(&pen_yong);
 
-		int j=m_footBegin;
-		float moveVla=0;
+	CBrush brush_yong;
+	if (!brush_yong.CreateSolidBrush(pDoc->m_colorArray[3]))
+		ASSERT(FALSE);
+	CBrush* pOldBrush=pDC->SelectObject(&brush_yong);
+
+	int bAdd=0;
+	int eAdd=0;
+	bAdd=CaclBeginFoot(nKln);
+	if(bAdd==-1)
+	{
+		pDC->SelectObject (pOldpen);
+		pDC->SelectObject (pOldBrush);
+		return;
+	}
+	eAdd=CaclEndFoot(nKln);
+	if(eAdd==-1)
+	{
+		pDC->SelectObject (pOldpen);
+		pDC->SelectObject (pOldBrush);
+		return;
+	}
+
+	int j=m_footBegin;
+	float moveVla=0;
+	if(m_axisType==1)
+		moveVla=m_pKlineAdd[nKln][bAdd].open-pView->m_pkline[m_footBegin].open;
+	if(m_pKlineAdd[nKln][bAdd].open<=0)
+	{
+		pDC->SelectObject (pOldpen);
+		pDC->SelectObject (pOldBrush);
+		return;
+	}
+	for(int i=bAdd; i<=eAdd; i++ )
+	{
 		if(m_axisType==1)
-			moveVla=m_pKlineAdd[nKln][bAdd].open-pView->m_pkline[m_footBegin].open;
-		if(m_pKlineAdd[nKln][bAdd].open<=0)
 		{
-			pDC->SelectObject (pOldpen);
-			pDC->SelectObject (pOldBrush);
-			return;
+			open = (m_pKlineAdd[nKln][i].open-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
+			close = (m_pKlineAdd[nKln][i].close-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
+			high = (m_pKlineAdd[nKln][i].high-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
+			low = (m_pKlineAdd[nKln][i].low-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
 		}
-		for(int i=bAdd; i<=eAdd; i++ )
+		else
 		{
-			if(m_axisType==1)
+			open = m_pKlineAdd[nKln][i].open;
+			close = m_pKlineAdd[nKln][i].close;
+			high = m_pKlineAdd[nKln][i].high;
+			low = m_pKlineAdd[nKln][i].low;
+		}
+
+		if( m_pKlineAdd[nKln][i].high > 0 )
+		{
+			int closek = (int)(YTransfer(close) );
+			int openk = (int)(YTransfer(open) );
+			int highk = (int)YTransfer(high);
+			int lowk = (int)YTransfer(low);
+
+
+
+
+			CRect rt;
+			rt.top =closek;
+			rt.bottom =openk;
+
+
+			int nRate = 1;
+			if(pView->m_nKlineKind2 >=5)
+				nRate = 60*60*24;
+			if(m_pKlineAdd[nKln][i].day/nRate<pView->m_pkline[j].day/nRate)
+				continue;
+			if(m_pKlineAdd[nKln][i].day/nRate>pView->m_pkline[j].day/nRate)
 			{
-				open = (m_pKlineAdd[nKln][i].open-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
-				close = (m_pKlineAdd[nKln][i].close-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
-				high = (m_pKlineAdd[nKln][i].high-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
-				low = (m_pKlineAdd[nKln][i].low-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
+				while(m_pKlineAdd[nKln][i].day/nRate>pView->m_pkline[j].day/nRate&&j<m_footEnd)
+				{
+					j++;
+				}
+				if((m_pKlineAdd[nKln][i].day/nRate<pView->m_pkline[j].day/nRate))
+					continue;
+			}
+
+
+			int x= leftf +(int)( (j-m_footBegin+0.5) * (float)widthPer);
+			if(klineWidthPer<1)
+			{
+				rt.left=leftf +(int)(  (j-m_footBegin+0.5) * (float)widthPer);
+				rt.right =leftf + (int)( (j-m_footBegin+0.5) * (float)widthPer);
+				pDC->MoveTo (x,highk);
+				pDC->LineTo (x,lowk);
 			}
 			else
 			{
-				open = m_pKlineAdd[nKln][i].open;
-				close = m_pKlineAdd[nKln][i].close;
-				high = m_pKlineAdd[nKln][i].high;
-				low = m_pKlineAdd[nKln][i].low;
+				rt.left=leftf -klineWidthPer +(int)(  (j-m_footBegin+0.5) * (float)widthPer);
+				rt.right =leftf +klineWidthPer + (int)( (j-m_footBegin+0.5) * (float)widthPer);
+
+				pDC->MoveTo (x-(int)(klineWidthPer),openk);
+				pDC->LineTo (x,openk);
+				pDC->MoveTo (x+(int)(klineWidthPer),closek);
+				pDC->LineTo (x,closek);
+
+				pDC->MoveTo (x,highk);
+				pDC->LineTo (x,lowk);
 			}
-
-			if( m_pKlineAdd[nKln][i].high > 0 )
-			{
-				int closek = (int)(YTransfer(close) );
-				int openk = (int)(YTransfer(open) );
-				int highk = (int)YTransfer(high);
-				int lowk = (int)YTransfer(low);
-
-
-
-
-				CRect rt;
-				rt.top =closek;
-				rt.bottom =openk;
-
-			
-				int nRate = 1;
-				if(pView->m_nKlineKind2 >=5)
-					nRate = 60*60*24;
-				if(m_pKlineAdd[nKln][i].day/nRate<pView->m_pkline[j].day/nRate)
-					continue;
-				if(m_pKlineAdd[nKln][i].day/nRate>pView->m_pkline[j].day/nRate)
-				{
-					while(m_pKlineAdd[nKln][i].day/nRate>pView->m_pkline[j].day/nRate&&j<m_footEnd)
-					{
-						j++;
-					}
-					if((m_pKlineAdd[nKln][i].day/nRate<pView->m_pkline[j].day/nRate))
-						continue;
-				}
-
-			
-				int x= leftf +(int)( (j-m_footBegin+0.5) * (float)widthPer);
-				if(klineWidthPer<1)
-				{
-					rt.left=leftf +(int)(  (j-m_footBegin+0.5) * (float)widthPer);
-					rt.right =leftf + (int)( (j-m_footBegin+0.5) * (float)widthPer);
-					pDC->MoveTo (x,highk);
-					pDC->LineTo (x,lowk);
-				}
-				else
-				{
-					rt.left=leftf -klineWidthPer +(int)(  (j-m_footBegin+0.5) * (float)widthPer);
-					rt.right =leftf +klineWidthPer + (int)( (j-m_footBegin+0.5) * (float)widthPer);
-					
-					pDC->MoveTo (x-(int)(klineWidthPer),openk);
-					pDC->LineTo (x,openk);
-					pDC->MoveTo (x+(int)(klineWidthPer),closek);
-					pDC->LineTo (x,closek);
-
-					pDC->MoveTo (x,highk);
-					pDC->LineTo (x,lowk);
-				}
-			}
-			j++;
-
 		}
+		j++;
 
-		pDC->SelectObject (pOldpen);
-		pDC->SelectObject (pOldBrush);
+	}
+
+	pDC->SelectObject (pOldpen);
+	pDC->SelectObject (pOldBrush);
 
 }
 
@@ -5418,7 +5415,7 @@ void CTaiKlineShowKline::DrawPower(CDC *pDC)
 
 			CImageList imagelist;
 			imagelist.Create(15,15, ILC_MASK, 1, 2);
-    
+
 			m_bitmap.LoadBitmap(IDB_BITMAP_138);
 			imagelist.Add(&m_bitmap, (COLORREF)0x00ffFFFF);
 			m_bitmap.DeleteObject();
@@ -5450,7 +5447,7 @@ void CTaiKlineShowKline::ShowTjxgShow(CDC *pDC)
 	if(n<=0)
 		return;
 
-	
+
 	int k=0;
 	for(int j=0;j<n;j++)
 	{
@@ -5458,92 +5455,92 @@ void CTaiKlineShowKline::ShowTjxgShow(CDC *pDC)
 
 
 		{
-			
+
 			for(;k<=m_footEnd;k++)
 			{
 				if(pView->m_pkline [k].day>=pDetail->buytime)
 				{
-						
-						POINT p[2];
-						int nFlag[2] ={1,1};
-						p[0].y=YTransfer((float)pView->m_pkline[k].low);
-						p[0].x=(int)((k-m_footBegin+0.5)*pView->m_rtKlineFiguer.rightX/m_klinNumDefault);
-						if((k-m_footBegin+0.5)<0) nFlag[0] = 0;
 
-						if(k+pDetail->timerange <= m_footEnd)
-							p[1].y=YTransfer((float)pView->m_pkline[k+pDetail->timerange].high)-18;
-						p[1].x=(int)((k-m_footBegin+0.5+pDetail->timerange)*pView->m_rtKlineFiguer.rightX/m_klinNumDefault);
-						if((k-m_footBegin+0.5+pDetail->timerange)<0) nFlag[1] = 0;
-						for(int ii=0;ii<2;ii++)
+					POINT p[2];
+					int nFlag[2] ={1,1};
+					p[0].y=YTransfer((float)pView->m_pkline[k].low);
+					p[0].x=(int)((k-m_footBegin+0.5)*pView->m_rtKlineFiguer.rightX/m_klinNumDefault);
+					if((k-m_footBegin+0.5)<0) nFlag[0] = 0;
+
+					if(k+pDetail->timerange <= m_footEnd)
+						p[1].y=YTransfer((float)pView->m_pkline[k+pDetail->timerange].high)-18;
+					p[1].x=(int)((k-m_footBegin+0.5+pDetail->timerange)*pView->m_rtKlineFiguer.rightX/m_klinNumDefault);
+					if((k-m_footBegin+0.5+pDetail->timerange)<0) nFlag[1] = 0;
+					for(int ii=0;ii<2;ii++)
+					{
+						if(pDoc->m_propertyInitiate.bTjxgZsFs==1)
+							if(pResult->nKindBuySell==0&&ii==1||pResult->nKindBuySell==1&&ii==0)
+								continue;
+						if(nFlag[ii]==0) continue;
+						if(k+pDetail->timerange > m_footEnd && ii == 1)
+							break;
+
+						if(pDetail->timerange<=0 && ii ==1)
+							break;
+
+						if(p[ii].y>pView->m_rtKlineFiguer.rtBlw[0].m_yBottom-18)
 						{
-							if(pDoc->m_propertyInitiate.bTjxgZsFs==1)
-							     if(pResult->nKindBuySell==0&&ii==1||pResult->nKindBuySell==1&&ii==0)
-									 continue;
-							if(nFlag[ii]==0) continue;
-							if(k+pDetail->timerange > m_footEnd && ii == 1)
-								break;
-
-							if(pDetail->timerange<=0 && ii ==1)
-								break;
-
-							if(p[ii].y>pView->m_rtKlineFiguer.rtBlw[0].m_yBottom-18)
-							{
-								p[ii].y =pView->m_rtKlineFiguer.rtBlw[0].m_yBottom-18;
-							}
-							if(p[ii].y<pView->m_heightCaption )
-								p[ii].y = pView->m_heightCaption;
-
-							int nMove = 2;
-							int nMovey = 8;
-							if(ii==0)
-							{
-								p[0].y += 8;
-								nMovey = -8;
-							}
-							CPoint pt[4]={CPoint(p[ii].x-nMove,p[ii].y),CPoint(p[ii].x+nMove,p[ii].y),
-								CPoint(p[ii].x,p[ii].y+nMovey),CPoint(p[ii].x-nMove,p[ii].y)};
-
-							CPen pen;
-							;
-
-							
-							if(pDetail->issuccess ==0 && ii == 0)
-							{
-								CRgn rgn;
-								rgn.CreatePolygonRgn (pt,4,ALTERNATE);
-								CBrush brush;
-								brush.CreateSolidBrush (pView->m_screenStockShow .buySellAdditional.nColorPoint[ii]);
-//							
-								pDC->FillRgn (&rgn,&brush);
-//							
-							}
-							if(pen.CreatePen (PS_SOLID,1,pView->m_screenStockShow .buySellAdditional.nColorPoint[ii]))
-							{
-								CPen* pOld = pDC->SelectObject (&pen);
-								pDC->MoveTo (pt[0]);
-								for(int i=0;i<2;i++)
-								{
-									pDC->LineTo (pt[i+1]);
-								}
-								int nOut = -1;
-								if(ii==0)
-									nOut = 1;
-								pt[0].x = pt[0].x -1;
-								pt[0].y = pt[0].y +nOut;
-								pt[1].x = pt[1].x +1;
-								pt[1].y = pt[1].y +nOut;
-								pt[2].x = pt[2].x ;
-								pt[2].y = pt[2].y -nOut;
-								pDC->LineTo (pt[0]);
-								pDC->MoveTo (pt[0]);
-								pDC->LineTo (pt[1]);
-								pDC->LineTo (pt[2]);
-								pDC->LineTo (pt[0]);
-								pDC->SelectObject (pOld);
-							}
-						
+							p[ii].y =pView->m_rtKlineFiguer.rtBlw[0].m_yBottom-18;
 						}
-						break;
+						if(p[ii].y<pView->m_heightCaption )
+							p[ii].y = pView->m_heightCaption;
+
+						int nMove = 2;
+						int nMovey = 8;
+						if(ii==0)
+						{
+							p[0].y += 8;
+							nMovey = -8;
+						}
+						CPoint pt[4]={CPoint(p[ii].x-nMove,p[ii].y),CPoint(p[ii].x+nMove,p[ii].y),
+							CPoint(p[ii].x,p[ii].y+nMovey),CPoint(p[ii].x-nMove,p[ii].y)};
+
+						CPen pen;
+						;
+
+
+						if(pDetail->issuccess ==0 && ii == 0)
+						{
+							CRgn rgn;
+							rgn.CreatePolygonRgn (pt,4,ALTERNATE);
+							CBrush brush;
+							brush.CreateSolidBrush (pView->m_screenStockShow .buySellAdditional.nColorPoint[ii]);
+							//							
+							pDC->FillRgn (&rgn,&brush);
+							//							
+						}
+						if(pen.CreatePen (PS_SOLID,1,pView->m_screenStockShow .buySellAdditional.nColorPoint[ii]))
+						{
+							CPen* pOld = pDC->SelectObject (&pen);
+							pDC->MoveTo (pt[0]);
+							for(int i=0;i<2;i++)
+							{
+								pDC->LineTo (pt[i+1]);
+							}
+							int nOut = -1;
+							if(ii==0)
+								nOut = 1;
+							pt[0].x = pt[0].x -1;
+							pt[0].y = pt[0].y +nOut;
+							pt[1].x = pt[1].x +1;
+							pt[1].y = pt[1].y +nOut;
+							pt[2].x = pt[2].x ;
+							pt[2].y = pt[2].y -nOut;
+							pDC->LineTo (pt[0]);
+							pDC->MoveTo (pt[0]);
+							pDC->LineTo (pt[1]);
+							pDC->LineTo (pt[2]);
+							pDC->LineTo (pt[0]);
+							pDC->SelectObject (pOld);
+						}
+
+					}
+					break;
 				}
 			}
 		}
@@ -5613,7 +5610,7 @@ bool CTaiKlineShowKline::ShowFenshiRulor(CDC *pDC,int wid)
 
 	CRect rt(m_rectDrawLine.right,m_rectDrawLine.top,
 		m_rectDrawLine.right+pView->m_midLen,m_rectDrawLine.bottom);
-   
+
 	if(m_rectDrawLine.bottom-m_rectDrawLine.top<2)
 		return true;
 	//--
@@ -5637,7 +5634,7 @@ bool CTaiKlineShowKline::ShowFenshiRulor(CDC *pDC,int wid)
 	else
 		valuePer=(float)(((int)ceil(valuePer*100))/(float)100);
 
-	
+
 	float cls;
 	if(wid!=1)
 	{
@@ -5685,7 +5682,7 @@ bool CTaiKlineShowKline::ShowFenshiRulor(CDC *pDC,int wid)
 
 		if(y<m_rectDrawLine.bottom-3 && y>=m_rectDrawLine.top)
 		{
-//
+			//
 
 
 			pDC->MoveTo(m_rectDrawLine.right+1,y);
@@ -5699,12 +5696,12 @@ bool CTaiKlineShowKline::ShowFenshiRulor(CDC *pDC,int wid)
 			p2.y=y;
 			if(m_nSon==0&&i==numLine-1)
 			{
-	
+
 				continue;
 			}
 
 			ShowVirtualLine(pDC,p1,p2);
-		
+
 		}
 	}
 
@@ -5815,7 +5812,7 @@ bool CTaiKlineShowKline::ShowFenshiRulor(CDC *pDC,int wid)
 					str.Format("%d",(int)(valuePer*(num_b+i)+m_min_sun[m_nSon]));
 					str+=bck;
 					if(wid==3)
-							pDC->TextOut(m_rectDrawLine.left-m,y-tm.tmHeight/2,str);
+						pDC->TextOut(m_rectDrawLine.left-m,y-tm.tmHeight/2,str);
 					if(y>m_rectDrawLine.bottom-5 || y<m_rectDrawLine.top-1)
 						continue;
 					pDC->TextOut(m_rectDrawLine.right+width-m,y-tm.tmHeight/2,str);
@@ -5869,7 +5866,7 @@ bool CTaiKlineShowKline::ShowFenshiRulor(CDC *pDC,int wid)
 	pDC->SelectObject(pOld);
 	pDC->SelectObject(pOldpen);
 	return true;
-	
+
 
 }
 
@@ -5900,7 +5897,7 @@ bool CTaiKlineShowKline::DrawRulorTextSelf(CDC *pDC, int wid)
 
 		y=YTransfer((float)(pIndex->posX [i] ));
 
-		
+
 
 		if(y<m_rectDrawLine.bottom-3 && y >= m_rectDrawLine.top)
 		{
@@ -5935,7 +5932,7 @@ bool CTaiKlineShowKline::DrawRulorTextSelf(CDC *pDC, int wid)
 			int hgt =(pDC->GetOutputTextExtent(sRight)).cy;
 			CRect r(m_rectDrawLine.right ,0,m_rectDrawLine.right + pView ->m_midLen,hgt +y);
 			pDC->ExtTextOut (m_rectDrawLine.right + pView ->m_midLen -2 ,y - hgt/2 ,ETO_CLIPPED,r,sRight,NULL);
-	
+
 			pDC->SelectObject(pOld);
 		}//end if
 	}
@@ -6057,172 +6054,185 @@ void CTaiKlineShowKline::MoveDragMode(CPoint &pPre, CPoint &pNext)
 }
 void CTaiKlineShowKline::DrawKlineHS(CDC *pDC)
 {
-		int leftf=m_rectDrawLine.left;
-		int topf=m_rectDrawLine.top;
-		int bottomf=m_rectDrawLine.bottom;
-		int rightf=m_rectDrawLine.right;
+	int leftf=m_rectDrawLine.left;
+	int topf=m_rectDrawLine.top;
+	int bottomf=m_rectDrawLine.bottom;
+	int rightf=m_rectDrawLine.right;
 
-	
-		CRgn rgn;
-		if(!pDC->IsPrinting())
+
+	CRgn rgn;
+	if(!pDC->IsPrinting())
+	{
+		if(rgn.CreateRectRgn ( leftf, topf, rightf, bottomf )==ERROR)
+			return ;
+		pDC->SelectClipRgn (&rgn);
+	}
+	int wdth=rightf-leftf;
+	int numberKline=m_klinNumDefault;
+
+	float widthPer =wdth/(float)(numberKline);
+
+	CPen pen_yong(PS_SOLID,1,pDoc->m_colorArray[3]);
+	CPen pen_yin(PS_SOLID,1,pDoc->m_colorArray[4]);
+	CPen pen_ping(PS_SOLID,1,pDoc->m_colorArray[2]);
+	CPen* pOldpen=pDC->SelectObject(&pen_yong);
+
+	for(int i=m_footBegin; i<=m_footEnd; i++ )
+	{
+
+		if( pView->m_pkline[i].close<=0)
 		{
-			if(rgn.CreateRectRgn ( leftf, topf, rightf, bottomf )==ERROR)
-				return ;
-			pDC->SelectClipRgn (&rgn);
+			if(m_axisType==2)
+				break;
+			continue;
 		}
-		int wdth=rightf-leftf;
-		int numberKline=m_klinNumDefault;
-	
-		float widthPer =wdth/(float)(numberKline);
+		int x= leftf +(int)( (i-(m_footBegin)+0.5) * (float)widthPer);
 
-		CPen pen_yong(PS_SOLID,1,pDoc->m_colorArray[3]);
-		CPen pen_yin(PS_SOLID,1,pDoc->m_colorArray[4]);
-		CPen pen_ping(PS_SOLID,1,pDoc->m_colorArray[2]);
-		CPen* pOldpen=pDC->SelectObject(&pen_yong);
+		float close;
+		close = pView->m_pkline[i].open;
+		int closek = (int)(YTransfer(close) );
 
-		for(int i=m_footBegin; i<=m_footEnd; i++ )
+
+		if( pView->m_pkline[i].vol < 0 )
 		{
-
-			if( pView->m_pkline[i].close<=0)
+			pDC->SelectObject (&pen_yin);
+			pDC->Ellipse (x-2,closek-2,x+2,closek+2);
+		}
+		else if( pView->m_pkline[i].vol > 0 )
+		{
+			pDC->SelectObject (&pen_yong);
+			pDC->Ellipse (x-2,closek-2,x+2,closek+2);
+		}
+		else 
+		{
+			if(i>0)
 			{
-				if(m_axisType==2)
-					break;
-				continue;
-			}
-			int x= leftf +(int)( (i-(m_footBegin)+0.5) * (float)widthPer);
-
-			float close;
-			close = pView->m_pkline[i].open;
-			int closek = (int)(YTransfer(close) );
-
-
-			if( pView->m_pkline[i].vol < 0 )
-			{
-				pDC->SelectObject (&pen_yin);
-				pDC->Ellipse (x-2,closek-2,x+2,closek+2);
-			}
-			else if( pView->m_pkline[i].vol > 0 )
-			{
-				pDC->SelectObject (&pen_yong);
-				pDC->Ellipse (x-2,closek-2,x+2,closek+2);
-			}
-			else 
-			{
-				if(i>0)
-				{
-					if(pView->m_pkline[i].close-pView->m_pkline[i-1].close>=0)
-						pDC->SelectObject (&pen_yong);
-					else
-						pDC->SelectObject (&pen_yin);
-				}
-				else if(i==0)
+				if(pView->m_pkline[i].close-pView->m_pkline[i-1].close>=0)
 					pDC->SelectObject (&pen_yong);
-				pDC->Ellipse (x-2,closek-2,x+2,closek+2);
+				else
+					pDC->SelectObject (&pen_yin);
 			}
-
-			if( pView->m_pkline[i].vol < 0 )
-				pView->m_pkline[i].vol = - pView->m_pkline[i].vol ;
+			else if(i==0)
+				pDC->SelectObject (&pen_yong);
+			pDC->Ellipse (x-2,closek-2,x+2,closek+2);
 		}
 
-			
+		if( pView->m_pkline[i].vol < 0 )
+			pView->m_pkline[i].vol = - pView->m_pkline[i].vol ;
+	}
 
-		CFont ft;
-		LOGFONT lgf=pDoc->m_fontstr[0];
-		ft.CreateFontIndirect (&lgf );
-		CFont* pftOld = pDC->SelectObject(&ft);
+
+
+	CFont ft;
+	LOGFONT lgf=pDoc->m_fontstr[0];
+	ft.CreateFontIndirect (&lgf );
+	CFont* pftOld = pDC->SelectObject(&ft);
+	pDC->SetTextAlign( TA_LEFT );
+	pDC->SetTextColor(  pDoc->m_colorArray [1]);
+	pDC->SetBkMode(TRANSPARENT);
+
+	int leftHL=(int)( (m_highFoot-(m_footBegin)+0.5) * (float)widthPer)+m_rectDrawLine.left;
+	int topHL=YTransfer(pView->m_pkline[m_highFoot].high);
+	CString sHL;
+	sHL.Format("%.2f",pView->m_pkline[m_highFoot].high);
+	if(leftHL>(m_rectDrawLine.right+m_rectDrawLine.left)/2)
+		pDC->SetTextAlign( TA_RIGHT );
+	else
 		pDC->SetTextAlign( TA_LEFT );
-		pDC->SetTextColor(  pDoc->m_colorArray [1]);
-		pDC->SetBkMode(TRANSPARENT);
+	pDC->ExtTextOut (leftHL,topHL ,ETO_CLIPPED,m_rectDrawLine,sHL,NULL);
 
-		int leftHL=(int)( (m_highFoot-(m_footBegin)+0.5) * (float)widthPer)+m_rectDrawLine.left;
-		int topHL=YTransfer(pView->m_pkline[m_highFoot].high);
-		CString sHL;
-		sHL.Format("%.2f",pView->m_pkline[m_highFoot].high);
-		if(leftHL>(m_rectDrawLine.right+m_rectDrawLine.left)/2)
-			pDC->SetTextAlign( TA_RIGHT );
-		else
-			pDC->SetTextAlign( TA_LEFT );
-		pDC->ExtTextOut (leftHL,topHL ,ETO_CLIPPED,m_rectDrawLine,sHL,NULL);
+	leftHL=(int)( (m_lowFoot-(m_footBegin)+0.5) * (float)widthPer)+m_rectDrawLine.left;
+	topHL=YTransfer(pView->m_pkline[m_lowFoot].low);
+	sHL.Format("%.2f",pView->m_pkline[m_lowFoot].low);
+	if(leftHL>(m_rectDrawLine.right+m_rectDrawLine.left)/2)
+		pDC->SetTextAlign( TA_RIGHT );
+	else
+		pDC->SetTextAlign( TA_LEFT );
+	topHL-=((pDC->GetOutputTextExtent(sHL)).cy+3);
+	pDC->ExtTextOut (leftHL,topHL ,ETO_CLIPPED,m_rectDrawLine,sHL,NULL);
+	pDC->SelectObject(pftOld);
 
-		leftHL=(int)( (m_lowFoot-(m_footBegin)+0.5) * (float)widthPer)+m_rectDrawLine.left;
-		topHL=YTransfer(pView->m_pkline[m_lowFoot].low);
-		sHL.Format("%.2f",pView->m_pkline[m_lowFoot].low);
-		if(leftHL>(m_rectDrawLine.right+m_rectDrawLine.left)/2)
-			pDC->SetTextAlign( TA_RIGHT );
-		else
-			pDC->SetTextAlign( TA_LEFT );
-		topHL-=((pDC->GetOutputTextExtent(sHL)).cy+3);
-		pDC->ExtTextOut (leftHL,topHL ,ETO_CLIPPED,m_rectDrawLine,sHL,NULL);
-		pDC->SelectObject(pftOld);
-		
-		if(!pDC->IsPrinting())
-		{
-			pDC->SelectClipRgn (NULL);
-			rgn.DeleteObject ();
-		}
-		pDC->SelectObject (pOldpen);
+	if(!pDC->IsPrinting())
+	{
+		pDC->SelectClipRgn (NULL);
+		rgn.DeleteObject ();
+	}
+	pDC->SelectObject (pOldpen);
 
 }
 
 bool CTaiKlineShowKline::DrawBTX(CDC *pDC)
 {
-		int leftf=m_rectDrawLine.left;
-		int topf=m_rectDrawLine.top;
-		int bottomf=m_rectDrawLine.bottom;
-		int rightf=m_rectDrawLine.right;
+	int leftf=m_rectDrawLine.left;
+	int topf=m_rectDrawLine.top;
+	int bottomf=m_rectDrawLine.bottom;
+	int rightf=m_rectDrawLine.right;
 
-		int wdth=rightf-leftf;
-		int numberKline=m_klinNumDefault;
-	
-		float widthPer =wdth/(float)(numberKline);
-		int klineWidthPer = (int)(widthPer*3/10);
+	int wdth=rightf-leftf;
+	int numberKline=m_klinNumDefault;
 
-		CPen pen_yong(PS_SOLID,1,pDoc->m_colorArray[3]);
-		CPen pen_yin(PS_SOLID,1,pDoc->m_colorArray[4]);
-		CPen pen_ping(PS_SOLID,1,pDoc->m_colorArray[2]);
-		CPen* pOldpen=pDC->SelectObject(&pen_yong);
+	float widthPer =wdth/(float)(numberKline);
+	int klineWidthPer = (int)(widthPer*3/10);
 
-		CBrush brush_yong;
-		if (!brush_yong.CreateSolidBrush(pDoc->m_colorArray[3]))
-			ASSERT(FALSE);
-		CBrush* pOldBrush=pDC->SelectObject(&brush_yong);
+	CPen pen_yong(PS_SOLID,1,pDoc->m_colorArray[3]);
+	CPen pen_yin(PS_SOLID,1,pDoc->m_colorArray[4]);
+	CPen pen_ping(PS_SOLID,1,pDoc->m_colorArray[2]);
+	CPen* pOldpen=pDC->SelectObject(&pen_yong);
 
-		float closeYest = pView->m_pkline[0].close;
-		float openYest = pView->m_pkline[0].close;
-		if(m_footBegin>0)
+	CBrush brush_yong;
+	if (!brush_yong.CreateSolidBrush(pDoc->m_colorArray[3]))
+		ASSERT(FALSE);
+	CBrush* pOldBrush=pDC->SelectObject(&brush_yong);
+
+	float closeYest = pView->m_pkline[0].close;
+	float openYest = pView->m_pkline[0].close;
+	if(m_footBegin>0)
+	{
+		closeYest = pView->m_pkline[m_footBegin-1].close;
+		openYest = pView->m_pkline[m_footBegin-1].close;
+	}
+
+	int begin0 = 0;
+	if(m_footBegin == 0)
+		begin0 = 1;
+	for(int i=m_footBegin+begin0; i<=m_footEnd; i++ )
+	{
+
+		if( pView->m_pkline[i].close<=0||pView->m_pkline[i].high <= 0 )
 		{
-			closeYest = pView->m_pkline[m_footBegin-1].close;
-			openYest = pView->m_pkline[m_footBegin-1].close;
+			if(m_axisType==2)
+				break;
+			continue;
 		}
+		int x= leftf +(int)( (i-(m_footBegin)+0.5) * (float)widthPer);
 
-		int begin0 = 0;
-		if(m_footBegin == 0)
-			begin0 = 1;
-		for(int i=m_footBegin+begin0; i<=m_footEnd; i++ )
+		float close;
+		close = pView->m_pkline[i].close;
+		int closek = (int)(YTransfer(close) );
+		int openk = (int)(YTransfer(closeYest) );
+		int openkYest = (int)(YTransfer(openYest) );
+
+		CRect rt;
+		rt.top =closek;
+		rt.bottom =openk;
+		if(klineWidthPer<1)
 		{
-
-			if( pView->m_pkline[i].close<=0||pView->m_pkline[i].high <= 0 )
+			if( openYest <= closeYest )
 			{
-				if(m_axisType==2)
-					break;
-				continue;
-			}
-			int x= leftf +(int)( (i-(m_footBegin)+0.5) * (float)widthPer);
-
-			float close;
-			close = pView->m_pkline[i].close;
-			int closek = (int)(YTransfer(close) );
-			int openk = (int)(YTransfer(closeYest) );
-			int openkYest = (int)(YTransfer(openYest) );
-
-			CRect rt;
-			rt.top =closek;
-			rt.bottom =openk;
-			if(klineWidthPer<1)
-			{
-				if( openYest <= closeYest )
+				if(close>=closeYest)
 				{
-					if(close>=closeYest)
+					rt.top =closek;
+					rt.bottom =openk;
+
+					pDC->SelectObject (&pen_yong);
+					pDC->MoveTo (x ,rt.top);
+					pDC->LineTo (x ,rt.bottom);
+					openYest = closeYest;
+					closeYest = close;
+				}
+				else
+				{
+					if(close>=openYest)
 					{
 						rt.top =closek;
 						rt.bottom =openk;
@@ -6230,89 +6240,106 @@ bool CTaiKlineShowKline::DrawBTX(CDC *pDC)
 						pDC->SelectObject (&pen_yong);
 						pDC->MoveTo (x ,rt.top);
 						pDC->LineTo (x ,rt.bottom);
-						openYest = closeYest;
-						closeYest = close;
+
+						openYest = close;
 					}
 					else
 					{
-						if(close>=openYest)
-						{
-							rt.top =closek;
-							rt.bottom =openk;
+						rt.top =openkYest;
+						rt.bottom =openk;
 
-							pDC->SelectObject (&pen_yong);
-							pDC->MoveTo (x ,rt.top);
-							pDC->LineTo (x ,rt.bottom);
+						pDC->SelectObject (&pen_yong);
+						pDC->MoveTo (x ,rt.top);
+						pDC->LineTo (x ,rt.bottom);
 
-							openYest = close;
-						}
-						else
-						{
-							rt.top =openkYest;
-							rt.bottom =openk;
+						rt.top =openkYest;
+						rt.bottom =closek;
+						pDC->SelectObject (&pen_yin);
+						pDC->MoveTo (x ,rt.top);
+						pDC->LineTo (x ,rt.bottom);
 
-							pDC->SelectObject (&pen_yong);
-							pDC->MoveTo (x ,rt.top);
-							pDC->LineTo (x ,rt.bottom);
-
-							rt.top =openkYest;
-							rt.bottom =closek;
-							pDC->SelectObject (&pen_yin);
-							pDC->MoveTo (x ,rt.top);
-							pDC->LineTo (x ,rt.bottom);
-
-							openYest = closeYest;
-							closeYest = close;
-						}
+						openYest = closeYest;
+						closeYest = close;
 					}
+				}
+			}
+			else
+			{
+				if(close<=closeYest)
+				{
+					pDC->SelectObject (&pen_yin);
+					pDC->MoveTo (x ,openk);
+					pDC->LineTo (x ,closek);
+
+					openYest = closeYest;
+					closeYest = close;
 				}
 				else
 				{
-					if(close<=closeYest)
+					if(close<=openYest)
 					{
 						pDC->SelectObject (&pen_yin);
 						pDC->MoveTo (x ,openk);
 						pDC->LineTo (x ,closek);
 
-						openYest = closeYest;
-						closeYest = close;
+						openYest = close;
 					}
 					else
 					{
-						if(close<=openYest)
-						{
-							pDC->SelectObject (&pen_yin);
-							pDC->MoveTo (x ,openk);
-							pDC->LineTo (x ,closek);
-						
-							openYest = close;
-						}
-						else
-						{
-							pDC->SelectObject (&pen_yin);
-							pDC->MoveTo (x ,openk);
-							pDC->LineTo (x ,openkYest);
+						pDC->SelectObject (&pen_yin);
+						pDC->MoveTo (x ,openk);
+						pDC->LineTo (x ,openkYest);
 
-							rt.top =openkYest;
-							rt.bottom =closek;
-							pDC->SelectObject (&pen_yong);
-							pDC->MoveTo (x ,openkYest);
-							pDC->LineTo (x ,closek);
+						rt.top =openkYest;
+						rt.bottom =closek;
+						pDC->SelectObject (&pen_yong);
+						pDC->MoveTo (x ,openkYest);
+						pDC->LineTo (x ,closek);
 
-							openYest = closeYest;
-							closeYest = close;
-						}
+						openYest = closeYest;
+						closeYest = close;
 					}
 				}
-
-				continue;
 			}
 
-			rt.left=leftf -klineWidthPer +(int)(  (i-(m_footBegin)+0.5) * (float)widthPer);
-			rt.right =leftf +klineWidthPer + (int)( (i-(m_footBegin)+0.5) * (float)widthPer);
-			if( openYest <= closeYest )
+			continue;
+		}
+
+		rt.left=leftf -klineWidthPer +(int)(  (i-(m_footBegin)+0.5) * (float)widthPer);
+		rt.right =leftf +klineWidthPer + (int)( (i-(m_footBegin)+0.5) * (float)widthPer);
+		if( openYest <= closeYest )
+		{
+			if(close>=closeYest)
 			{
-				if(close>=closeYest)
+				if(openk<=closek)
+				{
+					rt.top =openk;
+					rt.bottom =closek;
+				}
+				else
+				{
+					rt.top =closek;
+					rt.bottom =openk;
+				}
+
+
+				pDC->SelectObject (&pen_yong);
+				pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
+				pDC->MoveTo (x-(int)(klineWidthPer),rt.top);
+				pDC->LineTo (x-(int)(klineWidthPer),rt.bottom);
+				pDC->LineTo (x+(int)(klineWidthPer),rt.bottom);
+				pDC->LineTo (x+(int)(klineWidthPer),rt.top);
+				pDC->LineTo (x-(int)(klineWidthPer),rt.top);
+
+				pDC->MoveTo (x-(int)(klineWidthPer),openk);
+				pDC->LineTo (x+(int)(klineWidthPer),openk);
+
+				openYest = closeYest;
+				closeYest = close;
+			}
+			else
+			{
+				if(close>=openYest)
 				{
 					if(openk<=closek)
 					{
@@ -6325,7 +6352,6 @@ bool CTaiKlineShowKline::DrawBTX(CDC *pDC)
 						rt.bottom =openk;
 					}
 
-
 					pDC->SelectObject (&pen_yong);
 					pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
 					pDC->MoveTo (x-(int)(klineWidthPer),rt.top);
@@ -6337,65 +6363,63 @@ bool CTaiKlineShowKline::DrawBTX(CDC *pDC)
 					pDC->MoveTo (x-(int)(klineWidthPer),openk);
 					pDC->LineTo (x+(int)(klineWidthPer),openk);
 
-					openYest = closeYest;
-					closeYest = close;
+					openYest = close;
 				}
 				else
 				{
-					if(close>=openYest)
-					{
-						if(openk<=closek)
-						{
-							rt.top =openk;
-							rt.bottom =closek;
-						}
-						else
-						{
-							rt.top =closek;
-							rt.bottom =openk;
-						}
+					rt.top =openkYest;
+					rt.bottom =openk;
 
-						pDC->SelectObject (&pen_yong);
-						pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
-						pDC->MoveTo (x-(int)(klineWidthPer),rt.top);
-						pDC->LineTo (x-(int)(klineWidthPer),rt.bottom);
-						pDC->LineTo (x+(int)(klineWidthPer),rt.bottom);
-						pDC->LineTo (x+(int)(klineWidthPer),rt.top);
-						pDC->LineTo (x-(int)(klineWidthPer),rt.top);
+					pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
+					pDC->SelectObject (&pen_yong);
+					pDC->MoveTo (x-(int)(klineWidthPer),rt.top);
+					pDC->LineTo (x-(int)(klineWidthPer),rt.bottom);
+					pDC->LineTo (x+(int)(klineWidthPer),rt.bottom);
+					pDC->LineTo (x+(int)(klineWidthPer),rt.top);
+					pDC->LineTo (x-(int)(klineWidthPer),rt.top);
 
-						pDC->MoveTo (x-(int)(klineWidthPer),openk);
-						pDC->LineTo (x+(int)(klineWidthPer),openk);
+					rt.top =openkYest;
+					rt.bottom =closek;
+					rt.right +=1;
 
-						openYest = close;
-					}
-					else
-					{
-						rt.top =openkYest;
-						rt.bottom =openk;
+					pDC->FillSolidRect (rt,pDoc->m_colorArray [4]);
 
-						pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
-						pDC->SelectObject (&pen_yong);
-						pDC->MoveTo (x-(int)(klineWidthPer),rt.top);
-						pDC->LineTo (x-(int)(klineWidthPer),rt.bottom);
-						pDC->LineTo (x+(int)(klineWidthPer),rt.bottom);
-						pDC->LineTo (x+(int)(klineWidthPer),rt.top);
-						pDC->LineTo (x-(int)(klineWidthPer),rt.top);
+					openYest = closeYest;
+					closeYest = close;
 
-						rt.top =openkYest;
-						rt.bottom =closek;
-						rt.right +=1;
-
-						pDC->FillSolidRect (rt,pDoc->m_colorArray [4]);
-
-						openYest = closeYest;
-						closeYest = close;
-						
-					}
 				}
+			}
+		}
+		else
+		{
+			if(close<=closeYest)
+			{
+				if(openk<=closek)
+				{
+					rt.top =openk;
+					rt.bottom =closek;
+				}
+				else
+				{
+					rt.top =closek;
+					rt.bottom =openk;
+				}
+
+				pDC->SelectObject (&pen_yin);
+
+				pDC->MoveTo (x-(int)(klineWidthPer),openk);
+				pDC->LineTo (x+(int)(klineWidthPer),openk);
+
+				rt.right +=1;
+				pDC->FillSolidRect (rt,pDoc->m_colorArray [4]);
+
+
+				openYest = closeYest;
+				closeYest = close;
 			}
 			else
 			{
-				if(close<=closeYest)
+				if(close<=openYest)
 				{
 					if(openk<=closek)
 					{
@@ -6412,10 +6436,227 @@ bool CTaiKlineShowKline::DrawBTX(CDC *pDC)
 
 					pDC->MoveTo (x-(int)(klineWidthPer),openk);
 					pDC->LineTo (x+(int)(klineWidthPer),openk);
-					
+
 					rt.right +=1;
 					pDC->FillSolidRect (rt,pDoc->m_colorArray [4]);
 
+					openYest = close;
+
+				}
+				else
+				{
+					if(openkYest<=openk)
+					{
+						rt.top =openkYest;
+						rt.bottom =openk;
+					}
+					else
+					{
+						rt.top =openk;
+						rt.bottom =openkYest;
+					}
+
+					rt.right +=1;
+					pDC->FillSolidRect (rt,pDoc->m_colorArray [4]);
+
+					if(openkYest<=closek)
+					{
+						rt.top =openkYest;
+						rt.bottom =closek;
+					}
+					else
+					{
+						rt.top =closek;
+						rt.bottom =openkYest;
+					}
+					pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
+					pDC->SelectObject (&pen_yong);
+					pDC->MoveTo (x-(int)(klineWidthPer),rt.top);
+					pDC->LineTo (x-(int)(klineWidthPer),rt.bottom);
+					pDC->LineTo (x+(int)(klineWidthPer),rt.bottom);
+					pDC->LineTo (x+(int)(klineWidthPer),rt.top);
+					pDC->LineTo (x-(int)(klineWidthPer),rt.top);
+
+					openYest = closeYest;
+					closeYest = close;
+
+
+				}
+			}
+		}
+	}
+	pDC->SelectObject (pOldBrush);
+	pDC->SelectObject (pOldpen);
+
+	return true;
+}
+
+void CTaiKlineShowKline::DrawBTXAdded(CDC *pDC, int nKln)
+{
+	int leftf=0;
+	int topf=pView->m_heightCaption;
+	int bottomf=pView->m_rtKlineFiguer.rtBlw[0].m_yBottom;
+	int rightf=pView->m_rtKlineFiguer.rightX;
+
+	if(bottomf-topf<2)
+		return;
+
+
+	int wdth=rightf-leftf;
+	int numberKline=m_klinNumDefault;
+
+	float widthPer =wdth/(float)(numberKline);
+	int klineWidthPer =(int) (widthPer*3/10);
+
+	float close;
+	CPen pen_yong(PS_SOLID,1,pDoc->m_colorArray[7+nKln]);
+	CPen* pOldpen=pDC->SelectObject(&pen_yong);
+
+	int bAdd=0;
+	int eAdd=0;
+	bAdd=CaclBeginFoot(nKln);
+	if(bAdd==-1)
+	{
+		pDC->SelectObject (pOldpen);
+		return;
+	}
+	eAdd=CaclEndFoot(nKln);
+	if(eAdd==-1)
+	{
+		pDC->SelectObject (pOldpen);
+		return;
+	}
+
+	int j=m_footBegin;
+	float moveVla=0;
+	if(m_axisType==1)
+		moveVla=m_pKlineAdd[nKln][bAdd].open-pView->m_pkline[m_footBegin].open;
+	if(m_pKlineAdd[nKln][bAdd].open<=0)
+	{
+		pDC->SelectObject (pOldpen);
+		return;
+	}
+
+
+	float closeYest = pView->m_pkline[0].close;
+	float openYest = pView->m_pkline[0].close;
+	if(bAdd>0)
+	{
+		if(m_axisType==1)
+			closeYest = (m_pKlineAdd[nKln][bAdd-1].close-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
+		else
+			closeYest = m_pKlineAdd[nKln][bAdd-1].close;
+		openYest = closeYest;
+	}
+	int begin0 = 0;
+	if(bAdd == 0)
+		begin0 = 1;
+
+	for(int i=bAdd+begin0; i<=eAdd; i++ )
+	{
+		if( m_pKlineAdd[nKln][i].close<=0||m_pKlineAdd[nKln][i].high <= 0 )
+		{
+			if(m_axisType==2)
+				break;
+			continue;
+		}
+
+		if(m_axisType==1)
+		{
+			close = (m_pKlineAdd[nKln][i].close-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
+		}
+		else
+		{
+			close = m_pKlineAdd[nKln][i].close;
+		}
+
+
+		int closek = (int)(YTransfer(close) );
+
+		int openk = (int)(YTransfer(closeYest) );
+		int openkYest = (int)(YTransfer(openYest) );
+
+
+
+		CRect rt;
+		rt.top =closek;
+		rt.bottom =openk;
+
+
+		int nRate = 1;
+		if(pView->m_nKlineKind2 >=5)
+			nRate = 60*60*24;
+		if(m_pKlineAdd[nKln][i].day/nRate<pView->m_pkline[j].day/nRate)
+			continue;
+		if(m_pKlineAdd[nKln][i].day/nRate>pView->m_pkline[j].day/nRate)
+		{
+			while(m_pKlineAdd[nKln][i].day/nRate>pView->m_pkline[j].day/nRate&&j<m_footEnd)
+			{
+				j++;
+			}
+			if((m_pKlineAdd[nKln][i].day/nRate<pView->m_pkline[j].day/nRate))
+				continue;
+		}
+
+
+
+		int x= leftf +(int)( (j-m_footBegin+0.5) * (float)widthPer);
+		rt.top =closek;
+		rt.bottom =openk;
+		if(klineWidthPer<1)
+		{
+			if( openYest <= closeYest )
+			{
+				if(close>=closeYest)
+				{
+					rt.top =closek;
+					rt.bottom =openk;
+
+
+					pDC->MoveTo (x ,rt.top);
+					pDC->LineTo (x ,rt.bottom);
+					openYest = closeYest;
+					closeYest = close;
+				}
+				else
+				{
+					if(close>=openYest)
+					{
+						rt.top =closek;
+						rt.bottom =openk;
+
+						pDC->MoveTo (x ,rt.top);
+						pDC->LineTo (x ,rt.bottom);
+
+						openYest = close;
+					}
+					else
+					{
+						rt.top =openkYest;
+						rt.bottom =openk;
+
+
+						pDC->MoveTo (x ,rt.top);
+						pDC->LineTo (x ,rt.bottom);
+
+						rt.top =openkYest;
+						rt.bottom =closek;
+
+						pDC->MoveTo (x ,rt.top);
+						pDC->LineTo (x ,rt.bottom);
+
+						openYest = closeYest;
+						closeYest = close;
+					}
+				}
+			}
+			else
+			{
+				if(close<=closeYest)
+				{
+
+					pDC->MoveTo (x ,openk);
+					pDC->LineTo (x ,closek);
 
 					openYest = closeYest;
 					closeYest = close;
@@ -6424,282 +6665,68 @@ bool CTaiKlineShowKline::DrawBTX(CDC *pDC)
 				{
 					if(close<=openYest)
 					{
-						if(openk<=closek)
-						{
-							rt.top =openk;
-							rt.bottom =closek;
-						}
-						else
-						{
-							rt.top =closek;
-							rt.bottom =openk;
-						}
-
-						pDC->SelectObject (&pen_yin);
-
-						pDC->MoveTo (x-(int)(klineWidthPer),openk);
-						pDC->LineTo (x+(int)(klineWidthPer),openk);
-
-						rt.right +=1;
-						pDC->FillSolidRect (rt,pDoc->m_colorArray [4]);
+						//							
+						pDC->MoveTo (x ,openk);
+						pDC->LineTo (x ,closek);
 
 						openYest = close;
-
 					}
 					else
 					{
-						if(openkYest<=openk)
-						{
-							rt.top =openkYest;
-							rt.bottom =openk;
-						}
-						else
-						{
-							rt.top =openk;
-							rt.bottom =openkYest;
-						}
-
-						rt.right +=1;
-						pDC->FillSolidRect (rt,pDoc->m_colorArray [4]);
-
-						if(openkYest<=closek)
-						{
-							rt.top =openkYest;
-							rt.bottom =closek;
-						}
-						else
-						{
-							rt.top =closek;
-							rt.bottom =openkYest;
-						}
-						pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
-						pDC->SelectObject (&pen_yong);
-						pDC->MoveTo (x-(int)(klineWidthPer),rt.top);
-						pDC->LineTo (x-(int)(klineWidthPer),rt.bottom);
-						pDC->LineTo (x+(int)(klineWidthPer),rt.bottom);
-						pDC->LineTo (x+(int)(klineWidthPer),rt.top);
-						pDC->LineTo (x-(int)(klineWidthPer),rt.top);
-
-						openYest = closeYest;
-						closeYest = close;
-
-
-					}
-				}
-			}
-		}
-		pDC->SelectObject (pOldBrush);
-		pDC->SelectObject (pOldpen);
-
-		return true;
-}
-
-void CTaiKlineShowKline::DrawBTXAdded(CDC *pDC, int nKln)
-{
-		int leftf=0;
-		int topf=pView->m_heightCaption;
-		int bottomf=pView->m_rtKlineFiguer.rtBlw[0].m_yBottom;
-		int rightf=pView->m_rtKlineFiguer.rightX;
-
-		if(bottomf-topf<2)
-			return;
-
-
-		int wdth=rightf-leftf;
-		int numberKline=m_klinNumDefault;
-	
-		float widthPer =wdth/(float)(numberKline);
-		int klineWidthPer =(int) (widthPer*3/10);
-
-		float close;
-		CPen pen_yong(PS_SOLID,1,pDoc->m_colorArray[7+nKln]);
-		CPen* pOldpen=pDC->SelectObject(&pen_yong);
-
-		int bAdd=0;
-		int eAdd=0;
-		bAdd=CaclBeginFoot(nKln);
-		if(bAdd==-1)
-		{
-			pDC->SelectObject (pOldpen);
-			return;
-		}
-		eAdd=CaclEndFoot(nKln);
-		if(eAdd==-1)
-		{
-			pDC->SelectObject (pOldpen);
-			return;
-		}
-
-		int j=m_footBegin;
-		float moveVla=0;
-		if(m_axisType==1)
-			moveVla=m_pKlineAdd[nKln][bAdd].open-pView->m_pkline[m_footBegin].open;
-		if(m_pKlineAdd[nKln][bAdd].open<=0)
-		{
-			pDC->SelectObject (pOldpen);
-			return;
-		}
-
-	
-		float closeYest = pView->m_pkline[0].close;
-		float openYest = pView->m_pkline[0].close;
-		if(bAdd>0)
-		{
-			if(m_axisType==1)
-				closeYest = (m_pKlineAdd[nKln][bAdd-1].close-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
-			else
-				closeYest = m_pKlineAdd[nKln][bAdd-1].close;
-			openYest = closeYest;
-		}
-		int begin0 = 0;
-		if(bAdd == 0)
-			begin0 = 1;
-
-		for(int i=bAdd+begin0; i<=eAdd; i++ )
-		{
-			if( m_pKlineAdd[nKln][i].close<=0||m_pKlineAdd[nKln][i].high <= 0 )
-			{
-				if(m_axisType==2)
-					break;
-				continue;
-			}
-
-			if(m_axisType==1)
-			{
-				close = (m_pKlineAdd[nKln][i].close-m_pKlineAdd[nKln][bAdd].open)*pView->m_pkline[m_footBegin].open/m_pKlineAdd[nKln][bAdd].open+pView->m_pkline[m_footBegin].open;
-			}
-			else
-			{
-				close = m_pKlineAdd[nKln][i].close;
-			}
-
-
-			int closek = (int)(YTransfer(close) );
-
-			int openk = (int)(YTransfer(closeYest) );
-			int openkYest = (int)(YTransfer(openYest) );
-
-
-
-			CRect rt;
-			rt.top =closek;
-			rt.bottom =openk;
-
-	
-			int nRate = 1;
-			if(pView->m_nKlineKind2 >=5)
-				nRate = 60*60*24;
-			if(m_pKlineAdd[nKln][i].day/nRate<pView->m_pkline[j].day/nRate)
-				continue;
-			if(m_pKlineAdd[nKln][i].day/nRate>pView->m_pkline[j].day/nRate)
-			{
-				while(m_pKlineAdd[nKln][i].day/nRate>pView->m_pkline[j].day/nRate&&j<m_footEnd)
-				{
-					j++;
-				}
-				if((m_pKlineAdd[nKln][i].day/nRate<pView->m_pkline[j].day/nRate))
-					continue;
-			}
-
-		
-
-			int x= leftf +(int)( (j-m_footBegin+0.5) * (float)widthPer);
-			rt.top =closek;
-			rt.bottom =openk;
-			if(klineWidthPer<1)
-			{
-				if( openYest <= closeYest )
-				{
-					if(close>=closeYest)
-					{
-						rt.top =closek;
-						rt.bottom =openk;
-
-
-						pDC->MoveTo (x ,rt.top);
-						pDC->LineTo (x ,rt.bottom);
-						openYest = closeYest;
-						closeYest = close;
-					}
-					else
-					{
-						if(close>=openYest)
-						{
-							rt.top =closek;
-							rt.bottom =openk;
-
-							pDC->MoveTo (x ,rt.top);
-							pDC->LineTo (x ,rt.bottom);
-
-							openYest = close;
-						}
-						else
-						{
-							rt.top =openkYest;
-							rt.bottom =openk;
-
-
-							pDC->MoveTo (x ,rt.top);
-							pDC->LineTo (x ,rt.bottom);
-
-							rt.top =openkYest;
-							rt.bottom =closek;
-
-							pDC->MoveTo (x ,rt.top);
-							pDC->LineTo (x ,rt.bottom);
-
-							openYest = closeYest;
-							closeYest = close;
-						}
-					}
-				}
-				else
-				{
-					if(close<=closeYest)
-					{
-
+						//						
 						pDC->MoveTo (x ,openk);
+						pDC->LineTo (x ,openkYest);
+
+						rt.top =openkYest;
+						rt.bottom =closek;
+						//					
+						pDC->MoveTo (x ,openkYest);
 						pDC->LineTo (x ,closek);
 
 						openYest = closeYest;
 						closeYest = close;
 					}
-					else
-					{
-						if(close<=openYest)
-						{
-//							
-							pDC->MoveTo (x ,openk);
-							pDC->LineTo (x ,closek);
-						
-							openYest = close;
-						}
-						else
-						{
-//						
-							pDC->MoveTo (x ,openk);
-							pDC->LineTo (x ,openkYest);
-
-							rt.top =openkYest;
-							rt.bottom =closek;
-//					
-							pDC->MoveTo (x ,openkYest);
-							pDC->LineTo (x ,closek);
-
-							openYest = closeYest;
-							closeYest = close;
-						}
-					}
 				}
-
-				continue;
 			}
 
-			rt.left=leftf -klineWidthPer +(int)(  (j-(m_footBegin)+0.5) * (float)widthPer);
-			rt.right =leftf +klineWidthPer + (int)( (j-(m_footBegin)+0.5) * (float)widthPer);
-			if( openYest <= closeYest )
+			continue;
+		}
+
+		rt.left=leftf -klineWidthPer +(int)(  (j-(m_footBegin)+0.5) * (float)widthPer);
+		rt.right =leftf +klineWidthPer + (int)( (j-(m_footBegin)+0.5) * (float)widthPer);
+		if( openYest <= closeYest )
+		{
+			if(close>=closeYest)
 			{
-				if(close>=closeYest)
+				if(openk<=closek)
+				{
+					rt.top =openk;
+					rt.bottom =closek;
+				}
+				else
+				{
+					rt.top =closek;
+					rt.bottom =openk;
+				}
+
+
+				pDC->SelectObject (&pen_yong);
+				pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
+				pDC->MoveTo (x-(int)(klineWidthPer),rt.top);
+				pDC->LineTo (x-(int)(klineWidthPer),rt.bottom);
+				pDC->LineTo (x+(int)(klineWidthPer),rt.bottom);
+				pDC->LineTo (x+(int)(klineWidthPer),rt.top);
+				pDC->LineTo (x-(int)(klineWidthPer),rt.top);
+
+				pDC->MoveTo (x-(int)(klineWidthPer),openk);
+				pDC->LineTo (x+(int)(klineWidthPer),openk);
+
+				openYest = closeYest;
+				closeYest = close;
+			}
+			else
+			{
+				if(close>=openYest)
 				{
 					if(openk<=closek)
 					{
@@ -6711,7 +6738,6 @@ void CTaiKlineShowKline::DrawBTXAdded(CDC *pDC, int nKln)
 						rt.top =closek;
 						rt.bottom =openk;
 					}
-
 
 					pDC->SelectObject (&pen_yong);
 					pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
@@ -6724,65 +6750,63 @@ void CTaiKlineShowKline::DrawBTXAdded(CDC *pDC, int nKln)
 					pDC->MoveTo (x-(int)(klineWidthPer),openk);
 					pDC->LineTo (x+(int)(klineWidthPer),openk);
 
-					openYest = closeYest;
-					closeYest = close;
+					openYest = close;
 				}
 				else
 				{
-					if(close>=openYest)
-					{
-						if(openk<=closek)
-						{
-							rt.top =openk;
-							rt.bottom =closek;
-						}
-						else
-						{
-							rt.top =closek;
-							rt.bottom =openk;
-						}
+					rt.top =openkYest;
+					rt.bottom =openk;
 
-						pDC->SelectObject (&pen_yong);
-						pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
-						pDC->MoveTo (x-(int)(klineWidthPer),rt.top);
-						pDC->LineTo (x-(int)(klineWidthPer),rt.bottom);
-						pDC->LineTo (x+(int)(klineWidthPer),rt.bottom);
-						pDC->LineTo (x+(int)(klineWidthPer),rt.top);
-						pDC->LineTo (x-(int)(klineWidthPer),rt.top);
+					pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
+					pDC->SelectObject (&pen_yong);
+					pDC->MoveTo (x-(int)(klineWidthPer),rt.top);
+					pDC->LineTo (x-(int)(klineWidthPer),rt.bottom);
+					pDC->LineTo (x+(int)(klineWidthPer),rt.bottom);
+					pDC->LineTo (x+(int)(klineWidthPer),rt.top);
+					pDC->LineTo (x-(int)(klineWidthPer),rt.top);
 
-						pDC->MoveTo (x-(int)(klineWidthPer),openk);
-						pDC->LineTo (x+(int)(klineWidthPer),openk);
+					rt.top =openkYest;
+					rt.bottom =closek;
+					rt.right +=1;
 
-						openYest = close;
-					}
-					else
-					{
-						rt.top =openkYest;
-						rt.bottom =openk;
+					pDC->FillSolidRect (rt,pDoc->m_colorArray[7+nKln]);
 
-						pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
-						pDC->SelectObject (&pen_yong);
-						pDC->MoveTo (x-(int)(klineWidthPer),rt.top);
-						pDC->LineTo (x-(int)(klineWidthPer),rt.bottom);
-						pDC->LineTo (x+(int)(klineWidthPer),rt.bottom);
-						pDC->LineTo (x+(int)(klineWidthPer),rt.top);
-						pDC->LineTo (x-(int)(klineWidthPer),rt.top);
+					openYest = closeYest;
+					closeYest = close;
 
-						rt.top =openkYest;
-						rt.bottom =closek;
-						rt.right +=1;
-
-						pDC->FillSolidRect (rt,pDoc->m_colorArray[7+nKln]);
-
-						openYest = closeYest;
-						closeYest = close;
-					
-					}
 				}
+			}
+		}
+		else
+		{
+			if(close<=closeYest)
+			{
+				if(openk<=closek)
+				{
+					rt.top =openk;
+					rt.bottom =closek;
+				}
+				else
+				{
+					rt.top =closek;
+					rt.bottom =openk;
+				}
+
+				pDC->SelectObject (&pen_yong);
+
+				pDC->MoveTo (x-(int)(klineWidthPer),openk);
+				pDC->LineTo (x+(int)(klineWidthPer),openk);
+
+				rt.right +=1;
+				pDC->FillSolidRect (rt,pDoc->m_colorArray[7+nKln]);
+
+
+				openYest = closeYest;
+				closeYest = close;
 			}
 			else
 			{
-				if(close<=closeYest)
+				if(close<=openYest)
 				{
 					if(openk<=closek)
 					{
@@ -6799,84 +6823,57 @@ void CTaiKlineShowKline::DrawBTXAdded(CDC *pDC, int nKln)
 
 					pDC->MoveTo (x-(int)(klineWidthPer),openk);
 					pDC->LineTo (x+(int)(klineWidthPer),openk);
-					
+
 					rt.right +=1;
 					pDC->FillSolidRect (rt,pDoc->m_colorArray[7+nKln]);
 
+					openYest = close;
+					//			
+				}
+				else
+				{
+					if(openkYest<=openk)
+					{
+						rt.top =openkYest;
+						rt.bottom =openk;
+					}
+					else
+					{
+						rt.top =openk;
+						rt.bottom =openkYest;
+					}
+
+					rt.right +=1;
+					pDC->FillSolidRect (rt,pDoc->m_colorArray[7+nKln]);
+
+					if(openkYest<=closek)
+					{
+						rt.top =openkYest;
+						rt.bottom =closek;
+					}
+					else
+					{
+						rt.top =closek;
+						rt.bottom =openkYest;
+					}
+					pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
+					pDC->SelectObject (&pen_yong);
+					pDC->MoveTo (x-(int)(klineWidthPer),rt.top);
+					pDC->LineTo (x-(int)(klineWidthPer),rt.bottom);
+					pDC->LineTo (x+(int)(klineWidthPer),rt.bottom);
+					pDC->LineTo (x+(int)(klineWidthPer),rt.top);
+					pDC->LineTo (x-(int)(klineWidthPer),rt.top);
 
 					openYest = closeYest;
 					closeYest = close;
 				}
-				else
-				{
-					if(close<=openYest)
-					{
-						if(openk<=closek)
-						{
-							rt.top =openk;
-							rt.bottom =closek;
-						}
-						else
-						{
-							rt.top =closek;
-							rt.bottom =openk;
-						}
-
-						pDC->SelectObject (&pen_yong);
-
-						pDC->MoveTo (x-(int)(klineWidthPer),openk);
-						pDC->LineTo (x+(int)(klineWidthPer),openk);
-
-						rt.right +=1;
-						pDC->FillSolidRect (rt,pDoc->m_colorArray[7+nKln]);
-
-						openYest = close;
-	//			
-					}
-					else
-					{
-						if(openkYest<=openk)
-						{
-							rt.top =openkYest;
-							rt.bottom =openk;
-						}
-						else
-						{
-							rt.top =openk;
-							rt.bottom =openkYest;
-						}
-
-						rt.right +=1;
-						pDC->FillSolidRect (rt,pDoc->m_colorArray[7+nKln]);
-
-						if(openkYest<=closek)
-						{
-							rt.top =openkYest;
-							rt.bottom =closek;
-						}
-						else
-						{
-							rt.top =closek;
-							rt.bottom =openkYest;
-						}
-						pDC->FillSolidRect (rt,pDoc->m_colorArray [0]);
-						pDC->SelectObject (&pen_yong);
-						pDC->MoveTo (x-(int)(klineWidthPer),rt.top);
-						pDC->LineTo (x-(int)(klineWidthPer),rt.bottom);
-						pDC->LineTo (x+(int)(klineWidthPer),rt.bottom);
-						pDC->LineTo (x+(int)(klineWidthPer),rt.top);
-						pDC->LineTo (x-(int)(klineWidthPer),rt.top);
-
-						openYest = closeYest;
-						closeYest = close;
-					}
-				}
 			}
-			j++;
-
 		}
+		j++;
 
-		pDC->SelectObject (pOldpen);
+	}
+
+	pDC->SelectObject (pOldpen);
 }
 
 bool CTaiKlineShowKline::ValidDoKline(bool bMakeUp)
@@ -7017,57 +7014,57 @@ void CTaiKlineShowKline::DrawTextIconLine(CDC *pDC,int i)
 				&& m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j].nFoot<=this->m_footEnd )
 			{
 
-			x = (int)(m_rectDrawLine.left+(cellWidth+1)/2+(m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j].nFoot-m_footBegin)*cellWidth);
-			float y9 = (float)m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j].fVal;
-			float ff = YTransfer(y9);
-			pDC->MoveTo(x,ff);
-			if(!b)
-			{
-				pDC->Ellipse (x-1,ff-1,x+1,ff+1);
-			}
-
-			if(b == true)
-			{
-				int x2= (int)(m_rectDrawLine.left+(cellWidth+1)/2
-					+(m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j+1].nFoot-m_footBegin)*cellWidth);
-				float y2 = (float)m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j+1].fVal;
-
-				if(y2 == y9)
+				x = (int)(m_rectDrawLine.left+(cellWidth+1)/2+(m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j].nFoot-m_footBegin)*cellWidth);
+				float y9 = (float)m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j].fVal;
+				float ff = YTransfer(y9);
+				pDC->MoveTo(x,ff);
+				if(!b)
 				{
-					x = m_rectDrawLine.right;
-					y9 = y2;
+					pDC->Ellipse (x-1,ff-1,x+1,ff+1);
 				}
-				else
+
+				if(b == true)
 				{
-					float f2 = (x2-x)/(y2-y9);
-					if(y2>y9)
+					int x2= (int)(m_rectDrawLine.left+(cellWidth+1)/2
+						+(m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j+1].nFoot-m_footBegin)*cellWidth);
+					float y2 = (float)m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j+1].fVal;
+
+					if(y2 == y9)
 					{
-						x = f2*(m_max_sun[m_nSon]-y9)+x;
-						y9 = m_max_sun[m_nSon];
+						x = m_rectDrawLine.right;
+						y9 = y2;
 					}
 					else
 					{
-						x = f2*(m_min_sun[m_nSon]-y9)+x;
-						y9 = m_min_sun[m_nSon];
+						float f2 = (x2-x)/(y2-y9);
+						if(y2>y9)
+						{
+							x = f2*(m_max_sun[m_nSon]-y9)+x;
+							y9 = m_max_sun[m_nSon];
+						}
+						else
+						{
+							x = f2*(m_min_sun[m_nSon]-y9)+x;
+							y9 = m_min_sun[m_nSon];
+						}
 					}
+
+				}
+				else
+				{
+					x= (int)(m_rectDrawLine.left+(cellWidth+1)/2
+						+(m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j+1].nFoot-m_footBegin)*cellWidth);
+					y9 = (float)m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j+1].fVal;
+				}
+				ff = YTransfer(y9);
+				pDC->LineTo(x,	ff);
+				if(!b)
+				{
+					pDC->Ellipse (x-1,ff-1,x+1,ff+1);
 				}
 
 			}
-			else
-			{
-				x= (int)(m_rectDrawLine.left+(cellWidth+1)/2
-					+(m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j+1].nFoot-m_footBegin)*cellWidth);
-				y9 = (float)m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j+1].fVal;
-			}
-			ff = YTransfer(y9);
-			pDC->LineTo(x,	ff);
-			if(!b)
-			{
-				pDC->Ellipse (x-1,ff-1,x+1,ff+1);
-			}
 
-			}
-		
 		}
 	}
 
@@ -7105,7 +7102,7 @@ void CTaiKlineShowKline::DrawTextIconLine(CDC *pDC,int i)
 				pDC->LineTo(x,	ff);
 
 			}
-		
+
 		}
 	}
 
@@ -7128,23 +7125,23 @@ void CTaiKlineShowKline::DrawTextIconLine(CDC *pDC,int i)
 		m_bitmap.DeleteObject();
 
 		{
-		int n = m_dataFormular[m_nSon].line [i].m_arrBE.looseArr.GetSize();
-		for(int j = 0;j<n;j++)
-		{
+			int n = m_dataFormular[m_nSon].line [i].m_arrBE.looseArr.GetSize();
+			for(int j = 0;j<n;j++)
+			{
 
-			int x= (int)(m_rectDrawLine.left+(cellWidth+1)/2
-				+(m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j].nFoot-m_footBegin)*cellWidth);
-			float y9 = (float)m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j].fVal;
-		
- 
-		
-			POINT p;
-			p.x = x-7;
-			p.y = 	YTransfer(y9);
+				int x= (int)(m_rectDrawLine.left+(cellWidth+1)/2
+					+(m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j].nFoot-m_footBegin)*cellWidth);
+				float y9 = (float)m_dataFormular[m_nSon].line [i].m_arrBE.looseArr[j].fVal;
 
-			imagelist.Draw (pDC ,0,p,ILD_TRANSPARENT);
 
-		}
+
+				POINT p;
+				p.x = x-7;
+				p.y = 	YTransfer(y9);
+
+				imagelist.Draw (pDC ,0,p,ILD_TRANSPARENT);
+
+			}
 		}
 	}
 
@@ -7167,7 +7164,7 @@ void CTaiKlineShowKline::DrawTextIconLine(CDC *pDC,int i)
 			CFont* pOld=pDC->SelectObject(&ft);
 			pDC->TextOut (x+2,YTransfer(y9)-nh/2,m_dataFormular[m_nSon].line [i].m_arrBE.s);
 			pDC->SelectObject(pOld);
-		
+
 		}
 	}
 
@@ -7187,7 +7184,7 @@ void CTaiKlineShowKline::DrawTextIconLine(CDC *pDC,int i)
 		}
 
 
-	
+
 
 		for(int j = 0;j<n;j++)
 		{
@@ -7238,7 +7235,7 @@ void CTaiKlineShowKline::DrawTextIconLine(CDC *pDC,int i)
 				pDC->LineTo (rt.left,rt.bottom-1);//
 				pDC->LineTo (rt.left,rt.top);//
 			}
-		
+
 		}
 	}
 

@@ -251,12 +251,12 @@ BOOL CTaiChuQuanInDlg::InstallPowerData(CString FilePath)
     Split pSplit[80];
     int nFlag=0;
 	InFile.Read(&nFlag,4);
-    if(nFlag!=FILEID22)
-	{
-		AfxMessageBox("不是"+g_strCompanyName+"除权数据格式!");
-		InFile.Close();
-		return FALSE;
-	}
+ //   if(nFlag!=FILEID22)
+	//{
+	//	AfxMessageBox("不是"+g_strCompanyName+"除权数据格式!");
+	//	InFile.Close();
+	//	return FALSE;
+	//}
 	::ZeroMemory(pSplit,80*sizeof(Split));
 	InFile.Seek(8,CFile::begin);
 	BOOL bFirstTime=TRUE;

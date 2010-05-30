@@ -25,7 +25,7 @@ class CTaiKlineDlgNeuralLearn;
 
 class CDialogMYXMZ;
 
-class CMainFrame : public CMDIFrameWnd
+class CMainFrame : public CXTPMDIFrameWnd
 {
 	DECLARE_DYNCREATE(CMainFrame)
 public:
@@ -45,11 +45,6 @@ private:
 #ifdef WIDE_NET_VERSION
 	BOOL m_bLogonInterface;
 #endif
-
-public:
-	CTaiKlineMemFile m_memFile;
-
-	int InformationLoop;
 
 
 public:
@@ -96,22 +91,14 @@ public:
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 public:
-	bool CanUseIndicatorProtected();
-	BOOL IsSuccRegistered();
 	void ViewGgxx(int  nID = -1);
 	void RefreshFormu();
 	CString GetCurrentSelectStockCode( WORD & wMarket );
 	CTaiScreen* ShowTjxg();
-	BOOL m_fDLL;
-	void start_stockdll();
-	int nHeight;
-	int nY;
-	int nX;
 
 
 	void TestHQ();
 	static void ActiveVwbase(CTaiShanKlineShowView* pView);
-	static int StaticDrawKlineWindow(WPARAM wParam, LPARAM lParam);
 	CStatusBar_sjl  m_wndStatusBar;
 	bool bAlarm;
 	void DisplayBargain(
@@ -137,16 +124,6 @@ protected:
 	CStringArray m_symbol_array;
 	IndexDataInfo* pIndex_save;
 	int *nDays;
-	int nIndexNum;
-	int nStockNum;
-
-
-protected:  
-
-
-	BOOL	m_bRunFlag;			
-	CRect m_RiseFallRect_sz;
-	CRect m_RiseFallRect_sh;
 
 
 protected:
@@ -192,7 +169,6 @@ protected:
 	afx_msg void OnDownload20();
 	afx_msg void OnCloseReceiver();
 	afx_msg void OnUpdateCloseReceiver(CCmdUI* pCmdUI);
-	afx_msg void OnEnterInternet();
 	afx_msg void OnTjxgMmTest();
 	afx_msg void OnToolNnetTrain();
 	afx_msg void OnToolAutoSubmit();
@@ -204,7 +180,6 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg void OnSortIndex();
 	afx_msg void OnXgnExtData();
-	afx_msg void OnClearRealdata();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnNcLButtonDown(UINT nHitTest, CPoint point);
 	afx_msg int OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message);
@@ -225,13 +200,16 @@ protected:
 public:
 	void ShowMYXMZ();
 
-
+protected:
+	//CTabControl m_wndTabs;
+	CXTPTabClientWnd m_MTIClientWnd;
 
 public:
 	void HqStock_Init();
 	void HqStock_Quit();
 
 protected:
+	afx_msg void OnClearRealdata();
 	afx_msg long OnStkDataOK(UINT wFileType, LONG lPara);
 	DECLARE_MESSAGE_MAP()
 };

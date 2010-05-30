@@ -26,10 +26,8 @@ class CTaiKlineMin1  :public	CTaiKlineShowKline
 {
 	DECLARE_DYNCREATE(CTaiKlineMin1)
 public:
-	int TransferX(int x);
 	static void GetFenJia(int first,CBuySellList &buySellList,CFJList&	fenjiaUp,CFJList&	fenjiaDown,int nFlag = 0);
 	void SetRectDraw(int nFigu);
-	CReportData m_dt;	
 	CBuySellList m_hsMin1 ;
 	TRADE_DETAIL_H_PER	m_hsMin[240];
 	bool 	m_bHist;
@@ -46,22 +44,15 @@ public:
 	float m_min_dapan[2][2];
 	float* m_lineDapan[2][3];
 	float m_close_Dapan[2];
-	float m_close;//
 	int m_pFlg[5];//
 	int		m_isDapan;
-	CReportData* m_pReportData;	//
-	CReportData* m_pS0;	//
-	CReportData* m_pS1;	//
 	CString m_nameSon[5];//
 	bool m_bInvertRect;		
 
 
 	void ShowCNP(CDC *pDC,int nFlags=0);
 
-	void DrawDapanOther(CDC* pDC);
-	
 
-	void CaclMaxAdded();
 
 
 	void AddFenshiAdded(CString symbol, int nStock,int stkKind);
@@ -84,23 +75,38 @@ public:
 	void DrawDapan(CDC *pDC,int nMarket=0,int flagFrame=0);
 	int DrawHs(CDC *pDC,int nBegin, BYTE flag);
 
-	
+
 	void InitHs(bool bRemoveAll=true,bool bSkip = true);
 
 	void DrawCapt(CDC* pDC);
 	void DrawSon(CDC* pDC);
-	void InitMinuteLine();
-	
 
-	void DrawMin1Figuer(CDC* pDC);
-	CTaiKlineMin1();
-	CTaiKlineMin1(CTaiShanDoc* pDocI,CTaiShanKlineShowView* pViewI	);
+
 
 	float TongJi(CTaiKlineDialogShiDuanTJ* pTJ,int nFlags=0);
-	
 
+public:
+	CTaiKlineMin1();
+	CTaiKlineMin1(CTaiShanDoc* pDoci, CTaiShanKlineShowView* pViewi);
 	virtual ~CTaiKlineMin1();
 
+public:
+	CReportData		m_dt;
+	CReportData*	m_pReportData;
+	CReportData*	m_pS0;
+	CReportData*	m_pS1;
+
+	float m_close;
+
+protected:
+	void CaclMaxAdded();
+
+public:
+	void InitMinuteLine();
+	void DrawMin1Figuer(CDC* pDC);
+
+public:
+	int TransferX(int x);
 };
 
 #endif // !defined(AFX_LDOFENSHI_H__20183F81_BDC6_11D2_91D9_0080C8E1242B__INCLUDED_)

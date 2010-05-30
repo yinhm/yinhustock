@@ -1,5 +1,4 @@
 
-// by ÓáÃ÷Â¼
 #if !defined(AFX_CHILDFRM_H__61A31CEF_9707_11D1_ACAB_0000E823DBFD__INCLUDED_)
 #define AFX_CHILDFRM_H__61A31CEF_9707_11D1_ACAB_0000E823DBFD__INCLUDED_
 
@@ -22,32 +21,24 @@ public:
 	CTaiTestSplitter   *m_SplitterWnd;
 	CTaiShanDoc* m_CurrentDoc;
 
-public:
-    int ss;
-
-public:
-
 
 
 	//{{AFX_VIRTUAL(CChildFrame)
-	public:
-	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
-	protected:
+public:
 	virtual BOOL OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext* pContext);
+	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	//}}AFX_VIRTUAL
 
 
 public:
 	virtual ~CChildFrame();
-    virtual void OnUpdateFrameTitle(BOOL nAddToTitle);
-	void AddCuoHeView();
-    void DeleteCuoHeView();
 
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
 #endif
 
+	virtual void OnUpdateFrameTitle(BOOL nAddToTitle);
 
 protected:
 	//{{AFX_MSG(CChildFrame)

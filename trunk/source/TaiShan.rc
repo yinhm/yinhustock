@@ -4288,6 +4288,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "数据下载(&S)",                    ID_DOWNLOAD_20
         MENUITEM "关闭行情接收系统(&E)",                ID_CLOSE_RECEIVER
+        MENUITEM "清除今日分时行情",                    ID_CLEAR_REALDATA
     END
     POPUP "窗口(&W)"
     BEGIN

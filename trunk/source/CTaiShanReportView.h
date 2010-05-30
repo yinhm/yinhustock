@@ -10,8 +10,8 @@
 
 
 struct TitleMenuDef {
-   UINT  m_nString;              
-   UINT     m_nID;                 
+	UINT  m_nString;              
+	UINT     m_nID;                 
 };
 class CPageWnd;
 class CGridCtrl;
@@ -29,19 +29,19 @@ protected:
 
 public:
 	CTaiShanDoc* GetDocument();
-    CChildFrame *m_ChildFrame;
+	CChildFrame *m_ChildFrame;
 
 public:
 
 
-	
+
 	//{{AFX_VIRTUAL(CTaiShanReportView)
-	public:
+public:
 	virtual void OnDraw(CDC* pDC);  // overridden to draw this view
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual void OnInitialUpdate();
-	protected:
+protected:
 	virtual BOOL OnPreparePrinting(CPrintInfo* pInfo);
 	virtual void OnBeginPrinting(CDC* pDC, CPrintInfo* pInfo);
 	virtual void OnEndPrinting(CDC* pDC, CPrintInfo* pInfo);
@@ -117,9 +117,9 @@ protected:
 	afx_msg LRESULT OnKlineToThis(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnStockChange(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnColumnChange(WPARAM wParam, LPARAM lParam);
-    afx_msg LRESULT OnIndexColumnChange(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnIndexColumnChange(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnDisplayStockTypeChange(UINT nID);
-    afx_msg void OnUpdateDisplayStockType(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateDisplayStockType(CCmdUI* pCmdUI);
 
 
 
@@ -127,7 +127,7 @@ protected:
 private:
 	int     m_nStartColumn; 
 
- 	int     m_nCols; 
+	int     m_nCols; 
 	int		m_nRows; 
 
 	CImageList m_ImageList;   
@@ -139,7 +139,7 @@ private:
 	BOOL	m_bListMode;     
 	int     m_nBarlength;      
 	CRect   m_barRect;
-    UINT    m_TimeCount;
+	UINT    m_TimeCount;
 
 	CStringArray m_nColumnTitleArray;
 	UINT m_VisibleRowCount;                       
@@ -158,66 +158,65 @@ public:
 	CString GetCurrentSymbol();
 	void ActiveGrid();
 	virtual BOOL OnCmdMsg(UINT nID, int nCode, void* pExtra,
-						  AFX_CMDHANDLERINFO* pHandlerInfo);  
+		AFX_CMDHANDLERINFO* pHandlerInfo);  
 	void DoUpdateColumn(UINT nID);                          
-    int InitGridCtrl();                                      
-    void ClearStockRow(long nRow);                         
+	int InitGridCtrl();                                      
+	void ClearStockRow(long nRow);                         
 	void AddGridRow(UINT nPage);                          
 	void AddColumn(UINT m_Column,UINT nID);
-    void UpdateColumnData(CTaiShanDoc* pDoc,int m_Column,int FirstRow,int EndRow);
-    void UpdateColumn(UINT m_Column,UINT nID);
+	void UpdateColumnData(CTaiShanDoc* pDoc,int m_Column,int FirstRow,int EndRow);
+	void UpdateColumn(UINT m_Column,UINT nID);
 	BOOL ChangeToStockType(CTaiShanDoc* pDoc,CString m_StockType) ;
-    void PopMenuItemInit(CMenu *pMenuContext,UINT nRow);
+	void PopMenuItemInit(CMenu *pMenuContext,UINT nRow);
 	UINT GetActivePage();
 	long FindStockInNameSymbor(UINT nPage,char *zqdm);
-    void ScrollToSelectStock(char *zqdm,int nKind);
-    void HotKeyDownProgress(char  *HotKey);
+	void ScrollToSelectStock(char *zqdm,int nKind);
+	void HotKeyDownProgress(char  *HotKey);
 	void SortStockIndex(UINT nPage,UINT nID);
-    void DisplaySortDataInPage(SORTSTRUCT *m_pStockData,int DisplayCount);
-    UINT GetSortColumn(UINT nID);
-    void ScrollToPageOfStock(CTaiShanDoc* pDoc,int nPage,CString m_findzqdm);
+	void DisplaySortDataInPage(SORTSTRUCT *m_pStockData,int DisplayCount);
+	UINT GetSortColumn(UINT nID);
+	void ScrollToPageOfStock(CTaiShanDoc* pDoc,int nPage,CString m_findzqdm);
 	void DisplayDpStockRow(CTaiShanDoc* pDoc,CReportData *Cdat ,long nRow);
-    void LoopDisplayOnTimer();
+	void LoopDisplayOnTimer();
 	void ChangeToTjxg(CTaiShanDoc* pDoc);
 	BOOL ChangeToTjxg(CTaiShanDoc* pDoc,CString m_StockType );
-    LRESULT OnGridColorChange(WPARAM wParam, LPARAM lParam);
+	LRESULT OnGridColorChange(WPARAM wParam, LPARAM lParam);
 	void SortDataForColumn();
-    BOOL SetShowData(CTaiShanDoc *pDoc,int StockCount);
-    void LoadShowData(int nKind);
 	int  GetPageRows();
 	BOOL GetStockCodeForRow(int nRows,char *Code,int &nKind);
 	BOOL GetRowForStockCode(char * Code,int & nRow);
 	void SortDataForPage8();
 	void ChangedColumnType(int ColumnType);
-    void DefalutColumnSelect();
+	void DefalutColumnSelect();
 	void OnAddStocktype(UINT nID);
-    void OnDeleteTjxgStockType();
+	void OnDeleteTjxgStockType();
 	static void OnSaveScreenStocktype(SymbolKindArr& StockCodeArray ,CString *StockName=NULL); 
-    void ChangeToTjxg(CTaiShanDoc* pDoc,BOOL IsNewTjxg);
-    BOOL GetCdatPointForRow(int nRow,PCdat1 &pStockData);
-    void AddChoose(char *StockCode,int nKind);
+	void ChangeToTjxg(CTaiShanDoc* pDoc,BOOL IsNewTjxg);
+	BOOL GetCdatPointForRow(int nRow,PCdat1 &pStockData);
 #ifdef WIDE_NET_VERSION
 	TRANS_PACKAGE_STRUCTEx m_TransPackageStruct;
 	int m_nMinuteCount;
 	SOCKET_ID m_SocketID;
 	int n_nSendStockCount;
 	TransmitStockAttribute  *m_pTransmitStockAttribute;
-    void SendRecvDataInfomation(ClientTransmitAttributes  TransmitType);
-    BOOL SetSendStockCodeData(int SendStockCount);
+	void SendRecvDataInfomation(ClientTransmitAttributes  TransmitType);
+	BOOL SetSendStockCodeData(int SendStockCount);
 #endif
+
+public:
+	BOOL SetShowData(CTaiShanDoc* pDoc, int StockCount);
+	void LoadShowData(int nKind);
 
 public:
 	void ChangeToChoose(CTaiShanDoc* pDoc);
 	void ChangeToPage(int nPage, BOOL NewTjxg = FALSE);
+
+public:
+	void AddChoose(char* StockCode, int nKind);
 };
 
 #ifndef _DEBUG
 inline CTaiShanDoc* CTaiShanReportView::GetDocument() { return (CTaiShanDoc*)m_pDocument; }
 #endif
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_STOCK2000VIEW_H__13C4E5B0_D3B4_11D1_BF39_0000E86564F7__INCLUDED_)

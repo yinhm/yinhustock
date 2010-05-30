@@ -9,7 +9,7 @@
 #include "StructKlineView.h"
 #include "CTaiKlineMemFile.h"
 
-#define DAY_KLINE	0
+//#define DAY_KLINE	0
 #define MIN5_KLINE	1
 
 #define MAX_BLOCK_USE	26
