@@ -1,3 +1,4 @@
+
 #if !defined(AFX_MODIFYSTOCKTYPE_H__BD1C43A2_5D50_11D4_8829_00400552E583__INCLUDED_)
 #define AFX_MODIFYSTOCKTYPE_H__BD1C43A2_5D50_11D4_8829_00400552E583__INCLUDED_
 
@@ -18,7 +19,7 @@ public:
 public:
 	CImageList * m_pImageList;
 	CImageList * m_pImageListSmall;
-    CTaiShanDoc *m_pDoc;
+	CTaiShanDoc *m_pDoc;
 	STOCKTYPEINFO *m_pStockTypeInfo;
 	BOOL m_bIsAddNewStockType;
 	float m_fTotalRight;
@@ -27,12 +28,12 @@ public:
 	BOOL m_bIsCalc;
 
 public:
-    void FillToListCtrlHead();
-    void FillToListCtrlItem(CReportData *pCdat);
+	void FillToListCtrlHead();
+	void FillToListCtrlItem(CReportData *pCdat);
 	void RefreshShowData();
 	void CheckStockCount();
 
-	
+
 
 
 
@@ -49,37 +50,25 @@ public:
 	CProgressCtrl	m_Progress;
 	int  m_nRightType;
 	//}}AFX_DATA
-	//{{AFX_VIRTUAL(CModifyStockType)
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);  
-	virtual BOOL PreTranslateMessage(MSG* pMsg);
-
-	//}}AFX_VIRTUAL
-
 
 protected:
-
-
-	//{{AFX_MSG(CModifyStockType)
+	//{{AFX_VIRTUAL(CModifyStockType)
+	virtual void DoDataExchange(CDataExchange* pDX);  
 	virtual BOOL OnInitDialog();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	//}}AFX_VIRTUAL
+
+protected:
+	//{{AFX_MSG(CModifyStockType)
 	afx_msg void OnAddStock();
 	afx_msg void OnDeleteStock();
 	afx_msg void OnChangeStockTypeRight();
 	afx_msg void OnUpdateOk();
 	afx_msg void OnRefreshHistoryData();
 	afx_msg void OnChangedName();
-
-
-
-
+	afx_msg LRESULT OnAddStockCode(WPARAM wParam, LPARAM lParam); 
 	//}}AFX_MSG
-    afx_msg LRESULT OnAddStockCode(WPARAM wParam, LPARAM lParam); 
-
-
 	DECLARE_MESSAGE_MAP()
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_MODIFYSTOCKTYPE_H__BD1C43A2_5D50_11D4_8829_00400552E583__INCLUDED_)

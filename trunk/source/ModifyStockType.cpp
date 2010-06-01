@@ -19,17 +19,17 @@ static char THIS_FILE[] = __FILE__;
 // CModifyStockType dialog
 
 CModifyStockType::CModifyStockType(PSTOCKTYPEINFO &pStockTypeInfo,BOOL IsAddStockType,CWnd* pParent )   // standard constructor
-	: CDialog(CModifyStockType::IDD, pParent)
+: CDialog(CModifyStockType::IDD, pParent)
 {
-	
+
 	m_pStockTypeInfo=pStockTypeInfo;
 	m_bIsAddNewStockType=IsAddStockType;
-    m_bIsChanged=FALSE;
+	m_bIsChanged=FALSE;
 }
 
 
 CModifyStockType::CModifyStockType(CWnd* pParent /*=NULL*/)
-	: CDialog(CModifyStockType::IDD, pParent)
+: CDialog(CModifyStockType::IDD, pParent)
 {
 }
 
@@ -75,7 +75,7 @@ BOOL CModifyStockType::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 	this->CenterWindow();
-	
+
 
 	m_pDoc =((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc ;
 
@@ -87,43 +87,43 @@ BOOL CModifyStockType::OnInitDialog()
 	FillToListCtrlHead();
 	if(m_bIsAddNewStockType)
 	{
-       m_sStockTypeCode=m_pStockTypeInfo->m_szCode;
-	   m_nRightType=1;
-	   m_fTotalRight=0;
-	   m_nTotalCount=0;
+		m_sStockTypeCode=m_pStockTypeInfo->m_szCode;
+		m_nRightType=1;
+		m_fTotalRight=0;
+		m_nTotalCount=0;
 	}
 	else
 	{
-       m_sStockTypeCode=m_pStockTypeInfo->m_szCode;
-       m_sStockTypeName=m_pStockTypeInfo->m_szName;
-	   m_nRightType=m_pStockTypeInfo->m_iRightType;
-	   m_fTotalRight=m_pDoc->m_ManagerStockTypeData.GetStockBlockRight(m_pStockTypeInfo->m_szCode);
-	   m_nTotalCount=m_pStockTypeInfo->m_lStockCount;
-       SymbolKindArr m_StockCodeArray;
-	   if(m_pDoc->m_ManagerStockTypeData.GetStockFromStockType(m_StockCodeArray,m_sStockTypeCode.GetBuffer(0)))          
-	   {
+		m_sStockTypeCode=m_pStockTypeInfo->m_szCode;
+		m_sStockTypeName=m_pStockTypeInfo->m_szName;
+		m_nRightType=m_pStockTypeInfo->m_iRightType;
+		m_fTotalRight=m_pDoc->m_ManagerStockTypeData.GetStockBlockRight(m_pStockTypeInfo->m_szCode);
+		m_nTotalCount=m_pStockTypeInfo->m_lStockCount;
+		SymbolKindArr m_StockCodeArray;
+		if(m_pDoc->m_ManagerStockTypeData.GetStockFromStockType(m_StockCodeArray,m_sStockTypeCode.GetBuffer(0)))          
+		{
 			int DisplayCount=m_StockCodeArray.GetSize();
 
 			for(int row=0 ;row <  (int)DisplayCount  ;row++)          
 			{    
-				 CReportData *Cdat;
-				 SymbolKind m_SymbolKind; 
-				 m_SymbolKind=m_StockCodeArray.GetAt(row) ;
-	 			 if (m_pDoc->m_sharesInformation.Lookup(m_SymbolKind.m_chSymbol , Cdat,m_SymbolKind.m_nSymbolKind) == TRUE)     //检测该股票是否已记录在内存模板中
-				 {
-					 if(Cdat->pBaseInfo==NULL)
-						 continue;
-                     FillToListCtrlItem(Cdat);
-				 }
+				CReportData *Cdat;
+				SymbolKind m_SymbolKind; 
+				m_SymbolKind=m_StockCodeArray.GetAt(row) ;
+				if (m_pDoc->m_sharesInformation.Lookup(m_SymbolKind.m_chSymbol , Cdat,m_SymbolKind.m_nSymbolKind) == TRUE)     //检测该股票是否已记录在内存模板中
+				{
+					if(Cdat->pBaseInfo==NULL)
+						continue;
+					FillToListCtrlItem(Cdat);
+				}
 			}
-	   }
+		}
 	}
 	this->UpdateData(FALSE);
-    CWnd *pWnd=this->GetDlgItem(IDC_NAME);
+	CWnd *pWnd=this->GetDlgItem(IDC_NAME);
 	pWnd->SetFocus();
 
-    m_MyList.SetFocus();
-    m_MyList.SetItemState(0,LVIS_FOCUSED|LVIS_SELECTED , LVIS_SELECTED|LVIS_FOCUSED) ;
+	m_MyList.SetFocus();
+	m_MyList.SetItemState(0,LVIS_FOCUSED|LVIS_SELECTED , LVIS_SELECTED|LVIS_FOCUSED) ;
 
 	m_pImageList->Detach();
 	delete m_pImageList;
@@ -134,7 +134,7 @@ BOOL CModifyStockType::OnInitDialog()
 }
 void CModifyStockType::FillToListCtrlHead()
 {
-   	CRect           rect;
+	CRect           rect;
 	CString         strItem1= _T("股票代码");
 	CString         strItem2= _T("股票名称");
 	CString         strItem3= _T("总股本");
@@ -142,7 +142,7 @@ void CModifyStockType::FillToListCtrlHead()
 	CString         strItem5= _T("权重比例(%)");
 
 	m_MyList.SetExtendedStyle(m_MyList.GetExtendedStyle()|LVS_EX_FULLROWSELECT);
-    
+
 	this->m_MyList.SetImageList(m_pImageList, LVSIL_NORMAL);
 	this->m_MyList.SetImageList(m_pImageListSmall, LVSIL_SMALL);
 
@@ -167,42 +167,42 @@ void CModifyStockType::FillToListCtrlItem(CReportData *pCdat)
 	LVFINDINFO  lvf;
 	lvf.flags=LVFI_STRING;
 	lvf.psz=pCdat->id;
-    if(m_MyList.FindItem(&lvf)>=0)
+	if(m_MyList.FindItem(&lvf)>=0)
 		return;
-    iItem=this->m_MyList.GetItemCount();
+	iItem=this->m_MyList.GetItemCount();
 	CString strIconDesc[5];
-    strIconDesc[0]=pCdat->id;
-    strIconDesc[1]=pCdat->name;
-    strIconDesc[2].Format("%6.2f",pCdat->pBaseInfo->zgb);
+	strIconDesc[0]=pCdat->id;
+	strIconDesc[1]=pCdat->name;
+	strIconDesc[2].Format("%6.2f",pCdat->pBaseInfo->zgb);
 
 	if(CTaiShanReportView::IsBg( pCdat->kind))
 	{
-        strIconDesc[3].Format("%6.2f",pCdat->pBaseInfo->Bg);
+		strIconDesc[3].Format("%6.2f",pCdat->pBaseInfo->Bg);
 	}
 	else
-    {
-        strIconDesc[3].Format("%6.2f",pCdat->pBaseInfo->ltAg);
+	{
+		strIconDesc[3].Format("%6.2f",pCdat->pBaseInfo->ltAg);
 	}
 	if(m_fTotalRight!=0)
 	{
-	    switch(this->m_nRightType)
+		switch(this->m_nRightType)
 		{
-			case 0:
-					strIconDesc[4].Format("%8.3f",pCdat->pBaseInfo->zgb/m_fTotalRight);
-					break;
-			case 1:
-					if(CTaiShanReportView::IsBg( pCdat->kind))
-					{
-						strIconDesc[4].Format("%8.3f",pCdat->pBaseInfo->Bg/m_fTotalRight);
-					}
-					else
-					{
-						strIconDesc[4].Format("%8.3f",pCdat->pBaseInfo->ltAg/m_fTotalRight);
-					}
-					break;
-			case 2:
-					strIconDesc[4].Format("%8.3f",(float)1/m_fTotalRight);
-					break;
+		case 0:
+			strIconDesc[4].Format("%8.3f",pCdat->pBaseInfo->zgb/m_fTotalRight);
+			break;
+		case 1:
+			if(CTaiShanReportView::IsBg( pCdat->kind))
+			{
+				strIconDesc[4].Format("%8.3f",pCdat->pBaseInfo->Bg/m_fTotalRight);
+			}
+			else
+			{
+				strIconDesc[4].Format("%8.3f",pCdat->pBaseInfo->ltAg/m_fTotalRight);
+			}
+			break;
+		case 2:
+			strIconDesc[4].Format("%8.3f",(float)1/m_fTotalRight);
+			break;
 		}
 	}
 	for (iSubItem = 0; iSubItem <5; iSubItem++)
@@ -215,8 +215,8 @@ void CModifyStockType::FillToListCtrlItem(CReportData *pCdat)
 		lvitem.iItem = (iSubItem == 0)? iItem : iActualItem;
 		lvitem.iSubItem = iSubItem;
 
-	
-       
+
+
 		lvitem.pszText=strIconDesc[iSubItem].GetBuffer(strIconDesc[iSubItem].GetLength()); 
 		lvitem.iImage = iIcon;
 		if (iSubItem == 0)
@@ -225,7 +225,7 @@ void CModifyStockType::FillToListCtrlItem(CReportData *pCdat)
 			this->m_MyList.SetItem(&lvitem); 
 		m_MyList.SetItemData(iItem,pCdat->kind);
 	} 
-	
+
 }
 void CModifyStockType::RefreshShowData()
 {
@@ -233,94 +233,120 @@ void CModifyStockType::RefreshShowData()
 	m_fTotalRight=0;
 	m_nTotalCount=0;
 
-    int tmp=m_MyList.GetItemCount();
+	int tmp=m_MyList.GetItemCount();
 	for(int i=0;i<tmp;i++)
 	{
-	   char temp[20];
-       switch(this->m_nRightType)
-	   {
-	     case ZGB:    m_MyList.GetItemText( i, 2, temp, 20);
-			          m_fTotalRight+=atof(temp);
-				      m_nTotalCount++;
-				      break;
-	     case LTG:    m_MyList.GetItemText( i, 3, temp, 20);
-			          m_fTotalRight+=atof(temp);
-				      m_nTotalCount++;
-				      break; 
-	     case OTHER:  m_fTotalRight+=1;
-				      m_nTotalCount++;
-				      break;
-	  }
+		char temp[20];
+		switch(this->m_nRightType)
+		{
+		case ZGB:    m_MyList.GetItemText( i, 2, temp, 20);
+			m_fTotalRight+=atof(temp);
+			m_nTotalCount++;
+			break;
+		case LTG:    m_MyList.GetItemText( i, 3, temp, 20);
+			m_fTotalRight+=atof(temp);
+			m_nTotalCount++;
+			break; 
+		case OTHER:  m_fTotalRight+=1;
+			m_nTotalCount++;
+			break;
+		}
 	}
 	for(int i=0;i<tmp;i++)
 	{
-	   char temp[20];
-	   float l_fRight;
-	   CString l_sRight;
-       switch(this->m_nRightType)
-	   {
-	     case ZGB:    m_MyList.GetItemText( i, 2, temp, 20);
-			          l_fRight=atof(temp)/m_fTotalRight;
-					  l_sRight.Format("%8.3f",l_fRight);
-                      m_MyList.SetItemText( i, 4 , l_sRight );
-				      break;
-	     case LTG:    m_MyList.GetItemText( i, 3, temp, 20);
-			          l_fRight=atof(temp)/m_fTotalRight;
-					  l_sRight.Format("%8.3f",l_fRight);
-                      m_MyList.SetItemText( i, 4 , l_sRight );
-				      break; 
-	     case OTHER:  l_fRight=(float)1/m_nTotalCount;
-					  l_sRight.Format("%8.3f",l_fRight);
-                      m_MyList.SetItemText( i, 4 , l_sRight );
-				      break;
-	  }
+		char temp[20];
+		float l_fRight;
+		CString l_sRight;
+		switch(this->m_nRightType)
+		{
+		case ZGB:    m_MyList.GetItemText( i, 2, temp, 20);
+			l_fRight=atof(temp)/m_fTotalRight;
+			l_sRight.Format("%8.3f",l_fRight);
+			m_MyList.SetItemText( i, 4 , l_sRight );
+			break;
+		case LTG:    m_MyList.GetItemText( i, 3, temp, 20);
+			l_fRight=atof(temp)/m_fTotalRight;
+			l_sRight.Format("%8.3f",l_fRight);
+			m_MyList.SetItemText( i, 4 , l_sRight );
+			break; 
+		case OTHER:  l_fRight=(float)1/m_nTotalCount;
+			l_sRight.Format("%8.3f",l_fRight);
+			m_MyList.SetItemText( i, 4 , l_sRight );
+			break;
+		}
 	}
 	m_bIsChanged=TRUE;
 }
+
+void CModifyStockType::CheckStockCount()
+{
+	int tmp = m_MyList.GetItemCount();
+	int index = 0;
+	for (int i = 0; i < tmp; i++)
+	{
+		char l_szStockCode[10];
+		PSTOCK_TYPE_INFO pStock;
+		m_MyList.GetItemText(i, 0, l_szStockCode, 20);
+		int nKind = m_MyList.GetItemData(i);
+		if (!m_pDoc->m_ManagerStockTypeData.Lookup(l_szStockCode, nKind, pStock))
+		{
+			index++;
+		}
+	}
+
+	m_pDoc->m_ManagerStockTypeData.CheckStockCount(index);
+}
+
 void CModifyStockType::OnAddStock()
 {
-	SelectStock pDlg(this,TRUE);
+	SelectStock pDlg(this, TRUE);
 	pDlg.DoModal();
 }
+
 void CModifyStockType::OnDeleteStock()
 {
-    CString Id;
-	int temp=m_MyList.GetNextItem( -1, LVNI_SELECTED   ) ;
-	if(temp==-1)
+	int temp = m_MyList.GetNextItem(-1, LVNI_SELECTED);
+	if (temp == -1)
 	{
 		AfxMessageBox("请选择将要删除股票!");
 		return;
 	}
-    int rtn = MessageBox("是否确实进行这一删除操作?","警告",MB_YESNO|MB_ICONWARNING);
-    if(rtn!=6)
-	  return;
 
-	while(temp>=0)
+	int rtn = MessageBox("是否确实进行这一删除操作?", "警告", MB_YESNO|MB_ICONWARNING);
+	if (rtn != 6)
+		return;
+
+	while (temp >= 0)
 	{
 		char l_sStockCode[10];
+		m_MyList.GetItemText(temp, 0, l_sStockCode, 10);
+
 		CString l_strCode;
-        m_MyList.GetItemText( temp, 0, l_sStockCode, 10);
-        l_strCode=l_sStockCode;
+		l_strCode = l_sStockCode;
+
 		m_MyList.DeleteItem(temp);
-        temp=m_MyList.GetNextItem( -1,LVNI_SELECTED   ) ;
+		temp = m_MyList.GetNextItem(-1, LVNI_SELECTED);
 	}
 
-   RefreshShowData(); 
-   m_MyList.SetFocus();
-   m_MyList.SetItemState(0,LVIS_FOCUSED|LVIS_SELECTED , LVIS_SELECTED|LVIS_FOCUSED) ;
+	RefreshShowData();
+
+	m_MyList.SetFocus();
+	m_MyList.SetItemState(0, LVIS_FOCUSED|LVIS_SELECTED, LVIS_SELECTED|LVIS_FOCUSED);
 }
+
 void CModifyStockType::OnChangeStockTypeRight()
 {
-   RefreshShowData(); 
+	RefreshShowData(); 
 }
+
 BOOL CModifyStockType::PreTranslateMessage(MSG* pMsg)
 {
-    CWnd *pWnd=this->GetFocus();
+	CWnd *pWnd=this->GetFocus();
 	CWnd *pChildWnd=this->GetDlgItem(IDC_NAME);
 	if(pWnd!=pChildWnd)
-	if(pMsg->message==WM_CHAR&&((pMsg->wParam>='0'&&pMsg->wParam<='9')||(pMsg->wParam>='A'&&pMsg->wParam<='z')))
-	{
-		    CTaiKeyBoardAngelDlg m_diakeybrode;
+		if(pMsg->message==WM_CHAR&&((pMsg->wParam>='0'&&pMsg->wParam<='9')||(pMsg->wParam>='A'&&pMsg->wParam<='z')))
+		{
+			CTaiKeyBoardAngelDlg m_diakeybrode;
 			if(pMsg->wParam>='a'&&pMsg->wParam<='z')
 				pMsg->wParam-=32;
 			char input=pMsg->wParam;
@@ -329,98 +355,64 @@ BOOL CModifyStockType::PreTranslateMessage(MSG* pMsg)
 				m_diakeybrode.ischar=false;
 			else
 				m_diakeybrode.ischar=true;
-		m_diakeybrode.DoModal();
-		if(m_diakeybrode.isresultok)
-		{
-		   char result[10];               
-		   int nKind=m_diakeybrode.m_stkKind;
-           strcpy(result,m_diakeybrode.result);
-		   
-		   if(strlen(result)==6||strlen(result)==4)
-		   {
-			  LVFINDINFO  lvf;
-			  lvf.flags=LVFI_STRING;
-			  lvf.psz=result;
-			  if(m_MyList.FindItem(&lvf)>=0)
-			 	 return  TRUE;
-              
-			  CReportData *Cdat;
-	 		  if (m_pDoc->m_sharesInformation.Lookup(result , Cdat,nKind) == TRUE)     
-			  {
-				   if(Cdat->pBaseInfo!=NULL)
-                     FillToListCtrlItem(Cdat);
-			  }
-		   }
-		}
-        RefreshShowData(); 
-		return true;
-	}
-	return CDialog::PreTranslateMessage(pMsg);
-}
-LRESULT CModifyStockType::OnAddStockCode(WPARAM wParam, LPARAM lParam) 
-{
-	SHARES_DATA_ADD *pAddCode;
-	int lsCount=(int)lParam;
-    pAddCode=(SHARES_DATA_ADD *)wParam;
-	for(int i=0;i<lsCount;i++)
-	{
-		if(pAddCode[i].StockType<0)
-		{
-			int nKind=-pAddCode[i].StockType-1;
-		    LVFINDINFO  lvf;
-		    lvf.flags=LVFI_STRING;
-		    lvf.psz=pAddCode[i].name;
-			int iItem=m_MyList.FindItem(&lvf);
-		    if(iItem >=0)
+			m_diakeybrode.DoModal();
+			if(m_diakeybrode.isresultok)
 			{
-				if(nKind==m_MyList.GetItemData(iItem))
-			       continue;
-			}
-		    CReportData *pCdat;
-	 	    if (m_pDoc->m_sharesInformation.Lookup(pAddCode[i].name, pCdat,nKind) == TRUE)     //检测该股票是否已记录在内存模板中
-			{
-				if(CSharesInformation::IsZhiShu(pCdat->kind))
-				{
-					MessageBox("指数类将不能增加到板块中!","窗口操作提示",MB_OK);
-					continue;
-				}
-				if(pCdat->pBaseInfo==NULL||pCdat->pBaseInfo->zgb<=0)
-				{
-					MessageBox("在将股票加入板块时,该股票财务数据不能为空!","窗口操作提示",MB_OK);
-					continue;
-				}
-               if(pCdat->pBaseInfo!=0) 
-                 FillToListCtrlItem(pCdat);
-			}
-		}
-	}
-    RefreshShowData(); 
+				char result[10];               
+				int nKind=m_diakeybrode.m_stkKind;
+				strcpy(result,m_diakeybrode.result);
 
-	return 0;
+				if(strlen(result)==6||strlen(result)==4)
+				{
+					LVFINDINFO  lvf;
+					lvf.flags=LVFI_STRING;
+					lvf.psz=result;
+					if(m_MyList.FindItem(&lvf)>=0)
+						return  TRUE;
+
+					CReportData *Cdat;
+					if (m_pDoc->m_sharesInformation.Lookup(result , Cdat,nKind) == TRUE)     
+			  {
+				  if(Cdat->pBaseInfo!=NULL)
+					  FillToListCtrlItem(Cdat);
+			  }
+				}
+			}
+			RefreshShowData(); 
+			return true;
+		}
+		return CDialog::PreTranslateMessage(pMsg);
 }
 
 void CModifyStockType::OnUpdateOk()
 {
-	STOCKTYPEINFO *l_pStockType;
-	this->UpdateData(TRUE);
-	if(!m_bIsChanged)
+	UpdateData(TRUE);
+
+	if (!m_bIsChanged)
 	{
-      CDialog::OnOK();
-	  return;
+		CDialog::OnOK();
+		return;
 	}
-	if(this->m_sStockTypeName.GetLength()<=0||m_MyList.GetItemCount()<1)
+
+	STOCKTYPEINFO* l_pStockType;
+
+	if (m_sStockTypeName.GetLength () <= 0 || m_MyList.GetItemCount() < 1)
 	{
 		AfxMessageBox("请选择正确板块数据!");
-		return ;
+		return;
 	}
-	CWnd *pWnd=this->GetDlgItem(IDOK);
+
+	CWnd* pWnd = GetDlgItem(IDOK);
 	pWnd->EnableWindow(FALSE);
 
-	CMenu *pMenu=GetSystemMenu(FALSE);
-	pMenu->EnableMenuItem(SC_CLOSE,MF_BYCOMMAND|MF_DISABLED|MF_GRAYED); 
+	CMenu* pMenu = GetSystemMenu(FALSE);
+	pMenu->EnableMenuItem(SC_CLOSE, MF_BYCOMMAND|MF_DISABLED|MF_GRAYED);
 
-    BeginWaitCursor();
+	BeginWaitCursor();
+
+	// 检测要添加的股票数量，如果 CStkBlockManager 中无空间则增加
 	CheckStockCount();
+
 	if(m_bIsAddNewStockType)
 	{
 		if(m_pDoc->m_ManagerStockTypeData.CheckBlockName(m_sStockTypeName.GetBuffer(0),NULL))
@@ -433,7 +425,7 @@ void CModifyStockType::OnUpdateOk()
 		char temp[3];
 		if(!m_pDoc->m_ManagerStockTypeData.InsertStockType(l_pStockType,l_nStockTypePos))
 		{
-            EndWaitCursor();
+			EndWaitCursor();
 			return;
 		}
 		l_pStockType->m_lIsUse=TRUE;
@@ -451,14 +443,14 @@ void CModifyStockType::OnUpdateOk()
 		int tmp=m_MyList.GetItemCount();
 		for(int i=0;i<tmp;i++)
 		{
-            char l_szStockCode[10];
+			char l_szStockCode[10];
 			CReportData *l_pCdat;
 			int nKind=m_MyList.GetItemData(i);
 			m_MyList.GetItemText( i, 0, l_szStockCode , 20);
-            if(m_pDoc->m_sharesInformation.Lookup(l_szStockCode,l_pCdat,nKind))
+			if(m_pDoc->m_sharesInformation.Lookup(l_szStockCode,l_pCdat,nKind))
 			{
-			   if(l_pCdat->pBaseInfo!=NULL)
-			      m_pDoc->m_ManagerStockTypeData.InsertStockToType(l_pCdat,l_pStockType->m_szCode);
+				if(l_pCdat->pBaseInfo!=NULL)
+					m_pDoc->m_ManagerStockTypeData.InsertStockToType(l_pCdat,l_pStockType->m_szCode);
 			}
 		}
 		CReportData *pCdat;
@@ -466,12 +458,12 @@ void CModifyStockType::OnUpdateOk()
 		strcpy(pCdat->name ,l_pStockType->m_szName );
 		strcpy(pCdat->id ,l_pStockType->m_szCode );
 		pCdat->kind=STKTYPE;
-        m_pDoc->m_sharesInformation.SaveRealDataToFile(pCdat,sizeof(CReportData));
+		m_pDoc->m_sharesInformation.SaveRealDataToFile(pCdat,sizeof(CReportData));
 		if(strlen(pCdat->name)>0)
-		   m_pDoc->StockNameConvert(pCdat->name,pCdat->Gppyjc) ;
+			m_pDoc->StockNameConvert(pCdat->name,pCdat->Gppyjc) ;
 		m_pDoc->AddStockToKeyboard(pCdat->id,pCdat->kind,pCdat->name,pCdat->Gppyjc);
 	}
-    else
+	else
 	{
 		char BlockCode[MAX_PATH];
 		strcpy(BlockCode,m_sStockTypeCode.GetBuffer(0));
@@ -486,7 +478,7 @@ void CModifyStockType::OnUpdateOk()
 		char temp[3];
 		if(!m_pDoc->m_ManagerStockTypeData.InsertStockType(l_pStockType,l_nStockTypePos))
 		{
-            EndWaitCursor();
+			EndWaitCursor();
 			return;
 		}
 		l_pStockType->m_lIsUse=TRUE;
@@ -504,14 +496,14 @@ void CModifyStockType::OnUpdateOk()
 		int tmp=m_MyList.GetItemCount();
 		for(int i=0;i<tmp;i++)
 		{
-            char l_szStockCode[10];
+			char l_szStockCode[10];
 			CReportData *l_pCdat;
 			int nKind=m_MyList.GetItemData(i);
 			m_MyList.GetItemText( i, 0, l_szStockCode , 20);
-            if(m_pDoc->m_sharesInformation.Lookup(l_szStockCode,l_pCdat,nKind))
+			if(m_pDoc->m_sharesInformation.Lookup(l_szStockCode,l_pCdat,nKind))
 			{
-			   if(l_pCdat->pBaseInfo!=NULL)
-			      m_pDoc->m_ManagerStockTypeData.InsertStockToType(l_pCdat,l_pStockType->m_szCode);
+				if(l_pCdat->pBaseInfo!=NULL)
+					m_pDoc->m_ManagerStockTypeData.InsertStockToType(l_pCdat,l_pStockType->m_szCode);
 			}
 		}
 		CReportData *pCdat;
@@ -520,13 +512,14 @@ void CModifyStockType::OnUpdateOk()
 		strcpy(pCdat->id ,l_pStockType->m_szCode );
 		pCdat->kind=STKTYPE;
 		if(strlen(pCdat->name)>0)
-		   m_pDoc->StockNameConvert(pCdat->name,pCdat->Gppyjc) ;
+			m_pDoc->StockNameConvert(pCdat->name,pCdat->Gppyjc) ;
 		m_pDoc->AddStockToKeyboard(pCdat->id,pCdat->kind,pCdat->name,pCdat->Gppyjc);
 	}
-    m_pDoc->m_ManagerStockTypeData.RefreshHistoryDayLineData(m_sStockTypeCode.GetBuffer(0),	&m_Progress);
-    EndWaitCursor();
+	m_pDoc->m_ManagerStockTypeData.RefreshHistoryDayLineData(m_sStockTypeCode.GetBuffer(0),	&m_Progress);
+	EndWaitCursor();
 	CDialog::OnOK();
 }
+
 void CModifyStockType::OnRefreshHistoryData()
 {
 	CWnd *pWnd=this->GetDlgItem(IDC_REFRESH);
@@ -534,41 +527,41 @@ void CModifyStockType::OnRefreshHistoryData()
 
 	STOCKTYPEINFO *l_pStockType;
 	this->UpdateData(TRUE);
-    BeginWaitCursor();
+	BeginWaitCursor();
 	if(!m_bIsChanged)
 	{
-      m_pDoc->m_ManagerStockTypeData.RefreshHistoryDayLineData(m_sStockTypeCode.GetBuffer(0),&m_Progress);
-	  pWnd->EnableWindow(TRUE);
-      EndWaitCursor();
-	  return;
+		m_pDoc->m_ManagerStockTypeData.RefreshHistoryDayLineData(m_sStockTypeCode.GetBuffer(0),&m_Progress);
+		pWnd->EnableWindow(TRUE);
+		EndWaitCursor();
+		return;
 	}
 	else
 	{
 		int rtn = MessageBox("该板块数据已发生变化,是否在保存板块数据后进行数据刷新操作!","警告",MB_YESNO|MB_ICONWARNING);
 		if(rtn!=6)
 		{
-            m_pDoc->m_ManagerStockTypeData.RefreshHistoryDayLineData(m_sStockTypeCode.GetBuffer(0),&m_Progress);
-	        pWnd->EnableWindow(TRUE);
-            EndWaitCursor();
+			m_pDoc->m_ManagerStockTypeData.RefreshHistoryDayLineData(m_sStockTypeCode.GetBuffer(0),&m_Progress);
+			pWnd->EnableWindow(TRUE);
+			EndWaitCursor();
 			return;
 		}
 	}
 	if(this->m_sStockTypeName.GetLength()<=0||m_MyList.GetItemCount()<1)
 	{
 		AfxMessageBox("请选择正确板块数据!");
-	    pWnd->EnableWindow(TRUE);
-        EndWaitCursor();
+		pWnd->EnableWindow(TRUE);
+		EndWaitCursor();
 		return ;
 	}
-    CheckStockCount();
+	CheckStockCount();
 	if(m_bIsAddNewStockType)
 	{
 		int l_nStockTypePos=m_pDoc->m_ManagerStockTypeData.GetInsertStockTypePos();
 		char temp[3];
 		if(!m_pDoc->m_ManagerStockTypeData.InsertStockType(l_pStockType,l_nStockTypePos))
 		{
-	        pWnd->EnableWindow(TRUE);
-            EndWaitCursor();
+			pWnd->EnableWindow(TRUE);
+			EndWaitCursor();
 			return;
 		}
 		l_pStockType->m_lIsUse=TRUE;
@@ -583,18 +576,18 @@ void CModifyStockType::OnRefreshHistoryData()
 		}
 		sprintf(l_pStockType->m_szCode,"%s%s","8K00",temp);
 		l_pStockType->m_iRightType=this->m_nRightType;
-            
+
 		int tmp=m_MyList.GetItemCount();
 		for(int i=0;i<tmp;i++)
 		{
-            char l_szStockCode[10];
+			char l_szStockCode[10];
 			int nKind=m_MyList.GetItemData(i);
 			CReportData *l_pCdat;
 			m_MyList.GetItemText( i, 0, l_szStockCode , 20);
-            if(m_pDoc->m_sharesInformation.Lookup(l_szStockCode,l_pCdat,nKind))
+			if(m_pDoc->m_sharesInformation.Lookup(l_szStockCode,l_pCdat,nKind))
 			{
-			   if(l_pCdat->pBaseInfo!=NULL)
-			      m_pDoc->m_ManagerStockTypeData.InsertStockToType(l_pCdat,l_pStockType->m_szCode);
+				if(l_pCdat->pBaseInfo!=NULL)
+					m_pDoc->m_ManagerStockTypeData.InsertStockToType(l_pCdat,l_pStockType->m_szCode);
 			}
 		}
 		CReportData *pCdat;
@@ -603,18 +596,18 @@ void CModifyStockType::OnRefreshHistoryData()
 		strcpy(pCdat->id ,l_pStockType->m_szCode );
 		pCdat->kind=STKTYPE;
 		if(strlen(pCdat->name)>0)
-		   m_pDoc->StockNameConvert(pCdat->name,pCdat->Gppyjc) ;
+			m_pDoc->StockNameConvert(pCdat->name,pCdat->Gppyjc) ;
 		m_pDoc->AddStockToKeyboard(pCdat->id,pCdat->kind,pCdat->name,pCdat->Gppyjc);
 	}
-    else
+	else
 	{
 		m_pDoc->m_ManagerStockTypeData.DeleteStockType(m_sStockTypeCode.GetBuffer(0));
 		int l_nStockTypePos=m_pDoc->m_ManagerStockTypeData.GetInsertStockTypePos();
 		char temp[3];
 		if(!m_pDoc->m_ManagerStockTypeData.InsertStockType(l_pStockType,l_nStockTypePos))
 		{
-	        pWnd->EnableWindow(TRUE);
-            EndWaitCursor();
+			pWnd->EnableWindow(TRUE);
+			EndWaitCursor();
 			return;
 		}
 		l_pStockType->m_lIsUse=TRUE;
@@ -629,18 +622,18 @@ void CModifyStockType::OnRefreshHistoryData()
 		}
 		sprintf(l_pStockType->m_szCode,"%s%s","8K00",temp);
 		l_pStockType->m_iRightType=this->m_nRightType;
-            
+
 		int tmp=m_MyList.GetItemCount();
 		for(int i=0;i<tmp;i++)
 		{
-            char l_szStockCode[10];
+			char l_szStockCode[10];
 			int nKind=m_MyList.GetItemData(i);
 			CReportData *l_pCdat;
 			m_MyList.GetItemText( i, 0, l_szStockCode , 20);
-            if(m_pDoc->m_sharesInformation.Lookup(l_szStockCode,l_pCdat,nKind))
+			if(m_pDoc->m_sharesInformation.Lookup(l_szStockCode,l_pCdat,nKind))
 			{
-			   if(l_pCdat->pBaseInfo!=NULL)
-			      m_pDoc->m_ManagerStockTypeData.InsertStockToType(l_pCdat,l_pStockType->m_szCode);
+				if(l_pCdat->pBaseInfo!=NULL)
+					m_pDoc->m_ManagerStockTypeData.InsertStockToType(l_pCdat,l_pStockType->m_szCode);
 			}
 		}
 		CReportData *pCdat;
@@ -649,34 +642,66 @@ void CModifyStockType::OnRefreshHistoryData()
 		strcpy(pCdat->id ,l_pStockType->m_szCode );
 		pCdat->kind=STKTYPE;
 		if(strlen(pCdat->name)>0)
-		   m_pDoc->StockNameConvert(pCdat->name,pCdat->Gppyjc) ;
+			m_pDoc->StockNameConvert(pCdat->name,pCdat->Gppyjc) ;
 		m_pDoc->AddStockToKeyboard(pCdat->id,pCdat->kind,pCdat->name,pCdat->Gppyjc);
 	}
-    m_pDoc->m_ManagerStockTypeData.RefreshHistoryDayLineData(m_sStockTypeCode.GetBuffer(0),	&m_Progress);
+	m_pDoc->m_ManagerStockTypeData.RefreshHistoryDayLineData(m_sStockTypeCode.GetBuffer(0),	&m_Progress);
 	m_bIsChanged=FALSE;
-    m_bIsAddNewStockType=FALSE;
+	m_bIsAddNewStockType=FALSE;
 	pWnd->EnableWindow(TRUE);
-    EndWaitCursor();
+	EndWaitCursor();
 }
-void CModifyStockType::CheckStockCount()
-{
-	int tmp=m_MyList.GetItemCount();
-	int index=0;
-	for(int i=0;i<tmp;i++)
-	{
-        char l_szStockCode[10];
-		PSTOCK_TYPE_INFO pStock;
-		m_MyList.GetItemText( i, 0, l_szStockCode , 20);
-		int nKind=m_MyList.GetItemData(i);
-        if(!m_pDoc->m_ManagerStockTypeData.Lookup(l_szStockCode,nKind,pStock))
-		{
-		   index++;
-		}
-	}
-	m_pDoc->m_ManagerStockTypeData.CheckStockCount(index);
-}
+
 void CModifyStockType::OnChangedName()
 {
-	m_bIsChanged=TRUE;
+	m_bIsChanged = TRUE;
+}
 
+LRESULT CModifyStockType::OnAddStockCode(WPARAM wParam, LPARAM lParam) 
+{
+	SHARES_DATA_ADD* pAddCode;
+	pAddCode = (SHARES_DATA_ADD*)wParam;
+
+	int lsCount = (int)lParam;
+	for (int i = 0; i < lsCount; i++)
+	{
+		if (pAddCode[i].StockType < 0)
+		{
+			int nKind = -pAddCode[i].StockType - 1;
+
+			LVFINDINFO lvf;
+			lvf.flags = LVFI_STRING;
+			lvf.psz = pAddCode[i].name;
+
+			int iItem = m_MyList.FindItem(&lvf);
+			if (iItem >= 0)
+			{
+				if (nKind == m_MyList.GetItemData(iItem))
+					continue;
+			}
+
+			CReportData* pCdat;
+			if (m_pDoc->m_sharesInformation.Lookup(pAddCode[i].name, pCdat, nKind) == TRUE)
+			{
+				if (CSharesInformation::IsZhiShu(pCdat->kind))
+				{
+					MessageBox("指数类将不能增加到板块中!", "窗口操作提示", MB_OK);
+					continue;
+				}
+				if (pCdat->pBaseInfo == NULL || pCdat->pBaseInfo->zgb <= 0)
+				{
+					MessageBox("在将股票加入板块时,该股票财务数据不能为空!", "窗口操作提示", MB_OK);
+					continue;
+				}
+				if (pCdat->pBaseInfo != 0)
+				{
+					FillToListCtrlItem(pCdat);
+				}
+			}
+		}
+	}
+
+	RefreshShowData(); 
+
+	return 0;
 }

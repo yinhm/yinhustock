@@ -162,18 +162,18 @@ typedef struct
 	float m_fTotV;
 	float m_fTotRVol;
 	float m_fTotDVol;
-	int  m_iRightType;
+	int  m_iRightType;					// LTG ZGB OTHER
 	BOOL m_bIsDelete;
 } STOCKTYPEINFO;
 typedef STOCKTYPEINFO* PSTOCKTYPEINFO;
 
 typedef struct
 {
-	char m_szSymbol[10];
+	char m_szSymbol[10];				// ¥˙¬Î SH600000
 	BOOL m_bDeleted;
 	int m_iPos;
-	float m_ClosePrice;
-	float m_fRight[MaxRights];
+	float m_ClosePrice;					//  ’≈Ãº€
+	float m_fRight[MaxRights];			// LTG ZGB OTHER
 	BYTE m_btStockType[MaxStockTYpe];
 } STOCK_TYPE_INFO;
 typedef STOCK_TYPE_INFO* PSTOCK_TYPE_INFO;
@@ -182,17 +182,6 @@ typedef struct
 {
 	STOCK_TYPE_INFO* pStockInfo;
 } STOCK_POINT_INFO;
-
-//======================
-typedef struct
-{
-	char m_szSymbol[7];
-	BOOL m_bDeleted;
-	int m_iPos;
-	float m_ClosePrice;
-	float m_fRight[MaxRights];   
-	BYTE  m_btStockType[MaxStockTYpe];    
-}STOCK_TYPE_INFO_OLD;
 
 
 

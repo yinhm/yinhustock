@@ -3,9 +3,10 @@
 #include "CTaiShanApp.h"
 #include "ChuquanData.h"
 
+#include "StkDatabase.h"
+
 #include "KEYBRODEANGEL.h"
 #include "mainfrm.h"
-#include "CTaiChuQuanInDlg.h"
 #include "CTaiChuQuanSetDlg.h"
 
 #ifdef _DEBUG
@@ -403,7 +404,7 @@ void CChuquanData::OnImport()
 
 	UpdateData(TRUE);
 
-	FXJPOWER power_fxj;
+	FXJ_POWER power_fxj;
 
 	int nSplitMask=0;
 	int nTotalCount=0;
@@ -493,7 +494,7 @@ void CChuquanData::OnImport()
 					else if(StockSymbol.GetLength() == 6)
 						StockSymbol=StockSymbol.Right(4);
 
-					InFile.Read(&power_fxj, sizeof(FXJPOWER));
+					InFile.Read(&power_fxj, sizeof(FXJ_POWER));
 
 					pSplit[nEachChuQuanNo].nTime=power_fxj.nTime;
 					pSplit[nEachChuQuanNo].Give=power_fxj.fGive;
@@ -506,7 +507,7 @@ void CChuquanData::OnImport()
 				{
 
 					InFile.Seek(-4,CFile::current);
-					InFile.Read(&power_fxj, sizeof(FXJPOWER));
+					InFile.Read(&power_fxj, sizeof(FXJ_POWER));
 
 
 					pSplit[nEachChuQuanNo].nTime=power_fxj.nTime;

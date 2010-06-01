@@ -106,7 +106,7 @@ public:
 	BOOL InsertItemCorrect(char *StockId ,PCdat1 pStockData, DWORD StockType); 
 
 
-
+	// 删除所有的板块指数 分类为 STKTYPE
 	BOOL DeleteAllStockFromStockType();
 
 #ifdef WIDE_NET_VERSION

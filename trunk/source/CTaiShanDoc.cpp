@@ -202,55 +202,42 @@ CTaiShanDoc::~CTaiShanDoc()
 
 
 
-
-void CTaiShanDoc::Serialize(CArchive& ar)
-{
-	if (ar.IsStoring())
-	{
-
-	}
-	else
-	{
-
-	}
-}
-
-
-
 #ifdef _DEBUG
 void CTaiShanDoc::AssertValid() const
 {
 	CDocument::AssertValid();
 }
-
 void CTaiShanDoc::Dump(CDumpContext& dc) const
 {
 	CDocument::Dump(dc);
 }
 #endif 
 
-
+void CTaiShanDoc::Serialize(CArchive& ar)
+{
+	if (ar.IsStoring())
+	{
+	}
+	else
+	{
+	}
+}
 
 BOOL CTaiShanDoc::OnNewDocument()
 {
 	if (!CDocument::OnNewDocument())
 		return FALSE;
 
-	try
-	{
-		CreateDirectory("DATA",NULL);
-		CreateDirectory("html",NULL);
-		CreateDirectory("bitmap",NULL);
-		CreateDirectory("NEWS",NULL);
-		CreateDirectory("NEWS\\shanghai",NULL);
-		CreateDirectory("NEWS\\shenzhen",NULL);
-		CreateDirectory("NEWS\\cj",NULL);
-		CreateDirectory("板块数据",NULL);
-		CreateDirectory("DATA\\indicator",NULL);
-	}
-	catch(...)
-	{
-	}
+	CreateDirectory("Data", NULL);
+	CreateDirectory("Data\\Indicator", NULL);
+	CreateDirectory("Html", NULL);
+	CreateDirectory("Bitmap", NULL);
+	CreateDirectory("News", NULL);
+	CreateDirectory("News\\Shanghai", NULL);
+	CreateDirectory("News\\Shenzhen", NULL);
+	CreateDirectory("News\\cj", NULL);
+	CreateDirectory("板块数据", NULL);
+
 	m_bCloseReceiver=FALSE;
 	m_bAppAuthorized=((CTaiShanApp*)AfxGetApp())->m_bAppAuthorized;
 
@@ -1079,6 +1066,17 @@ void CTaiShanDoc::CheckKind()
 	}
 }
 
+void CTaiShanDoc::InitChooseAndStockType()
+{
+	m_ManagerStockTypeData.InitStockPoint();
+	if (m_ManagerStockTypeData.GetStockTypeCounts() != m_sharesInformation.GetStockTypeCount(10))
+	{
+		m_sharesInformation.DeleteAllStockFromStockType();
+	}
+	if (m_sharesInformation.GetStockTypeCount(10) == 0)
+		m_ManagerStockTypeData.InitStockTypePoint();                 
+}
+
 void CTaiShanDoc::ClearRealData()
 {
 	Init_StockData(0);
@@ -1126,13 +1124,18 @@ void CTaiShanDoc::OnCalcHqDataProgress()
 
 
 	// 状态栏显示指数
-	CReportData *p1A0001, *p2A01, *p2D01;
+	CReportData *p1A0001, *p399001, *p2D01;
 	m_sharesInformation.Lookup((CSharesCompute::GetIndexSymbol(0)).GetBuffer(0), p1A0001, SHZS);
-	m_sharesInformation.Lookup((CSharesCompute::GetIndexSymbol(1)).GetBuffer(0), p2A01, SZZS);
+	if (p1A0001 == NULL)
+		m_sharesInformation.Lookup((CSharesCompute::GetIndexSymbol(0)).GetBuffer(0), p1A0001, SHAG);
+	m_sharesInformation.Lookup((CSharesCompute::GetIndexSymbol(1)).GetBuffer(0), p399001, SZZS);
+	if (p399001 == NULL)
+		m_sharesInformation.Lookup((CSharesCompute::GetIndexSymbol(1)).GetBuffer(0), p399001, SZAG);
+
 	CString seb = CSharesCompute::GetIndexSymbol(2);
 	m_sharesInformation.Lookup(seb.GetBuffer(0), p2D01, 2);
 
-	if (p1A0001 != NULL && p2A01 != NULL)
+	if (p1A0001 != NULL && p399001 != NULL)
 	{
 		if (p1A0001->nowp == 0)
 		{
@@ -1146,7 +1149,7 @@ void CTaiShanDoc::OnCalcHqDataProgress()
 		{
 			((CMainFrame*)(AfxGetApp()->m_pMainWnd))->DisplayBargain(
 				p1A0001->nowp, p1A0001->nowp - p1A0001->ystc, p1A0001->totv, p1A0001->totp / 10000,
-				p2A01->nowp, p2A01->nowp - p2A01->ystc, p2A01->totv, p2A01->totp / 100000000,
+				p399001->nowp, p399001->nowp - p399001->ystc, p399001->totv, p399001->totp / 100000000,
 				p2D01->nowp, p2D01->nowp - p2D01->ystc, p2D01->totv, p2D01->totp / 100000000,
 				rd_sh / 100, rd_sz / 100, rd_eb / 100);
 		}
@@ -1154,7 +1157,7 @@ void CTaiShanDoc::OnCalcHqDataProgress()
 		{
 			((CMainFrame*)(AfxGetApp()->m_pMainWnd))->DisplayBargain(
 				p1A0001->nowp, p1A0001->nowp - p1A0001->ystc, p1A0001->totv, p1A0001->totp / 100000000,
-				p2A01->nowp, p2A01->nowp - p2A01->ystc, p2A01->totv, p2A01->totp / 100000000,
+				p399001->nowp, p399001->nowp - p399001->ystc, p399001->totv, p399001->totp / 100000000,
 				0, 0, 0, 0,
 				rd_sh / 100, rd_sz / 100, rd_eb / 100);
 		}
@@ -1640,54 +1643,6 @@ void* CTaiShanDoc::LookUpArray(Formu_Array1 &js, CString &str)
 		}
 	}
 	return NULL;
-}
-void CTaiShanDoc::OnOpenDocument() 
-{
-
-}
-
-
-
-
-
-
-void CTaiShanDoc::OnToolClosework() 
-{
-
-#ifdef TEST
-	CTime t3 = CTime::GetCurrentTime();
-	CTime t2(2001, 6, 30, 0, 0, 0 );
-	if(t3 > t2)
-	{
-		AfxMessageBox("使用期已过！",MB_ICONSTOP);
-		return;
-	}
-#endif
-
-	int tmp=GetStocktime(0) ;   
-	if(tmp<902)
-		return;
-
-	struct tm when; 
-	time_t now; 
-	time( &now );
-	when = *localtime( &now );
-	if(when.tm_wday==0||when.tm_wday==6)
-		return ;
-	if(!m_bCloseWorkDone)
-	{
-		m_bCloseWorkDone=TRUE;
-		StockCloseWork();
-	}
-	else
-	{
-		int rtn = MessageBox(NULL,"当天已收盘！是否再做收盘作业？","警告",MB_YESNO|MB_ICONWARNING);
-		if(rtn==6)
-		{
-			m_bCloseWorkDone=TRUE;
-			StockCloseWork();
-		}
-	}
 }
 void  CTaiShanDoc::StockNameConvert(char *StockName,char *pyjc)
 {
@@ -2206,17 +2161,6 @@ BOOL CTaiShanDoc::ModifyStockOfKeyboard(CString strStockCode,int stkKind,CString
 	}
 	return bResult;
 }
-
-void CTaiShanDoc::InitChooseAndStockType()
-{
-	m_ManagerStockTypeData.InitStockPoint();
-	if(m_ManagerStockTypeData.GetStockTypeCounts()!=this->m_sharesInformation.GetStockTypeCount(10))
-	{
-		m_sharesInformation.DeleteAllStockFromStockType();
-	}
-	if(this->m_sharesInformation.GetStockTypeCount(10)==0)
-		m_ManagerStockTypeData.InitStockTypePoint();                 
-}
 void CTaiShanDoc::InitStockFiveDaysVolumn()
 {
 	for(int i=0;i<10;i++)
@@ -2548,3 +2492,35 @@ void CTaiShanDoc::WideNetInitMarketBargainingData2(RCV_STKLABEL2_STRUCTEx *pStkL
 	}
 }
 #endif
+
+void CTaiShanDoc::OnOpenDocument()
+{
+}
+
+void CTaiShanDoc::OnToolClosework() 
+{
+	int tmp = GetStocktime(0);
+	if (tmp < 902)
+		return;
+
+	struct tm when; 
+	time_t now; 
+	time( &now );
+	when = *localtime( &now );
+	if(when.tm_wday==0||when.tm_wday==6)
+		return ;
+	if(!m_bCloseWorkDone)
+	{
+		m_bCloseWorkDone=TRUE;
+		StockCloseWork();
+	}
+	else
+	{
+		int rtn = MessageBox(NULL,"当天已收盘！是否再做收盘作业？","警告",MB_YESNO|MB_ICONWARNING);
+		if(rtn==6)
+		{
+			m_bCloseWorkDone=TRUE;
+			StockCloseWork();
+		}
+	}
+}

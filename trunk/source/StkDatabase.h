@@ -3,6 +3,23 @@
 
 #include "CTaiKlineFileHS.h"
 
+// 分析家除权结构
+typedef struct tagFXJ_POWER
+{
+	int		nTime;
+	float	fGive;
+	float	fAlloc;
+	float	fAllocPrice;
+	float	fDividend;
+} FXJ_POWER;
+
+typedef struct tagStockSymbol
+{
+	WORD wMarket;
+	char szLabel[8];
+	char szSymbol[10];
+}  StockSymbol;
+
 //class CStkReportFile;
 class CTaiKlineFileKLine;
 class CSharesBaseInfo;
@@ -37,6 +54,9 @@ public:
 public:
 	CString GetStockSymbol(char* szStock, int nKind);
 	void GetStockSymbol(SymbolKind& symbol, char* szSymbol);
+
+public:
+	void AddStockSymbol(WORD wMarket, char* szLabel);
 };
 
 CStkDatabase* TSKDatabase();

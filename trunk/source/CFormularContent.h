@@ -1,3 +1,4 @@
+
 #if !defined(AFX_LJISHU_H__A3E1ADE5_B7F2_11D1_83EC_0000E8593F1A__INCLUDED_)
 #define AFX_LJISHU_H__A3E1ADE5_B7F2_11D1_83EC_0000E8593F1A__INCLUDED_
 
@@ -102,7 +103,6 @@ public:
 		};
 		BYTE btMemData[LEN_BYTE];
 	};
-	ADDITIONAL_BUYSELL * pAdditionalBS;
 	CArray<FLOAT11,FLOAT11&>	defaultValArray;	
 
 	CString		name;	
@@ -123,53 +123,54 @@ public:
 	CString		subKindIndexTime;	
 	CString		strReserved;	
 
-	static bool m_bVer20;
-	static CStringArray m_strArrayKind[4];
 	float		defaultValYH[8];	
 
 
 
 public:
-	CString GetFormular();
 	static bool ExportFormular(Formu_Array1* pArr,int nArr,CString fileName,BOOL bCompleteSecret, BOOL bPassword, CString strPassword);
 	static bool InstallIndicator(CString sFilePathName,bool bPromp = false,bool bFromServer = true);
 	static bool InstallIndicatorCwd(CString sFilePathName,bool bPromp = false,bool bFromServer = true);
-	bool IsValid();
 	void SecretForm(CString& s,bool bLoad );
-	void AddDefaultValToArray();
 	static float GetParamDataEach(int iIndex,int nKlineType,CFormularContent* pJishu);
-	static void  DeleteKindName(CString s, int nKind);
-	void InitDefaultValArray();
-	static void AddKindName(CString s,int nKind = 0 );
-	void SerializeData(CArchive& ar);
 	void SetData(CFormularContent * data);
+
+
+
 
 
 
 	virtual ~CFormularContent();
 
-	//{{AFX_VIRTUAL(CFormularContent)
-	//}}AFX_VIRTUAL
+public:
+	static CStringArray m_strArrayKind[4];
+	static BOOL m_bVer20;
 
-
-protected:
-
-	virtual void Serialize(CArchive& ar);
-	DECLARE_SERIAL(CFormularContent)
-
-
-	//{{AFX_MSG(CFormularContent)
-
-	//}}AFX_MSG
+public:
+	ADDITIONAL_BUYSELL* pAdditionalBS;
 
 public:
 	static void ReadWriteIndex(CTaiShanDoc* pDoc, int nKind = 0, BOOL bRead = TRUE);
+	static void AddKindName(CString strName, int nKind = 0);
+	static void DeleteKindName(CString strName, int nKind);
 	static void ClearIndex(CTaiShanDoc* pDoc, int nKind = 0);
+
+public:
+	void AddDefaultValToArray();
+	void InitDefaultValArray();
+	CString GetFormular();
+	BOOL IsValid();
+	void SerializeData(CArchive& ar);
+
+protected:
+	//{{AFX_VIRTUAL(CFormularContent)
+	virtual void Serialize(CArchive& ar);
+	//}}AFX_VIRTUAL
+
+protected:
+	//{{AFX_MSG(CFormularContent)
+	//}}AFX_MSG
+	DECLARE_SERIAL(CFormularContent)
 };
-
-/////////////////////////////////////////////////////////////////////////////
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
 #endif // !defined(AFX_LJISHU_H__A3E1ADE5_B7F2_11D1_83EC_0000E8593F1A__INCLUDED_)

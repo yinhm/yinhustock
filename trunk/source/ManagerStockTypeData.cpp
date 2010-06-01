@@ -62,49 +62,6 @@ CSuperviseSharesBlockData::~CSuperviseSharesBlockData()
 	}
 }
 
-BOOL CSuperviseSharesBlockData::InitStockPoint()                   
-{
-
-	for(int j=0;j<m_pStockTypeHead->m_lStockCount;j++)
-	{
-		CReportData *pCdat;
-		CString m_strStockKind=m_pStockInfo[j].m_szSymbol;
-		char m_szStockCode[10];
-		int nKind;		 
-		strcpy(m_szStockCode,m_strStockKind.Right(m_strStockKind.GetLength()-2).GetBuffer(0));
-		nKind=m_pDoc->GetStockKind(m_strStockKind.Left(2));
-		if(nKind<0)
-			continue;
-		if(this->m_pDoc->m_sharesInformation.Lookup(m_szStockCode,pCdat,nKind))
-		{
-			pCdat->pStockTypeInfo=&m_pStockInfo[j];
-		}
-
-	}
-	return TRUE;
-}
-
-BOOL CSuperviseSharesBlockData::InitStockTypePoint()                   
-{
-	for(int i=0;i<MaxStockTYpe;i++)
-	{
-		if(m_pStockTypeInfo[i].m_bIsDelete||m_pStockTypeInfo[i].m_lIsUse==-1 )
-			continue;
-		CReportData *pCdat;
-		if(!this->m_pDoc->m_sharesInformation.Lookup(m_pStockTypeInfo[i].m_szCode,pCdat,STKTYPE))//查找股票是否存在
-		{
-			m_pDoc->m_sharesInformation.InsertItem(m_pStockTypeInfo[i].m_szCode,pCdat,STKTYPE);    //插入股票
-			strcpy(pCdat->name ,m_pStockTypeInfo[i].m_szName );
-			strcpy(pCdat->id ,m_pStockTypeInfo[i].m_szCode );
-			pCdat->kind=STKTYPE; 
-			if(strlen(pCdat->name)>0)
-				m_pDoc->StockNameConvert(pCdat->name,pCdat->Gppyjc) ;
-			m_pDoc->AddStockToKeyboard(pCdat->id,pCdat->kind,pCdat->name,pCdat->Gppyjc);
-		}
-	}
-	return TRUE;
-}
-
 BOOL CSuperviseSharesBlockData::InitStockTypeDataEmpty(CString strPath)
 {
 	BYTE* temp;
@@ -218,6 +175,54 @@ BOOL CSuperviseSharesBlockData::InitStockTypeData(CString strPath)
 	else
 	{
 		InitStockTypeDataExist(strPath);
+	}
+
+	return TRUE;
+}
+
+BOOL CSuperviseSharesBlockData::InitStockPoint()
+{
+	for (int j = 0; j < m_pStockTypeHead->m_lStockCount; j++)
+	{
+		CReportData* pCdat;
+		CString m_strStockKind = m_pStockInfo[j].m_szSymbol;
+		char m_szStockCode[10];
+		int nKind;
+		strcpy(m_szStockCode, m_strStockKind.Right(m_strStockKind.GetLength() - 2).GetBuffer(0));
+		nKind = m_pDoc->GetStockKind(m_strStockKind.Left(2));
+		if (nKind < 0)
+		{
+			continue;
+		}
+
+		if (m_pDoc->m_sharesInformation.Lookup(m_szStockCode, pCdat, nKind))
+		{
+			pCdat->pStockTypeInfo = &m_pStockInfo[j];
+		}
+	}
+
+	return TRUE;
+}
+
+BOOL CSuperviseSharesBlockData::InitStockTypePoint()
+{
+	for (int i = 0; i < MaxStockTYpe; i++)
+	{
+		if (m_pStockTypeInfo[i].m_bIsDelete || m_pStockTypeInfo[i].m_lIsUse == -1)
+			continue;
+
+		CReportData* pCdat;
+		if (!m_pDoc->m_sharesInformation.Lookup(m_pStockTypeInfo[i].m_szCode, pCdat, STKTYPE))
+		{
+			m_pDoc->m_sharesInformation.InsertItem(m_pStockTypeInfo[i].m_szCode, pCdat, STKTYPE);
+			strcpy(pCdat->name, m_pStockTypeInfo[i].m_szName);
+			strcpy(pCdat->id, m_pStockTypeInfo[i].m_szCode);
+			pCdat->kind = STKTYPE;
+			if (strlen(pCdat->name) > 0)
+				m_pDoc->StockNameConvert(pCdat->name, pCdat->Gppyjc);
+
+			m_pDoc->AddStockToKeyboard(pCdat->id, pCdat->kind, pCdat->name, pCdat->Gppyjc);
+		}
 	}
 
 	return TRUE;
@@ -763,111 +768,92 @@ BOOL CSuperviseSharesBlockData::SavePosToFile()
 	return TRUE;
 }
 
-//***************************************************
-
-//***************************************************
-
-BOOL CSuperviseSharesBlockData::InsertStockType(PSTOCKTYPEINFO &m_pStktype,int m_iPos)
+BOOL CSuperviseSharesBlockData::InsertStockType(PSTOCKTYPEINFO& m_pStktype, int m_iPos)
 {
-	if(m_iPos>=MaxStockTYpe)
+	if (m_iPos >= MaxStockTYpe)
 	{
-		AfxMessageBox("增加新板块位置不正确!");
+		ASSERT(FALSE);
 		return FALSE;
 	}
-	if(m_pStockTypeInfo[m_iPos].m_bIsDelete||m_pStockTypeInfo[m_iPos].m_lIsUse==-1 )
-	{ 
-		m_pStktype=m_pStockTypeInfo+m_iPos;      
+
+	if (m_pStockTypeInfo[m_iPos].m_bIsDelete || m_pStockTypeInfo[m_iPos].m_lIsUse == -1)
+	{
+		m_pStktype = m_pStockTypeInfo + m_iPos;
 	}
 	else
 	{
-		AfxMessageBox("增加新板块位置时，原板块没有删除，增加没有成功!");
+		ASSERT(FALSE);
 		return FALSE;
 	}
-	m_pStktype->m_fNewIndex=0;
-	m_pStktype->m_fTotP=0;        
-	m_pStktype->m_fTotV=0;       
-	m_pStktype->m_fYstIndex=0;
-	m_pStktype->m_fOpenIndex=0;
 
-	SaveDataToFile(m_pStockTypeHead,0);
+	m_pStktype->m_fNewIndex = 0;
+	m_pStktype->m_fTotP = 0;
+	m_pStktype->m_fTotV = 0;
+	m_pStktype->m_fYstIndex = 0;
+	m_pStktype->m_fOpenIndex = 0;
+
+	SaveDataToFile(m_pStockTypeHead, 0);
+
 	return TRUE;
 }
 
-int CSuperviseSharesBlockData::GetStockCountFromType(char *m_pszCode)
+BOOL CSuperviseSharesBlockData::DeleteStockType(char* m_pszStockTypeCode)
 {
-	BYTE m_btPos=GetStockTypeNumber(m_pszCode) ;
-	return m_pStockTypeInfo[m_btPos].m_lStockCount;
-}
-
-BOOL CSuperviseSharesBlockData::DeleteStockType(char *m_pszStockTypeCode)                                 
-{
-	BYTE m_btPos=GetStockTypeNumber(m_pszStockTypeCode);
-	for(int i=0;i<m_pStockTypeHead->m_lStockCount;i++)
+	BYTE m_btPos = GetStockTypeNumber(m_pszStockTypeCode);
+	for (int i = 0; i < m_pStockTypeHead->m_lStockCount; i++)
 	{
-		int index=0;
-		BOOL m_bIsFind=FALSE;
+		int index = 0;
+		BOOL m_bIsFind = FALSE;
 
-		while(m_pStockInfo[i].m_btStockType[index]!=255&&index<MaxStockTYpe&&!m_bIsFind)
+		while (m_pStockInfo[i].m_btStockType[index] != 255 && index < MaxStockTYpe && !m_bIsFind)
 		{
-			if(m_pStockInfo[i].m_btStockType[index]==m_btPos)
+			if (m_pStockInfo[i].m_btStockType[index] == m_btPos)
 			{
 				do
-			 {
-				 m_pStockInfo[i].m_btStockType[index]=m_pStockInfo[i].m_btStockType[index+1];
-				 index++; 
-			 }while(m_pStockInfo[i].m_btStockType[index]!=255&&index<MaxStockTYpe);
-			 m_bIsFind=TRUE;
-			 break;
+				{
+					m_pStockInfo[i].m_btStockType[index] = m_pStockInfo[i].m_btStockType[index + 1];
+					index++;
+				}
+				while (m_pStockInfo[i].m_btStockType[index] != 255 && index < MaxStockTYpe);
+				m_bIsFind = TRUE;
+				break;
 			}
 			index++;
 		};
 	}
-	m_pStockTypeInfo[m_btPos].m_bIsDelete=TRUE;
-	CTaiKlineFileKLine::ZeroKlineData(m_pStockTypeInfo[m_btPos].m_szCode,STKTYPE,TRUE);
-	CTaiKlineFileKLine::ZeroKlineData(m_pStockTypeInfo[m_btPos].m_szCode,STKTYPE,FALSE);
-	SaveDataToFile(m_pStockTypeHead,0);
+
+	m_pStockTypeInfo[m_btPos].m_bIsDelete = TRUE;
+	CTaiKlineFileKLine::ZeroKlineData(m_pStockTypeInfo[m_btPos].m_szCode, STKTYPE, TRUE);
+	CTaiKlineFileKLine::ZeroKlineData(m_pStockTypeInfo[m_btPos].m_szCode, STKTYPE, FALSE);
+	SaveDataToFile(m_pStockTypeHead, 0);
+
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::GetStockTypePoint(PSTOCKTYPEINFO &m_pStktype,char *m_pszStockTypeCode)
+BOOL CSuperviseSharesBlockData::GetStockFromStockType(SymbolKindArr& m_StockCodeArray, char* m_pszStockTypeCode)
 {
-	BYTE m_btPos=GetStockTypeNumber(m_pszStockTypeCode) ;
-	m_pStktype=m_pStockTypeInfo+m_btPos;
-	return TRUE;
-}
+	BYTE m_btPos = GetStockTypeNumber(m_pszStockTypeCode);
 
-int  CSuperviseSharesBlockData::GetInsertStockTypePos()                                                
-{
-	for(int i=0;i<MaxStockTYpe;i++)
+	int index = 0;
+	for (int i = 0; i < m_pStockTypeHead->m_lStockCount; i++)
 	{
-		if(m_pStockTypeInfo[i].m_bIsDelete||m_pStockTypeInfo[i].m_lIsUse==-1 )
-			return i;
-	}
-	AfxMessageBox("没有可增加板块数，请删除某些不用板块后再增加新板块!");
-	return -1;
-}
+		int j = 0;
 
-BOOL CSuperviseSharesBlockData::GetStockFromStockType(SymbolKindArr &m_StockCodeArray,char *m_pszStockTypeCode)          
-{
-	BYTE m_btPos=GetStockTypeNumber(m_pszStockTypeCode);
-	int index=0;
-	for(int i=0;i<m_pStockTypeHead->m_lStockCount;i++)
-	{
-		int j=0;
-		if(m_pStockPoint[i].pStockInfo==NULL)
+		if (m_pStockPoint[i].pStockInfo == NULL)
 			continue;
-		while(m_pStockPoint[i].pStockInfo->m_btStockType[j]!=255&&j<MaxStockTYpe)
+
+		while (m_pStockPoint[i].pStockInfo->m_btStockType[j] != 255 && j < MaxStockTYpe)
 		{
-			if(m_pStockPoint[i].pStockInfo->m_btStockType[j]==m_btPos)  
+			if (m_pStockPoint[i].pStockInfo->m_btStockType[j] == m_btPos)
 			{
 				SymbolKind CodeStr;
-				CString m_strStockKind=m_pStockPoint[i].pStockInfo->m_szSymbol;
+				CString m_strStockKind = m_pStockPoint[i].pStockInfo->m_szSymbol;
 				char m_szStockCode[10];
 				int nKind;
-				strcpy(m_szStockCode,m_strStockKind.Right(m_strStockKind.GetLength()-2).GetBuffer(0));
-				nKind=m_pDoc->GetStockKind(m_strStockKind.Left(2));
-				strcpy(CodeStr.m_chSymbol,m_szStockCode);
-				CodeStr.m_nSymbolKind=nKind;
+				strcpy(m_szStockCode, m_strStockKind.Right(m_strStockKind.GetLength() - 2).GetBuffer(0));
+				nKind = m_pDoc->GetStockKind(m_strStockKind.Left(2));
+				strcpy(CodeStr.m_chSymbol, m_szStockCode);
+				CodeStr.m_nSymbolKind = nKind;
 				m_StockCodeArray.Add(CodeStr);
 				index++;
 				break;
@@ -875,154 +861,155 @@ BOOL CSuperviseSharesBlockData::GetStockFromStockType(SymbolKindArr &m_StockCode
 			j++;
 		};
 	}
+
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::GetStockFromStockTypeName(SymbolKindArr &m_StockCodeArray,char *m_pszStockTypeName)          
+BOOL CSuperviseSharesBlockData::GetStockFromStockTypeName(SymbolKindArr& m_StockCodeArray, char* m_pszStockTypeName)
 {
-	STOCKTYPEINFO *l_pStktype;
-	if(!GetStockTypePointFromName(l_pStktype,m_pszStockTypeName))
+	STOCKTYPEINFO* l_pStktype;
+	if (!GetStockTypePointFromName(l_pStktype, m_pszStockTypeName))
 	{
 		return FALSE;
 	}
-	BYTE m_btPos=GetStockTypeNumber(l_pStktype->m_szCode);
-	int index=0;
-	for(int i=0;i<m_pStockTypeHead->m_lStockCount;i++)
-	{
-		int j=0;
 
-		while((m_pStockPoint+i)!=NULL&&m_pStockPoint[i].pStockInfo->m_btStockType[j]!=255&&j<MaxStockTYpe)
-		{
-			if(m_pStockPoint[i].pStockInfo->m_btStockType[j]==m_btPos)   
-			{
-				SymbolKind CodeStr;
-				CString m_strStockKind=m_pStockPoint[i].pStockInfo->m_szSymbol;
-				char m_szStockCode[10];
-				int nKind;
-				strcpy(m_szStockCode,m_strStockKind.Right(m_strStockKind.GetLength()-2).GetBuffer(0));
-				nKind=m_pDoc->GetStockKind(m_strStockKind.Left(2));
-				strcpy(CodeStr.m_chSymbol,m_szStockCode);
-				CodeStr.m_nSymbolKind=nKind;
-				m_StockCodeArray.Add(CodeStr);
-				index++;
-				break;
-			}
-			j++;
-		};
-	}
-	return TRUE;
+	return GetStockFromStockType(m_StockCodeArray, l_pStktype->m_szCode);
 }
 
-BOOL CSuperviseSharesBlockData::InsertStockToType(PCdat1 &m_pCdat,char *m_pszStockTypeCode)        
+int CSuperviseSharesBlockData::GetStockCountFromType(char* m_pszCode)
 {
-	STOCKTYPEINFO *m_pStktype;
-	STOCK_TYPE_INFO *m_pStock;
-	int index=0;
-	if(m_pCdat->pBaseInfo==NULL)
-	{
-		MessageBox(NULL,"在将股票加入板块时,该股票财务数据不能为空!","窗口操作提示",MB_OK);
-		return FALSE;
-	}
-	if(!CheckKind(m_pCdat->kind))
+	BYTE m_btPos = GetStockTypeNumber(m_pszCode);
+	return m_pStockTypeInfo[m_btPos].m_lStockCount;
+}
 
-	{
-		MessageBox(NULL,"指数类将不能增加到板块中!","窗口操作提示",MB_OK);
-		return FALSE;
-	}
-	BYTE m_btPos=GetStockTypeNumber(m_pszStockTypeCode);             
+BOOL CSuperviseSharesBlockData::InsertStockToType(PCdat1& m_pCdat, char* m_pszStockTypeCode)
+{
+	STOCKTYPEINFO* m_pStktype;
+	STOCK_TYPE_INFO* m_pStock;
 
-	if(!GetStockTypePoint( m_pStktype,m_pszStockTypeCode))   
+	int index = 0;
+
+	/* 去掉这两项检测
+	if (m_pCdat->pBaseInfo == NULL)
 	{
-		AfxMessageBox("板块代码不正确! 不能从该板块中增加股票");
+		MessageBox(NULL, "在将股票加入板块时,该股票财务数据不能为空!", "窗口操作提示", MB_OK);
 		return FALSE;
 	}
-	if(!InsertStockItem(m_pCdat->id ,m_pCdat->kind,m_pStock))    
+
+	if (!CheckKind(m_pCdat->kind))
 	{
-		AfxMessageBox("插入股票时不正确! 不能增加股票");
+		MessageBox(NULL, "指数类将不能增加到板块中!", "窗口操作提示", MB_OK);
+		return FALSE;
+	}//*/
+
+	BYTE m_btPos = GetStockTypeNumber(m_pszStockTypeCode);
+
+	if (!GetStockTypePoint(m_pStktype, m_pszStockTypeCode))
+	{
+		ASSERT(FALSE);
 		return FALSE;
 	}
-	for(int i=0;m_pStock->m_btStockType[i]!=255&&i<MaxStockTYpe;i++)  
+
+	if (!InsertStockItem(m_pCdat->id, m_pCdat->kind, m_pStock))
 	{
-		if(m_pStock->m_btStockType[i]==m_btPos)
+		ASSERT(FALSE);
+		return FALSE;
+	}
+
+	for (int i = 0; m_pStock->m_btStockType[i] != 255 && i < MaxStockTYpe; i++)
+	{
+		if (m_pStock->m_btStockType[i] == m_btPos)
 			return TRUE;
 	}
-	while(m_pStock->m_btStockType[index]!=255&&index<MaxStockTYpe)
+
+	while (m_pStock->m_btStockType[index] != 255 && index < MaxStockTYpe)
 	{
 		index++;
 	};
 
-	m_pStock->m_btStockType[index]=m_btPos;
-	m_pStock->m_bDeleted=FALSE;
-	m_pStock->m_fRight[ZGB]=m_pCdat->pBaseInfo->zgb;
-	if(m_pCdat->kind==SHBG||m_pCdat->kind==SZBG)
-		m_pStock->m_fRight[LTG]=m_pCdat->pBaseInfo->Bg;
+	m_pStock->m_btStockType[index] = m_btPos;
+	m_pStock->m_bDeleted = FALSE;
+	m_pStock->m_fRight[ZGB] = m_pCdat->pBaseInfo->zgb;
+	if (m_pCdat->kind == SHBG || m_pCdat->kind == SZBG)
+		m_pStock->m_fRight[LTG] = m_pCdat->pBaseInfo->Bg;
 	else
-		m_pStock->m_fRight[LTG]=m_pCdat->pBaseInfo->ltAg;
+		m_pStock->m_fRight[LTG] = m_pCdat->pBaseInfo->ltAg;
 
-	CTaiKlineFileKLine::GetFirstKline(m_pCdat->id,m_pCdat->kind,TRUE,1 ,&m_pStock->m_ClosePrice);
+	CTaiKlineFileKLine::GetFirstKline(m_pCdat->id, m_pCdat->kind, TRUE, 1, &m_pStock->m_ClosePrice);
 
-	m_pCdat->pStockTypeInfo= m_pStock; 
+	m_pCdat->pStockTypeInfo = m_pStock; 
 
-
-	switch(m_pStktype->m_iRightType)        
+	switch (m_pStktype->m_iRightType)
 	{
-	case ZGB:    m_pStktype->m_fTotalRight+=m_pStock->m_fRight[ZGB]*m_pStock->m_ClosePrice;
+	case ZGB:
+		m_pStktype->m_fTotalRight += m_pStock->m_fRight[ZGB] * m_pStock->m_ClosePrice;
 		m_pStktype->m_lStockCount++;
 		break;
-	case LTG:    m_pStktype->m_fTotalRight+=m_pStock->m_fRight[LTG]*m_pStock->m_ClosePrice;
+	case LTG:
+		m_pStktype->m_fTotalRight += m_pStock->m_fRight[LTG] * m_pStock->m_ClosePrice;
 		m_pStktype->m_lStockCount++;
-		break; 
-	case OTHER:  m_pStktype->m_fTotalRight+=m_pStock->m_ClosePrice;
+		break;
+	case OTHER:
+		m_pStktype->m_fTotalRight += m_pStock->m_ClosePrice;
 		m_pStktype->m_lStockCount++;
 		break;
 	}
-	SaveDataToFile(m_pStockTypeHead,0);
+
+	SaveDataToFile(m_pStockTypeHead, 0);
+
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::DeleteStockFromType(char *m_pszStockCode,int nKind,char *m_pszStockTypeCode)
+BOOL CSuperviseSharesBlockData::DeleteStockFromType(char* m_pszStockCode, int nKind, char* m_pszStockTypeCode)
 {
-	STOCKTYPEINFO *m_pStktype;
-	BYTE m_btPos=GetStockTypeNumber(m_pszStockTypeCode);
+	STOCKTYPEINFO* m_pStktype;
 
-	if(!GetStockTypePoint( m_pStktype,m_pszStockTypeCode))   
+	BYTE m_btPos = GetStockTypeNumber(m_pszStockTypeCode);
+
+	if (!GetStockTypePoint(m_pStktype, m_pszStockTypeCode))
 	{
-		AfxMessageBox("板块代码不正确! 不能从该板块中删除股票");
+		ASSERT(FALSE);
 		return FALSE;
 	}
-	STOCK_TYPE_INFO *m_pStock;
-	if(Lookup(m_pszStockCode,nKind,m_pStock))   
+
+	STOCK_TYPE_INFO* m_pStock;
+	if (Lookup(m_pszStockCode, nKind, m_pStock))
 	{
-		int index=0;
-		while(m_pStock->m_btStockType[index]!=255&&index<MaxStockTYpe)
+		int index = 0;
+		while (m_pStock->m_btStockType[index] != 255 && index < MaxStockTYpe)
 		{
-			if(m_pStock->m_btStockType[index]==m_btPos)  
+			if (m_pStock->m_btStockType[index] == m_btPos)
 			{
-				switch(m_pStktype->m_iRightType)           
+				switch (m_pStktype->m_iRightType)           
 				{
-				case ZGB:    m_pStktype->m_fTotalRight-=m_pStock->m_fRight[ZGB]*m_pStock->m_ClosePrice;
+				case ZGB:
+					m_pStktype->m_fTotalRight -= m_pStock->m_fRight[ZGB] * m_pStock->m_ClosePrice;
 					m_pStktype->m_lStockCount--;
 					break;
-				case LTG:    m_pStktype->m_fTotalRight-=m_pStock->m_fRight[LTG]*m_pStock->m_ClosePrice;
+				case LTG:
+					m_pStktype->m_fTotalRight -= m_pStock->m_fRight[LTG] * m_pStock->m_ClosePrice;
 					m_pStktype->m_lStockCount--;
 					break; 
-				case OTHER:  m_pStktype->m_fTotalRight-=m_pStock->m_ClosePrice;
+				case OTHER:
+					m_pStktype->m_fTotalRight -= m_pStock->m_ClosePrice;
 					m_pStktype->m_lStockCount--;
 					break;
 				}
+
 				do
 				{
-					m_pStock->m_btStockType[index]=m_pStock->m_btStockType[index+1];
-					index++; 
-				}while(m_pStock->m_btStockType[index]!=255&&index<MaxStockTYpe);
-				m_pStock->m_btStockType[index]=255;
-				if(index==0)
-					m_pStock->m_bDeleted=TRUE;
+					m_pStock->m_btStockType[index] = m_pStock->m_btStockType[index + 1];
+					index++;
+				}
+				while (m_pStock->m_btStockType[index] != 255 && index < MaxStockTYpe);
+				m_pStock->m_btStockType[index] = 255;
+				if (index == 0)
+					m_pStock->m_bDeleted = TRUE;
 				break;
 			}
 			index++;
 		};
-		SaveDataToFile(m_pStockTypeHead,0);
+		SaveDataToFile(m_pStockTypeHead, 0);
 		return TRUE;
 	}
 	else
@@ -1032,131 +1019,200 @@ BOOL CSuperviseSharesBlockData::DeleteStockFromType(char *m_pszStockCode,int nKi
 }
 
 
-void CSuperviseSharesBlockData::GetAllStockTypeCode(CStringArray &m_StockTypeCodeArray)
+BOOL CSuperviseSharesBlockData::CheckBlockName(char* BlockName, char* BlockCode)
 {
-	for(int i=0;i<MaxStockTYpe;i++)
+	for (int i = 0; i < MaxStockTYpe; i++)
+	{
+		CString m_szTypeName;
+
+		if (m_pStockTypeInfo[i].m_lIsUse == -1)
+			break;
+
+		if (m_pStockTypeInfo[i].m_bIsDelete)
+			continue;
+
+		if (BlockCode == NULL)
+		{
+			if (strcmp(m_pStockTypeInfo[i].m_szName, BlockName) == 0)
+				return TRUE;
+		}
+		else
+		{
+			if (strcmp(m_pStockTypeInfo[i].m_szName, BlockName) == 0 && strcmp(m_pStockTypeInfo[i].m_szCode, BlockCode) != 0)
+				return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
+int CSuperviseSharesBlockData::GetInsertStockTypePos()
+{
+	for (int i = 0; i < MaxStockTYpe; i++)
+	{
+		if (m_pStockTypeInfo[i].m_bIsDelete || m_pStockTypeInfo[i].m_lIsUse == -1)
+		{
+			return i;
+		}
+	}
+
+	ASSERT(FALSE);
+
+	return -1;
+}
+
+void CSuperviseSharesBlockData::GetAllStockTypeCode(CStringArray& m_StockTypeCodeArray)
+{
+	for (int i = 0; i < MaxStockTYpe; i++)
 	{
 		CString m_szTypeCode;
-		if(this->m_pStockTypeInfo[i].m_lIsUse==-1)
+		if (m_pStockTypeInfo[i].m_lIsUse == -1)
 			break;
-		if(this->m_pStockTypeInfo[i].m_bIsDelete)
+
+		if (m_pStockTypeInfo[i].m_bIsDelete)
 			continue;
-		m_szTypeCode=m_pStockTypeInfo[i].m_szCode;
+
+		m_szTypeCode = m_pStockTypeInfo[i].m_szCode;
 		m_StockTypeCodeArray.Add(m_szTypeCode);
 	}
 }
-int CSuperviseSharesBlockData::GetStockTypeCounts()          
-{
-	int index=0;
-	for(int i=0;i<MaxStockTYpe;i++)
-	{
-		if(this->m_pStockTypeInfo[i].m_lIsUse==-1)
-			break;
-		if(this->m_pStockTypeInfo[i].m_bIsDelete)
-			continue;
-		index++;
-	}
-	return index;
-}
 
-
-void CSuperviseSharesBlockData::GetAllStockTypeName(CStringArray &m_StockTypeNameArray)
+void CSuperviseSharesBlockData::GetAllStockTypeName(CStringArray& m_StockTypeNameArray)
 {
-	for(int i=0;i<MaxStockTYpe;i++)
+	for (int i = 0; i < MaxStockTYpe; i++)
 	{
 		CString m_szTypeName;
-		if(this->m_pStockTypeInfo[i].m_lIsUse==-1)
+		if (m_pStockTypeInfo[i].m_lIsUse == -1)
 			break;
-		if(this->m_pStockTypeInfo[i].m_bIsDelete)
+
+		if (m_pStockTypeInfo[i].m_bIsDelete)
 			continue;
-		m_szTypeName=m_pStockTypeInfo[i].m_szName;
+
+		m_szTypeName = m_pStockTypeInfo[i].m_szName;
 		m_StockTypeNameArray.Add(m_szTypeName);
 	}
 }
 
-BOOL CSuperviseSharesBlockData::GetStockTypePointFromName(PSTOCKTYPEINFO &m_pStktype,char *m_pszStockTypeName)
+BOOL CSuperviseSharesBlockData::GetStockTypePoint(PSTOCKTYPEINFO& m_pStktype, char* m_pszStockTypeCode)
 {
-	for(int i=0;i<MaxStockTYpe;i++)
+	BYTE m_btPos = GetStockTypeNumber(m_pszStockTypeCode);
+	m_pStktype = m_pStockTypeInfo + m_btPos;
+
+	return TRUE;
+}
+
+BOOL CSuperviseSharesBlockData::GetStockTypePointFromName(PSTOCKTYPEINFO& m_pStktype, char* m_pszStockTypeName)
+{
+	for (int i = 0; i < MaxStockTYpe; i++)
 	{
 		CString m_szTypeName;
-		if(this->m_pStockTypeInfo[i].m_lIsUse==-1)
+		if (m_pStockTypeInfo[i].m_lIsUse == -1)
 			break;
-		if(this->m_pStockTypeInfo[i].m_bIsDelete)
+
+		if (m_pStockTypeInfo[i].m_bIsDelete)
 			continue;
 
-		if(strcmp(this->m_pStockTypeInfo[i].m_szName,m_pszStockTypeName)==0)
+		if (strcmp(m_pStockTypeInfo[i].m_szName, m_pszStockTypeName) == 0)
 		{
-			m_pStktype=&m_pStockTypeInfo[i];
+			m_pStktype = &m_pStockTypeInfo[i];
 			return TRUE;
 		}
 	}
+
 	return FALSE;
 }
 
-
-BOOL CSuperviseSharesBlockData::ImportStockTypeData(CString m_szPathStr,CString m_szStockTyoeNameStr,PSTOCKTYPEINFO &l_pStockkType,int nRightType)
+BOOL CSuperviseSharesBlockData::ImportStockTypeData(CString m_szPathStr, CString m_szStockTyoeNameStr, PSTOCKTYPEINFO& l_pStockkType, int nRightType)
 {
-
-	if(GetStockTypePointFromName(l_pStockkType,m_szStockTyoeNameStr.GetBuffer(0)))
+	if (GetStockTypePointFromName(l_pStockkType, m_szStockTyoeNameStr.GetBuffer(0)))
 	{
 		DeleteStockType(l_pStockkType->m_szCode);
-		CReportData *pCdat;
-		if(m_pDoc->m_sharesInformation.Lookup(l_pStockkType->m_szCode,pCdat,STKTYPE))
+		CReportData* pCdat;
+		if (m_pDoc->m_sharesInformation.Lookup(l_pStockkType->m_szCode, pCdat, STKTYPE))
 		{
-			m_pDoc->DeleteStockFromKeyboard(pCdat->id,pCdat->kind,pCdat->name,pCdat->Gppyjc);
-			m_pDoc->m_sharesInformation.DeleteOneStockInfo(l_pStockkType->m_szCode,STKTYPE);
+			m_pDoc->DeleteStockFromKeyboard(pCdat->id, pCdat->kind, pCdat->name, pCdat->Gppyjc);
+			m_pDoc->m_sharesInformation.DeleteOneStockInfo(l_pStockkType->m_szCode, STKTYPE);
 		}
 	}
-	int l_nStockTypePos=this->GetInsertStockTypePos();
-	char temp[3];
 
-	if(!InsertStockType(l_pStockkType,l_nStockTypePos))
+	int l_nStockTypePos = GetInsertStockTypePos();
+	if (!InsertStockType(l_pStockkType, l_nStockTypePos))
 	{
 		return FALSE;
 	}
 
-	l_pStockkType->m_lIsUse=TRUE;
-	l_pStockkType->m_bIsDelete =FALSE;
-	strcpy(l_pStockkType->m_szName,m_szStockTyoeNameStr);
-	l_pStockkType->m_lStockCount=0;
-	l_pStockkType->m_fTotalRight=0;
-	sprintf(temp,"%2d",l_nStockTypePos);
-	for(int i=0;i<2;i++)
+	char temp[3];
+
+	l_pStockkType->m_lIsUse = TRUE;
+	l_pStockkType->m_bIsDelete = FALSE;
+	strcpy(l_pStockkType->m_szName, m_szStockTyoeNameStr);
+	l_pStockkType->m_lStockCount = 0;
+	l_pStockkType->m_fTotalRight = 0;
+	sprintf(temp, "%2d", l_nStockTypePos);
+
+	for (int i = 0; i < 2; i++)
 	{
-		if(temp[i]==' ')temp[i]='0';
+		if (temp[i] == ' ')
+			temp[i] = '0';
 	}
-	sprintf(l_pStockkType->m_szCode,"%s%s","8K00",temp);
-	l_pStockkType->m_iRightType=nRightType;
+
+	sprintf(l_pStockkType->m_szCode, "%s%s", "8K00", temp);
+	l_pStockkType->m_iRightType = nRightType;
+
 
 	int stocklength;
-	char  blank[2]={' ',' '};  
+	char blank[2] = { ' ', ' ' };
 	CFile stockfile;
 	CString filepath;
+	filepath.Format("%s%s%s", m_szPathStr.GetBuffer(0), "\\", m_szStockTyoeNameStr.GetBuffer(0));
 
-	filepath.Format("%s%s%s",m_szPathStr.GetBuffer(0),"\\",m_szStockTyoeNameStr.GetBuffer(0));
-	if(stockfile.Open((LPCTSTR)filepath,CFile::modeReadWrite))
+	if (stockfile.Open((LPCTSTR)filepath, CFile::modeReadWrite))
 	{
-		stockfile.Read(&stocklength,4);
-		for(int j=0;j<stocklength;j++)
+		stockfile.Read(&stocklength, 4);
+		for (int j = 0; j < stocklength; j++)
 		{
-			CReportData *l_pCdat;
-			SharesSymbol *symbol=new SharesSymbol;
-			stockfile.Read(symbol->sharesymbol,6);
-			stockfile.Read(&symbol->nKind,4); 
-			symbol->sharesymbol[6]='\0';
-			stockfile.Read(&blank,2);
-			if(m_pDoc->m_sharesInformation.Lookup(symbol->sharesymbol,l_pCdat,symbol->nKind))
+			CReportData* l_pCdat;
+			SharesSymbol* symbol = new SharesSymbol;
+			stockfile.Read(symbol->sharesymbol, 6);
+			stockfile.Read(&symbol->nKind, 4);
+			symbol->sharesymbol[6] = '\0';
+			stockfile.Read(&blank, 2);
+			if (m_pDoc->m_sharesInformation.Lookup(symbol->sharesymbol, l_pCdat, symbol->nKind))
 			{
-
-				if(l_pCdat->pBaseInfo!=NULL)
-					InsertStockToType(l_pCdat,l_pStockkType->m_szCode);
+				if (l_pCdat->pBaseInfo != NULL)
+				{
+					InsertStockToType(l_pCdat, l_pStockkType->m_szCode);
+				}
 			}
 			delete symbol;
 		}
 		stockfile.Close();
 	}
+
 	return TRUE;
 }
+
+
+
+int CSuperviseSharesBlockData::GetStockTypeCounts()
+{
+	int index = 0;
+	for (int i = 0; i < MaxStockTYpe; i++)
+	{
+		if (m_pStockTypeInfo[i].m_lIsUse == -1)
+			break;
+
+		if (m_pStockTypeInfo[i].m_bIsDelete)
+			continue;
+
+		index++;
+	}
+
+	return index;
+}
+
+
+
 ///////////////////////////////
 
 BOOL CSuperviseSharesBlockData::InsertStockItem(char* m_szStockId, int nKind, PSTOCK_TYPE_INFO& m_pStock)
@@ -1170,14 +1226,14 @@ BOOL CSuperviseSharesBlockData::InsertStockItem(char* m_szStockId, int nKind, PS
 	CString strSymbol = TSKDatabase()->GetStockSymbol(m_szStockId, nKind);
 	strcpy_s(m_szStockKind, strSymbol.GetBuffer(0));
 
-	while(low <= high)
+	while (low <= high)
 	{
-		mid=(low+high)/2;
-		if(low==high)
+		mid = (low + high) / 2;
+		if (low == high)
 		{
-			if(strcmp(m_szStockKind , m_pStockPoint[mid].pStockInfo->m_szSymbol )>0)
+			if (strcmp(m_szStockKind, m_pStockPoint[mid].pStockInfo->m_szSymbol) > 0)
 			{
-				if(m_pStockTypeHead->m_lStockCount==0||m_pStockTypeHead->m_lStockCount==mid)
+				if (m_pStockTypeHead->m_lStockCount==0||m_pStockTypeHead->m_lStockCount==mid)
 					InsertPose=mid ;
 				else
 					InsertPose=mid +1;   
@@ -1202,45 +1258,49 @@ BOOL CSuperviseSharesBlockData::InsertStockItem(char* m_szStockId, int nKind, PS
 			return TRUE ;
 		}
 	}
-	if(high<low)
-		InsertPose=low;
+
+	if (high < low)
+		InsertPose = low;
 
 
-	if(m_pStockTypeHead->m_lStockCount + 1 >m_pStockTypeHead->m_lStockMaxCount)  
+	if (m_pStockTypeHead->m_lStockCount + 1 > m_pStockTypeHead->m_lStockMaxCount)
 	{
-		AddStockTypeDataSize();    
+		AddStockTypeDataSize();
 	}
 
-	if(m_pStockTypeHead->m_lStockCount > InsertPose)  
+	if (m_pStockTypeHead->m_lStockCount > InsertPose)
 	{
-		STOCK_POINT_INFO *ptemp;
+		STOCK_POINT_INFO* ptemp;
 		HGLOBAL	hMem;
 		LPVOID hp;
-		hMem = GlobalAlloc( GPTR, (m_pStockTypeHead->m_lStockCount - InsertPose )* sizeof( STOCK_POINT_INFO) );
-		hp=GlobalLock(hMem);
-		if(hp)
+
+		hMem = GlobalAlloc(GPTR, (m_pStockTypeHead->m_lStockCount - InsertPose) * sizeof(STOCK_POINT_INFO));
+		hp = GlobalLock(hMem);
+		if (hp)
 		{
-			ptemp= (STOCK_POINT_INFO *)hp;
+			ptemp = (STOCK_POINT_INFO*)hp;
 		}
 		else
 		{
-			AfxMessageBox("分配内存出错",MB_ICONSTOP);
+			ASSERT(FALSE);
 			return FALSE;
 		}
-		memcpy(ptemp,&m_pStockPoint[InsertPose],(m_pStockTypeHead->m_lStockCount - InsertPose)*sizeof(STOCK_POINT_INFO));
-		memcpy(&m_pStockPoint[InsertPose+1],ptemp,(m_pStockTypeHead->m_lStockCount - InsertPose)*sizeof(STOCK_POINT_INFO));
-		GlobalUnlock((HGLOBAL)ptemp);        
-		GlobalFree( (HGLOBAL)ptemp);
+
+		memcpy(ptemp, &m_pStockPoint[InsertPose], (m_pStockTypeHead->m_lStockCount - InsertPose) * sizeof(STOCK_POINT_INFO));
+		memcpy(&m_pStockPoint[InsertPose + 1], ptemp, (m_pStockTypeHead->m_lStockCount - InsertPose) * sizeof(STOCK_POINT_INFO));
+		GlobalUnlock((HGLOBAL)ptemp);
+		GlobalFree((HGLOBAL)ptemp);
 	}
 
-	m_pStockPoint[InsertPose].pStockInfo=m_pStockInfo+m_pStockTypeHead->m_lStockCount;
-	strcpy(m_pStockPoint[InsertPose].pStockInfo->m_szSymbol,m_szStockKind);
-	memset(&m_pStockPoint[InsertPose].pStockInfo->m_btStockType[0],255,sizeof(BYTE)*MaxStockTYpe);
-	m_pStockPoint[InsertPose].pStockInfo->m_bDeleted=FALSE;
-	m_pStockTypeHead->m_lStockCount++;	
+	m_pStockPoint[InsertPose].pStockInfo = m_pStockInfo + m_pStockTypeHead->m_lStockCount;
+	strcpy(m_pStockPoint[InsertPose].pStockInfo->m_szSymbol, m_szStockKind);
+	memset(&m_pStockPoint[InsertPose].pStockInfo->m_btStockType[0], 255, sizeof(BYTE) * MaxStockTYpe);
+	m_pStockPoint[InsertPose].pStockInfo->m_bDeleted = FALSE;
+	m_pStockTypeHead->m_lStockCount++;
 
-	m_pStock=m_pStockPoint[InsertPose].pStockInfo ;
-	SaveDataToFile(m_pStockTypeHead,0);
+	m_pStock = m_pStockPoint[InsertPose].pStockInfo;
+
+	SaveDataToFile(m_pStockTypeHead, 0);
 
 	return TRUE;
 }
@@ -1253,7 +1313,7 @@ BOOL CSuperviseSharesBlockData::DeleteStockItem(char* m_szStockId, int nKind)
 	int DeletePos = -1;
 
 	char m_szStockKind[10];
-	CString strSymbol = TSKDatabase()->GetStockSymbol(m_szStockKind, nKind);
+	CString strSymbol = TSKDatabase()->GetStockSymbol(m_szStockId, nKind);
 	strcpy_s(m_szStockKind, strSymbol.GetBuffer(0));
 
 	while (low <= high)
@@ -1333,7 +1393,7 @@ BOOL CSuperviseSharesBlockData::Lookup(char *m_szStockId,int nKind,PSTOCK_TYPE_I
 	int mid=0;
 
 	char m_szStockKind[10];
-	CString strSymbol = TSKDatabase()->GetStockSymbol(m_szStockKind, nKind);
+	CString strSymbol = TSKDatabase()->GetStockSymbol(m_szStockId, nKind);
 	strcpy_s(m_szStockKind, strSymbol.GetBuffer(0));
 
 	while(low <= high)
@@ -1860,28 +1920,6 @@ float CSuperviseSharesBlockData::GetStockBlockRight(char *StockTypeCode)
 	}
 	return TotalBlockRight;
 }
-BOOL CSuperviseSharesBlockData::CheckBlockName(char *BlockName,char *BlockCode)
-{
-	for(int i=0;i<MaxStockTYpe;i++)
-	{
-		CString m_szTypeName;
-		if(this->m_pStockTypeInfo[i].m_lIsUse==-1)
-			break;
-		if(this->m_pStockTypeInfo[i].m_bIsDelete)
-			continue;
-		if(BlockCode==NULL)
-		{
-			if(strcmp(m_pStockTypeInfo[i].m_szName,BlockName)==0)
-				return TRUE;
-		}
-		else
-		{
-			if(strcmp(m_pStockTypeInfo[i].m_szName,BlockName)==0&&strcmp(m_pStockTypeInfo[i].m_szCode,BlockCode)!=0)
-				return TRUE;
-		}
-	}
-	return FALSE;
-}
 
 bool CSuperviseSharesBlockData::CheckKind(int i)
 {
@@ -1890,3 +1928,21 @@ bool CSuperviseSharesBlockData::CheckKind(int i)
 		b = false;
 	return b;
 }
+
+
+
+/* ============================================================================
+
+STOCKTYPEINFO* m_pStockTypeInfo
+
+修改指数代码规则
+8K00 XX
+前面数字代表类型 1 2 3 
+后面三位数字，按板块编号
+
+STOCK_TYPE_INFO 代码表改为 01XXXXXX SHXXXXXX
+char m_szStockKind[10];
+CString strSymbol = TSKDatabase()->GetStockSymbol(m_szStockId, nKind);
+strcpy_s(m_szStockKind, strSymbol.GetBuffer(0));
+
+*/

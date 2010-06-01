@@ -11,6 +11,7 @@
 
 #define PRO 03
 
+#define _CRT_SECURE_NO_DEPRECATE
 
 #define VC_EXTRALEAN	
 
@@ -26,7 +27,6 @@
 #include "STKDRV.H"
 #include "stockdrv.h"
 #include "StructTaiShares.h"
-//#include "CSharesBaseInfo.h"
 #include "CSharesInformation.h"
 #include "CSharesCompute.h"
 #include "StructKlineView.h"
@@ -49,9 +49,6 @@ const char g_baseinfo[64] = "Data\\CompanyBase";
 const char g_stocktypeinfo[64] = "Data\\BlockInfomation";
 const char g_hzpy[64] = "Data\\languagedata";
 const char g_rate[64] = "Data\\stockrate";
-const char g_kxzh_hz[64] = "Data\\KlineGroup";
-const char g_tixg_hz[64] = "Data\\ScreenData";
-const char g_zbgs_hz[64] = "Data\\IndexData";
 
 const char g_daysh[64] = "Data\\sh\\day";
 const char g_daysz[64] = "Data\\sz\\day";

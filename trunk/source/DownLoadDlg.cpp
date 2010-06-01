@@ -19,7 +19,6 @@
 #include "DownLoadDlg.h"
 #include  "ImportData.h"
 #include <direct.h>
-#include  "CTaiChuQuanInDlg.h"
 #include <io.h>
 #include "CTaiKlineFileKLine.h"
 #include "CTaiShanKlineShowView.h"
@@ -3191,7 +3190,7 @@ BOOL CDownLoadDlg::InstallStockChuQuan(REQUEST_CONTEXT *pRequestContext)
 {
     char SaveFileName[255];
 	sprintf(SaveFileName,"%s\\Extract\\dest.pwr",m_szCurrentDir);
-	return CTaiChuQuanInDlg::InstallPowerData(SaveFileName);
+	return true/*CTaiChuQuanInDlg::InstallPowerData(SaveFileName)*/;
 }
 void CDownLoadDlg::InstallStockMenute(char *pFilePath) 
 {

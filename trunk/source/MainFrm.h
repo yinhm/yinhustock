@@ -68,7 +68,6 @@ public:
 
 	BOOL        m_F9ORF10;                  
 
-	bool        m_BaseInfo;                
 	BOOL        m_StopCuoHe;                  
 
 	IndexDataInfo m_index_save;
@@ -119,11 +118,6 @@ public:
 	static CTaiScreen *dialogtjxg;
 	static CTaiScreenTest *dialogtjxgmmtest;
 	static CTaiKlineDlgNeuralLearn* m_pDlgNL;
-
-protected:
-	CStringArray m_symbol_array;
-	IndexDataInfo* pIndex_save;
-	int *nDays;
 
 
 protected:

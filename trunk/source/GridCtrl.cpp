@@ -5869,7 +5869,7 @@ BOOL CGridCtrl::GetCell(CGridCell* pGridCell,int nRow, int nCol) const
 		pGridCell->nFormat =DT_CENTER|DT_VCENTER|DT_SINGLELINE;    
 		pGridCell->szText=m_pColData[nCol].szText;      // Cell text (or binary data if you wish...)
 		pGridCell->iImage=-1;    
-	    pGridCell->crBkClr=m_clrBackGround;//m_pDoc->m_colorArray[18];  // Background colour (or CLR_DEFAULT)
+	    pGridCell->crBkClr=/*m_clrBackGround*/m_pDoc->m_colorArray[0];	// Background colour (or CLR_DEFAULT)
 		
 		pGridCell->crFgClr=m_pDoc->m_colorArray[1];     
 		pGridCell->lParam=0;     
@@ -5893,7 +5893,7 @@ BOOL CGridCtrl::GetCell(CGridCell* pGridCell,int nRow, int nCol) const
     pGridCell->lParam=0;
     pGridCell->lfFont=m_Logfont;     
 
-    pGridCell->crBkClr=m_clrBackGround;//m_pDoc->m_colorArray[18];//CLR_DEFAULT;  // Background colour (or CLR_DEFAULT)
+    pGridCell->crBkClr=/*m_clrBackGround*/m_pDoc->m_colorArray[0];	// Background colour (or CLR_DEFAULT)
     pGridCell->nFormat=m_pColData[nCol].nFormat;
     
 	if(nRow >= m_nRealRow)

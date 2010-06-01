@@ -244,7 +244,6 @@ CMainFrame::CMainFrame():m_dlgLeftPop(this)
 	m_EnableF10 = true;
 	m_EnableF9 = true;
 	m_bFullScreen = FALSE;
-	m_BaseInfo = true;
 
 	m_drawLineToolBar = new CToolBar;
 	m_F9ORF10 = FALSE;
@@ -336,10 +335,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;      // fail to create
 	}
 
-	VERIFY(m_MTIClientWnd.Attach(this, TRUE));
-	m_MTIClientWnd.LoadState();
-	m_MTIClientWnd.EnableToolTips();
-	m_MTIClientWnd.SetFlags(xtpWorkspaceHideClose | xtpWorkspaceHideArrows | xtpWorkspaceShowCloseSelectedTab);
+	//VERIFY(m_MTIClientWnd.Attach(this, TRUE));
+	//m_MTIClientWnd.LoadState();
+	//m_MTIClientWnd.EnableToolTips();
+	//m_MTIClientWnd.SetFlags(xtpWorkspaceHideClose | xtpWorkspaceHideArrows | xtpWorkspaceShowCloseSelectedTab);
 
 	TSKReceiver()->StartEngine();
 

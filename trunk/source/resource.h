@@ -362,7 +362,6 @@
 #define IDI_CARD                        308
 #define IDD_RISKINDEX                   310
 #define IDD_9_INDICATOR_OFTEN           311
-#define IDD_CHUQUANIMPORT               314
 #define IDD_CAIWUDATA                   315
 #define IDD_CAIWUINOUT                  315
 #define IDD_CHUQUANDATA                 316
@@ -1235,7 +1234,6 @@
 #define IDC_TREE_INFO                   3206
 #define IDD_MANAGER_CHOOSE1             3206
 #define IDB_TREEBMP1                    3207
-#define IDD_7_ALARM_ADDED_CASE1         3207
 #define IDB_TREEBMP2                    3208
 #define IDD_CWD_EXPORT_FORMU            3208
 #define IDB_TREEBMP3                    3209

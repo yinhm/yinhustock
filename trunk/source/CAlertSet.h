@@ -8,7 +8,7 @@
 #include "CTaiScreenParent.h"
 #include "CAlertSystem.h"
 
-class CAlertSet : public CTaiScreenParent
+class CAlertSetDlg : public CTaiScreenParent
 {
 
 public:
@@ -18,10 +18,10 @@ public:
 	void SetInitData(ALERT_SET_ITEM& itemData);
 	BYTE m_btAddtional[4];
 
-	CAlertSet(CWnd* pParent = NULL);   
+	CAlertSetDlg(CWnd* pParent = NULL);   
 
 
-	//{{AFX_DATA(CAlertSet)
+	//{{AFX_DATA(CAlertSetDlg)
 	enum { IDD = IDD_TJXG_ALARM_SET };
 	CButtonST	m_settingAdded;
 	CButtonST	m_buttonExpl;
@@ -35,8 +35,8 @@ public:
 
 
 
-	//{{AFX_VIRTUAL(CAlertSet)
-	protected:
+	//{{AFX_VIRTUAL(CAlertSetDlg)
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);  
 	//}}AFX_VIRTUAL
 
@@ -44,7 +44,7 @@ public:
 protected:
 
 
-	//{{AFX_MSG(CAlertSet)
+	//{{AFX_MSG(CAlertSetDlg)
 	virtual void OnOK();
 	virtual void OnCancel();
 	afx_msg void OnDeleteStocks2();

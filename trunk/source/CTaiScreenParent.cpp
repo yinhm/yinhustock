@@ -31,47 +31,47 @@ CImageList CTaiScreenParent::m_imageList ;
 CFont CTaiScreenParent::m_Font;
 ARRAY_BE CTaiScreenParent::m_gLineOut;
 CString CTaiScreenParent::m_gPeriodName[]={"换手","1分钟线","5分钟线","15分钟线","30分钟线",
-								"60分钟线","日线","周线","月线","年线",
-								"多日线"};
+"60分钟线","日线","周线","月线","年线",
+"多日线"};
 int CTaiScreenParent::nLKind[]={
-		HS_KLINE,
-		MINUTE1_KLINE,
-		MIN5_KLINE,
-		MIN15_KLINE,
-		MIN30_KLINE,
-		MIN60_KLINE,
-		DAY_KLINE,
-		WEEK_KLINE,
-		MONTH_KLINE,
-		YEAR_KLINE ,
-		MANY_DAY_KLINE,
-		 0
+	HS_KLINE,
+	MINUTE1_KLINE,
+	MIN5_KLINE,
+	MIN15_KLINE,
+	MIN30_KLINE,
+	MIN60_KLINE,
+	DAY_KLINE,
+	WEEK_KLINE,
+	MONTH_KLINE,
+	YEAR_KLINE ,
+	MANY_DAY_KLINE,
+	0
 };
 CString CTaiScreenParent::m_subIndexGroup[] = {"大于参数1",
-		                       "小于参数1",
-	                           "等于参数1",
-							   "上穿参数1",
-							   "下破参数1",
-                               "大于参数1小于参数2",
-							   "维持参数1周期后上穿参数2",
-							   "维持参数1周期后下破参数2"
-	};
+"小于参数1",
+"等于参数1",
+"上穿参数1",
+"下破参数1",
+"大于参数1小于参数2",
+"维持参数1周期后上穿参数2",
+"维持参数1周期后下破参数2"
+};
 static int nFootFinance[100] = {0,1,2,3,8,
-								7,6,4,9,10,
-								11,13,14,12,15,
-								16,18,22,17,23,
-								24,25,26,-1,-1,
-								-1,-1,-1,26,-1,
-								27,28,31,29,32,
-								21,30,2,3,4,
-			};
+7,6,4,9,10,
+11,13,14,12,15,
+16,18,22,17,23,
+24,25,26,-1,-1,
+-1,-1,-1,26,-1,
+27,28,31,29,32,
+21,30,2,3,4,
+};
 
 
 CFormularContent*	CTaiScreenParent::m_gpIndex[] = {NULL,NULL,NULL,NULL,NULL};
 
 
 CTaiScreenParent::CTaiScreenParent(int nIDD,CWnd* pParent /*=NULL*/)
-	: CDialog(nIDD, pParent)
+: CDialog(nIDD, pParent)
 {
 	m_bXgnExt = false;
 
@@ -81,7 +81,7 @@ CTaiScreenParent::CTaiScreenParent(int nIDD,CWnd* pParent /*=NULL*/)
 	//{{AFX_DATA_INIT(CTaiScreenParent)
 	m_and_or = 0;
 	//}}AFX_DATA_INIT
-//	m_bExecuteCalc = false;
+	//	m_bExecuteCalc = false;
 	m_bDlgTest = false;
 	m_pStockSelectList = NULL;
 	static bool bCreateImg = false;
@@ -168,7 +168,7 @@ int CTaiScreenParent::ReadKLine(CString symbol,int stkKind, Kline *&pKline, int 
 	if(tmEnd !=NULL && CTaiKlineFileKLine::IsNeedHs(nKlineType))
 	{
 		{
-		
+
 			CTaiShanDoc* pDoc =CMainFrame::m_taiShanDoc ;
 			int n = 0;
 
@@ -219,13 +219,13 @@ CFormularContent* CTaiScreenParent::LookUpArray(int iKind, CString sIndex,CTaiSh
 	switch(iKind)
 	{
 	case CTaiKlineTreeCtl::nKindIndex:
-	     pIndex=(CFormularContent*)(pDoc->LookUpArray (pDoc->m_formuar_index,sIndex)); 
+		pIndex=(CFormularContent*)(pDoc->LookUpArray (pDoc->m_formuar_index,sIndex)); 
 		break;
 	case CTaiKlineTreeCtl::nKindChoose:
-	     pIndex=(CFormularContent*)(pDoc->LookUpArray (pDoc->m_formuar_choose,sIndex)); 
+		pIndex=(CFormularContent*)(pDoc->LookUpArray (pDoc->m_formuar_choose,sIndex)); 
 		break;
 	case CTaiKlineTreeCtl::nKindKline:
-	     pIndex=(CFormularContent*)(pDoc->LookUpArray (pDoc->m_formuar_kline,sIndex)); 
+		pIndex=(CFormularContent*)(pDoc->LookUpArray (pDoc->m_formuar_kline,sIndex)); 
 		break;
 	case CTaiKlineTreeCtl::nKindPriceAlert://
 	case CTaiKlineTreeCtl::nKindUpDownAlert://
@@ -276,7 +276,7 @@ float CTaiScreenParent::FormularComputeShares(CString symbol,int stkKind,int kCo
 	if(pIndex!=NULL)
 		if(!pIndex->IsValid()) return 0;
 
-    CFormularCompute *m_formuCompute =new CFormularCompute(0,kCounts-1,pKline,pIndex,symbol,stkKind ,pBuySellList,nLKind[indexSv->iDataType] );
+	CFormularCompute *m_formuCompute =new CFormularCompute(0,kCounts-1,pKline,pIndex,symbol,stkKind ,pBuySellList,nLKind[indexSv->iDataType] );
 	//--
 	int numPa=pIndex->numPara ;
 	for(int j=0;j<numPa;j++)
@@ -295,12 +295,12 @@ float CTaiScreenParent::FormularComputeShares(CString symbol,int stkKind,int kCo
 			if(pLine ==NULL)
 			{
 				if(m_formuCompute->GetIndexPoint(nLn,nPoint)!=0)
-  				  nPoint=0;
+					nPoint=0;
 			}
 			else
 			{
-				 if(m_formuCompute->GetLine (nLn,*pLine,s)!=0)
-					  nPoint=-1;
+				if(m_formuCompute->GetLine (nLn,*pLine,s)!=0)
+					nPoint=-1;
 			}
 		}		
 	}
@@ -311,7 +311,7 @@ float CTaiScreenParent::FormularComputeShares(CString symbol,int stkKind,int kCo
 BOOL CTaiScreenParent::OnInitDialog() 
 {
 	CDialog::OnInitDialog();
-	
+
 	((CTabCtrl*)GetDlgItem(IDC_TAB_SELECT))->InsertItem( 0, "分类");
 	((CTabCtrl*)GetDlgItem(IDC_TAB_SELECT))->InsertItem( 1, "全部");
 	((CTabCtrl*)GetDlgItem(IDC_TAB_SELECT))->InsertItem( 2, "常用");
@@ -383,32 +383,32 @@ bool CTaiScreenParent::IsSuccess(CString StockId,int stkKind,int * pnBuyResult,i
 	CaclPrice(0, this->buySellAdditional .nEnterPoint [0], nMoveAdd);
 	switch(bBuySell)
 	{
-		case 0:
+	case 0:
+		{
+			for(int i=nB;i<nCount;i++)
 			{
-				for(int i=nB;i<nCount;i++)
+				if(pnBuyResult[i]==1)
 				{
-					if(pnBuyResult[i]==1)
+					TRACE("is = %d\n",i);
+					int bSucc=10;
+					int nMove;
+					int nEnterPoint = this->buySellAdditional .nEnterPoint [0];
+					if(i==nCount) nEnterPoint = 0;
+					MidPrice=CaclPrice(pKline+i,nEnterPoint , nMove);
+
+					if(i ==nCount-1 && nMove>0)
+						MidPrice=CaclMid(pKline[i]);
+					if((i+nRange)>nCount)
 					{
-						TRACE("is = %d\n",i);
-						int bSucc=10;
-						int nMove;
-						int nEnterPoint = this->buySellAdditional .nEnterPoint [0];
-						if(i==nCount) nEnterPoint = 0;
-						MidPrice=CaclPrice(pKline+i,nEnterPoint , nMove);
+						nTimelen=nCount-i;
+						bSucc=2;
+					}
+					if(i<(nCount-1-nMoveAdd))
+					{
+						HighPriceItem=i+1+nMoveAdd;
 
-						if(i ==nCount-1 && nMove>0)
-							MidPrice=CaclMid(pKline[i]);
-						if((i+nRange)>nCount)
-						{
-							nTimelen=nCount-i;
-							bSucc=2;
-						}
-						if(i<(nCount-1-nMoveAdd))
-						{
-						    HighPriceItem=i+1+nMoveAdd;
-
-							HighPrice=CaclMid(pKline[i+1+nMoveAdd]);
-							for(int bb=(i+1+nMoveAdd);bb<i+nTimelen;bb++)
+						HighPrice=CaclMid(pKline[i+1+nMoveAdd]);
+						for(int bb=(i+1+nMoveAdd);bb<i+nTimelen;bb++)
 							if(CaclMid(pKline[bb])>HighPrice)
 							{
 								HighPriceItem=bb;
@@ -418,170 +418,170 @@ bool CTaiScreenParent::IsSuccess(CString StockId,int stkKind,int * pnBuyResult,i
 
 
 
-						
+
+					}
+					else 
+					{
+						HighPriceItem=i;
+						HighPrice=CaclMid(pKline[i]);
+					}
+
+					profit=(HighPrice-MidPrice)/MidPrice;
+					if(bSucc!=2)
+					{
+						if(HighPriceItem==i)
+							bSucc=1;
+						else if((profit/(HighPriceItem-i))>=(fProfit/nRange))
+						{
+							bSucc=0;
+							bSuccCount++;
 						}
 						else 
-						{
-							HighPriceItem=i;
-							HighPrice=CaclMid(pKline[i]);
-						}
-						
-						profit=(HighPrice-MidPrice)/MidPrice;
-						if(bSucc!=2)
-						{
-							if(HighPriceItem==i)
-								bSucc=1;
-							else if((profit/(HighPriceItem-i))>=(fProfit/nRange))
-							{
-								bSucc=0;
-								bSuccCount++;
-							}
-							else 
-								bSucc=1;
-						}
-						int nCurr = i+nMoveAdd;
-						if(nCurr>=nCount) nCurr = nCount-1;
-						ASSERT(HighPriceItem<nCount);
-						if(HighPriceItem>=nCount) HighPriceItem = nCount-1;
-
-						detail.buytime=pKline[nCurr].day;
-
-						detail.selltime=pKline[HighPriceItem].day;
-						detail.buyprice=MidPrice;
-						detail.sellprice=HighPrice;
-						detail.timerange=HighPriceItem-nCurr;
-						detail.profit=profit*100;
-						if(buySellAdditional.bSubstractFee)
-                            detail.profit-=fee;
-						detail.issuccess=bSucc;
-						detail.nKindSell=bKindSell;
-					
-						if(tmB== 0 || detail.buytime>=tmB && detail.buytime<=tmE)
-							chooseresult->m_detail.Add(detail);
-
-					
-						if(i>=nCount) i = nCount-1;
-				
+							bSucc=1;
 					}
-					
+					int nCurr = i+nMoveAdd;
+					if(nCurr>=nCount) nCurr = nCount-1;
+					ASSERT(HighPriceItem<nCount);
+					if(HighPriceItem>=nCount) HighPriceItem = nCount-1;
+
+					detail.buytime=pKline[nCurr].day;
+
+					detail.selltime=pKline[HighPriceItem].day;
+					detail.buyprice=MidPrice;
+					detail.sellprice=HighPrice;
+					detail.timerange=HighPriceItem-nCurr;
+					detail.profit=profit*100;
+					if(buySellAdditional.bSubstractFee)
+						detail.profit-=fee;
+					detail.issuccess=bSucc;
+					detail.nKindSell=bKindSell;
+
+					if(tmB== 0 || detail.buytime>=tmB && detail.buytime<=tmE)
+						chooseresult->m_detail.Add(detail);
+
+
+					if(i>=nCount) i = nCount-1;
+
 				}
-                chooseresult->choosecount=chooseresult->m_detail.GetSize();
-				chooseresult->symbol=StockId;
-				chooseresult->m_stkKind = stkKind;
-				chooseresult->successcount=bSuccCount;
-				if(chooseresult->m_detail.GetSize()==0)
-					chooseresult->successpercent=0;
-				else
-				    chooseresult->successpercent=float(bSuccCount)/(chooseresult->m_detail.GetSize());
-				chooseresult->nKindBuySell=0;
+
 			}
-			break;
-		case 1:
+			chooseresult->choosecount=chooseresult->m_detail.GetSize();
+			chooseresult->symbol=StockId;
+			chooseresult->m_stkKind = stkKind;
+			chooseresult->successcount=bSuccCount;
+			if(chooseresult->m_detail.GetSize()==0)
+				chooseresult->successpercent=0;
+			else
+				chooseresult->successpercent=float(bSuccCount)/(chooseresult->m_detail.GetSize());
+			chooseresult->nKindBuySell=0;
+		}
+		break;
+	case 1:
+		{
+			for(int i=nB;i<nCount;i++)
 			{
-				for(int i=nB;i<nCount;i++)
+				if(pnSellResult[i]==1)
 				{
-					if(pnSellResult[i]==1)
+					int bSucc=10;
+					MidPrice=CaclMid(pKline[i]);
+					if((i-nRange)<0)
 					{
-						int bSucc=10;
-						MidPrice=CaclMid(pKline[i]);
-						if((i-nRange)<0)
-						{
-							nTimelen=i;
-							bSucc=2;
-						}
-						if(i!=0)
-						{
-						    HighPriceItem=i-1;
-							HighPrice=CaclMid(pKline[i-1]);
-							for(int bb=(i-nTimelen);bb<i;bb++)
+						nTimelen=i;
+						bSucc=2;
+					}
+					if(i!=0)
+					{
+						HighPriceItem=i-1;
+						HighPrice=CaclMid(pKline[i-1]);
+						for(int bb=(i-nTimelen);bb<i;bb++)
 							if(CaclMid(pKline[bb])<HighPrice)
 							{
 								HighPriceItem=bb;
 								HighPrice=CaclMid(pKline[bb]);
 							}
-						
+
+					}
+					else 
+					{
+						HighPriceItem=i;
+						HighPrice=CaclMid(pKline[i]);
+					}
+
+					profit=(MidPrice-HighPrice)/HighPrice;
+					if(bSucc!=2)
+					{
+						if(HighPriceItem==i)
+							bSucc=1;
+						else if((profit/(i-HighPriceItem))>=(fProfit/nRange))
+						{
+							bSucc=0;
+							bSuccCount++;
 						}
 						else 
-						{
-							HighPriceItem=i;
-							HighPrice=CaclMid(pKline[i]);
-						}
-						
-						profit=(MidPrice-HighPrice)/HighPrice;
-						if(bSucc!=2)
-						{
-							if(HighPriceItem==i)
-								bSucc=1;
-							else if((profit/(i-HighPriceItem))>=(fProfit/nRange))
-							{
-								bSucc=0;
-								bSuccCount++;
-							}
-							else 
-								bSucc=1;
-						}
-						detail.buytime=pKline[HighPriceItem].day;
-						detail.selltime=pKline[i].day;
-						detail.buyprice=HighPrice;
-						detail.sellprice=MidPrice;
-						detail.timerange=i-HighPriceItem;
-						detail.profit=profit*100;
-						if(buySellAdditional.bSubstractFee)
-                            detail.profit-=fee;
-						detail.issuccess=bSucc;
-						detail.nKindSell=bKindSell;
-						
-						if(tmB== 0 || detail.buytime>=tmB && detail.buytime<=tmE)
-							chooseresult->m_detail.Add(detail);
-						
-						if(i>=nCount) i = nCount-1;
-				
+							bSucc=1;
 					}
-					
+					detail.buytime=pKline[HighPriceItem].day;
+					detail.selltime=pKline[i].day;
+					detail.buyprice=HighPrice;
+					detail.sellprice=MidPrice;
+					detail.timerange=i-HighPriceItem;
+					detail.profit=profit*100;
+					if(buySellAdditional.bSubstractFee)
+						detail.profit-=fee;
+					detail.issuccess=bSucc;
+					detail.nKindSell=bKindSell;
+
+					if(tmB== 0 || detail.buytime>=tmB && detail.buytime<=tmE)
+						chooseresult->m_detail.Add(detail);
+
+					if(i>=nCount) i = nCount-1;
+
 				}
-                chooseresult->choosecount=chooseresult->m_detail.GetSize();
-				chooseresult->symbol=StockId;
-				chooseresult->successcount=bSuccCount;
-				if(chooseresult->m_detail.GetSize()==0)
-                   chooseresult->successpercent=0;
-				else
-				   chooseresult->successpercent=float(bSuccCount)/(chooseresult->m_detail.GetSize());
-				chooseresult->nKindBuySell=1;
+
 			}
-			break;
-		case 2:
+			chooseresult->choosecount=chooseresult->m_detail.GetSize();
+			chooseresult->symbol=StockId;
+			chooseresult->successcount=bSuccCount;
+			if(chooseresult->m_detail.GetSize()==0)
+				chooseresult->successpercent=0;
+			else
+				chooseresult->successpercent=float(bSuccCount)/(chooseresult->m_detail.GetSize());
+			chooseresult->nKindBuySell=1;
+		}
+		break;
+	case 2:
+		{
+			for(int i=nB;i<nCount;i++)
 			{
-				for(int i=nB;i<nCount;i++)
+				if(pnBuyResult[i]==1)
 				{
-					if(pnBuyResult[i]==1)
-					{
-						int iTemp = i;
-						int bSucc=10;
-						int nMove;
-						int nEnterPoint = this->buySellAdditional .nEnterPoint [0];
-						if(i==nCount) nEnterPoint = 0;
-						MidPrice=CaclPrice(pKline+i, nEnterPoint, nMove);
-						if(i ==nCount-1 && nMove>0)
-							MidPrice=CaclMid(pKline[i]);
-						nMove = 0;
+					int iTemp = i;
+					int bSucc=10;
+					int nMove;
+					int nEnterPoint = this->buySellAdditional .nEnterPoint [0];
+					if(i==nCount) nEnterPoint = 0;
+					MidPrice=CaclPrice(pKline+i, nEnterPoint, nMove);
+					if(i ==nCount-1 && nMove>0)
+						MidPrice=CaclMid(pKline[i]);
+					nMove = 0;
 
-						HighPriceItem=0;
-						for(int bb=i+1+nMoveAdd;bb<nCount;bb++)
-							if(pnSellResult[bb]==1)
-							{
-                                HighPriceItem=bb;
-								iTemp = bb--;
-								break;
-							}
-
-					    if(HighPriceItem==0)
+					HighPriceItem=0;
+					for(int bb=i+1+nMoveAdd;bb<nCount;bb++)
+						if(pnSellResult[bb]==1)
 						{
-						   HighPriceItem = nCount-1;
-						   iTemp = nCount;
-						   bSucc=2;
+							HighPriceItem=bb;
+							iTemp = bb--;
+							break;
 						}
-					
-                        for(int add=i+1+nMoveAdd;add<HighPriceItem;add++)
+
+						if(HighPriceItem==0)
+						{
+							HighPriceItem = nCount-1;
+							iTemp = nCount;
+							bSucc=2;
+						}
+
+						for(int add=i+1+nMoveAdd;add<HighPriceItem;add++)
 						{
 							float addprofit=100*(CaclMid(pKline[add])-MidPrice)/MidPrice;
 							if(buySellAdditional.bLose)
@@ -589,24 +589,24 @@ bool CTaiScreenParent::IsSuccess(CString StockId,int stkKind,int * pnBuyResult,i
 								{
 									HighPriceItem=add;
 									bKindSell = 1;
-                                    break;
+									break;
 								}
-                            if(buySellAdditional.bWin)
-								if(buySellAdditional.fMaxWin<addprofit)
-								{
-									HighPriceItem=add;
-									bKindSell = 1;
-                                    break;
-								}
-							if(buySellAdditional.bMaxDays)
-								if(buySellAdditional.fMaxDays<(HighPriceItem -i - nMoveAdd))
-								{
-									HighPriceItem=i+nMoveAdd+int(buySellAdditional.fMaxDays);
-									bKindSell = 1;
-                                    break;
-								}
+								if(buySellAdditional.bWin)
+									if(buySellAdditional.fMaxWin<addprofit)
+									{
+										HighPriceItem=add;
+										bKindSell = 1;
+										break;
+									}
+									if(buySellAdditional.bMaxDays)
+										if(buySellAdditional.fMaxDays<(HighPriceItem -i - nMoveAdd))
+										{
+											HighPriceItem=i+nMoveAdd+int(buySellAdditional.fMaxDays);
+											bKindSell = 1;
+											break;
+										}
 						}
-				
+
 						HighPrice=CaclMid(pKline[HighPriceItem]);
 						profit=(HighPrice-MidPrice)/MidPrice;
 						if(bSucc == 10)
@@ -618,7 +618,7 @@ bool CTaiScreenParent::IsSuccess(CString StockId,int stkKind,int * pnBuyResult,i
 								bSuccCount++;
 							}
 						}
-						
+
 						int nCurr = i+nMoveAdd;
 						if(nCurr>=nCount) nCurr = nCount-1;
 
@@ -634,33 +634,33 @@ bool CTaiScreenParent::IsSuccess(CString StockId,int stkKind,int * pnBuyResult,i
 						detail.timerange=nSellFoot-nCurr;
 						detail.profit=profit*100;
 						if(buySellAdditional.bSubstractFee)
-                            detail.profit-=fee;
+							detail.profit-=fee;
 						detail.issuccess=bSucc;
 						detail.nKindSell=bKindSell;
-						
+
 						if(tmB== 0 || detail.buytime>=tmB && detail.buytime<=tmE)
 							chooseresult->m_detail.Add(detail);
 
-						 i = iTemp;
-					}
-					
+						i = iTemp;
 				}
-                chooseresult->choosecount=chooseresult->m_detail.GetSize();
-				chooseresult->symbol=StockId;
-				chooseresult->successcount=bSuccCount;
-				if(chooseresult->m_detail.GetSize()==0)
-					chooseresult->successpercent=0;
-				else
-				    chooseresult->successpercent=float(bSuccCount)/(chooseresult->m_detail.GetSize());
-				chooseresult->nKindBuySell=2;
+
 			}
-			break;
-		default :
-			
-			return false;
-			}
+			chooseresult->choosecount=chooseresult->m_detail.GetSize();
+			chooseresult->symbol=StockId;
+			chooseresult->successcount=bSuccCount;
+			if(chooseresult->m_detail.GetSize()==0)
+				chooseresult->successpercent=0;
+			else
+				chooseresult->successpercent=float(bSuccCount)/(chooseresult->m_detail.GetSize());
+			chooseresult->nKindBuySell=2;
+		}
+		break;
+	default :
+
+		return false;
+	}
 	chooseresult->m_stkKind = stkKind;
-    m_testResultArray.Add(chooseresult);
+	m_testResultArray.Add(chooseresult);
 	return true;
 }
 
@@ -684,10 +684,10 @@ void CTaiScreenParent::GetIndexLineName(CFormularContent *pIndex)
 		nEquation.AddPara (pIndex->namePara [j],pIndex->defaultVal [j]);
 	}
 	nEquation.Devide();
-    nLineName.RemoveAll(); 
+	nLineName.RemoveAll(); 
 	for(int i=0;i<nEquation.GetRlineNum ();i++)
 	{
-        CString LName=nEquation.GetRlineName(i);
+		CString LName=nEquation.GetRlineName(i);
 		LName.MakeUpper();
 		this->nLineName.Add(LName);
 		m_nLineType[i] = nEquation.m_RlineType[i];
@@ -714,13 +714,13 @@ void CTaiScreenParent::OnSelchangedTreeFormularAll(NMHDR* pNMHDR, LRESULT* pResu
 	HTREEITEM hItem = this->m_treeFormularCtrl.GetSelectedItem ();
 	if(hItem == NULL)
 	{
-	  return;
+		return;
 	}
 	if ((hItem != NULL) )
 	{
-	   this->m_treeFormularCtrl .SelectItem(hItem);
+		this->m_treeFormularCtrl .SelectItem(hItem);
 	}
-    m_hItem = hItem;
+	m_hItem = hItem;
 	int nKindRoot,nKindItem;
 	m_pIndex = NULL;
 	bool bSucc = m_treeFormularCtrl.GetCurrentItemInfo (nKindRoot,nKindItem,m_pIndex);	
@@ -731,7 +731,7 @@ void CTaiScreenParent::OnSelchangedTreeFormularAll(NMHDR* pNMHDR, LRESULT* pResu
 	if(nKind == -7 || nKind == -8)
 		m_pIndex = GetSpecialLJishu(-nKind-7);
 	if(nKind != -6)
-	m_conRich.SetLJishu(m_pIndex);
+		m_conRich.SetLJishu(m_pIndex);
 	if(m_pIndex == NULL || nKind == -6)
 		goto DO_END;
 
@@ -744,18 +744,18 @@ void CTaiScreenParent::OnSelchangedTreeFormularAll(NMHDR* pNMHDR, LRESULT* pResu
 		if((CComboBox *)(GetDlgItem(nID[j]) == 0)) continue;
 		while(((CComboBox *)(GetDlgItem(nID[j])))->GetCount())
 		{
-		  ((CComboBox *)(GetDlgItem(nID[j])))->DeleteString(0); 
+			((CComboBox *)(GetDlgItem(nID[j])))->DeleteString(0); 
 		}
 		for(i=0;i<this->nLineName.GetSize();i++)
 		{
 			((CComboBox *)(GetDlgItem(nID[j])))->InsertString(i,nLineName.GetAt(i));
 		}
 		if(j==0)
-		((CComboBox *)(GetDlgItem(nID[j])))->SetCurSel(0);
+			((CComboBox *)(GetDlgItem(nID[j])))->SetCurSel(0);
 	}
 
 DO_END:
-	
+
 	if((nKind != -1 || m_pIndex == NULL) && nKind != -6)
 	{
 		GetDlgItem(IDC_LIST_FORMULAR_LINE_ALL)->ShowWindow(SW_HIDE);
@@ -765,7 +765,7 @@ DO_END:
 		if(GetDlgItem(IDC_STATIC_COND_NEED)) GetDlgItem(IDC_STATIC_COND_NEED)->ShowWindow(SW_HIDE);//
 		if(GetDlgItem(IDC_STATIC_P1)) GetDlgItem(IDC_STATIC_P1)->ShowWindow(SW_HIDE);//
 		if(GetDlgItem(IDC_STATIC_P2)) GetDlgItem(IDC_STATIC_P2)->ShowWindow(SW_HIDE);//
-		
+
 	}
 	else 
 	{
@@ -786,7 +786,7 @@ DO_END:
 		int nn = -1;
 
 		{
-			
+
 			for(i=0;i<37;i++)
 			{
 				if(nFootFinance[i]>=0)
@@ -821,7 +821,7 @@ DO_END:
 	}
 	if(m_bDlgIndicator == true)
 		GetDlgItem(IDC_COMBO_PERIOD)->ShowWindow(SW_HIDE);
-	
+
 	//end
 	OnSelchangeListSubFormular() ;
 	UpdateData(FALSE);
@@ -848,7 +848,7 @@ CString CTaiScreenParent::GetGuoteIndex(IndexDataInfo *indexSv,CFormularContent 
 			sSub=GetIndexLineName(pIndex, indexSv->iLine);
 			sSub = "\""+pIndex->name +"."+sSub+"\"";
 
-		
+
 			if(pIndex->numPara<=0)
 			{
 				sParam="";
@@ -968,7 +968,7 @@ int CTaiScreenParent::GetCountValid(IndexDataInfo *indexSv, CTaiShanDoc *pDoc, i
 		s=pIndex->fomular ;
 		s.MakeLower();
 	}
-	
+
 	CString str = " ";
 
 	CFormularCompute* m_formuCompute =new CFormularCompute(0,nKline-1,kline,pIndex,CSharesCompute::GetIndexSymbol(0),SHZS,NULL,5);
@@ -1045,7 +1045,7 @@ CString CTaiScreenParent::GetIndexLineName(CFormularContent *pIndex, int nLine)
 
 	int nTot = nEquation.GetRlineNum ();
 	ASSERT(nTot>nLine);
-    LName=nEquation.GetRlineName(nLine);
+	LName=nEquation.GetRlineName(nLine);
 	LName.MakeUpper();
 	return LName;
 
@@ -1065,28 +1065,28 @@ void CTaiScreenParent::OnAdd()
 	UpdateData();
 
 
-	
+
 	IndexDataInfo index_save;
 	memset(&index_save,0,sizeof(index_save));
 	if(m_pIndex)
 		strcpy(index_save.sIndex_name,m_pIndex->name);
 	else
 		strcpy(index_save.sIndex_name,"");
-    index_save.iKind = nKind;
+	index_save.iKind = nKind;
 
 	UpdateParams(&index_save);	
 	if(m_pIndex!=NULL && (m_gpIndex[0] == m_pIndex || m_gpIndex[1] == m_pIndex))
 	{
 		if(index_save.fParam [0] >= index_save.fParam [1] )
 		{
-		AfxMessageBox("指标参数设置不合理！");
-		return;
+			AfxMessageBox("指标参数设置不合理！");
+			return;
 		}
 	}
 
 	int nDays=GetCountValid(&index_save,pDoc,10);
-    index_save.iBeginFoot  = nDays ;
-	
+	index_save.iBeginFoot  = nDays ;
+
 
 	if(m_bCaclYHParam == TRUE)
 	{
@@ -1098,18 +1098,18 @@ void CTaiScreenParent::OnAdd()
 			AfxMessageBox("必须首先加入股票，才能根据这些股票的数据进行优化参数计算！");
 #endif
 	}
-	
+
 	IndexDataInfo GetIndex;
 	if(m_indexSaveArray.GetSize() > 0)
 	{
 		for(int i=0;i<m_indexSaveArray.GetSize();i++)
 		{
-		  GetIndex = m_indexSaveArray.GetAt(i);   
-		  if(memcmp(&GetIndex,&index_save,sizeof(IndexDataInfo)) == 0)
-		  {
-			  AfxMessageBox("指标已选入,请选择其他指标或改变参数!");
-			  return;
-		  }
+			GetIndex = m_indexSaveArray.GetAt(i);   
+			if(memcmp(&GetIndex,&index_save,sizeof(IndexDataInfo)) == 0)
+			{
+				AfxMessageBox("指标已选入,请选择其他指标或改变参数!");
+				return;
+			}
 		}
 	}
 	//////////////////////////////////////
@@ -1130,7 +1130,7 @@ void CTaiScreenParent::OnSave()
 		AfxMessageBox("没有可用的条件组合！");
 		return;
 	}
-    CString     defaultname;
+	CString     defaultname;
 	defaultname="";
 	CString strdir;
 	::GetCurrentDirectory(MAX_PATH,strdir.GetBuffer(MAX_PATH));
@@ -1144,21 +1144,21 @@ void CTaiScreenParent::OnSave()
 	int nPnt ;
 	if((nPnt = filename.Find('.')) == -1)
 	{
-	  CString temp;
-	  temp.Format("%s.TJZ",filename);
-	  filename = temp;
+		CString temp;
+		temp.Format("%s.TJZ",filename);
+		filename = temp;
 	}
 	else
 	{
 		if(filename.GetLength ()>4)
 		{
-		CString s = filename.Right (4);
-		s.MakeUpper ();
-		if(s!=".TJZ") 
-		{
-			AfxMessageBox("文件扩展名不对，请重新输入！");
-			return;
-		}
+			CString s = filename.Right (4);
+			s.MakeUpper ();
+			if(s!=".TJZ") 
+			{
+				AfxMessageBox("文件扩展名不对，请重新输入！");
+				return;
+			}
 		}
 		else return;
 	}
@@ -1167,15 +1167,15 @@ void CTaiScreenParent::OnSave()
 } 
 void CTaiScreenParent::OnDelete() 
 {
-	
-   int i = m_choose_list.GetCurSel();	
-   if(i == LB_ERR)
-   {
-      AfxMessageBox("请选择要删除的指标!");
-	  return;
-   }
-   this->m_indexSaveArray.RemoveAt(i,1);
-   m_choose_list.DeleteString(i);
+
+	int i = m_choose_list.GetCurSel();	
+	if(i == LB_ERR)
+	{
+		AfxMessageBox("请选择要删除的指标!");
+		return;
+	}
+	this->m_indexSaveArray.RemoveAt(i,1);
+	m_choose_list.DeleteString(i);
 	SetHorizonExtent()	;
 
 	if(m_choose_list.GetCount ()>i)
@@ -1186,23 +1186,23 @@ void CTaiScreenParent::OnDelete()
 
 void CTaiScreenParent::OnLoad() 
 {
-	
+
 	UpdateData();
-  	CString     defaultname;
+	CString     defaultname;
 	defaultname="";
 	CString strdir;
 	::GetCurrentDirectory(MAX_PATH,strdir.GetBuffer(MAX_PATH));
-	
+
 	CFileDialog  m_filedia(TRUE,0,"*.TJZ",OFN_CREATEPROMPT|OFN_HIDEREADONLY|OFN_NOCHANGEDIR,"*.TJZ|*.TJZ||");
 	m_filedia.m_ofn.lpstrInitialDir=strdir;
 	if(m_filedia.DoModal()==IDCANCEL)
 	{
-	
+
 		return;
 	}
 	UpdateData(FALSE);
 	CString filename=m_filedia.GetPathName();
-    LoadTjxgZsFile(filename);
+	LoadTjxgZsFile(filename);
 }  
 
 BOOL CTaiScreenParent::UpdateParams(IndexDataInfo *pIndex_save)
@@ -1213,36 +1213,36 @@ BOOL CTaiScreenParent::UpdateParams(IndexDataInfo *pIndex_save)
 	m_conRich.GetParamVal((float *)fVal);
 	for(int i=0;i<8;i++)
 	{
-        pIndex_save->fParam[i] =fVal[i];
+		pIndex_save->fParam[i] =fVal[i];
 	}
 	char str[20];
 	m_period.GetLBText(m_period.GetCurSel(),str);
 
 	for(int i=0;i<11;i++)
 		if(strcmp(str,m_gPeriodName[i]) == 0)
-		  pIndex_save->iDataType = i;
+			pIndex_save->iDataType = i;
 
 	if(pIndex_save->iKind == -6)
 		pIndex_save->iDataType = 6;
-    
-    pIndex_save->iLine =  m_sLineAll.GetCurSel();
+
+	pIndex_save->iLine =  m_sLineAll.GetCurSel();
 	if(pIndex_save->iLine<0) pIndex_save->iLine = 0;
 
 	pIndex_save->iSunIndex = m_sSubFormular.GetCurSel();
-    
+
 	int i = m_sSubFormular.GetCurSel();
 	if(i < 0)
-	  i = 0;
+		i = 0;
 	CString sStr;
-    m_sSubFormular.GetLBText(i,sStr);
+	m_sSubFormular.GetLBText(i,sStr);
 	pIndex_save->iSunIndex =0;
 	for(i=0;i<8;i++)
 	{  
-	  if(sStr == m_subIndexGroup[i])
-	  {
-		  pIndex_save->iSunIndex = i;
-		  break;
-	  }
+		if(sStr == m_subIndexGroup[i])
+		{
+			pIndex_save->iSunIndex = i;
+			break;
+		}
 	}
 	pIndex_save->iLineParam[0] = CB_ERR ;
 	pIndex_save->iLineParam[1] = CB_ERR ;
@@ -1251,20 +1251,20 @@ BOOL CTaiScreenParent::UpdateParams(IndexDataInfo *pIndex_save)
 		CComboBox * pBox = (CComboBox*)GetDlgItem(IDC_EDIT_PARAM1);
 		CString s = "";
 		if(pBox)
-		pBox->GetWindowText (s);
-	   pIndex_save->fSubParam1 = float( atof(s) );
+			pBox->GetWindowText (s);
+		pIndex_save->fSubParam1 = float( atof(s) );
 		if(pBox)
-		pIndex_save->iLineParam[0] = pBox->GetCurSel();
+			pIndex_save->iLineParam[0] = pBox->GetCurSel();
 	}
 	if(sStr.Find("参数2",0) != -1)
 	{
 		CComboBox * pBox = (CComboBox*)GetDlgItem(IDC_EDIT_PARAM2);
 		CString s = "";
 		if(pBox)
-		pBox->GetWindowText (s);
-	   pIndex_save->fSubParam2 = float( atof(s) );
+			pBox->GetWindowText (s);
+		pIndex_save->fSubParam2 = float( atof(s) );
 		if(pBox)
-		pIndex_save->iLineParam[1] = pBox->GetCurSel();
+			pIndex_save->iLineParam[1] = pBox->GetCurSel();
 	}
 
 	if(m_nLineType[pIndex_save->iLine] == BUY_CASE)
@@ -1281,7 +1281,7 @@ BOOL CTaiScreenParent::UpdateParams(IndexDataInfo *pIndex_save)
 		pIndex_save->fSubParam2 = 0;
 		pIndex_save->bBuyCase = 1;
 	}
-    else pIndex_save->bBuyCase  = this->m_bBuy ;	
+	else pIndex_save->bBuyCase  = this->m_bBuy ;	
 	if((int)(pIndex_save->bBuyCase) != m_bBuy && m_bShowBuyCase == true)
 	{
 		CString s3 = "买入条件！";
@@ -1296,39 +1296,39 @@ BOOL CTaiScreenParent::UpdateParams(IndexDataInfo *pIndex_save)
 
 void CTaiScreenParent::OnSelchangeListSubFormular() 
 {
-  int index = m_sSubFormular.GetCurSel();
-  if(index < 0)
-	  return;
-  if(!GetDlgItem(IDC_LIST_SUB_FORMULAR)->IsWindowVisible())
-	  return;
-  CString str;
-  m_sSubFormular.GetLBText(index,str);
-  if(str.Find("参数1",0) != -1)
-  {
-	  (GetDlgItem(IDC_EDIT_PARAM1))->ShowWindow(SW_SHOW);
-	  (GetDlgItem(IDC_EDIT_PARAM1))->EnableWindow(TRUE);
+	int index = m_sSubFormular.GetCurSel();
+	if(index < 0)
+		return;
+	if(!GetDlgItem(IDC_LIST_SUB_FORMULAR)->IsWindowVisible())
+		return;
+	CString str;
+	m_sSubFormular.GetLBText(index,str);
+	if(str.Find("参数1",0) != -1)
+	{
+		(GetDlgItem(IDC_EDIT_PARAM1))->ShowWindow(SW_SHOW);
+		(GetDlgItem(IDC_EDIT_PARAM1))->EnableWindow(TRUE);
 		if(GetDlgItem(IDC_STATIC_P1)) GetDlgItem(IDC_STATIC_P1)->ShowWindow(SW_SHOW);//
-  }
-  else
-  {
-	 (GetDlgItem(IDC_EDIT_PARAM1))->ShowWindow(SW_HIDE);
-     (GetDlgItem(IDC_EDIT_PARAM1))->EnableWindow(FALSE);
+	}
+	else
+	{
+		(GetDlgItem(IDC_EDIT_PARAM1))->ShowWindow(SW_HIDE);
+		(GetDlgItem(IDC_EDIT_PARAM1))->EnableWindow(FALSE);
 		if(GetDlgItem(IDC_STATIC_P1)) GetDlgItem(IDC_STATIC_P1)->ShowWindow(SW_HIDE);//
-  }
+	}
 
-  if(str.Find("参数2",0) != -1)
-  {
-      (GetDlgItem(IDC_EDIT_PARAM2))->ShowWindow(SW_SHOW);
-	  (GetDlgItem(IDC_EDIT_PARAM2))->EnableWindow(TRUE);
+	if(str.Find("参数2",0) != -1)
+	{
+		(GetDlgItem(IDC_EDIT_PARAM2))->ShowWindow(SW_SHOW);
+		(GetDlgItem(IDC_EDIT_PARAM2))->EnableWindow(TRUE);
 		if(GetDlgItem(IDC_STATIC_P2)) GetDlgItem(IDC_STATIC_P2)->ShowWindow(SW_SHOW);//
-  }
-  else
-  {
+	}
+	else
+	{
 		if(GetDlgItem(IDC_STATIC_P2)) GetDlgItem(IDC_STATIC_P2)->ShowWindow(SW_HIDE);//
-	 (GetDlgItem(IDC_EDIT_PARAM2))->ShowWindow(SW_HIDE);
-     (GetDlgItem(IDC_EDIT_PARAM2))->EnableWindow(FALSE);
-  }
-  
+		(GetDlgItem(IDC_EDIT_PARAM2))->ShowWindow(SW_HIDE);
+		(GetDlgItem(IDC_EDIT_PARAM2))->EnableWindow(FALSE);
+	}
+
 } 
 
 
@@ -1371,13 +1371,13 @@ void CTaiScreenParent::ReAddPeriodName()
 	int k=0;
 	for(int i=0;i<11;i++)
 	{
-	   if(m_pIndex->nPeriodsUsed[i] == 1)
-	   {
-		   this->m_period.AddString(m_gPeriodName[i]);
-		   k++;
-		   if(strPre==m_gPeriodName[i])
-			   nSel = k-1;
-	   }
+		if(m_pIndex->nPeriodsUsed[i] == 1)
+		{
+			this->m_period.AddString(m_gPeriodName[i]);
+			k++;
+			if(strPre==m_gPeriodName[i])
+				nSel = k-1;
+		}
 	}
 	if(nSel<0) nSel = 0;
 	if(m_period.GetCount()<=nSel)
@@ -1415,90 +1415,90 @@ void CTaiScreenParent::ShowExplain(CFormularContent *pJishu)
 	}
 }
 
-void CTaiScreenParent::FillToListCtrlHead(CListCtrl *pList)
+void CTaiScreenParent::FillToListCtrlHead(CListCtrl* pList)
 {
-   	CRect           rect;
-	CString         strItem1= _T("证券名称");
-	CString         strItem2= _T("类型");
-	
-	pList->InsertColumn(0, strItem1, LVCFMT_LEFT,
-		80, 0);
-	pList->InsertColumn(1, strItem2, LVCFMT_LEFT,
-		80, 1);
+	CRect rect;
+	pList->GetWindowRect(&rect);
+	int nWidth = rect.Width() - 80 - 16;
 
+	CString strItem1 = _T("证券名称");
+	CString strItem2 = _T("类型");
+
+	pList->InsertColumn(0, strItem1, LVCFMT_LEFT, 80, 0);
+	pList->InsertColumn(1, strItem2, LVCFMT_LEFT, nWidth, 1);
 }
 
 void CTaiScreenParent::AddIndexArrayToList(IndexDataInfo* pIndex_Save)
 {
-	  IndexDataInfo index_save;
-	  int n = m_indexSaveArray.GetSize();
-	  CFormularContent *pJishu;
-	  if(pIndex_Save!=NULL)
-		  n=1;
-	  for(int i=0;i<n;i++)
-	  {
-		 if(pIndex_Save!=NULL)
+	IndexDataInfo index_save;
+	int n = m_indexSaveArray.GetSize();
+	CFormularContent *pJishu;
+	if(pIndex_Save!=NULL)
+		n=1;
+	for(int i=0;i<n;i++)
+	{
+		if(pIndex_Save!=NULL)
 			index_save = *pIndex_Save;
-		 else
+		else
 			index_save = m_indexSaveArray[i];
 
-		 pJishu = LookUpArray(index_save.iKind,index_save.sIndex_name,pDoc);
+		pJishu = LookUpArray(index_save.iKind,index_save.sIndex_name,pDoc);
 
 		this->GetIndexLineName(pJishu);
 
-		 CString sTemp = "" ;
-		 int j;
-		 if(pJishu == NULL && index_save.iKind == -6)
-		 {
-			 sTemp = "";
-			 CString ss;
- 			 ss.LoadString (IDS_ZGB+index_save.iLine);
+		CString sTemp = "" ;
+		int j;
+		if(pJishu == NULL && index_save.iKind == -6)
+		{
+			sTemp = "";
+			CString ss;
+			ss.LoadString (IDS_ZGB+index_save.iLine);
 
-			 sTemp+= ss;
-			 sTemp+= m_subIndexGroup[index_save.iSunIndex];
-			 CString s;
+			sTemp+= ss;
+			sTemp+= m_subIndexGroup[index_save.iSunIndex];
+			CString s;
 			s=CLongString::FloatToString(index_save.fSubParam1);
-			 if(index_save.iLineParam [0]!=CB_ERR)
-			 {
-				 if(index_save.iLineParam [0]<nLineName.GetSize ())
-				 {
-					 s=nLineName.GetAt(index_save.iLineParam [0]);
-				 }
-				 else
-					 ASSERT(FALSE);
-				 ;
-			 }
-			 sTemp.Replace("参数1",s);
-			 s=CLongString::FloatToString(index_save.fSubParam2);
-			 if(index_save.iLineParam [1]!=CB_ERR)
-			 {
-				 if(index_save.iLineParam [1]<nLineName.GetSize ())
-				 {
-					 s=nLineName.GetAt(index_save.iLineParam [1]);
-				 }
-				 else
-					 ASSERT(FALSE);
-				 ;
-			 }
-			 sTemp.Replace("参数2",s);
-		 }
-		 else if(pJishu == NULL)
-		 {
-			 if(pIndex_Save==NULL)
-			 {
-				 CString ss;
-				 ss.Format ("第%d个",i+1);
-				 AfxMessageBox(ss+"指标不存在，无法加入！");
+			if(index_save.iLineParam [0]!=CB_ERR)
+			{
+				if(index_save.iLineParam [0]<nLineName.GetSize ())
+				{
+					s=nLineName.GetAt(index_save.iLineParam [0]);
+				}
+				else
+					ASSERT(FALSE);
+				;
+			}
+			sTemp.Replace("参数1",s);
+			s=CLongString::FloatToString(index_save.fSubParam2);
+			if(index_save.iLineParam [1]!=CB_ERR)
+			{
+				if(index_save.iLineParam [1]<nLineName.GetSize ())
+				{
+					s=nLineName.GetAt(index_save.iLineParam [1]);
+				}
+				else
+					ASSERT(FALSE);
+				;
+			}
+			sTemp.Replace("参数2",s);
+		}
+		else if(pJishu == NULL)
+		{
+			if(pIndex_Save==NULL)
+			{
+				CString ss;
+				ss.Format ("第%d个",i+1);
+				AfxMessageBox(ss+"指标不存在，无法加入！");
 				m_indexSaveArray.RemoveAt(i);
 				i--;
 				n--;
-			 }
-		    continue;
-		 }
-		 else
-		 {
-		 sTemp = pJishu->name;
-		 for( j=0;j<pJishu->numPara ;j++)
+			}
+			continue;
+		}
+		else
+		{
+			sTemp = pJishu->name;
+			for( j=0;j<pJishu->numPara ;j++)
 		 {
 			 CString s = "";
 			 s=CLongString::FloatToString(index_save.fParam[j]);
@@ -1512,14 +1512,14 @@ void CTaiScreenParent::AddIndexArrayToList(IndexDataInfo* pIndex_Save)
 			 }
 			 sTemp+=s;
 		 }
-		 CString sPeriod;
+			CString sPeriod;
 
-		 sTemp+= " ";
-		 if(m_bDlgIndicator == false )
-			sTemp+= m_gPeriodName[index_save.iDataType];
-		 sTemp+= " ";
+			sTemp+= " ";
+			if(m_bDlgIndicator == false )
+				sTemp+= m_gPeriodName[index_save.iDataType];
+			sTemp+= " ";
 
-		 if(index_save.iKind == -1)
+			if(index_save.iKind == -1)
 		 {
 			 GetIndexLineName(pJishu);
 			 sTemp+= nLineName.GetAt(index_save.iLine);
@@ -1550,20 +1550,20 @@ void CTaiScreenParent::AddIndexArrayToList(IndexDataInfo* pIndex_Save)
 			 }
 			 sTemp.Replace("参数2",s);
 		 }
-		 }
+		}
 
-		 CString sKind[]={"指标:","选股:","模式:","","",
-							"基本面选股:","价格:","涨跌幅:","","",
-							 "","","","",""};
-		 CString sBuy[]={"买入","卖出"};
-		 sTemp = sKind[-index_save.iKind-1]+sTemp;
-		 if(m_bShowBuyCase == true)
-		 {
-			 sTemp =sBuy[ index_save.bBuyCase]+":"+sTemp;
-		 }
+		CString sKind[]={"指标:","选股:","模式:","","",
+			"基本面选股:","价格:","涨跌幅:","","",
+			"","","","",""};
+		CString sBuy[]={"买入","卖出"};
+		sTemp = sKind[-index_save.iKind-1]+sTemp;
+		if(m_bShowBuyCase == true)
+		{
+			sTemp =sBuy[ index_save.bBuyCase]+":"+sTemp;
+		}
 
-		 m_choose_list.AddString(sTemp);
-	  }
+		m_choose_list.AddString(sTemp);
+	}
 
 }
 
@@ -1623,7 +1623,7 @@ CFormularContent* CTaiScreenParent::GetSpecialLJishu(int nJishu)
 
 float CTaiScreenParent::CaclMid(Kline kline)
 {
-    int j=pDoc->m_systemdata.middleprice;
+	int j=pDoc->m_systemdata.middleprice;
 	if(j<0||j>4)
 		j=0;
 	float rtn;
@@ -1657,10 +1657,10 @@ void CTaiScreenParent::ClearTestResultArray()
 	int n = m_testResultArray.GetSize();
 	for(int i=0;i<n;i++)
 	{
-	
-			 SCREEN_RESULT *chooseresult;
-			 chooseresult=m_testResultArray.GetAt(i);
-			 delete chooseresult;
+
+		SCREEN_RESULT *chooseresult;
+		chooseresult=m_testResultArray.GetAt(i);
+		delete chooseresult;
 	}
 	m_testResultArray.RemoveAll();
 
@@ -1676,13 +1676,13 @@ float CTaiScreenParent::GetParamValue(int i)
 
 void CTaiScreenParent::PostNcDestroy() 
 {
-	
-	
+
+
 	CDialog::PostNcDestroy();
 }
 BOOL CTaiScreenParent::PreTranslateMessage(MSG* pMsg) 
 {
-	
+
 
 	if(m_pStockSelectList!=0)
 	{
@@ -1702,7 +1702,7 @@ BOOL CTaiScreenParent::PreTranslateMessage(MSG* pMsg)
 
 				if(m_diakeybrode.DoModal() != IDOK)
 					return TRUE;
-			
+
 				if(m_diakeybrode.isresultok ==TRUE && m_diakeybrode.isresultstock ==TRUE)
 				{
 					CString s3 = m_diakeybrode.result;
@@ -1714,17 +1714,17 @@ BOOL CTaiScreenParent::PreTranslateMessage(MSG* pMsg)
 				return TRUE;
 			}
 		}
-		
+
 	}
 	if(m_treeFormularCtrl.m_hWnd == pMsg->hwnd)
 		if(pMsg->message==WM_KEYDOWN&&pMsg->wParam==13)
 		{
 
-				OnAdd();
+			OnAdd();
 			return TRUE;
 		}
 
-	return CDialog::PreTranslateMessage(pMsg);
+		return CDialog::PreTranslateMessage(pMsg);
 }
 
 void CTaiScreenParent::AddAStockKeyBoard(CListCtrl *pList)
@@ -1737,14 +1737,14 @@ void CTaiScreenParent::OnDestroy()
 
 
 	CDialog::OnDestroy();
-	
-	
-	
+
+
+
 }
 
 void CTaiScreenParent::OnReturnTreeFormularAll(NMHDR* pNMHDR, LRESULT* pResult) 
 {
-	
+
 	*pResult = 0;
 }
 
@@ -1771,15 +1771,15 @@ CString CTaiScreenParent::GetPeriodName(int nKlineType)
 
 void CTaiScreenParent::OnSelchangeListFormularLineAll() 
 {
-	
+
 	if(!GetDlgItem(IDC_LIST_FORMULAR_LINE_ALL)->IsWindowVisible())
-		  return;
+		return;
 	int index = m_sLineAll.GetCurSel();
 	if(index < 0)
-		  return;
+		return;
 	int index2 = m_sSubFormular.GetCurSel();
 	if(index2 < 0)
-		  index2 = 0;
+		index2 = 0;
 
 	if(m_nLineType[index] == BUY_CASE || m_nLineType[index] == SELL_CASE)
 	{
@@ -1801,7 +1801,7 @@ void CTaiScreenParent::OnSelchangeListFormularLineAll()
 			OnSelchangeListSubFormular() ;
 		}
 	}
-	
+
 }
 
 void CTaiScreenParent::NotifySubclass()
@@ -1819,7 +1819,7 @@ void CTaiScreenParent::ListCtrlSetSelectItem(CListCtrl *pList, int nItem)
 	{
 		pList->SetItemState(0,LVIS_SELECTED , LVIS_SELECTED) ;
 	}
-			
+
 }
 
 void CTaiScreenParent::AddStocks()
@@ -1840,7 +1840,7 @@ void CTaiScreenParent::DeleteStocks()
 	{
 		SelectStock::DeleteSelectedItem(m_pStockSelectList);
 		SelectStock::GetStockSymbolArray(m_pStockSelectList,m_stockchoose);
-	
+
 		CAlertSystem::ListCtrlToSymbolType(m_symbolTypeArray,m_pStockSelectList);
 		ListCtrlSetSelectItem(m_pStockSelectList);
 		NotifySubclass();
@@ -1853,11 +1853,11 @@ int CTaiScreenParent::IsPeriodValid(int nKlineType,CFormularContent* pJishu)
 	int rtn = 0;
 	for(int i=0;i<11;i++)
 	{
-	   if(pJishu->nPeriodsUsed[i] == 1 && nKlineType == nLKind[i])
-	   {
-		   rtn = 1;
-		   break;
-	   }
+		if(pJishu->nPeriodsUsed[i] == 1 && nKlineType == nLKind[i])
+		{
+			rtn = 1;
+			break;
+		}
 	}
 	return rtn;
 }
@@ -1869,11 +1869,11 @@ void CTaiScreenParent::WriteTizhToFile(CString FileName,int m_and_or, bool bZh,i
 	{
 		if(file.Open(FileName,CFile::modeRead)!=0)
 		{
-			
+
 			if(AfxMessageBox("文件已存在，是否替换？",MB_YESNO)!=IDYES)
 				return;
 		}
-        file.Close();
+		file.Close();
 	}
 	if(file.Open(FileName,CFile::modeCreate|CFile::modeWrite)==0)
 	{
@@ -1887,12 +1887,12 @@ void CTaiScreenParent::WriteTizhToFile(CString FileName,int m_and_or, bool bZh,i
 	file.Write(pi,1);
 	for(int i=0;i<m_indexSaveArray.GetSize();i++)
 	{
-	  indexToSave = m_indexSaveArray.GetAt(i);
-	  file.SeekToEnd();
-	  file.Write(&indexToSave,sizeof(IndexDataInfo));
+		indexToSave = m_indexSaveArray.GetAt(i);
+		file.SeekToEnd();
+		file.Write(&indexToSave,sizeof(IndexDataInfo));
 	}
 
-    if(!bZh)
+	if(!bZh)
 	{
 		file.Write(&m_mbzq,sizeof(int));
 		file.Write(&m_mbly,sizeof(float));
@@ -1905,42 +1905,42 @@ BOOL CTaiScreenParent::LoadTjxgZsFile(CString FileName, bool bShow)
 	CFile file;
 	if(file.Open(FileName,CFile::modeRead)==0)
 	{
-	    if(bShow)
-		    AfxMessageBox("找不到文件"+FileName);
+		if(bShow)
+			AfxMessageBox("找不到文件"+FileName);
 		return FALSE;
 	}
 	else
 	{	
-	  int i = 0;
-	  int nRead = 0;
-	  CString sTemp;
-	 
-	  if(bShow)
-	  while(m_choose_list.GetCount())
-	      m_choose_list.DeleteString(0);
-	  this->m_indexSaveArray.RemoveAll();
-	  file.Read(&i,1);
-	  m_and_or = i;
-	  
-	  IndexDataInfo index_save;
-	  nRead = file.Read(&index_save,sizeof(IndexDataInfo));
-	  while(nRead == sizeof(IndexDataInfo))
-	  {
-		  
-	     m_indexSaveArray.Add(index_save);
-		  nRead = file.Read(&index_save,sizeof(IndexDataInfo));
-	  }
-	  if(bShow)
-	  {
-	      AddIndexArrayToList();
-          SetHorizonExtent();
-	  }
+		int i = 0;
+		int nRead = 0;
+		CString sTemp;
+
+		if(bShow)
+			while(m_choose_list.GetCount())
+				m_choose_list.DeleteString(0);
+		this->m_indexSaveArray.RemoveAll();
+		file.Read(&i,1);
+		m_and_or = i;
+
+		IndexDataInfo index_save;
+		nRead = file.Read(&index_save,sizeof(IndexDataInfo));
+		while(nRead == sizeof(IndexDataInfo))
+		{
+
+			m_indexSaveArray.Add(index_save);
+			nRead = file.Read(&index_save,sizeof(IndexDataInfo));
+		}
+		if(bShow)
+		{
+			AddIndexArrayToList();
+			SetHorizonExtent();
+		}
 	}                    
 	file.Close();
 	if(bShow)
-    if(m_choose_list.GetCount ()>0)
-		m_choose_list.SetCurSel (m_choose_list.GetCount ()-1);
-     return TRUE;
+		if(m_choose_list.GetCount ()>0)
+			m_choose_list.SetCurSel (m_choose_list.GetCount ()-1);
+	return TRUE;
 }
 
 float CTaiScreenParent::CaclPrice(Kline *pKline, int nEnterPoint, int &nMove)
@@ -2029,7 +2029,7 @@ bool CTaiScreenParent::TestSuccessEach(CString StockId,int stkKind, int nCount, 
 	{
 		index_save=m_indexSaveArray.GetAt(k);
 		index_save.iDataType = nPeriod;
-		
+
 		float a=FormularComputeShares(StockId,stkKind,nRead,&index_save,bSucc,pKline, pList,true,&linebe);
 
 		if(a==-1)
@@ -2040,15 +2040,15 @@ bool CTaiScreenParent::TestSuccessEach(CString StockId,int stkKind, int nCount, 
 		{
 			NumBuy++;
 			for(int j=resultb;j<nRead;j++)
-			resultBuy[j]+=(int)linebe.line[j];
+				resultBuy[j]+=(int)linebe.line[j];
 		}
 		else 
 		{
 			NumSell++;
 			for(int j=resultb;j<nRead;j++)
-			resultSell[j]+=(int)linebe.line[j];
+				resultSell[j]+=(int)linebe.line[j];
 		}
-        
+
 	}
 
 	for(int ii=resultb;ii<nRead;ii++)
@@ -2073,12 +2073,12 @@ bool CTaiScreenParent::TestSuccessEach(CString StockId,int stkKind, int nCount, 
 				else
 					resultSell[ii]=0;
 		}
-		
+
 	}
 
 	if(NumBuy==0&&NumSell>0)
-         bBuySell=1;
-    if(NumBuy>0&&NumSell==0)
+		bBuySell=1;
+	if(NumBuy>0&&NumSell==0)
 		bBuySell=0;
 	if(NumBuy>0&&NumSell>0)
 		bBuySell=2;
@@ -2107,12 +2107,12 @@ float CTaiScreenParent::GetProfitAverage(float &fRateSucc,int& nBuy)
 
 	for(int i=0;i<Total;i++)
 	{
-        SCREEN_RESULT * chooseresult= m_testResultArray.GetAt(i);
+		SCREEN_RESULT * chooseresult= m_testResultArray.GetAt(i);
 		int num;
 		float num1=0.0;
 		float num2=0.0;
 		float DataArray[10];
-	    memset(DataArray,0x00,sizeof(float)*10);
+		memset(DataArray,0x00,sizeof(float)*10);
 		CReportData * pdt = 0;
 		if(!pDoc->m_sharesInformation.Lookup(chooseresult->symbol.GetBuffer(0),pdt,chooseresult->m_stkKind ))
 			continue;
@@ -2121,28 +2121,28 @@ float CTaiScreenParent::GetProfitAverage(float &fRateSucc,int& nBuy)
 
 		for(int n=0;n<num;n++)
 		{
-		    detail=chooseresult->m_detail.GetAt(n);
+			detail=chooseresult->m_detail.GetAt(n);
 			if(detail.profit>0)
 			{
-			     DataArray[6]++;
-			     num1+=detail.profit;
+				DataArray[6]++;
+				num1+=detail.profit;
 			}
 			else
 			{
-			     DataArray[7]++;
-				 num2+=detail.profit;
+				DataArray[7]++;
+				num2+=detail.profit;
 			}
-            DataArray[0]+=detail.profit;
+			DataArray[0]+=detail.profit;
 			if(n==0)
 			{
-			     DataArray[4]=detail.profit;
-				 DataArray[5]=detail.profit;
+				DataArray[4]=detail.profit;
+				DataArray[5]=detail.profit;
 			}
 			if(DataArray[4]<detail.profit)
-		         DataArray[4]=detail.profit;
-            if(DataArray[5]>detail.profit)
-			     DataArray[5]=detail.profit;
-			
+				DataArray[4]=detail.profit;
+			if(DataArray[5]>detail.profit)
+				DataArray[5]=detail.profit;
+
 		}
 		if(num!=0)
 		{
@@ -2218,25 +2218,25 @@ bool CTaiScreenParent::GetCurSelData(IndexDataInfo &indexSave)
 		strcpy(indexSave.sIndex_name,m_pIndex->name);
 	else
 		strcpy(indexSave.sIndex_name,"");
-    indexSave.iKind = nKind;	
+	indexSave.iKind = nKind;	
 
 	UpdateParams(&indexSave);
 	if(m_pIndex!=NULL && (m_gpIndex[0] == m_pIndex || m_gpIndex[1] == m_pIndex))
 	{
 		if(indexSave.fParam [0] >= indexSave.fParam [1] )
 		{
-		AfxMessageBox("指标参数设置不合理！");
-		return false;
+			AfxMessageBox("指标参数设置不合理！");
+			return false;
 		}
 	}
 
 	int nDays=GetCountValid(&indexSave,pDoc,10);
-    indexSave.iBeginFoot  = nDays ;
-	
-	
+	indexSave.iBeginFoot  = nDays ;
+
+
 	if(m_bCaclYHParam == TRUE)
 	{
-	
+
 #ifndef OEM
 		if(m_stockchoose.GetSize ()>0)
 			CTaiKlineDlgYHParam::CalcYH(&indexSave, &m_stockchoose );

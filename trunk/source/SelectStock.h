@@ -18,7 +18,7 @@ public:
 	bool m_bScreenStockBlock;
 	CTaiShanDoc *m_pDoc;
 	CImageList * m_pImageListSmall;
-    CStringArray m_StockTypeNameArray;
+	CStringArray m_StockTypeNameArray;
 	BOOL m_bOnlyAddStock;
 	BOOL m_bCloseWindows; 
 	CString m_strStockCode;
@@ -34,7 +34,7 @@ public:
 
 	BOOL InsertStockTypeToList() ;         
 	BOOL InsertStockColumnToList();      
-    BOOL InsertStockToList(char *name,char *code,int nKind);
+	BOOL InsertStockToList(char *name,char *code,int nKind);
 
 	//{{AFX_DATA(SelectStock)
 	enum { IDD = IDD_TYPE_STOCK };
@@ -47,7 +47,7 @@ public:
 	//}}AFX_DATA
 
 	//{{AFX_VIRTUAL(SelectStock)
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);   
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 

@@ -605,13 +605,18 @@ BOOL  CSharesInformation::InsertItemCorrect(char *StockId ,PCdat1 pStockData, DW
 
 	return TRUE;
 }
+
 BOOL CSharesInformation::DeleteAllStockFromStockType()
 {
-	int m_counts=GetStockTypeCount(STKTYPE);
-	for(int i=m_counts-1;  i>=0 ; i--)
-		RemoveKey(m_pData[STKTYPE][i].StockId ,STKTYPE);   
+	int m_counts = GetStockTypeCount(STKTYPE);
+	for (int i = m_counts - 1; i >= 0; i--)
+	{
+		RemoveKey(m_pData[STKTYPE][i].StockId, STKTYPE);
+	}
+
 	return TRUE;
 }
+
 #ifdef WIDE_NET_VERSION
 BOOL CSharesInformation::ClearAllRealTimeMarketData()
 {

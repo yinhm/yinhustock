@@ -76,7 +76,7 @@ END_MESSAGE_MAP()
 void CAlertSystem::OnAdd() 
 {
 
-	CAlertSet dlg;
+	CAlertSetDlg dlg;
 	for(int i=0;i<1000;i++)
 	{
 		int n = m_gAlarmArray.GetCount ();
@@ -143,7 +143,7 @@ void CAlertSystem::OnDelete()
 void CAlertSystem::OnModify()
 {
 
-	CAlertSet dlg;
+	CAlertSetDlg dlg;
 	int temp=m_condArrayList.GetNextItem( -1, LVNI_SELECTED   ) ;
 	if(temp==-1)
 	{

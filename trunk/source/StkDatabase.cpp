@@ -134,3 +134,41 @@ void CStkDatabase::GetStockSymbol(SymbolKind& symbol, char* szSymbol)
 
 	symbol.m_nSymbolKind = CSharesInformation::GetStockKind(symbol.m_wMarket, symbol.m_chSymbol);
 }
+
+void CStkDatabase::AddStockSymbol(WORD wMarket, char *szLabel)
+{
+	CString strSymbol = _T("");
+	memcpy(strSymbol.GetBuffer(0), &wMarket, sizeof(WORD));
+
+	BOOL bFind = FALSE;
+
+	//for (int j = 0; j < m_strArrayKind[nKind].GetSize(); j++)
+	//{
+	//	if (m_strArrayKind[nKind][j] == strName)
+	//	{
+	//		bFind = TRUE;
+	//		break;
+	//	}
+	//}
+
+	//if (bFind == FALSE)
+	//{
+	//	if (m_strArrayKind[nKind].GetSize() <= 0)
+	//	{
+	//		m_strArrayKind[nKind].Add(strName);
+	//		return;
+	//	}
+
+	//	for (int j = 0; j < m_strArrayKind[nKind].GetSize(); j++)
+	//	{
+	//		int k = strName.Compare(m_strArrayKind[nKind][j]);
+	//		if (k < 0)
+	//		{
+	//			m_strArrayKind[nKind].InsertAt(j, strName);
+	//			return;
+	//		}
+	//	}
+
+	//	m_strArrayKind[nKind].Add(strName);
+	//}
+}
