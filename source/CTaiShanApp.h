@@ -69,10 +69,6 @@ class CTaiShanApp : public CWinApp
 {
 public:
 
-	virtual void * GetLineDayData( LPCSTR lpszLabel, WORD wMarket, CTime tm, BOOL bDoPowerSplit = FALSE );
-
-	virtual void * GetBaseInfoData( LPCSTR lpszLabel, WORD wMarket);
-
 
 	virtual void SwitchToReportView( LPCSTR lpszLabel, WORD wMarket);
 

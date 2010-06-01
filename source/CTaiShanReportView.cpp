@@ -26,7 +26,7 @@
 #include "NineShowView.h"
 
 //#include "sheetbhadd.h"
-#include "DiaTest.h"
+//#include "DiaTest.h"
 #include "CTaiKlineFileHS.h"
 #include "HistoryDlg.h"
 

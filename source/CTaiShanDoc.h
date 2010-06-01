@@ -182,7 +182,6 @@ enum CUOHETYPE
 
 
 typedef CTypedPtrMap< CMapStringToString , CString , CString > CMapNewsFileName ;
-typedef CTypedPtrList<CPtrList,HS*> CHSList; 
 typedef CTypedPtrList<CPtrList,FENJIA*> CFJList; 
 class CTaiShanReportView;
 class CTaiShanTesting;
@@ -241,15 +240,6 @@ public:
 
 public:
 
-	//{{AFX_VIRTUAL(CTaiShanDoc)
-public:
-	virtual BOOL OnNewDocument();
-	virtual void Serialize(CArchive& ar);
-	virtual void OnCloseDocument();
-	virtual void DeleteContents();
-
-	//}}AFX_VIRTUAL
-
 
 public:
 	void* LookUpArray(Formu_Array1& js,CString& str);
@@ -265,10 +255,6 @@ public:
 public:
 
 	virtual ~CTaiShanDoc();
-#ifdef _DEBUG
-	virtual void AssertValid() const;
-	virtual void Dump(CDumpContext& dc) const;
-#endif
 public:
 
 
@@ -378,7 +364,6 @@ public:
 	void StockNameConvert(char *StockName,char *pyjc);
 	void InitTjxg();           
 	BOOL IdleProc( LONG lCount );
-	void InitChooseAndStockType();
 	void InitStockFiveDaysVolumn();
 	void InitFiveDaysVolumnForStock(PCdat1 &pCdat);
 	void WriteStockInfoToFile();
@@ -400,12 +385,6 @@ protected:
 	void FreeKeyBoardAngel();
 
 	void InitializeKeyBoardAngle(BOOL IsAddStock);
-
-protected:
-	//{{AFX_MSG(CTaiShanDoc)
-	afx_msg void OnOpenDocument();
-	afx_msg void OnToolClosework();
-	//}}AFX_MSG
 
 public:
 	// 全局设置
@@ -441,14 +420,33 @@ public:
 public:
 	BOOL	m_bCloseWorkDone;			// 是否已经收盘
 
+public:
+	//{{AFX_VIRTUAL(CTaiShanDoc)
+#ifdef _DEBUG
+	virtual void AssertValid() const;
+	virtual void Dump(CDumpContext& dc) const;
+#endif
+	virtual void Serialize(CArchive& ar);
+	virtual BOOL OnNewDocument();
+	virtual void OnCloseDocument();
+	virtual void DeleteContents();
+	//}}AFX_VIRTUAL
+
 protected:
 	void CheckKind();
+	void InitChooseAndStockType();
 
 public:
 	void ClearRealData();
 
 public:
 	void OnCalcHqDataProgress();
+
+protected:
+	//{{AFX_MSG(CTaiShanDoc)
+	afx_msg void OnOpenDocument();
+	afx_msg void OnToolClosework();
+	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 };
 

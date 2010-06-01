@@ -926,28 +926,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="CTaiChuQuanInDlg.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="CTaiChuQuanSetDlg.cpp"
 				>
 				<FileConfiguration
@@ -1964,51 +1942,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="ListOleDropTarget.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="ListTool.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="LKeyBoardDial.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -3553,10 +3487,6 @@
 				>
 			</File>
 			<File
-				RelativePath="CTaiChuQuanInDlg.h"
-				>
-			</File>
-			<File
 				RelativePath="CTaiChuQuanSetDlg.h"
 				>
 			</File>
@@ -3749,15 +3679,7 @@
 				>
 			</File>
 			<File
-				RelativePath="ListOleDropTarget.h"
-				>
-			</File>
-			<File
 				RelativePath="ListTool.h"
-				>
-			</File>
-			<File
-				RelativePath="LKeyBoardDial.h"
 				>
 			</File>
 			<File
@@ -5957,32 +5879,6 @@
 			</File>
 			<File
 				RelativePath="DiaStockdetail.h"
-				>
-			</File>
-			<File
-				RelativePath="DiaTest.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="DiaTest.h"
 				>
 			</File>
 			<File

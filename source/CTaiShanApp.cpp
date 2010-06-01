@@ -8,11 +8,9 @@
 #include "cellRange.h"
 #include "CTaiShanReportView.h"
 #include "CTaiShanKlineShowView.h"
-//#include "CompanyInfoView.h"
 #include "MyTreeView.h"
 #include "MyRichView.h"
 #include "InfoView.h"
-////////////////////
 #include "NineShowView.h"
 #include "NineShowFrm.h"
 #include "MySplash.h"
@@ -25,7 +23,6 @@
 
 
 #include "CaiwuData.h"
-#include  "CTaiChuQuanInDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -33,19 +30,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-	extern long ReadDog( void );
-	extern long WriteDog( void );
-	extern short DogAddr,DogBytes;
-	extern void * DogData;
-}
-#else
-extern long ReadDog( void );
-extern long WriteDog( void );
-extern short DogAddr,DogBytes;
-extern void * DogData;
-#endif
 extern HANDLE hDevice;
 
 
@@ -523,46 +507,7 @@ int CTaiShanApp::Run()
 }
 
 
-void* CTaiShanApp::GetLineDayData( LPCSTR lpszLabel, WORD wMarket, CTime tm, BOOL bDoPowerSplit )
-{
-	Kline* pKline = NULL;
-	int kind = CMainFrame::m_taiShanDoc ->m_sharesInformation .GetStockKind(wMarket,(char*)lpszLabel);
-	if(kind>=0)
-	{
-		PCdat1 pStockData = NULL;
-		if(CMainFrame::m_taiShanDoc ->m_sharesInformation.Lookup ((char*)lpszLabel,pStockData,kind))
-		{
-			CTaiKlineFileKLine * pFile = CTaiKlineFileKLine::GetFilePointer(lpszLabel,kind,true);
-			Kline* pKline2 = NULL;
-			int n = pFile->ReadKlineAccordingTime(lpszLabel, pKline2, tm ,2,0);
-			if(n>0)
-			{
-				static Kline retval;
-				pKline = &retval;
-				pKline[0] = pKline2[n-1];
-			}
-			if(pKline2)
-				delete [] pKline2;
-		}
-	}
-	return pKline;
-}
 
-
-void * CTaiShanApp::GetBaseInfoData( LPCSTR lpszLabel, WORD wMarket)
-{
-	BASEINFO* pBase = NULL;
-	int kind = CMainFrame::m_taiShanDoc ->m_sharesInformation .GetStockKind(wMarket,(char*)lpszLabel);
-	if(kind>=0)
-	{
-		PCdat1 pStockData = NULL;
-		if(CMainFrame::m_taiShanDoc ->m_sharesInformation.Lookup ((char*)lpszLabel,pStockData,kind))
-		{
-			pBase = pStockData->pBaseInfo;
-		}
-	}
-	return pBase;
-}
 
 
 void CTaiShanApp::SwitchToReportView( LPCSTR lpszLabel, WORD wMarket)

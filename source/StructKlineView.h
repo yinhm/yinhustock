@@ -580,11 +580,6 @@ typedef struct{
 }DATA_KLINE2;
 
 typedef struct{
-	short time;
-	float price;
-	float vol;
-}HS;
-typedef struct{
 	float price;
 	float vol;
 }FENJIA;

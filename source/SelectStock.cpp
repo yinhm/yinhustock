@@ -26,15 +26,15 @@ static char THIS_FILE[] = __FILE__;
 #define WM_USER_ADDSTOCK WM_USER+1200
 
 SelectStock::SelectStock(CWnd* pParent /*=NULL*/,BOOL bOnlyAddStock,bool bScreenStockBlock,BOOL bCloseWindows)
-	: CDialog(SelectStock::IDD, pParent)
+: CDialog(SelectStock::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(SelectStock)
 	m_nRadio = 0;
 	//}}AFX_DATA_INIT
 	m_bOnlyAddStock=bOnlyAddStock;
 	m_bCloseWindows=bCloseWindows;
-//	if(m_bOnlyAddStock)
-//	   m_nRadio = 1;
+	//	if(m_bOnlyAddStock)
+	//	   m_nRadio = 1;
 	m_bScreenStockBlock = bScreenStockBlock;
 	m_pSelectResultList = NULL;
 	m_nCurTab = 0;
@@ -44,13 +44,13 @@ SelectStock::SelectStock(CWnd* pParent /*=NULL*/,BOOL bOnlyAddStock,bool bScreen
 }
 
 SelectStock::SelectStock(UINT IDDLG, CWnd* pParent ,BOOL bOnlyAddStock,bool bScreenStockBlock,BOOL bCloseWindows)
-	: CDialog(IDDLG, pParent)
+: CDialog(IDDLG, pParent)
 {
 	m_nRadio = 0;
 	m_bOnlyAddStock=bOnlyAddStock;
 	m_bCloseWindows=bCloseWindows;
-//	if(m_bOnlyAddStock)
-//	   m_nRadio = 1;
+	//	if(m_bOnlyAddStock)
+	//	   m_nRadio = 1;
 	m_bScreenStockBlock = bScreenStockBlock;
 	m_pSelectResultList = NULL;
 	m_nCurTab = 0;
@@ -100,13 +100,13 @@ BOOL SelectStock::OnInitDialog()
 	ASSERT( m_pImageListSmall != NULL);    
 	m_pImageListSmall->Create(IDB_BITMAP12,16,0,RGB(192,192,192));
 
-   	CString         strItem= _T("StockType");
+	CString         strItem= _T("StockType");
 	this->m_StockTypeList.SetImageList(m_pImageListSmall, LVSIL_SMALL);
 
 	this->m_StockTypeList.InsertColumn(0, strItem);
 	m_StockTypeList.SetColumnWidth( 0, 80 );
 
-    InsertStockTypeToListExt(0);
+	InsertStockTypeToListExt(0);
 	InsertStockColumnToList();
 	if(	m_bOnlyAddStock)
 	{
@@ -169,14 +169,15 @@ BOOL SelectStock::OnInitDialog()
 	}
 	return TRUE; 
 }
+
 BOOL SelectStock::InsertStockTypeToList() 
 {
-   	CRect           rect;
+	CRect           rect;
 	int             iItem;
 	LV_ITEM         lvitem;
 	LPTSTR          pStrTemp;
 
-    iItem=0;
+	iItem=0;
 
 	lvitem.mask = LVIF_TEXT | LVIF_IMAGE|TVIF_PARAM;
 	lvitem.iItem =  iItem ;
@@ -277,7 +278,7 @@ BOOL SelectStock::InsertStockTypeToList()
 	lvitem.pszText = pStrTemp;
 	lvitem.iImage = 0;
 	m_StockTypeList.InsertItem(&lvitem); 
-	
+
 	iItem++;
 	lvitem.mask = LVIF_TEXT | LVIF_IMAGE|TVIF_PARAM;
 	lvitem.iItem =  iItem ;
@@ -313,9 +314,9 @@ BOOL SelectStock::InsertStockTypeToList()
 	m_StockTypeList.InsertItem(&lvitem); 
 
 	m_StockTypeNameArray.RemoveAll ();
-    m_pDoc->m_ManagerStockTypeData.GetAllStockTypeName(m_StockTypeNameArray);
-    int l_nCount=m_StockTypeNameArray.GetSize();
-    for(int i=0;i<l_nCount;i++)
+	m_pDoc->m_ManagerStockTypeData.GetAllStockTypeName(m_StockTypeNameArray);
+	int l_nCount=m_StockTypeNameArray.GetSize();
+	for(int i=0;i<l_nCount;i++)
 	{
 		iItem++;
 		lvitem.mask = LVIF_TEXT | LVIF_IMAGE|TVIF_PARAM;
@@ -336,7 +337,7 @@ void SelectStock::OnClickList1(NMHDR* pNMHDR, LRESULT* pResult)
 {
 
 	int nCurTab=((CTabCtrl*)GetDlgItem(IDC_TAB_TYPE))->GetCurSel();
-    if(nCurTab!=0)
+	if(nCurTab!=0)
 		return;
 
 	m_StockList.DeleteAllItems();
@@ -344,7 +345,7 @@ void SelectStock::OnClickList1(NMHDR* pNMHDR, LRESULT* pResult)
 	int temp=m_StockTypeList.GetNextItem( -1, LVNI_SELECTED) ;
 	if(temp==-1)
 		return;
-    int nParam=m_StockTypeList.GetItemData(temp); 
+	int nParam=m_StockTypeList.GetItemData(temp); 
 	if(nParam==CHOOSESTK)
 	{
 		SymbolKindArr l_StockArray;
@@ -352,14 +353,14 @@ void SelectStock::OnClickList1(NMHDR* pNMHDR, LRESULT* pResult)
 		int DisplayCount=l_StockArray.GetSize();
 		for(int row=0 ;row <  (int)DisplayCount  ;row++)         
 		{
-			 CReportData *Cdat;
-			 SymbolKind symbolkind=l_StockArray.GetAt(row);
-	 		 CString l_strCode=symbolkind.m_chSymbol;
-			 int nKind=symbolkind.m_nSymbolKind;
-			 if (m_pDoc->m_sharesInformation.Lookup(l_strCode.GetBuffer(0) , Cdat,nKind) == TRUE)     //检测该股票是否已记录在内存模板中
-			 {
-                 InsertStockToList(Cdat->name,Cdat->id,nKind);
-			 }
+			CReportData *Cdat;
+			SymbolKind symbolkind=l_StockArray.GetAt(row);
+			CString l_strCode=symbolkind.m_chSymbol;
+			int nKind=symbolkind.m_nSymbolKind;
+			if (m_pDoc->m_sharesInformation.Lookup(l_strCode.GetBuffer(0) , Cdat,nKind) == TRUE)     //检测该股票是否已记录在内存模板中
+			{
+				InsertStockToList(Cdat->name,Cdat->id,nKind);
+			}
 		}
 	}
 	else if(nParam<CHOOSESTK)
@@ -371,40 +372,40 @@ void SelectStock::OnClickList1(NMHDR* pNMHDR, LRESULT* pResult)
 			m_pDoc->m_sharesInformation.GetStockItem(nParam,j,Cdat);
 			if(Cdat==NULL)
 				continue;
-            InsertStockToList(Cdat->name,Cdat->id,Cdat->kind );
+			InsertStockToList(Cdat->name,Cdat->id,Cdat->kind );
 		}
 	}
 	else 
 	{
 		CString l_sStockTypeName=this->m_StockTypeNameArray.GetAt(nParam-1000);
-        SymbolKindArr l_StockCodeArray;
-	    m_pDoc->m_ManagerStockTypeData.GetStockFromStockTypeName(l_StockCodeArray,l_sStockTypeName.GetBuffer(0));          
-        
-	    int DisplayCount=l_StockCodeArray.GetSize();
+		SymbolKindArr l_StockCodeArray;
+		m_pDoc->m_ManagerStockTypeData.GetStockFromStockTypeName(l_StockCodeArray,l_sStockTypeName.GetBuffer(0));          
+
+		int DisplayCount=l_StockCodeArray.GetSize();
 		for(int row=0 ;row <  (int)DisplayCount  ;row++)          
 		{    
-			 CReportData *Cdat;
-			 CString m_zqdm; 
-			 SymbolKind symbolkind;
-			 symbolkind=l_StockCodeArray.GetAt(row) ;
-			 m_zqdm=symbolkind.m_chSymbol;
-			 int nKind=symbolkind.m_nSymbolKind;
-	 		 if (m_pDoc->m_sharesInformation.Lookup(m_zqdm.GetBuffer(0) , Cdat,nKind) == TRUE)     //检测该股票是否已记录在内存模板中
-			 {
-                InsertStockToList(Cdat->name,Cdat->id,nKind);
-			 }
+			CReportData *Cdat;
+			CString m_zqdm; 
+			SymbolKind symbolkind;
+			symbolkind=l_StockCodeArray.GetAt(row) ;
+			m_zqdm=symbolkind.m_chSymbol;
+			int nKind=symbolkind.m_nSymbolKind;
+			if (m_pDoc->m_sharesInformation.Lookup(m_zqdm.GetBuffer(0) , Cdat,nKind) == TRUE)     //检测该股票是否已记录在内存模板中
+			{
+				InsertStockToList(Cdat->name,Cdat->id,nKind);
+			}
 		}
 	}
 }
 BOOL SelectStock::InsertStockColumnToList()
 {
-   	CRect           rect;
+	CRect           rect;
 	CString         strItem1= _T("name");
 	CString         strItem2= _T("code");
-    
+
 	this->m_StockList.SetImageList(m_pImageListSmall, LVSIL_SMALL);
 
-	
+
 	this->m_StockList.InsertColumn(0, strItem1);
 	m_StockList.SetColumnWidth( 0, 100 );
 	this->m_StockList.InsertColumn(1, strItem2);
@@ -425,11 +426,11 @@ BOOL SelectStock::InsertStockToList(char *name,char *code,int nKind)
 		lvitem.mask = LVIF_TEXT | (iSubItem == 0? LVIF_IMAGE|LVIF_PARAM  : 0);
 		lvitem.iItem = (iSubItem == 0)? iItem : iActualItem;
 		lvitem.iSubItem = iSubItem;
-		
-	
+
+
 		CString strIconDesc, strIconShortDesc;
-        strIconShortDesc=name;
-	    strIconDesc=code;
+		strIconShortDesc=name;
+		strIconDesc=code;
 		pStrTemp1= strIconShortDesc.GetBuffer(strIconShortDesc.GetLength()); 
 		pStrTemp2= strIconDesc.GetBuffer(strIconDesc.GetLength());
 		lvitem.pszText = iSubItem == 0? pStrTemp1 : pStrTemp2;
@@ -445,7 +446,7 @@ BOOL SelectStock::InsertStockToList(char *name,char *code,int nKind)
 
 void SelectStock::OnRadio1() 
 {
-	
+
 	m_StockList.DeleteAllItems();
 
 	this->UpdateData(TRUE);
@@ -456,7 +457,7 @@ void SelectStock::OnRadio1()
 
 void SelectStock::OnRadio2() 
 {
-	
+
 	this->UpdateData(TRUE);
 	m_StockTypeList.SetSelectionMark(0 );
 }
@@ -472,7 +473,7 @@ void SelectStock::OnAdd()
 	{
 		int listcount=m_StockTypeList.GetSelectedCount( ) ;
 		hMem = GlobalAlloc( GPTR, ( listcount)* sizeof( SHARES_DATA_ADD) );
-	    hp=GlobalLock(hMem);
+		hp=GlobalLock(hMem);
 		if( hp )
 		{
 			pAddMxtj= (SHARES_DATA_ADD *)hp;
@@ -482,14 +483,14 @@ void SelectStock::OnAdd()
 			AfxMessageBox("分配内存出错",MB_ICONSTOP);
 			return;
 		}
-        int temp=m_StockTypeList.GetNextItem( -1, LVNI_SELECTED) ;
+		int temp=m_StockTypeList.GetNextItem( -1, LVNI_SELECTED) ;
 		int index=0;
-        while(temp>=0)
+		while(temp>=0)
 		{
-           pAddMxtj[index].StockType=m_StockTypeList.GetItemData(temp);
-		   m_StockTypeList.GetItemText( temp, 0, pAddMxtj[index].name, 10);
-           temp=m_StockTypeList.GetNextItem( temp, LVNI_SELECTED) ;
-		   index++;
+			pAddMxtj[index].StockType=m_StockTypeList.GetItemData(temp);
+			m_StockTypeList.GetItemText( temp, 0, pAddMxtj[index].name, 10);
+			temp=m_StockTypeList.GetNextItem( temp, LVNI_SELECTED) ;
+			index++;
 		}
 		CWnd *pWnd=this->GetParent();
 
@@ -508,7 +509,7 @@ void SelectStock::OnAdd()
 	{
 		int listcount=m_StockList.GetSelectedCount( ) ;
 		hMem = GlobalAlloc( GPTR, ( listcount)* sizeof( SHARES_DATA_ADD) );
-	    hp=GlobalLock(hMem);
+		hp=GlobalLock(hMem);
 		if( hp )
 		{
 			pAddMxtj= (SHARES_DATA_ADD *)hp;
@@ -518,16 +519,16 @@ void SelectStock::OnAdd()
 			AfxMessageBox("分配内存出错",MB_ICONSTOP);
 			return;
 		}
-        int temp=m_StockList.GetNextItem( -1, LVNI_SELECTED) ;
+		int temp=m_StockList.GetNextItem( -1, LVNI_SELECTED) ;
 		int nKind;
 		int index=0;
-        while(temp>=0)
+		while(temp>=0)
 		{
-		   nKind=m_StockList.GetItemData(temp);
-           pAddMxtj[index].StockType=-1-nKind;
-		   m_StockList.GetItemText( temp, 1, pAddMxtj[index].name, 10);
-           temp=m_StockList.GetNextItem( temp, LVNI_SELECTED) ;
-		   index++;
+			nKind=m_StockList.GetItemData(temp);
+			pAddMxtj[index].StockType=-1-nKind;
+			m_StockList.GetItemText( temp, 1, pAddMxtj[index].name, 10);
+			temp=m_StockList.GetNextItem( temp, LVNI_SELECTED) ;
+			index++;
 		}
 		CWnd *pWnd=this->GetParent();
 
@@ -542,11 +543,11 @@ void SelectStock::OnAdd()
 		}
 		m_StockList.SetSelectionMark(-1 );
 	}
-	
+
 	if(pAddMxtj)
 	{
-	   GlobalUnlock(pAddMxtj);        
-	   GlobalFree(pAddMxtj);
+		GlobalUnlock(pAddMxtj);        
+		GlobalFree(pAddMxtj);
 	}
 }
 
@@ -592,7 +593,7 @@ BOOL SelectStock::InsertStockTypeToListExt(int nKind)
 	{
 		POSITION position=m_pDoc->m_Tjxgblocklist.GetHeadPosition();
 		int i=0;
-   		CRect           rect;
+		CRect           rect;
 		int             iItem;
 		LV_ITEM         lvitem;
 		LPTSTR          pStrTemp;
@@ -675,16 +676,16 @@ void SelectStock::FillToListCtrlItem(CListCtrl *pList, char *Id, int nParam)
 	LVFINDINFO  lvf;
 	lvf.flags=LVFI_STRING;
 	lvf.psz=Id;
-	
+
 	int StockType = 0;
 	if(nParam <= -1)
 		StockType = 1;
 	if(nParam >= 2000)
 		StockType = 2;
 
-    if(pList->FindItem(&lvf)>=0)
+	if(pList->FindItem(&lvf)>=0)
 		return;
-    iItem= pList->GetItemCount();
+	iItem= pList->GetItemCount();
 	for (iSubItem = 0; iSubItem <2; iSubItem++)
 	{
 		if (iSubItem == 0)
@@ -696,21 +697,21 @@ void SelectStock::FillToListCtrlItem(CListCtrl *pList, char *Id, int nParam)
 		lvitem.iItem = (iSubItem == 0)? iItem : iActualItem;
 		lvitem.iSubItem = iSubItem;
 
-	
+
 		CString strIconDesc, strIconShortDesc;
-        strIconShortDesc=Id;
+		strIconShortDesc=Id;
 		iIcon = 1; 
 		if(StockType==1)
-		   strIconDesc="股票";
+			strIconDesc="股票";
 		else if(StockType==0)
 		{
 			iIcon=0;
-		   strIconDesc="板块";
+			strIconDesc="板块";
 		}
 		else
 		{
 			iIcon=0;
-		   strIconDesc="选股";
+			strIconDesc="选股";
 		}
 
 		pStrTemp1= strIconShortDesc.GetBuffer(strIconShortDesc.GetLength()); 
@@ -721,9 +722,9 @@ void SelectStock::FillToListCtrlItem(CListCtrl *pList, char *Id, int nParam)
 		if (iSubItem == 0)
 			iActualItem = pList->InsertItem(&lvitem); 
 		else
-			 pList->SetItem(&lvitem); 
+			pList->SetItem(&lvitem); 
 	} 
-	 pList->SetItemData( iItem, nParam );
+	pList->SetItemData( iItem, nParam );
 }
 
 void SelectStock::GetStockSymbolArray(CListCtrl *pList, SymbolKindArr &sSymbolArray)
@@ -747,14 +748,14 @@ void SelectStock::GetStockSymbolArray(CListCtrl *pList, SymbolKindArr &sSymbolAr
 
 void SelectStock::DeleteSelectedItem(CListCtrl *pList)
 {
-    CString Id;
+	CString Id;
 	int temp=pList->GetNextItem( -1, LVNI_SELECTED   ) ;
 	if(temp==-1)
 		return;
 	while(temp>=0)
 	{
 		pList->DeleteItem(temp);
-        temp=pList->GetNextItem( -1,LVNI_SELECTED   ) ;
+		temp=pList->GetNextItem( -1,LVNI_SELECTED   ) ;
 	}
 }
 BOOL SelectStock::PreTranslateMessage(MSG* pMsg)
@@ -762,28 +763,28 @@ BOOL SelectStock::PreTranslateMessage(MSG* pMsg)
 
 	if(pMsg->message==WM_CHAR&&((pMsg->wParam>='0'&&pMsg->wParam<='9')||(pMsg->wParam>='A'&&pMsg->wParam<='z')))
 	{
-			int nCurTab=((CTabCtrl*)GetDlgItem(IDC_TAB_TYPE))->GetCurSel();
-			if(nCurTab!=0)
-				return CDialog::PreTranslateMessage(pMsg);
-			
-		    CTaiKeyBoardAngelDlg m_diakeybrode;
-			if(pMsg->wParam>='a'&&pMsg->wParam<='z')
-				pMsg->wParam-=32;
-			char input=pMsg->wParam;
-			m_diakeybrode.input=input;
-			if(pMsg->wParam>='0'&&pMsg->wParam<='9')
-				m_diakeybrode.ischar=false;
-			else
-				m_diakeybrode.ischar=true;
+		int nCurTab=((CTabCtrl*)GetDlgItem(IDC_TAB_TYPE))->GetCurSel();
+		if(nCurTab!=0)
+			return CDialog::PreTranslateMessage(pMsg);
+
+		CTaiKeyBoardAngelDlg m_diakeybrode;
+		if(pMsg->wParam>='a'&&pMsg->wParam<='z')
+			pMsg->wParam-=32;
+		char input=pMsg->wParam;
+		m_diakeybrode.input=input;
+		if(pMsg->wParam>='0'&&pMsg->wParam<='9')
+			m_diakeybrode.ischar=false;
+		else
+			m_diakeybrode.ischar=true;
 
 		m_diakeybrode.DoModal();
 		if(m_diakeybrode.isresultok)
 		{
-		   char result[10];            
-           strcpy(result,m_diakeybrode.result);
-	   
-		   if(strlen(result)==6||strlen(result)==4)
-		   {
+			char result[10];            
+			strcpy(result,m_diakeybrode.result);
+
+			if(strlen(result)==6||strlen(result)==4)
+			{
 				LVFINDINFO  lvf;
 				lvf.flags=LVFI_STRING;
 				CReportData *pCdat;
@@ -794,16 +795,16 @@ BOOL SelectStock::PreTranslateMessage(MSG* pMsg)
 				lvf.psz=pCdat->name;
 				if((l_pos=m_StockList.FindItem(&lvf))>=0)
 				{
-                   LVITEM lv;
-				   lv.mask=LVIF_STATE;
-				   lv.iItem=l_pos;
-				   lv.state=LVIS_SELECTED;
-                   m_StockList.SetFocus();
-                   m_StockList.EnsureVisible( l_pos, TRUE );
-                   m_StockList.SetItemState(l_pos,LVIS_FOCUSED|LVIS_SELECTED , LVIS_SELECTED|LVIS_FOCUSED) ;
+					LVITEM lv;
+					lv.mask=LVIF_STATE;
+					lv.iItem=l_pos;
+					lv.state=LVIS_SELECTED;
+					m_StockList.SetFocus();
+					m_StockList.EnsureVisible( l_pos, TRUE );
+					m_StockList.SetItemState(l_pos,LVIS_FOCUSED|LVIS_SELECTED , LVIS_SELECTED|LVIS_FOCUSED) ;
 				}
 				return TRUE;
-		   }
+			}
 		}
 		return true;
 	}
@@ -813,31 +814,29 @@ BOOL SelectStock::PreTranslateMessage(MSG* pMsg)
 void SelectStock::OnCancel() 
 {
 
-	
+
 	CDialog::OnCancel();
 }
 
 void SelectStock::OnOK() 
 {
-
-	
-	if(m_bCloseWindows)
+	if (m_bCloseWindows)
 	{
-        int temp=m_StockList.GetNextItem( -1, LVNI_SELECTED) ;
-		if(temp>=0)
+		int temp = m_StockList.GetNextItem(-1, LVNI_SELECTED);
+		if (temp >= 0)
 		{
-           char strCode[10]; 
-		   m_StockList.GetItemText( temp, 1,strCode , 10);
-           m_strStockCode=strCode;
-		   m_stkKind = m_StockList.GetItemData (temp);
+			char strCode[10];
+			m_StockList.GetItemText(temp, 1, strCode, 10);
+			m_strStockCode = strCode;
+			m_stkKind = m_StockList.GetItemData(temp);
 		}
 		else
 		{
-           MessageBox("请正确选择股票代码","操作提示窗口",MB_OK);
-           return ;
+			MessageBox("请正确选择股票代码", "操作提示窗口", MB_OK);
+			return ;
 		}
-		CDialog::OnOK();
 
+		CDialog::OnOK();
 	}
 }
 

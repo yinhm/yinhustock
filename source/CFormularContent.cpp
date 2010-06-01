@@ -5,6 +5,7 @@
 
 #include "MainFrm.h"
 #include "CTaiShanDoc.h"
+
 #include "CTaiScreenParent.h"
 #include "KEYBRODEANGEL.h"
 #include "CwdOverWriteF.h"
@@ -17,13 +18,16 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 CStringArray CFormularContent::m_strArrayKind[4];
-bool CFormularContent::m_bVer20 = false;
+
+BOOL CFormularContent::m_bVer20 = FALSE;
 
 /////////////////////////////////////////////////////////////////////////////
 // CFormularContent
-IMPLEMENT_SERIAL(CFormularContent,CObject,1)
+
+IMPLEMENT_SERIAL(CFormularContent, CObject, 1)
+
 CFormularContent::CFormularContent()
-{//子窗口框架
+{
 	memset(this->btMemData,0,LEN_BYTE);
 	for(int i=0;i<16;i++)
 		nPeriodsUsed[i]=1;	
@@ -56,106 +60,8 @@ CFormularContent::CFormularContent()
 
 CFormularContent::~CFormularContent()
 {
-	if(pAdditionalBS != NULL)
+	if (pAdditionalBS != NULL)
 		delete pAdditionalBS;
-}
-
-void CFormularContent::Serialize(CArchive& ar)
-{// NOTE: the ClassWizard will add member functions here
-	if(m_bVer20 == false)
-	{
-		if(ar.IsStoring())
-		{
-			ar<<buyStr;
-			ar<<defaultVal[0];
-			ar<<defaultVal[1];
-			ar<<defaultVal[2];
-			ar<<defaultVal[3];
-			ar<<explainBrief;
-			ar<<fomular;
-			ar<<help;
-			ar<<isMainFiguer;
-			ar<<isOfen;
-			ar<<isProtected;
-			ar<<isSystem;
-			ar<<max[0];
-			ar<<max[1];
-			ar<<max[2];
-			ar<<max[3];
-			ar<<min[0];
-			ar<<min[1];
-			ar<<min[2];
-			ar<<min[3];
-			ar<<name;
-			ar<<namePara[0];
-			ar<<namePara[1];
-			ar<<namePara[2];
-			ar<<namePara[3];
-			ar<<numPara;
-			ar<<password;
-			ar<<posFlag;
-			ar<<posX[0];
-			ar<<posX[1];
-			ar<<posX[2];
-			ar<<posX[3];
-			ar<<posX[4];
-			ar<<posX[5];
-			ar<<posX[6];
-			ar<<sellStr;
-			ar<<stepLen[0];
-			ar<<stepLen[1];
-			ar<<stepLen[2];
-			ar<<stepLen[3];
-		}
-		else
-		{
-			ar>>buyStr;
-			ar>>defaultVal[0];
-			ar>>defaultVal[1];
-			ar>>defaultVal[2];
-			ar>>defaultVal[3];
-			ar>>explainBrief;
-			ar>>fomular;
-			ar>>help;
-			ar>>isMainFiguer;
-			ar>>isOfen;
-			ar>>isProtected;
-			ar>>isSystem;
-			ar>>max[0];
-			ar>>max[1];
-			ar>>max[2];
-			ar>>max[3];
-			ar>>min[0];
-			ar>>min[1];
-			ar>>min[2];
-			ar>>min[3];
-			ar>>name;
-			ar>>namePara[0];
-			ar>>namePara[1];
-			ar>>namePara[2];
-			ar>>namePara[3];
-			ar>>numPara;
-			ar>>password;
-			ar>>posFlag;
-			ar>>posX[0];
-			ar>>posX[1];
-			ar>>posX[2];
-			ar>>posX[3];
-			ar>>posX[4];
-			ar>>posX[5];
-			ar>>posX[6];
-			ar>>sellStr;
-			ar>>stepLen[0];
-			ar>>stepLen[1];
-			ar>>stepLen[2];
-			ar>>stepLen[3];
-		}
-	}
-	else
-	{
-		SerializeData(ar);
-	}
-
 }
 
 void CFormularContent::SetData(CFormularContent *data)
@@ -204,229 +110,6 @@ void CFormularContent::SetData(CFormularContent *data)
 }
 
 
-void CFormularContent::SerializeData(CArchive &ar)
-{// NOTE: the ClassWizard will add member functions here
-	int i;
-	if(ar.IsStoring())
-	{
-		for(i=0;i<LEN_BYTE;i++)
-			ar<<btMemData[i];
-
-		int nTemp = 62332442;
-		ar<<nTemp;
-
-		if(pAdditionalBS != NULL)
-		{
-			isAdditionalCond = 1;
-		}
-		ar<<isAdditionalCond;
-		if(isAdditionalCond == 1)
-		{
-
-			BYTE * pb = (BYTE*)pAdditionalBS;
-			for(i=0;i<sizeof(ADDITIONAL_BUYSELL);i++)
-			{
-				ar<<pb[i];
-			}
-		}
-
-		BYTE nArray = (BYTE)defaultValArray.GetSize();
-		if(nArray!=this->numPara) nArray = 0;
-
-		ar<<nArray;
-		for(i=0;i<nArray;i++)
-		{
-			float*  pf11 = (float*)(&(defaultValArray[i]));
-			for(int j=0;j<11;j++)
-			{
-				ar<<pf11[j];
-			}
-		}
-
-		{
-			ar<<name ;		
-			CString s2 = password;
-
-
-			SecretForm(s2,false);
-			ar<<s2	 ;
-			ar<<explainBrief ;	
-			ar<<explainParam ;	
-
-			for(i=0;i<8;i++)
-				ar<<namePara[i]	 ;
-
-
-			s2 = fomular;
-			SecretForm(s2,false);
-
-			ar<<s2	 ;		
-			ar<<help	 ;		
-
-			ar<<buyStr   ;     
-			ar<<sellStr  ;   
-			ar<<buyStrKong   ;      
-			ar<<sellStrKong  ;      
-
-			ar<<subKindIndex ;		
-			ar<<subKindIndexTime ;		
-			ar<<strReserved ;	
-		}
-	}
-	else
-	{
-		for(i=0;i<LEN_BYTE;i++)
-			ar>>btMemData[i];
-		int nTemp = 62332442;
-		ar>>nTemp;
-
-
-		ar>>isAdditionalCond;
-		if(isAdditionalCond == 1)
-		{
-			if(pAdditionalBS == NULL)
-				pAdditionalBS = new ADDITIONAL_BUYSELL;
-			BYTE * pb = (BYTE*)pAdditionalBS;
-			for(i=0;i<sizeof(ADDITIONAL_BUYSELL);i++)
-			{
-				ar>>pb[i];
-			}
-		}
-
-		BYTE nArray ;
-		ar>>nArray;
-		defaultValArray.RemoveAll();
-		for(i=0;i<nArray;i++)
-		{
-			FLOAT11 f11;
-			float*  pf11 = (float*)&f11;
-			for(int j=0;j<11;j++)
-			{
-				ar>>pf11[j];
-			}
-			defaultValArray.Add(f11);
-		}
-
-		if(nArray != this->numPara)
-		{
-			AddDefaultValToArray();
-		}
-
-
-		for(int iIndex = 0;iIndex< numPara ;iIndex++)
-		{
-			if( defaultValYH [iIndex]> max [iIndex]||
-				defaultValYH [iIndex]< min [iIndex])
-				defaultValYH [iIndex] =  defaultVal [iIndex];
-		}
-
-
-
-		{
-			ar>>name ;	
-
-			ar>>password	 ;
-
-			CString s2 = password;
-			SecretForm(s2,true);
-			password = s2;
-
-			ar>>explainBrief ;
-			ar>>explainParam ;	
-
-			for(i=0;i<8;i++)
-				ar>>namePara[i]	 ;
-			ar>>fomular	 ;	
-			s2 = fomular;
-			SecretForm(s2,true);
-			fomular = s2;
-
-			ar>>help	 ;	
-
-			ar>>buyStr   ;      
-			ar>>sellStr  ;    
-			ar>>buyStrKong   ;     
-			ar>>sellStrKong  ;      
-
-			ar>>subKindIndex ;		
-			ar>>subKindIndexTime ;	
-			ar>>strReserved ;	
-
-
-
-
-		}
-	}
-
-}
-
-void CFormularContent::AddKindName(CString s, int nKind)
-{// standard constructor
-	bool bFind = false;
-	if(s=="")
-		return;
-	for(int j=0;j<m_strArrayKind[nKind].GetSize();j++)
-	{
-		if(m_strArrayKind[nKind][j]==s)
-		{
-			bFind = true;
-			break;
-		}
-	}
-	if(bFind == false)
-	{
-		if(m_strArrayKind[nKind].GetSize()<=0)
-		{
-			m_strArrayKind[nKind].Add(s);
-			return;
-		}
-
-		for(int j=0;j<m_strArrayKind[nKind].GetSize();j++)
-		{
-			int k = s.Compare (m_strArrayKind[nKind][j]);
-			if(k<0)
-			{
-				m_strArrayKind[nKind].InsertAt(j,s);
-				return;
-			}
-		}
-		m_strArrayKind[nKind].Add(s);
-	}
-
-}
-
-
-void CFormularContent::InitDefaultValArray()
-{// standard constructor
-	if(defaultValArray.GetSize()!=numPara)
-	{
-		defaultValArray.RemoveAll();
-		for(int j=0;j<numPara;j++)
-		{
-			FLOAT11 f11;
-			for(int i=0;i<11;i++)
-			{
-				f11.fValue [i] = defaultVal [j];
-			}
-			defaultValArray.Add(f11);
-		}
-	}
-
-}
-
-void CFormularContent::DeleteKindName(CString s, int nKind)
-{
-	if(s=="")
-		return;
-	for(int j=0;j<m_strArrayKind[nKind].GetSize();j++)
-	{
-		if(m_strArrayKind[nKind][j]==s)
-		{
-			m_strArrayKind[nKind].RemoveAt(j);
-			break;
-		}
-	}
-}
 
 float CFormularContent::GetParamDataEach(int iIndex, int nKlineType, CFormularContent *pJishu)
 {
@@ -448,21 +131,6 @@ float CFormularContent::GetParamDataEach(int iIndex, int nKlineType, CFormularCo
 		}
 	}
 	return f;
-}
-
-void CFormularContent::AddDefaultValToArray()
-{// standard constructor
-	defaultValArray.RemoveAll();
-	FLOAT11 f11;
-	for(int i=0;i<this->numPara;i++)
-	{
-		for(int j=0;j<11;j++)
-		{
-			f11.fValue[j]=defaultVal[i];
-		}
-		defaultValArray.Add(f11);
-	}
-
 }
 
 void CFormularContent::SecretForm(CString &s,bool bLoad)
@@ -526,20 +194,6 @@ void CFormularContent::SecretForm(CString &s,bool bLoad)
 		}
 
 	}
-
-}
-
-bool CFormularContent::IsValid()
-{//Default FontName
-	CTaiShanDoc*   pDoc=CMainFrame::m_taiShanDoc ;
-	if( buyStr .GetLength () >0)
-	{
-		if( buyStr .CompareNoCase ( pDoc->m_strSerial)!=0)
-		{
-			return false;
-		}
-	}
-	return true;
 
 }
 
@@ -995,21 +649,9 @@ bool CFormularContent::ExportFormular(Formu_Array1 *pArr, int nArr,CString fileN
 	return true;
 }
 
-CString CFormularContent::GetFormular()
-{//为该类的对象
-	//Do not modify the contents of this file.
-	CString sFormular;
-	if( buyStr != "")
-		sFormular = "";
-	else if(sellStr != "" )
-		sFormular = "";
-	else if(isProtected )
-		sFormular = "此公式被密码保护！";
-	else 
-		sFormular  = fomular  ;
-	return sFormular;
-
-}
+const char g_kxzh_hz[64] = "System\\KlineGroup";
+const char g_tixg_hz[64] = "System\\ScreenData";
+const char g_zbgs_hz[64] = "System\\IndexData";
 
 void CFormularContent::ReadWriteIndex(CTaiShanDoc* pDoc, int nKind, BOOL bRead)
 {
@@ -1106,7 +748,60 @@ void CFormularContent::ReadWriteIndex(CTaiShanDoc* pDoc, int nKind, BOOL bRead)
 	m_bVer20 = FALSE;
 }
 
-void CFormularContent::ClearIndex(CTaiShanDoc *pDoc, int nKind)
+void CFormularContent::AddKindName(CString strName, int nKind)
+{
+	if (strName == "")
+		return;
+
+	BOOL bFind = FALSE;
+
+	for (int j = 0; j < m_strArrayKind[nKind].GetSize(); j++)
+	{
+		if (m_strArrayKind[nKind][j] == strName)
+		{
+			bFind = TRUE;
+			break;
+		}
+	}
+
+	if (bFind == FALSE)
+	{
+		if (m_strArrayKind[nKind].GetSize() <= 0)
+		{
+			m_strArrayKind[nKind].Add(strName);
+			return;
+		}
+
+		for (int j = 0; j < m_strArrayKind[nKind].GetSize(); j++)
+		{
+			int k = strName.Compare(m_strArrayKind[nKind][j]);
+			if (k < 0)
+			{
+				m_strArrayKind[nKind].InsertAt(j, strName);
+				return;
+			}
+		}
+
+		m_strArrayKind[nKind].Add(strName);
+	}
+}
+
+void CFormularContent::DeleteKindName(CString strName, int nKind)
+{
+	if (strName == "")
+		return;
+
+	for (int j = 0; j < m_strArrayKind[nKind].GetSize(); j++)
+	{
+		if (m_strArrayKind[nKind][j] == strName)
+		{
+			m_strArrayKind[nKind].RemoveAt(j);
+			break;
+		}
+	}
+}
+
+void CFormularContent::ClearIndex(CTaiShanDoc* pDoc, int nKind)
 {
 	if (pDoc == NULL)
 		return;
@@ -1134,4 +829,230 @@ void CFormularContent::ClearIndex(CTaiShanDoc *pDoc, int nKind)
 	}
 
 	pArray->RemoveAll();
+}
+
+void CFormularContent::AddDefaultValToArray()
+{
+	defaultValArray.RemoveAll();
+	FLOAT11 f11;
+
+	for (int i = 0; i < numPara; i++)
+	{
+		for (int j = 0; j < 11; j++)
+		{
+			f11.fValue[j] = defaultVal[i];
+		}
+
+		defaultValArray.Add(f11);
+	}
+}
+
+void CFormularContent::InitDefaultValArray()
+{
+	if (defaultValArray.GetSize() != numPara)
+	{
+		defaultValArray.RemoveAll();
+		for (int j = 0; j < numPara; j++)
+		{
+			FLOAT11 f11;
+			for (int i = 0; i < 11; i++)
+			{
+				f11.fValue[i] = defaultVal[j];
+			}
+			defaultValArray.Add(f11);
+		}
+	}
+}
+
+CString CFormularContent::GetFormular()
+{
+	CString sFormular;
+
+	if (buyStr != "")
+		sFormular = "";
+	else if (sellStr != "" )
+		sFormular = "";
+	else if (isProtected )
+		sFormular = "此公式被密码保护！";
+	else 
+		sFormular = fomular;
+
+	return sFormular;
+
+}
+
+BOOL CFormularContent::IsValid()
+{
+	CTaiShanDoc* pDoc = CMainFrame::m_taiShanDoc;
+
+	if (buyStr.GetLength() > 0)
+	{
+		if (buyStr.CompareNoCase(pDoc->m_strSerial) != 0)
+		{
+			return FALSE;
+		}
+	}
+
+	return TRUE;
+}
+
+void CFormularContent::SerializeData(CArchive &ar)
+{// NOTE: the ClassWizard will add member functions here
+	int i;
+	if(ar.IsStoring())
+	{
+		for(i=0;i<LEN_BYTE;i++)
+			ar<<btMemData[i];
+
+		int nTemp = 62332442;
+		ar<<nTemp;
+
+		if(pAdditionalBS != NULL)
+		{
+			isAdditionalCond = 1;
+		}
+		ar<<isAdditionalCond;
+		if(isAdditionalCond == 1)
+		{
+
+			BYTE * pb = (BYTE*)pAdditionalBS;
+			for(i=0;i<sizeof(ADDITIONAL_BUYSELL);i++)
+			{
+				ar<<pb[i];
+			}
+		}
+
+		BYTE nArray = (BYTE)defaultValArray.GetSize();
+		if(nArray!=this->numPara) nArray = 0;
+
+		ar<<nArray;
+		for(i=0;i<nArray;i++)
+		{
+			float*  pf11 = (float*)(&(defaultValArray[i]));
+			for(int j=0;j<11;j++)
+			{
+				ar<<pf11[j];
+			}
+		}
+
+		{
+			ar<<name ;		
+			CString s2 = password;
+
+
+			SecretForm(s2,false);
+			ar<<s2	 ;
+			ar<<explainBrief ;	
+			ar<<explainParam ;	
+
+			for(i=0;i<8;i++)
+				ar<<namePara[i]	 ;
+
+
+			s2 = fomular;
+			SecretForm(s2,false);
+
+			ar<<s2	 ;		
+			ar<<help	 ;		
+
+			ar<<buyStr   ;     
+			ar<<sellStr  ;   
+			ar<<buyStrKong   ;      
+			ar<<sellStrKong  ;      
+
+			ar<<subKindIndex ;		
+			ar<<subKindIndexTime ;		
+			ar<<strReserved ;	
+		}
+	}
+	else
+	{
+		for(i=0;i<LEN_BYTE;i++)
+			ar>>btMemData[i];
+		int nTemp = 62332442;
+		ar>>nTemp;
+
+
+		ar>>isAdditionalCond;
+		if(isAdditionalCond == 1)
+		{
+			if(pAdditionalBS == NULL)
+				pAdditionalBS = new ADDITIONAL_BUYSELL;
+			BYTE * pb = (BYTE*)pAdditionalBS;
+			for(i=0;i<sizeof(ADDITIONAL_BUYSELL);i++)
+			{
+				ar>>pb[i];
+			}
+		}
+
+		BYTE nArray ;
+		ar>>nArray;
+		defaultValArray.RemoveAll();
+		for(i=0;i<nArray;i++)
+		{
+			FLOAT11 f11;
+			float*  pf11 = (float*)&f11;
+			for(int j=0;j<11;j++)
+			{
+				ar>>pf11[j];
+			}
+			defaultValArray.Add(f11);
+		}
+
+		if(nArray != this->numPara)
+		{
+			AddDefaultValToArray();
+		}
+
+
+		for(int iIndex = 0;iIndex< numPara ;iIndex++)
+		{
+			if( defaultValYH [iIndex]> max [iIndex]||
+				defaultValYH [iIndex]< min [iIndex])
+				defaultValYH [iIndex] =  defaultVal [iIndex];
+		}
+
+
+
+		{
+			ar>>name ;	
+
+			ar>>password	 ;
+
+			CString s2 = password;
+			SecretForm(s2,true);
+			password = s2;
+
+			ar>>explainBrief ;
+			ar>>explainParam ;	
+
+			for(i=0;i<8;i++)
+				ar>>namePara[i]	 ;
+			ar>>fomular	 ;	
+			s2 = fomular;
+			SecretForm(s2,true);
+			fomular = s2;
+
+			ar>>help	 ;	
+
+			ar>>buyStr   ;      
+			ar>>sellStr  ;    
+			ar>>buyStrKong   ;     
+			ar>>sellStrKong  ;      
+
+			ar>>subKindIndex ;		
+			ar>>subKindIndexTime ;	
+			ar>>strReserved ;	
+
+
+
+
+		}
+	}
+
+}
+
+void CFormularContent::Serialize(CArchive& ar)
+{
+	SerializeData(ar);
 }
