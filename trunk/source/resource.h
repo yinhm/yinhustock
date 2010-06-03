@@ -1,5 +1,5 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by TaiShan.rc
 //
 #define IDD_6_TJXG_ALARM                2
@@ -29,7 +29,6 @@
 #define ID_GO_FORWARD                   103
 #define IDS_KLINE                       103
 #define IDS_ZIBIAO                      104
-#define IDD_OTHERSETDLG                 104
 #define IDS_DATA_INFO                   105
 #define IDD_TIMESETDLG                  105
 #define IDC_DATESTART                   105
@@ -125,7 +124,6 @@
 #define IDC_CURSOR_6                    148
 #define IDC_CURSOR_MOVE                 149
 #define IDC_CURSOR_3                    149
-#define IDD_CSmy                        150
 #define IDD_CORPINFO                    150
 #define IDI_EXIT16                      150
 #define IDD_DIALOG_KEYB                 151
@@ -434,7 +432,6 @@
 #define IDI_MYXMZ                       382
 #define IDB_MYLIST                      384
 #define IDD_WIDEDOWNLOAD                385
-#define IDD_WIDE_SETTIME                386
 #define IDD_DIALOG_LOGON                387
 #define IDR_MAINFRAME_WIDE              388
 #define IDR_VWBASETYPE_WIDE             389
@@ -442,7 +439,6 @@
 #define IDB_TOOLBAR_DIS                 393
 #define IDD_DIALOG12                    394
 #define IDI_ICON6                       395
-#define IDD_DIALOG13                    396
 #define IDB_1                           397
 #define IDB_2                           398
 #define IDD_XGN_EXTDATA_PROP            399
@@ -1319,7 +1315,6 @@
 #define ID_SETOTHER                     32773
 #define ID_BOTTOMPAGEADD                32774
 #define ID_SHSTOCKA                     32774
-#define ID_BOTTOMPAGEADD2               32775
 #define ID_SHSTOCKB                     32775
 #define ADD_ROW                         32776
 #define ID_SHZHSTOCKA                   32776
@@ -1334,7 +1329,6 @@
 #define ID_SAVE_SELECT                  32782
 #define ID_SAVE_STOCKTYPE               32783
 #define ID_STOCK_ASH                    32784
-#define ID_CHOOSE                       32785
 #define ID_STOCKTYPE                    32786
 #define ID_FONT_CHANGE                  32787
 #define ID_YOU                          32787
@@ -1356,7 +1350,6 @@
 #define ID_VIEW_DAYLINE                 32796
 #define ID_AUTOPAGE                     32796
 #define ID_VIEW_WEEKLINE                32797
-#define ID_MENUITEM32797                32797
 #define ID_CUOHE_ASH                    32797
 #define ID_VIEW_MONUTHLINE              32798
 #define ID_CUOHE_BSH                    32798
@@ -1481,9 +1474,6 @@
 #define ID_JISHU_EXPLAIN                32909
 #define ID_MODIFY_JISHU_POP             32910
 #define ID_TREND_LINE_ALARM             32912
-#define ID_FIRST_DAY_H                  32914
-#define ID_LAST_DAY_H                   32915
-#define ID_HIDE_BACK_H                  32916
 #define ID_MOVE_CHENGBEN_2              32917
 #define ID_TJXG_MM_TEST                 32918
 #define ID_TJXG_MM_TEST_SHOW            32919
@@ -1506,7 +1496,6 @@
 #define ID_SPIRE_LINE                   32937
 #define ID_SZEB                         32938
 #define ID_MENUITEM_DELETE_K            32939
-#define ID_TTTT                         32940
 #define ID_TJXG                         32941
 #define ID_CLOSE                        32942
 #define ID_HIST_OPEN_POP                32943
@@ -1552,8 +1541,6 @@
 #define ID_L_LINGXIAN                   42799
 #define ID_L_DUOKONG                    42800
 #define ID_L_TENGLUO                    42801
-#define ID_MENUITEM32802                42802
-#define ID_MENUITEM32803                42803
 #define ID_EXTEND_KLINE                 42806
 #define ID_NOMALSCREEN                  42806
 #define ID_RESTORE_KLINE                42808
@@ -1640,12 +1627,6 @@
 #define AFX_IDS_SCTASKLIST2             61205
 #define AFX_IDS_MDICHILD2               61216
 #define AFX_IDS_PREVIEW_CLOSE2          61446
-#define ID_SHINFOPANE                   61446
-#define ID_SZINFOPANE                   61447
-#define ID_BIG_LISTPANE                 61448
-#define ID_CARDPANE                     61449
-#define ID_ALARMPANE                    61450
-#define ID_SIGNALPANE                   61451
 #define IDS_LOGON                       61453
 
 // Next default values for new objects

@@ -1,7 +1,6 @@
 
 #include "stdafx.h"
 #include "CTaiShanApp.h"
-#include "ChooseReceiveDataForm.h"
 #include "MainFrm.h"
 #include "ChildFrm.h"
 #include "CTaiShanDoc.h"

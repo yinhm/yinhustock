@@ -7,20 +7,21 @@
 #endif // _MSC_VER > 1000
 
 #include "StkFile.h"
-#include <afxcmn.h>
 
-#define ADDSIZES	50
-#define CHOOSEPOS	251
+#define ADDSIZES	50			// 
+#define CHOOSEPOS	251			// 自选股位置
 
 class CSuperviseSharesBlockData : public CStkFile
 {
 public:
 	CSuperviseSharesBlockData();
 	virtual ~CSuperviseSharesBlockData();
-	enum {ZGB=0,LTG=1,OTHER=2	 };     
 
-private:
-	CTaiShanDoc   *m_pDoc;      
+protected:
+	CTaiShanDoc* m_pDoc;					// 
+
+public:
+	enum { ZGB = 0, LTG = 1, OTHER = 2 };	// 
 
 protected:
 	STOCKTYPEHEAD* m_pStockTypeHead;		// 
@@ -29,17 +30,20 @@ protected:
 	STOCK_POINT_INFO* m_pStockPoint;		// 
 
 protected:
-	BOOL InitStockTypeDataEmpty(CString strPath);       
-	BOOL InitStockTypeDataExist(CString strPath);    
+	// 初始化文件
+	BOOL InitStockTypeDataEmpty(CString strPath);
+	BOOL InitStockTypeDataExist(CString strPath);
 	BOOL AddStockTypeDataSize(int AddSize = ADDSIZES);
-	BOOL SetMemroyALLOCSize(unsigned int nSize);  
-	BOOL InsertItemPoint(STOCK_TYPE_INFO* m_pStk);  
-	BOOL SavePosToFile();                             
+
+	// 分配内存空间 STOCK_POINT_INFO* m_pStockPoint
+	BOOL SetMemroyALLOCSize(unsigned int nSize);
+	BOOL InsertItemPoint(STOCK_TYPE_INFO* m_pStk);
+	BOOL SavePosToFile();
 	void SaveDataToFile(LPCVOID lpBaseAddress, DWORD dwNumberOfBytesToFlush);
 
 public:
+	// 初始化文件
 	BOOL InitStockTypeData(CString strPath);
-	void GetStockTypeHeadPoint(PSTOCKTYPEHEAD& pStockTypeHead) { pStockTypeHead = m_pStockTypeHead; }
 
 	// 将股票连接到 Report->pStockTypeInfo
 	BOOL InitStockPoint();
@@ -47,37 +51,55 @@ public:
 	// 插入板块指数到 Report (STKTYPE)
 	BOOL InitStockTypePoint();
 
-	void CalcAllStockTypeData();           
-	void CalcRealTimeStockTypeIndex();      
-	void CalcMinuteRealTimeIndex();    
+	void GetStockTypeHeadPoint(PSTOCKTYPEHEAD& pStockTypeHead) { pStockTypeHead = m_pStockTypeHead; }
 
 
+
+	void CalcAllStockTypeData();
+	void CalcRealTimeStockTypeIndex();
+	void CalcMinuteRealTimeIndex();
+
+
+
+public:
+
+	// 导入股票板块
+	BOOL ImportStockTypeData(CString m_szPathStr, CString m_szStockNameStr, PSTOCKTYPEINFO& m_pStktype, int nRightType = LTG);
+
+
+
+public:
+	static bool CheckKind(int i);
+	void  CheckStockCount(int AddStockCount);
+	void RefreshHistoryDayLineData(char *pszStockTypeCode, CProgressCtrl *p=NULL);
+	BOOL GetStockTypeStartDate(char * pszStockTypeCode,SymbolKindArr &StockCodeArray,time_t &t);
+	BOOL InsertStockItemCorrect(char *m_szStockId ,PSTOCK_TYPE_INFO m_pStock) ;     
+	long CorrectKline(Kline *pKline,long LineCount);
+	float GetStockBlockRight(char *StockTypeCode);
+
+
+
+
+public:
+	// 股票插入、删除、查找
+	BOOL InsertStockItem(char* m_szStockId, int nKind, PSTOCK_TYPE_INFO& m_pStock);
+	BOOL DeleteStockItem(char* m_szStockId, int nKind);  
+	BOOL RemoveDeletedStock();
+	BOOL Lookup(char* m_szStockId, int nKind, PSTOCK_TYPE_INFO& m_pStock);
 
 public:
 	// 在指定位置插入板块
 	BOOL InsertStockType(PSTOCKTYPEINFO& m_pStktype, int m_iPos);
 	BOOL DeleteStockType(char* m_pszStockTypeCode);
 
-	// 获取指定板块的证券列表
-	BOOL GetStockFromStockType(SymbolKindArr& m_StockCodeArray, char* m_pszStockTypeCode);
-	BOOL GetStockFromStockTypeName(SymbolKindArr& m_StockCodeArray, char* m_pszStockTypeName);
-
-	// 获取指定板块的证券数
-	int GetStockCountFromType(char* m_pszCode);
-
-	// 取得有效板块个数
-	int GetStockTypeCounts();
-
-	// 在板块中插入删除股票
-	BOOL InsertStockToType(PCdat1& m_pCdat, char* m_szStockTypeCode);       
-	BOOL DeleteStockFromType(char* m_pszStockCode, int nKind, char* m_szStockTypeCode);    
-	BYTE GetStockTypeNumber(char* m_szStockTypeCode);
-
 	// 检测版块名和代码是否重复
 	BOOL CheckBlockName(char* BlockName, char* BlockCode);
 
 	// 获取板块空白插入位置
 	int GetInsertStockTypePos();
+
+	// 取得有效板块个数
+	int GetStockTypeCounts();
 
 	// 获取所有板块名称和代码
 	void GetAllStockTypeCode(CStringArray& m_StockTypeCodeArray);
@@ -87,32 +109,29 @@ public:
 	BOOL GetStockTypePoint(PSTOCKTYPEINFO& m_pStktype, char* m_pszStockTypeCode);
 	BOOL GetStockTypePointFromName(PSTOCKTYPEINFO& m_pStktype, char* m_pszStockTypeName);
 
-	// 导入股票板块
-	BOOL ImportStockTypeData(CString m_szPathStr, CString m_szStockNameStr, PSTOCKTYPEINFO& m_pStktype, int nRightType = LTG);
+public:
+	// 在板块中插入删除股票
+	BOOL InsertStockToType(PCdat1& m_pCdat, char* m_szStockTypeCode);
+	BOOL DeleteStockFromType(char* m_pszStockCode, int nKind, char* m_szStockTypeCode);
+
+	// 根据代码获取位置
+	BYTE GetStockTypeNumber(char* m_szStockTypeCode);
+
+	// 获取指定板块的证券数
+	int GetStockCountFromType(char* m_pszCode);
+
+	// 获取指定板块的证券列表
+	BOOL GetStockFromStockType(SymbolKindArr& m_StockCodeArray, char* m_pszStockTypeCode);
+	BOOL GetStockFromStockTypeName(SymbolKindArr& m_StockCodeArray, char* m_pszStockTypeName);
 
 public:
-	static bool CheckKind(int i);
-	void  CheckStockCount(int AddStockCount);
-
-
-	void RefreshHistoryDayLineData(char *pszStockTypeCode, CProgressCtrl *p=NULL);
-	BOOL GetStockTypeStartDate(char * pszStockTypeCode,SymbolKindArr &StockCodeArray,time_t &t);
-
-	BOOL InsertStockItemCorrect(char *m_szStockId ,PSTOCK_TYPE_INFO m_pStock) ;     
-	long CorrectKline(Kline *pKline,long LineCount);
-	float GetStockBlockRight(char *StockTypeCode);
-
-public:
-	BOOL InsertStockItem(char* m_szStockId, int nKind, PSTOCK_TYPE_INFO& m_pStock);
-	BOOL DeleteStockItem(char* m_szStockId, int nKind);  
-	BOOL RemoveDeletedStock();
-	BOOL Lookup(char* m_szStockId, int nKind, PSTOCK_TYPE_INFO& m_pStock);
-
-public:
-	BOOL GetChooseStockCode(SymbolKindArr& m_StockCodeArray);
-	int GetChooseStockCounts();
+	// 插入删除自选股
 	BOOL InsertStockToChoose(char* m_szStockId, int nKind);
 	BOOL DeleteStockFromChoose(char* m_szStockId, int nKind);
+
+	// 获取自选板块列表
+	BOOL GetChooseStockCode(SymbolKindArr& m_StockCodeArray);
+	int GetChooseStockCounts();
 };
 
 inline void CSuperviseSharesBlockData::SaveDataToFile(LPCVOID lpBaseAddress, DWORD dwNumberOfBytesToFlush)

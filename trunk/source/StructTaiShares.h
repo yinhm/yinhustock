@@ -122,16 +122,6 @@ typedef struct tagBASEINFO
 } BASEINFO;
 typedef BASEINFO* PBASEINFO;
 
-typedef struct
-{
-	int DayAddr;
-	int Min5Addr;
-	BASEINFO *pBaseInfo;
-	int HsAddr;
-	char Free[8];
-}MapFileAddr;
-
-
 // °å¿éÎÄ¼þÍ·
 typedef struct
 {
@@ -182,7 +172,6 @@ typedef struct
 {
 	STOCK_TYPE_INFO* pStockInfo;
 } STOCK_POINT_INFO;
-
 
 
 typedef struct

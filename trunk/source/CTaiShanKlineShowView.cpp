@@ -35,7 +35,6 @@
 #include "CTaiKlineMoveChenben.h"
 #include "ChildFrm.h"
 #include "CTaiKlineSplitWnd.h"
-#include "CTaiKlineWndChild.h"
 #include "CTaiKlineFileKLine.h"
 #include "CTaiKlineMemFile.h"
 #include "CTaiKlineFileKLine.h"

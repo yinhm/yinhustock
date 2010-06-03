@@ -12,7 +12,7 @@
 #include "CTaiKlineFileHS.h"
 #include "SelectStock.h"
 #include "CTaiKlineWideNet.h"
-#include "WideDownLoadTimeSet.h"
+//#include "WideDownLoadTimeSet.h"
 #include "WideDownLoadDlg.h"
 
 #ifdef _DEBUG
@@ -795,11 +795,11 @@ void CDownLoadNetDlg::OnSetupTime()
 	WIDEREQUEST_CONTEXT *pRequestContext;
 	pRequestContext=(WIDEREQUEST_CONTEXT *)m_MyList.GetItemData(temp1);
     this->GetStartAndEndTime(t1,t2,pRequestContext->m_strDownLoadDate);
-	CDownLoadNetTimeSet Dlg(t1,t2);
-	if(Dlg.DoModal()==IDOK)
+	//CDownLoadNetTimeSet Dlg(t1,t2);
+	//if(Dlg.DoModal()==IDOK)
 	{
-		t1=Dlg.m_Start.GetTime();
-		t2=Dlg.m_End.GetTime();
+		//t1=Dlg.m_Start.GetTime();
+		//t2=Dlg.m_End.GetTime();
 		this->GetTimeString(t1,t2,strTime);
 		while(temp1>=0)
 		{
@@ -1041,12 +1041,12 @@ LRESULT CDownLoadNetDlg::OnAddStock(WPARAM wParam, LPARAM lParam)
 	int TempnId=this->m_MyTree.GetItemData(hTreeItem); 
 	if(TempnId==WideHistoryDetail)
 	{
-		CDownLoadNetTimeSet Dlg;
-		if(Dlg.DoModal()==IDOK)
-		{
-            tStartTime=Dlg.m_Start.GetTime();
-			tEndTime=Dlg.m_End.GetTime();
-		}
+		//CDownLoadNetTimeSet Dlg;
+		//if(Dlg.DoModal()==IDOK)
+		//{
+  //          tStartTime=Dlg.m_Start.GetTime();
+		//	tEndTime=Dlg.m_End.GetTime();
+		//}
 	}
 	switch(TempnId)
 	{
@@ -1354,26 +1354,26 @@ void CDownLoadNetDlg::OnDblclkList1(NMHDR* pNMHDR, LRESULT* pResult)
 		WIDEREQUEST_CONTEXT *pRequestContext;
 		pRequestContext=(WIDEREQUEST_CONTEXT *)m_MyList.GetItemData(temp1);
         this->GetStartAndEndTime(t1,t2,pRequestContext->m_strDownLoadDate);
-		CDownLoadNetTimeSet Dlg(t1,t2);
-		if(Dlg.DoModal()==IDOK)
-		{
-			t1=Dlg.m_Start.GetTime();
-			t2=Dlg.m_End.GetTime();
-			this->GetTimeString(t1,t2,strTime);
-			while(temp1>=0)
-			{
-				WIDEREQUEST_CONTEXT *pRequestContext;
-				pRequestContext=(WIDEREQUEST_CONTEXT *)m_MyList.GetItemData(temp1);
-				if(pRequestContext->m_DownLoadAttributes==WideHistoryDetail)
-				{
-					strcpy(pRequestContext->m_strDownLoadDate,strTime);
-					m_MyList.SetItemText(temp1,3,strTime);
-			        GetTimeString(t1,t2,pRequestContext->m_strDownLoadDate);
-					this->GetHistoryDetailTimeCounts(t1,t2,pRequestContext);
-				}
-				temp1=m_MyList.GetNextItem( temp1,LVNI_SELECTED   ) ;
-			}
-		}
+		//CDownLoadNetTimeSet Dlg(t1,t2);
+		//if(Dlg.DoModal()==IDOK)
+		//{
+		//	t1=Dlg.m_Start.GetTime();
+		//	t2=Dlg.m_End.GetTime();
+		//	this->GetTimeString(t1,t2,strTime);
+		//	while(temp1>=0)
+		//	{
+		//		WIDEREQUEST_CONTEXT *pRequestContext;
+		//		pRequestContext=(WIDEREQUEST_CONTEXT *)m_MyList.GetItemData(temp1);
+		//		if(pRequestContext->m_DownLoadAttributes==WideHistoryDetail)
+		//		{
+		//			strcpy(pRequestContext->m_strDownLoadDate,strTime);
+		//			m_MyList.SetItemText(temp1,3,strTime);
+		//	        GetTimeString(t1,t2,pRequestContext->m_strDownLoadDate);
+		//			this->GetHistoryDetailTimeCounts(t1,t2,pRequestContext);
+		//		}
+		//		temp1=m_MyList.GetNextItem( temp1,LVNI_SELECTED   ) ;
+		//	}
+		//}
 	}
 	*pResult = 0;
 }

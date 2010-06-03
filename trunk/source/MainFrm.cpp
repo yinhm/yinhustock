@@ -30,7 +30,7 @@
 #include "CTaiScreenTest.h"
 #include "CAlertSystem.h"
 #include "CAlertPopDlg.h"
-#include "RecvStockCode.h"
+//#include "RecvStockCode.h"
 #include "NineShowFrm.h"
 #include "GetSetReg.h"
 //Added By CuiWei.2000-08-03
@@ -60,21 +60,10 @@
 #include "DlgShowInformation.h"
 #include "XgnExtDataDlg.h"
 #include "CwdCloseWork.h"
-//#include "DownFilesDlg.h"
-
-//
-//Added by Xia Qiankun 2000/5/11
-//
-//#include "LoginDlg.h"
-//#include "InvestManageDlg.h"
-//end
 
 #include "DlgMYXMZ.h"
 
-#define ID_SIZECHANGE   2
-#define ID_GPSJCL   200
 #define TJXG_ALERT  400   
-#define MaxShareMem   (1024*1024)
 
 #include "StkReceiver.h"
 
