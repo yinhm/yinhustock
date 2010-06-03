@@ -54,6 +54,7 @@ public:
 public:
 	CString GetStockSymbol(char* szStock, int nKind);
 	void GetStockSymbol(SymbolKind& symbol, char* szSymbol);
+	void GetStockSymbol(SymbolKind& symbol, char* szStock, int nKind);
 
 public:
 	void AddStockSymbol(WORD wMarket, char* szLabel);

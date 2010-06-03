@@ -135,6 +135,11 @@ void CStkDatabase::GetStockSymbol(SymbolKind& symbol, char* szSymbol)
 	symbol.m_nSymbolKind = CSharesInformation::GetStockKind(symbol.m_wMarket, symbol.m_chSymbol);
 }
 
+void CStkDatabase::GetStockSymbol(SymbolKind& symbol, char* szStock, int nKind)
+{
+
+}
+
 void CStkDatabase::AddStockSymbol(WORD wMarket, char *szLabel)
 {
 	CString strSymbol = _T("");

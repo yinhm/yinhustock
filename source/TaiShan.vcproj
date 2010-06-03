@@ -640,28 +640,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="ChooseReceiveDataForm.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="ChuquanData.cpp"
 				>
 				<FileConfiguration
@@ -1169,50 +1147,6 @@
 			</File>
 			<File
 				RelativePath="DayLineSelect.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="DBZLLBSH.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="DBZLLBSZ.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2580,28 +2514,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="RecvStockCode.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="ReorganizeDayLineData.cpp"
 				>
 				<FileConfiguration
@@ -2778,28 +2690,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="SetOtherDlg.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="SetParam.cpp"
 				>
 				<FileConfiguration
@@ -2844,73 +2734,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="SHEETBKCYBK.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="SHEETQT.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="SheetScrollBar.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="SHEETWG.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -3174,28 +2998,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="ToolBarEx.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="TransactFee.cpp"
 				>
 				<FileConfiguration
@@ -3241,28 +3043,6 @@
 			</File>
 			<File
 				RelativePath="WideDownLoadDlg.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="WideDownLoadTimeSet.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -3435,10 +3215,6 @@
 				>
 			</File>
 			<File
-				RelativePath="ChooseReceiveDataForm.h"
-				>
-			</File>
-			<File
 				RelativePath="ChuquanData.h"
 				>
 			</File>
@@ -3532,14 +3308,6 @@
 			</File>
 			<File
 				RelativePath="DayLineSelect.h"
-				>
-			</File>
-			<File
-				RelativePath="DBZLLBSH.h"
-				>
-			</File>
-			<File
-				RelativePath="DBZLLBSZ.h"
 				>
 			</File>
 			<File
@@ -3807,10 +3575,6 @@
 				>
 			</File>
 			<File
-				RelativePath="RecvStockCode.h"
-				>
-			</File>
-			<File
 				RelativePath="ReorganizeDayLineData.h"
 				>
 			</File>
@@ -3847,10 +3611,6 @@
 				>
 			</File>
 			<File
-				RelativePath="SetOtherDlg.h"
-				>
-			</File>
-			<File
 				RelativePath="SetParam.h"
 				>
 			</File>
@@ -3859,23 +3619,7 @@
 				>
 			</File>
 			<File
-				RelativePath="SHEETBKCYBK.h"
-				>
-			</File>
-			<File
-				RelativePath="SHEETDMDZ.h"
-				>
-			</File>
-			<File
-				RelativePath="SHEETQT.h"
-				>
-			</File>
-			<File
 				RelativePath="SheetScrollBar.h"
-				>
-			</File>
-			<File
-				RelativePath="SHEETWG.h"
 				>
 			</File>
 			<File
@@ -3935,10 +3679,6 @@
 				>
 			</File>
 			<File
-				RelativePath="ToolBarEx.h"
-				>
-			</File>
-			<File
 				RelativePath="TransactFee.h"
 				>
 			</File>
@@ -3948,10 +3688,6 @@
 			</File>
 			<File
 				RelativePath="WideDownLoadDlg.h"
-				>
-			</File>
-			<File
-				RelativePath="WideDownLoadTimeSet.h"
 				>
 			</File>
 			<File
@@ -5362,32 +5098,6 @@
 				>
 			</File>
 			<File
-				RelativePath="CTaiKlineWndChild.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="CTaiKlineWndChild.h"
-				>
-			</File>
-			<File
 				RelativePath="CTaiScreen.cpp"
 				>
 				<FileConfiguration
@@ -5801,32 +5511,6 @@
 			</File>
 			<File
 				RelativePath="DialogProgressPingce.h"
-				>
-			</File>
-			<File
-				RelativePath="DIALOGTEST.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="DIALOGTEST.h"
 				>
 			</File>
 			<File

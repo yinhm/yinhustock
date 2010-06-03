@@ -21,7 +21,7 @@
 #include <afxdtctl.h>	
 #include <afxtempl.h>
 #include <wininet.h>
-
+#include <afxcmn.h>
 
 #include "resource.h"
 #include "STKDRV.H"
@@ -46,7 +46,6 @@
 
 const char g_realtime[64] = "Data\\Report.tsk";
 const char g_baseinfo[64] = "Data\\CompanyBase";
-const char g_stocktypeinfo[64] = "Data\\BlockInfomation";
 const char g_hzpy[64] = "Data\\languagedata";
 const char g_rate[64] = "Data\\stockrate";
 
