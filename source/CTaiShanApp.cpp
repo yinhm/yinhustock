@@ -18,10 +18,9 @@
 #include "CTaiKlineFileKLine.h"
 #include "FyRegister.h"
 
-#include <afxpriv.h>
+//#include <afxpriv.h>
 
-
-#include "CaiwuData.h"
+#include "StkDatabase.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -146,6 +145,9 @@ BOOL CTaiShanApp::InitInstance()
 
 	SetRegistryKey("");
 	LoadStdProfileSettings();  
+
+
+	TSKDatabase()->InitInstance();
 
 
 #ifdef WIDE_NET_VERSION

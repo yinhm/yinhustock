@@ -3,7 +3,7 @@
 
 #if !defined(AFX_STDAFX_H__61A31CEB_9707_11D1_ACAB_0000E823DBFD__INCLUDED_)
 #define AFX_STDAFX_H__61A31CEB_9707_11D1_ACAB_0000E823DBFD__INCLUDED_
-            
+
 #if _MSC_VER > 1000
 #pragma once
 #endif 
@@ -24,13 +24,12 @@
 #include <afxcmn.h>
 
 #include "resource.h"
-#include "STKDRV.H"
 #include "stockdrv.h"
 #include "StructTaiShares.h"
 #include "CSharesInformation.h"
 #include "CSharesCompute.h"
 #include "StructKlineView.h"
-#include "ManagerStockTypeData.h"
+#include "StkBlockManager.h"
 #include "JiShuColumnInfo.h"
 #include "CSharesBigBillData.h"
 #include "CFormularCompute.h"
@@ -45,8 +44,6 @@
 #endif 
 
 const char g_realtime[64] = "Data\\Report.tsk";
-const char g_baseinfo[64] = "Data\\CompanyBase";
-const char g_hzpy[64] = "Data\\languagedata";
 const char g_rate[64] = "Data\\stockrate";
 
 const char g_daysh[64] = "Data\\sh\\day";
@@ -61,7 +58,7 @@ const CString g_sF10sz = "Data\\sz\\f10\\";
 
 #include "BtnST.h"
 enum {	SHPAGE = 0, SZPAGE ,STKINDEXPAGE, CHOOSEPAGE,STKTYPEPAGE
-		,TJXGPAGE};
+,TJXGPAGE};
 enum {	SZEBPAGE=102};//STKINDEXPAGE =100,STKTYPEPAGE=101,
 //enum {	SHPAGE = 0, SZPAGE , STKINDEXPAGE ,	CHOOSEPAGE
 //		,STKTYPEPAGE,TJXGPAGE};

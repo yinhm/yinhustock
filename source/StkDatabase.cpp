@@ -5,7 +5,9 @@
 //#include "StkReportFile.h"
 #include "CTaiKlineFileKLine.h"
 #include "CSharesBaseInfo.h"
+#include "StkBlockManager.h"			// 板块管理
 
+#include "StkBlockDzh.h"
 #include "mainfrm.h"
 #include "CTaiShanDoc.h"
 
@@ -29,6 +31,30 @@ BOOL CStkDatabase::InitInstance()
 	GetAppPath();
 
 	CreateDirectory(GetAppPath() + _T("\\Data"), NULL);
+
+	CStringArray block;
+	CStkBlockDzh dzhBlock;
+	dzhBlock.EnumAllType(block);
+
+	CStringArray arrBlock;
+	dzhBlock.EnumBlockNames(_T("行业"), arrBlock);
+
+	int nSize = arrBlock.GetSize();
+	for (int i = 0; i < nSize; i++)
+	{
+		CString strBlock = arrBlock.GetAt(i);
+
+		CStringArray arrStock;
+		dzhBlock.ReadSymbols(strBlock, arrStock);
+
+		//if (GetBlockManager()->CheckBlockName(strBlock.GetBuffer(0), NULL) == FALSE)
+		//{
+		//	PSTOCKTYPEINFO pBlock;
+
+		//	int nPos = GetBlockManager()->GetInsertStockTypePos();
+		//	GetBlockManager()->InsertStockType(pBlock, nPos);
+		//}
+	}
 
 	return TRUE;
 }
@@ -112,6 +138,16 @@ CSharesBaseInfo* CStkDatabase::GetBaseInfoFile(WORD wMarket)
 	return pFile;
 }
 
+CStkBlockManager* CStkDatabase::GetBlockManager()
+{
+	CStkBlockManager* pManager = NULL;
+
+	CTaiShanDoc* pDoc = ((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc;
+	pManager = &pDoc->m_ManagerStockTypeData;
+
+	return pManager;
+}
+
 CString CStkDatabase::GetStockSymbol(char* szStock, int nKind)
 {
 	char szSymbol[10];
@@ -176,4 +212,20 @@ void CStkDatabase::AddStockSymbol(WORD wMarket, char *szLabel)
 
 	//	m_strArrayKind[nKind].Add(strName);
 	//}
+}
+
+void CStkDatabase::ProcessReport(RCV_REPORT_STRUCTEx* pReport, int nCount)
+{
+	CTaiShanDoc* pDoc = ((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc;
+	if (pDoc == NULL)
+		return;
+
+	BYTE* pBuffBase = (BYTE*)pReport;
+	int nBuffSize = pReport->m_cbSize;
+
+	for (int i = 0; i < nCount; i++)
+	{
+		RCV_REPORT_STRUCTEx* pBuffer = (RCV_REPORT_STRUCTEx*)(pBuffBase + nBuffSize * i);
+		pDoc->m_sharesCompute.StockDataUpdate(pBuffer);
+	}
 }

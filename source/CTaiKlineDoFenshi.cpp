@@ -148,7 +148,7 @@ void CTaiKlineMin1::InitMinuteLine()
 		if(b)
 		{
 			time_t mt = CTime::GetCurrentTime ().GetTime ();
-			((CMainFrame*)AfxGetMainWnd())->gSTOCKDLL.QueryMinData(symbol, CSharesCompute::GetMarketKind(pView->m_stkKind),mt);
+			//((CMainFrame*)AfxGetMainWnd())->gSTOCKDLL.QueryMinData(symbol, CSharesCompute::GetMarketKind(pView->m_stkKind),mt);
 		}
 
 		if(pDoc->m_bInitDone ==FALSE)

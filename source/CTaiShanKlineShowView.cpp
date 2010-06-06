@@ -12,7 +12,6 @@
 #include "CTaiShanKlineShowView.h"
 #include "CTaiKlineDoKline.h"
 #include "CTaiKlineDoFenshi.h"
-#include "DIALOGTEST.h"
 #include "GuiZhouTvView.h"
 #include "CTaiKlineDialogCross.h"
 #include "CTaiKlineDrawLine.h"
@@ -8009,7 +8008,7 @@ int CTaiShanKlineShowView::ReadKLine(CString fName,int stkKind,Kline*& pKline,in
 
 	time_t mt = 0;
 	if(rtnK>0) mt= pKline[rtnK-1].day;
-	((CMainFrame*)AfxGetMainWnd())->gSTOCKDLL.QueryKData(fName, CSharesCompute::GetMarketKind(stkKind),mt);
+	//((CMainFrame*)AfxGetMainWnd())->gSTOCKDLL.QueryKData(fName, CSharesCompute::GetMarketKind(stkKind),mt);
 	return rtnK;
 }
 

@@ -6,6 +6,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include "StkDriver.h"
+
 #include "CTaiShanKlineShowView.h"
 #include "TestDialogbar.h"
 #include "CTaiScreen.h"
@@ -39,7 +41,7 @@ public:
 
 	static BOOL m_bLogonSuccess;
 #else
-	CSTKDRV	gSTOCKDLL;
+	CStkDriver	gSTOCKDLL;
 #endif
 private:
 #ifdef WIDE_NET_VERSION

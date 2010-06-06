@@ -15,7 +15,6 @@
 #include "NineShowView.h"
 #include "MyTreeView.h"
 #include "InfoView.h"
-#include "hzpy.h"
 
 #define  systemcolorlength   34
 #define  comblength          9
@@ -219,8 +218,6 @@ public:
 	CTaiTestTreeView *m_taiViewF9;
 	CTaiTestTreeView *m_taiViewF10;
 
-	CSpz m_spz;					
-	CDyz m_dyz;					
 	static BOOL m_bAppAuthorized;
 	CString m_strPName;			
 	CString m_strUser;		
@@ -311,7 +308,6 @@ public:
 
 	CSharesInformation m_sharesInformation;
 	CSharesCompute m_sharesCompute;
-	CSuperviseSharesBlockData m_ManagerStockTypeData;
 	TechniqueColumnInfo *m_pTechniqueColumn;
 #ifdef WIDE_NET_VERSION
 	CDownLoadNetDlg *m_pDownLoadDlg;
@@ -410,6 +406,8 @@ public:
 	Formu_Array1	m_formuar_choose;	
 	Formu_Array1	m_formuar_master;	
 	Formu_Array1	m_formuar_kline;	
+
+	CStkBlockManager m_ManagerStockTypeData;
 
 public:
 	int		m_nPreDisplayRow;			// 列表显示行数

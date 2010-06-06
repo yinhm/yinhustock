@@ -23,6 +23,7 @@ typedef struct tagStockSymbol
 //class CStkReportFile;
 class CTaiKlineFileKLine;
 class CSharesBaseInfo;
+class CStkBlockManager;
 
 class CStkDatabase
 {
@@ -50,6 +51,7 @@ public:
 	CTaiKlineFileHS* GetTickFile(WORD wMarket);
 	CTaiKlineFileHS* GetTickFile(CString strSymbol, int nKind);
 	CSharesBaseInfo* GetBaseInfoFile(WORD wMarket);
+	CStkBlockManager* GetBlockManager();
 
 public:
 	CString GetStockSymbol(char* szStock, int nKind);
@@ -58,6 +60,9 @@ public:
 
 public:
 	void AddStockSymbol(WORD wMarket, char* szLabel);
+
+public:
+	void ProcessReport(RCV_REPORT_STRUCTEx* pReport, int nCount);
 };
 
 CStkDatabase* TSKDatabase();

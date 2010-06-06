@@ -354,28 +354,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="BlockTypeManager.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="BrowseForFolder.cpp"
 				>
 				<FileConfiguration
@@ -1630,28 +1608,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="hzpy.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="ImportData.cpp"
 				>
 				<FileConfiguration
@@ -2009,28 +1965,6 @@
 			</File>
 			<File
 				RelativePath="ManagerStockType.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="ManagerStockTypeData.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -2802,28 +2736,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="STKDRV.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="Sysface.cpp"
 				>
 				<FileConfiguration
@@ -3159,10 +3071,6 @@
 				>
 			</File>
 			<File
-				RelativePath="BlockTypeManager.h"
-				>
-			</File>
-			<File
 				RelativePath="BrowseForFolder.h"
 				>
 			</File>
@@ -3407,10 +3315,6 @@
 				>
 			</File>
 			<File
-				RelativePath="hzpy.h"
-				>
-			</File>
-			<File
 				RelativePath="ImportData.h"
 				>
 			</File>
@@ -3472,10 +3376,6 @@
 			</File>
 			<File
 				RelativePath="ManagerStockType.h"
-				>
-			</File>
-			<File
-				RelativePath="ManagerStockTypeData.h"
 				>
 			</File>
 			<File
@@ -3628,10 +3528,6 @@
 			</File>
 			<File
 				RelativePath="StdAfx.h"
-				>
-			</File>
-			<File
-				RelativePath="STKDRV.h"
 				>
 			</File>
 			<File
@@ -5916,6 +5812,32 @@
 				>
 			</File>
 			<File
+				RelativePath=".\StkDriver.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\StkDriver.h"
+				>
+			</File>
+			<File
 				RelativePath=".\StkReceiver.cpp"
 				>
 			</File>
@@ -6055,6 +5977,58 @@
 			</File>
 			<File
 				RelativePath="CTaiKlineMemFile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StkBlockDzh.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\StkBlockDzh.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StkBlockManager.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\StkBlockManager.h"
 				>
 			</File>
 			<File

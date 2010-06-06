@@ -1,7 +1,7 @@
 
 #include "stdafx.h"
 #include "CTaiShanApp.h"
-#include "ManagerStockTypeData.h"
+#include "StkBlockManager.h"
 
 #include "CTaiKlineFileKLine.h"
 #include "StkDatabase.h"
@@ -28,7 +28,7 @@ const char g_stocktypeinfo[64] = "Data\\Block.tsk";
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CSuperviseSharesBlockData::CSuperviseSharesBlockData()
+CStkBlockManager::CStkBlockManager()
 {
 	m_hFile = NULL;
 	m_hFileMap = NULL;
@@ -40,7 +40,7 @@ CSuperviseSharesBlockData::CSuperviseSharesBlockData()
 	m_pStockPoint = NULL;
 }
 
-CSuperviseSharesBlockData::~CSuperviseSharesBlockData()
+CStkBlockManager::~CStkBlockManager()
 {
 	BOOL result = TRUE;
 
@@ -73,7 +73,7 @@ CSuperviseSharesBlockData::~CSuperviseSharesBlockData()
 	}
 }
 
-BOOL CSuperviseSharesBlockData::InitStockTypeDataEmpty(CString strPath)
+BOOL CStkBlockManager::InitStockTypeDataEmpty(CString strPath)
 {
 	BYTE* temp;
 
@@ -114,7 +114,7 @@ BOOL CSuperviseSharesBlockData::InitStockTypeDataEmpty(CString strPath)
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::InitStockTypeDataExist(CString strPath)
+BOOL CStkBlockManager::InitStockTypeDataExist(CString strPath)
 {
 	BYTE* temp;
 	BOOL IsCorrect = FALSE;
@@ -176,7 +176,7 @@ BOOL CSuperviseSharesBlockData::InitStockTypeDataExist(CString strPath)
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::AddStockTypeDataSize(int AddSizes)
+BOOL CStkBlockManager::AddStockTypeDataSize(int AddSizes)
 {
 	BYTE* temp;
 
@@ -240,7 +240,7 @@ BOOL CSuperviseSharesBlockData::AddStockTypeDataSize(int AddSizes)
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::InsertItemPoint(STOCK_TYPE_INFO* m_pStk)
+BOOL CStkBlockManager::InsertItemPoint(STOCK_TYPE_INFO* m_pStk)
 {
 	int InsertPose = m_pStk->m_iPos;
 	m_pStockPoint[InsertPose].pStockInfo = m_pStk;
@@ -248,7 +248,7 @@ BOOL CSuperviseSharesBlockData::InsertItemPoint(STOCK_TYPE_INFO* m_pStk)
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::SavePosToFile()
+BOOL CStkBlockManager::SavePosToFile()
 {
 	for (int j = 0; j < m_pStockTypeHead->m_lStockCount; j++)
 	{
@@ -263,7 +263,7 @@ BOOL CSuperviseSharesBlockData::SavePosToFile()
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::SetMemroyALLOCSize(unsigned int nSize)
+BOOL CStkBlockManager::SetMemroyALLOCSize(unsigned int nSize)
 {
 	STOCK_POINT_INFO* tempData;
 	int temp = 0;
@@ -307,7 +307,7 @@ BOOL CSuperviseSharesBlockData::SetMemroyALLOCSize(unsigned int nSize)
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::InitStockTypeData(CString strPath)
+BOOL CStkBlockManager::InitStockTypeData(CString strPath)
 {
 	m_pDoc = ((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc;
 
@@ -323,7 +323,7 @@ BOOL CSuperviseSharesBlockData::InitStockTypeData(CString strPath)
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::InitStockPoint()
+BOOL CStkBlockManager::InitStockPoint()
 {
 	for (int j = 0; j < m_pStockTypeHead->m_lStockCount; j++)
 	{
@@ -347,7 +347,7 @@ BOOL CSuperviseSharesBlockData::InitStockPoint()
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::InitStockTypePoint()
+BOOL CStkBlockManager::InitStockTypePoint()
 {
 	for (int i = 0; i < MaxStockTYpe; i++)
 	{
@@ -372,7 +372,7 @@ BOOL CSuperviseSharesBlockData::InitStockTypePoint()
 	return TRUE;
 }
 
-void CSuperviseSharesBlockData::CalcAllStockTypeData()         
+void CStkBlockManager::CalcAllStockTypeData()         
 {
 	for(int i=0;i<MaxStockTYpe;i++)    
 	{
@@ -498,7 +498,7 @@ void CSuperviseSharesBlockData::CalcAllStockTypeData()
 	}
 }
 
-void CSuperviseSharesBlockData::CalcRealTimeStockTypeIndex()      
+void CStkBlockManager::CalcRealTimeStockTypeIndex()      
 {
 	if(!m_pDoc-> m_bInitDone)
 		return ;
@@ -635,7 +635,7 @@ void CSuperviseSharesBlockData::CalcRealTimeStockTypeIndex()
 	m_pStockTypeHead->m_lLastTime=m_pDoc->m_nANT[0];
 }
 
-void CSuperviseSharesBlockData::CalcMinuteRealTimeIndex()     
+void CStkBlockManager::CalcMinuteRealTimeIndex()     
 {
 	for(int t=0;t<m_pDoc->m_nANT[0];t++) 
 	{
@@ -772,7 +772,7 @@ void CSuperviseSharesBlockData::CalcMinuteRealTimeIndex()
 	}
 }
 
-void CSuperviseSharesBlockData::CheckStockCount(int AddStockCount)
+void CStkBlockManager::CheckStockCount(int AddStockCount)
 {
 	if(m_pStockTypeHead->m_lStockCount+AddStockCount>=m_pStockTypeHead->m_lStockMaxCount)
 	{
@@ -782,7 +782,7 @@ void CSuperviseSharesBlockData::CheckStockCount(int AddStockCount)
 }
 
 
-BOOL CSuperviseSharesBlockData::ImportStockTypeData(CString m_szPathStr, CString m_szStockTyoeNameStr, PSTOCKTYPEINFO& l_pStockkType, int nRightType)
+BOOL CStkBlockManager::ImportStockTypeData(CString m_szPathStr, CString m_szStockTyoeNameStr, PSTOCKTYPEINFO& l_pStockkType, int nRightType)
 {
 	if (GetStockTypePointFromName(l_pStockkType, m_szStockTyoeNameStr.GetBuffer(0)))
 	{
@@ -859,7 +859,7 @@ BOOL CSuperviseSharesBlockData::ImportStockTypeData(CString m_szPathStr, CString
 ///////////////////////////////
 
 //****************************************************
-BOOL CSuperviseSharesBlockData::GetStockTypeStartDate(char * pszStockTypeCode,SymbolKindArr& StockCodeArray,time_t &t)
+BOOL CStkBlockManager::GetStockTypeStartDate(char * pszStockTypeCode,SymbolKindArr& StockCodeArray,time_t &t)
 {
 	int FirstKlineData=0;
 	if(!GetStockFromStockType(StockCodeArray,pszStockTypeCode))          
@@ -879,7 +879,7 @@ BOOL CSuperviseSharesBlockData::GetStockTypeStartDate(char * pszStockTypeCode,Sy
 	}
 	return TRUE;    
 }
-void CSuperviseSharesBlockData::RefreshHistoryDayLineData(char * pszStockTypeCode,CProgressCtrl *pProgressCtrl)
+void CStkBlockManager::RefreshHistoryDayLineData(char * pszStockTypeCode,CProgressCtrl *pProgressCtrl)
 {
 	typedef struct
 	{
@@ -1164,7 +1164,7 @@ void CSuperviseSharesBlockData::RefreshHistoryDayLineData(char * pszStockTypeCod
 	}
 }
 
-BOOL CSuperviseSharesBlockData::InsertStockItemCorrect(char *m_szStockId ,PSTOCK_TYPE_INFO m_pStock)        //插入一个股票
+BOOL CStkBlockManager::InsertStockItemCorrect(char *m_szStockId ,PSTOCK_TYPE_INFO m_pStock)        //插入一个股票
 {
 	int low=0;
 	int high=m_pStockTypeHead->m_lStockCount -1 ;
@@ -1237,7 +1237,7 @@ BOOL CSuperviseSharesBlockData::InsertStockItemCorrect(char *m_szStockId ,PSTOCK
 	m_pStockTypeHead->m_lStockCount++;	
 	return TRUE;
 }
-long CSuperviseSharesBlockData::CorrectKline(Kline *pKline,long LineCount)
+long CStkBlockManager::CorrectKline(Kline *pKline,long LineCount)
 {
 	long index=0;
 	for(int i=0;i<LineCount-1;i++)
@@ -1255,7 +1255,7 @@ long CSuperviseSharesBlockData::CorrectKline(Kline *pKline,long LineCount)
 	}
 	return index+1;
 }
-float CSuperviseSharesBlockData::GetStockBlockRight(char *StockTypeCode)
+float CStkBlockManager::GetStockBlockRight(char *StockTypeCode)
 {
 	PSTOCKTYPEINFO m_pStktype;
 	BYTE m_btPos=GetStockTypeNumber(StockTypeCode);
@@ -1306,7 +1306,7 @@ float CSuperviseSharesBlockData::GetStockBlockRight(char *StockTypeCode)
 	return TotalBlockRight;
 }
 
-bool CSuperviseSharesBlockData::CheckKind(int i)
+bool CStkBlockManager::CheckKind(int i)
 {
 	bool b = true;
 	if(i==SHZS||i==SZZS||i==EBZS||i==STKTYPE)
@@ -1316,7 +1316,7 @@ bool CSuperviseSharesBlockData::CheckKind(int i)
 
 
 
-BOOL CSuperviseSharesBlockData::InsertStockItem(char* m_szStockId, int nKind, PSTOCK_TYPE_INFO& m_pStock)
+BOOL CStkBlockManager::InsertStockItem(char* m_szStockId, int nKind, PSTOCK_TYPE_INFO& m_pStock)
 {
 	int low = 0;
 	int mid = 0;
@@ -1417,7 +1417,7 @@ BOOL CSuperviseSharesBlockData::InsertStockItem(char* m_szStockId, int nKind, PS
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::DeleteStockItem(char* m_szStockId, int nKind)
+BOOL CStkBlockManager::DeleteStockItem(char* m_szStockId, int nKind)
 {
 	int low = 0;
 	int mid = 0;
@@ -1459,7 +1459,7 @@ BOOL CSuperviseSharesBlockData::DeleteStockItem(char* m_szStockId, int nKind)
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::RemoveDeletedStock()
+BOOL CStkBlockManager::RemoveDeletedStock()
 {
 	BOOL result = TRUE;
 	int index = m_pStockTypeHead->m_lStockCount;
@@ -1496,7 +1496,7 @@ BOOL CSuperviseSharesBlockData::RemoveDeletedStock()
 	return result;
 }
 
-BOOL CSuperviseSharesBlockData::Lookup(char* m_szStockId, int nKind, PSTOCK_TYPE_INFO& m_pStock)
+BOOL CStkBlockManager::Lookup(char* m_szStockId, int nKind, PSTOCK_TYPE_INFO& m_pStock)
 {
 	int low = 0;
 	int mid = 0;
@@ -1529,7 +1529,7 @@ BOOL CSuperviseSharesBlockData::Lookup(char* m_szStockId, int nKind, PSTOCK_TYPE
 	return FALSE;
 }
 
-BOOL CSuperviseSharesBlockData::InsertStockType(PSTOCKTYPEINFO& m_pStktype, int m_iPos)
+BOOL CStkBlockManager::InsertStockType(PSTOCKTYPEINFO& m_pStktype, int m_iPos)
 {
 	if (m_iPos >= MaxStockTYpe)
 	{
@@ -1558,7 +1558,7 @@ BOOL CSuperviseSharesBlockData::InsertStockType(PSTOCKTYPEINFO& m_pStktype, int 
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::DeleteStockType(char* m_pszStockTypeCode)
+BOOL CStkBlockManager::DeleteStockType(char* m_pszStockTypeCode)
 {
 	BYTE m_btPos = GetStockTypeNumber(m_pszStockTypeCode);
 	for (int i = 0; i < m_pStockTypeHead->m_lStockCount; i++)
@@ -1591,7 +1591,7 @@ BOOL CSuperviseSharesBlockData::DeleteStockType(char* m_pszStockTypeCode)
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::CheckBlockName(char* BlockName, char* BlockCode)
+BOOL CStkBlockManager::CheckBlockName(char* BlockName, char* BlockCode)
 {
 	for (int i = 0; i < MaxStockTYpe; i++)
 	{
@@ -1618,9 +1618,9 @@ BOOL CSuperviseSharesBlockData::CheckBlockName(char* BlockName, char* BlockCode)
 	return FALSE;
 }
 
-int CSuperviseSharesBlockData::GetInsertStockTypePos()
+int CStkBlockManager::GetInsertStockTypePos(int nStart)
 {
-	for (int i = 0; i < MaxStockTYpe; i++)
+	for (int i = nStart; i < MaxStockTYpe; i++)
 	{
 		if (m_pStockTypeInfo[i].m_bIsDelete || m_pStockTypeInfo[i].m_lIsUse == -1)
 		{
@@ -1633,7 +1633,7 @@ int CSuperviseSharesBlockData::GetInsertStockTypePos()
 	return -1;
 }
 
-int CSuperviseSharesBlockData::GetStockTypeCounts()
+int CStkBlockManager::GetStockTypeCounts()
 {
 	int index = 0;
 	for (int i = 0; i < MaxStockTYpe; i++)
@@ -1650,7 +1650,7 @@ int CSuperviseSharesBlockData::GetStockTypeCounts()
 	return index;
 }
 
-void CSuperviseSharesBlockData::GetAllStockTypeCode(CStringArray& m_StockTypeCodeArray)
+void CStkBlockManager::GetAllStockTypeCode(CStringArray& m_StockTypeCodeArray)
 {
 	for (int i = 0; i < MaxStockTYpe; i++)
 	{
@@ -1666,7 +1666,7 @@ void CSuperviseSharesBlockData::GetAllStockTypeCode(CStringArray& m_StockTypeCod
 	}
 }
 
-void CSuperviseSharesBlockData::GetAllStockTypeName(CStringArray& m_StockTypeNameArray)
+void CStkBlockManager::GetAllStockTypeName(CStringArray& m_StockTypeNameArray)
 {
 	for (int i = 0; i < MaxStockTYpe; i++)
 	{
@@ -1682,7 +1682,7 @@ void CSuperviseSharesBlockData::GetAllStockTypeName(CStringArray& m_StockTypeNam
 	}
 }
 
-BOOL CSuperviseSharesBlockData::GetStockTypePoint(PSTOCKTYPEINFO& m_pStktype, char* m_pszStockTypeCode)
+BOOL CStkBlockManager::GetStockTypePoint(PSTOCKTYPEINFO& m_pStktype, char* m_pszStockTypeCode)
 {
 	BYTE m_btPos = GetStockTypeNumber(m_pszStockTypeCode);
 	m_pStktype = m_pStockTypeInfo + m_btPos;
@@ -1690,7 +1690,7 @@ BOOL CSuperviseSharesBlockData::GetStockTypePoint(PSTOCKTYPEINFO& m_pStktype, ch
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::GetStockTypePointFromName(PSTOCKTYPEINFO& m_pStktype, char* m_pszStockTypeName)
+BOOL CStkBlockManager::GetStockTypePointFromName(PSTOCKTYPEINFO& m_pStktype, char* m_pszStockTypeName)
 {
 	for (int i = 0; i < MaxStockTYpe; i++)
 	{
@@ -1711,7 +1711,7 @@ BOOL CSuperviseSharesBlockData::GetStockTypePointFromName(PSTOCKTYPEINFO& m_pStk
 	return FALSE;
 }
 
-BOOL CSuperviseSharesBlockData::InsertStockToType(PCdat1& m_pCdat, char* m_pszStockTypeCode)
+BOOL CStkBlockManager::InsertStockToType(PCdat1& m_pCdat, char* m_pszStockTypeCode)
 {
 	STOCKTYPEINFO* m_pStktype;
 	STOCK_TYPE_INFO* m_pStock;
@@ -1793,7 +1793,7 @@ BOOL CSuperviseSharesBlockData::InsertStockToType(PCdat1& m_pCdat, char* m_pszSt
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::DeleteStockFromType(char* m_pszStockCode, int nKind, char* m_pszStockTypeCode)
+BOOL CStkBlockManager::DeleteStockFromType(char* m_pszStockCode, int nKind, char* m_pszStockTypeCode)
 {
 	STOCKTYPEINFO* m_pStktype;
 
@@ -1853,13 +1853,13 @@ BOOL CSuperviseSharesBlockData::DeleteStockFromType(char* m_pszStockCode, int nK
 	}
 }
 
-int CSuperviseSharesBlockData::GetStockCountFromType(char* m_pszCode)
+int CStkBlockManager::GetStockCountFromType(char* m_pszCode)
 {
 	BYTE m_btPos = GetStockTypeNumber(m_pszCode);
 	return m_pStockTypeInfo[m_btPos].m_lStockCount;
 }
 
-BOOL CSuperviseSharesBlockData::GetStockFromStockType(SymbolKindArr& m_StockCodeArray, char* m_pszStockTypeCode)
+BOOL CStkBlockManager::GetStockFromStockType(SymbolKindArr& m_StockCodeArray, char* m_pszStockTypeCode)
 {
 	BYTE m_btPos = GetStockTypeNumber(m_pszStockTypeCode);
 
@@ -1889,7 +1889,7 @@ BOOL CSuperviseSharesBlockData::GetStockFromStockType(SymbolKindArr& m_StockCode
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::GetStockFromStockTypeName(SymbolKindArr& m_StockCodeArray, char* m_pszStockTypeName)
+BOOL CStkBlockManager::GetStockFromStockTypeName(SymbolKindArr& m_StockCodeArray, char* m_pszStockTypeName)
 {
 	STOCKTYPEINFO* l_pStktype;
 	if (!GetStockTypePointFromName(l_pStktype, m_pszStockTypeName))
@@ -1904,7 +1904,7 @@ BOOL CSuperviseSharesBlockData::GetStockFromStockTypeName(SymbolKindArr& m_Stock
 	自选板块操作
 */
 
-BOOL CSuperviseSharesBlockData::InsertStockToChoose(char* m_szStockId, int nKind)
+BOOL CStkBlockManager::InsertStockToChoose(char* m_szStockId, int nKind)
 {
 	PSTOCK_TYPE_INFO m_pStock;
 	InsertStockItem(m_szStockId, nKind, m_pStock);
@@ -1916,7 +1916,7 @@ BOOL CSuperviseSharesBlockData::InsertStockToChoose(char* m_szStockId, int nKind
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::DeleteStockFromChoose(char* m_szStockId, int nKind)
+BOOL CStkBlockManager::DeleteStockFromChoose(char* m_szStockId, int nKind)
 {
 	PSTOCK_TYPE_INFO m_pStock;
 	Lookup(m_szStockId, nKind, m_pStock);
@@ -1927,7 +1927,7 @@ BOOL CSuperviseSharesBlockData::DeleteStockFromChoose(char* m_szStockId, int nKi
 	return TRUE;
 }
 
-BOOL CSuperviseSharesBlockData::GetChooseStockCode(SymbolKindArr& m_StockCodeArray)
+BOOL CStkBlockManager::GetChooseStockCode(SymbolKindArr& m_StockCodeArray)
 {
 	for (int i = 0; i < m_pStockTypeHead->m_lStockCount; i++)
 	{
@@ -1947,7 +1947,7 @@ BOOL CSuperviseSharesBlockData::GetChooseStockCode(SymbolKindArr& m_StockCodeArr
 	return TRUE;
 }
 
-int CSuperviseSharesBlockData::GetChooseStockCounts()
+int CStkBlockManager::GetChooseStockCounts()
 {
 	int iCounts = 0;
 	for (int i = 0; i < m_pStockTypeHead->m_lStockCount; i++)

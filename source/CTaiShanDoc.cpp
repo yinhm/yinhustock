@@ -294,10 +294,6 @@ BOOL CTaiShanDoc::OnNewDocument()
 		SysFile.Close();
 	}
 
-
-	m_spz.Open();	
-	m_dyz.Open();	
-
 	m_pPingCe=new CTaiShanTesting(this);
 	if (m_pPingCe==NULL)
 		AfxMessageBox("initial Ping Ce failed!");
@@ -566,9 +562,6 @@ void CTaiShanDoc::OnCloseDocument()
 	int length=m_formuar_choose.GetSize();
 	FreeKeyBoardAngel();
 
-
-	m_spz.Close();		
-	m_dyz.Close();
 	if (m_pPingCe!=NULL)
 	{
 		delete m_pPingCe;
@@ -1655,8 +1648,6 @@ void  CTaiShanDoc::StockNameConvert(char *StockName,char *pyjc)
 	int index=0;
 	p=StockName;
 	n=strlen(StockName);
-	if (m_dyz.GetPy(StockName, pyjc))
-		return;
 
 	try
 	{
@@ -1753,10 +1744,6 @@ void  CTaiShanDoc::StockNameConvert(char *StockName,char *pyjc)
 				else if(mzqmc>=_T("A3B0")&&mzqmc<=_T("A3B9"))
 				{
 					str[index++]=c2-128;  
-				}
-				else if(m_spz.GetPy(p-2,sPy))
-				{
-					str[index++]=sPy;
 				}
 			}
 		}
