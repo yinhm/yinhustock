@@ -4,6 +4,13 @@
 #define WM_APP_STKRECEIVER_TSDATA	WM_APP + 5
 #define WM_APP_STKRECEIVER_SCDATA	WM_APP + 6
 
+typedef struct tagFOX_DATA1
+{
+	int n1;
+	int n2;
+	int n3;
+} FOX_DATA1;
+
 typedef struct tagFoxShareInfo
 {
 	BYTE b1[8];
@@ -43,6 +50,9 @@ public:
 public:
 	BOOL StartEngine();
 	BOOL StopEngine();
+
+public:
+	HWND GetReceiverHwnd() { FOX_SHAREINFO* pFox = (FOX_SHAREINFO*)m_pMapping; return pFox->hDrvierWnd; }
 };
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

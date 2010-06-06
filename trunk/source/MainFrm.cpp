@@ -87,7 +87,7 @@ IMPLEMENT_DYNCREATE(CMainFrame, CMDIFrameWnd)
 BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWnd)
 	//{{AFX_MSG_MAP(CMainFrame)
 	ON_WM_CREATE()
-	ON_MESSAGE(DA_SERVICE_MSG_EXT,OnExtService)
+	//ON_MESSAGE(DA_SERVICE_MSG_EXT,OnExtService)
 	ON_WM_DESTROY()
 	ON_WM_TIMER()
 	ON_WM_SIZE()
@@ -1576,29 +1576,29 @@ void CMainFrame::RefreshFormu()
 }
 long CMainFrame::OnExtService(UINT wFileType, LONG lPara)
 {
-	STRUCT_REXT_HEAD *pHead = (STRUCT_REXT_HEAD*)lPara ;
-	ASSERT(wFileType == pHead->m_Service);
-	CString msg ;
-	if ( wFileType == RCV_EXT_TRADEDATA)
-	{
-		msg.Format("%.6s %.8s %d 分笔" , pHead->m_Code, pHead->m_Name, pHead->m_num);
-		STCP_QBD_STRUCT *pk = (STCP_QBD_STRUCT *) (lPara + sizeof(STRUCT_REXT_HEAD));
+	//STRUCT_REXT_HEAD *pHead = (STRUCT_REXT_HEAD*)lPara ;
+	//ASSERT(wFileType == pHead->m_Service);
+	//CString msg ;
+	//if ( wFileType == RCV_EXT_TRADEDATA)
+	//{
+	//	msg.Format("%.6s %.8s %d 分笔" , pHead->m_Code, pHead->m_Name, pHead->m_num);
+	//	STCP_QBD_STRUCT *pk = (STCP_QBD_STRUCT *) (lPara + sizeof(STRUCT_REXT_HEAD));
 
-	}
-	if ( wFileType == RCV_EXT_TRADEDATAV2){
-		msg.Format("新%.6s %.8s %d 分笔" , pHead->m_Code, pHead->m_Name, pHead->m_num);
-		STCP_QBD6_STRUCT *pk = (STCP_QBD6_STRUCT *) (lPara + sizeof(STRUCT_REXT_HEAD));
-	}
-	if ( wFileType == RCV_EXT_KDATA)
-	{
-		msg.Format("%.6s %.8s %d K线" , pHead->m_Code, pHead->m_Name, pHead->m_num);
-		RITK_STRUCT *pk = (RITK_STRUCT *) (lPara + sizeof(STRUCT_REXT_HEAD));
-	}
-	if (wFileType == RCV_EXT_STOCKTABLE)
-	{
-		msg.Format("股票代码表" );
-		RCV_STOCK_CELLEx *pk = (RCV_STOCK_CELLEx *) (lPara + sizeof(STRUCT_REXT_HEAD));
-	}
+	//}
+	//if ( wFileType == RCV_EXT_TRADEDATAV2){
+	//	msg.Format("新%.6s %.8s %d 分笔" , pHead->m_Code, pHead->m_Name, pHead->m_num);
+	//	STCP_QBD6_STRUCT *pk = (STCP_QBD6_STRUCT *) (lPara + sizeof(STRUCT_REXT_HEAD));
+	//}
+	//if ( wFileType == RCV_EXT_KDATA)
+	//{
+	//	msg.Format("%.6s %.8s %d K线" , pHead->m_Code, pHead->m_Name, pHead->m_num);
+	//	RITK_STRUCT *pk = (RITK_STRUCT *) (lPara + sizeof(STRUCT_REXT_HEAD));
+	//}
+	//if (wFileType == RCV_EXT_STOCKTABLE)
+	//{
+	//	msg.Format("股票代码表" );
+	//	RCV_STOCK_CELLEx *pk = (RCV_STOCK_CELLEx *) (lPara + sizeof(STRUCT_REXT_HEAD));
+	//}
 	return 0;
 }
 
@@ -1680,7 +1680,7 @@ void CMainFrame::HqStock_Init()
 	ok = gSTOCKDLL.Stock_Init(m_hWnd, Gp_Msg_StkData, RCV_WORK_SENDMSG);
 	gSTOCKDLL.GetStockDrvInfo(RI_SUPPORTEXTHQ, (void*)a);
 
-	gSTOCKDLL.SetExtMsg(DA_SERVICE_MSG_EXT);
+	//gSTOCKDLL.SetExtMsg(DA_SERVICE_MSG_EXT);
 	m_taiShanDoc->m_bCloseReceiver = TRUE;
 
 	SetTimer(1007, 2000, NULL);
@@ -1696,6 +1696,7 @@ void CMainFrame::HqStock_Quit()
 
 	m_taiShanDoc->m_bCloseReceiver = FALSE;
 #endif
+	TSKReceiver()->StopEngine();
 }
 
 void CMainFrame::OnClearRealdata() 

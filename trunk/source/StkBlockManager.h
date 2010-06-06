@@ -11,11 +11,11 @@
 #define ADDSIZES	50			// 
 #define CHOOSEPOS	251			// 自选股位置
 
-class CSuperviseSharesBlockData : public CStkFile
+class CStkBlockManager : public CStkFile
 {
 public:
-	CSuperviseSharesBlockData();
-	virtual ~CSuperviseSharesBlockData();
+	CStkBlockManager();
+	virtual ~CStkBlockManager();
 
 protected:
 	CTaiShanDoc* m_pDoc;					// 
@@ -96,7 +96,7 @@ public:
 	BOOL CheckBlockName(char* BlockName, char* BlockCode);
 
 	// 获取板块空白插入位置
-	int GetInsertStockTypePos();
+	int GetInsertStockTypePos(int nStart = 51);
 
 	// 取得有效板块个数
 	int GetStockTypeCounts();
@@ -134,12 +134,12 @@ public:
 	int GetChooseStockCounts();
 };
 
-inline void CSuperviseSharesBlockData::SaveDataToFile(LPCVOID lpBaseAddress, DWORD dwNumberOfBytesToFlush)
+inline void CStkBlockManager::SaveDataToFile(LPCVOID lpBaseAddress, DWORD dwNumberOfBytesToFlush)
 {
 	FlushViewOfFile(lpBaseAddress, dwNumberOfBytesToFlush);
 }
 
-inline BYTE CSuperviseSharesBlockData::GetStockTypeNumber(char* m_szStockTypeCode)
+inline BYTE CStkBlockManager::GetStockTypeNumber(char* m_szStockTypeCode)
 {
 	char mtemp[3];
 	memcpy(mtemp, m_szStockTypeCode + 4, 2);
