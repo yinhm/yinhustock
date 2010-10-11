@@ -98,8 +98,8 @@ public:
 	CTime t;
 	BOOL m_bAppAuthorized;
 
-	//{{AFX_VIRTUAL(CTaiShanApp)
 public:
+	//{{AFX_VIRTUAL(CTaiShanApp)
 	virtual BOOL InitInstance();
 	virtual int ExitInstance();
 	virtual BOOL OnIdle(LONG lCount);

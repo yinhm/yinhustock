@@ -428,8 +428,6 @@
 #define IDD_STOCK_HIS_DETAIL2           376
 #define IDD_DIALOG_tongji_zb            378
 #define IDD_200107_PARAM                379
-#define IDD_MYXMZ                       380
-#define IDI_MYXMZ                       382
 #define IDB_MYLIST                      384
 #define IDD_WIDEDOWNLOAD                385
 #define IDD_DIALOG_LOGON                387
@@ -1171,7 +1169,6 @@
 #define IDC_COMMONBLOCK10               1210
 #define IDC_LTP_RATE                    1210
 #define IDC_CJL_RATE                    1211
-#define IDC_MYXMZLIST                   1212
 #define IDC_CHECK_AUTOLOGON             1215
 #define IDC_EDIT_SERVER                 1216
 #define IDC_EDIT_USERNAME               1217

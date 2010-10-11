@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="gb2312"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
-	Name="TaiShan"
+	Version="9.00"
+	Name="TskingPro"
 	ProjectGUID="{66847054-2652-4196-B387-B456BAA4E1D1}"
 	RootNamespace="TaiShan"
 	Keyword="MFCProj"
+	TargetFrameworkVersion="0"
 	>
 	<Platforms>
 		<Platform
@@ -17,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory=".\Debug"
-			IntermediateDirectory=".\Debug"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="2"
@@ -49,18 +50,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="hfiles"
+				AdditionalIncludeDirectories="hfiles;..\TskInfraLib;..\TskTcpipLib"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USE_32BIT_TIME_T"
 				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="1"
 				PrecompiledHeaderThrough="stdafx.h"
-				PrecompiledHeaderFile=".\Debug/TaiShan.pch"
-				AssemblerListingLocation=".\Debug/"
-				ObjectFile=".\Debug/"
-				ProgramDataBaseFileName=".\Debug/"
-				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
@@ -79,12 +74,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib wininet.lib htmlhelp.lib userreg.lib StockTools.lib Version.lib"
-				OutputFile="..\temp\$(ProjectName).exe"
-				LinkIncremental="2"
+				OutputFile="..\Bin\$(ProjectName).exe"
+				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="GDFX_Lib"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/taishan.pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -109,16 +103,13 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\$(ProjectName)"
+			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)\$(ProjectName)"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="2"
@@ -149,18 +140,13 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="hfiles"
+				AdditionalIncludeDirectories="hfiles;..\TskInfraLib;..\TskTcpipLib"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USE_32BIT_TIME_T"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="1"
 				PrecompiledHeaderThrough="stdafx.h"
-				PrecompiledHeaderFile=".\Release/TaiShan.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
-				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 			/>
@@ -178,11 +164,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="shlwapi.lib wininet.lib htmlhelp.lib userreg.lib StockTools.lib Version.lib"
-				OutputFile="..\temp\$(ProjectName).exe"
+				OutputFile="..\Bin\$(ProjectName).exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="GDFX_Lib"
-				ProgramDatabaseFile=".\Release/tc.pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>
@@ -205,9 +190,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -5488,32 +5470,6 @@
 				>
 			</File>
 			<File
-				RelativePath="DlgMYXMZ.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="DlgMYXMZ.h"
-				>
-			</File>
-			<File
 				RelativePath="DlgShowInformation.cpp"
 				>
 				<FileConfiguration
@@ -5812,6 +5768,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FoxDriver.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\FoxDriver.h"
+				>
+			</File>
+			<File
 				RelativePath=".\StkDriver.cpp"
 				>
 				<FileConfiguration
@@ -5954,32 +5918,6 @@
 				>
 			</File>
 			<File
-				RelativePath="CTaiKlineMemFile.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="CTaiKlineMemFile.h"
-				>
-			</File>
-			<File
 				RelativePath=".\StkBlockDzh.cpp"
 				>
 				<FileConfiguration
@@ -6045,6 +5983,86 @@
 			</File>
 			<File
 				RelativePath=".\StkFile.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="TdxDriver"
+			>
+			<File
+				RelativePath=".\ClientSocket.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ClientSocket.h"
+				>
+			</File>
+			<File
+				RelativePath=".\commands.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\commands.h"
+				>
+			</File>
+			<File
+				RelativePath=".\config.h"
+				>
+			</File>
+			<File
+				RelativePath=".\request.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\request.h"
+				>
+			</File>
+			<File
+				RelativePath=".\response.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\response.h"
+				>
+			</File>
+			<File
+				RelativePath=".\stock1.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\stock1.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TdxStructDef.h"
+				>
+			</File>
+			<File
+				RelativePath=".\util.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\util.hpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Common Files"
+			>
+			<File
+				RelativePath=".\Readme.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StkCommon.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\StkCommon.h"
+				>
+			</File>
+			<File
+				RelativePath=".\StkStructDef.h"
 				>
 			</File>
 		</Filter>

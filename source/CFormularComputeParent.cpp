@@ -5483,7 +5483,8 @@ int CFormularComputeParent::ReadKline(CString s,int stkKind, Kline *&pKline)
 			bDay = false;
 		CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(s,stkKind,bDay) ;
 		
-		n = pFile->ReadKLine(s,pKline,-1,48)	;
+		std::string symbol(s);
+		n = pFile->ReadKLine(symbol, pKline, -1, 48)	;
 
 		CTaiKlineTransferKline trans;
 		trans.TransferKlineHistory(s,stkKind,pKline, n,m_nKindKline,true);

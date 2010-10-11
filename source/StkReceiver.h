@@ -11,16 +11,7 @@ typedef struct tagFOX_DATA1
 	int n3;
 } FOX_DATA1;
 
-typedef struct tagFoxShareInfo
-{
-	BYTE b1[8];
-	time_t stime;
-	DWORD dwFoxPid;
-	HWND hReceiverWnd;
-	time_t dtime;
-	DWORD dwDriverPid;
-	HWND hDrvierWnd;
-} FOX_SHAREINFO;
+class CStkDriver;
 
 class CStkReceiver
 {
@@ -35,13 +26,8 @@ protected:
 	HWND m_hWnd;
 	HWND m_hSendWnd;
 
-	HANDLE m_hMapping;
-	LPVOID m_pMapping;
-
 protected:
-	BOOL CreateFoxMemoryShare(DWORD dwPid = -1);
-	void CloseFoxMemoryShare();
-	BOOL CopyProcessInfo();
+	CStkDriver* m_pDriver;
 
 public:
 	HWND CreateReceiverWnd();
@@ -52,7 +38,7 @@ public:
 	BOOL StopEngine();
 
 public:
-	HWND GetReceiverHwnd() { FOX_SHAREINFO* pFox = (FOX_SHAREINFO*)m_pMapping; return pFox->hDrvierWnd; }
+	CStkDriver* GetStkDriver();
 };
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);

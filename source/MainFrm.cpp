@@ -53,15 +53,19 @@
 #include    "SysSetParaPage.h"
 #include    "direct.h"
 #include "CTaiKlineDlgNeuralLearn.h"
-#include "DlgMYXMZ.h"
+
+
+#include "GenericThread.h"
+#include "OSManager.h"
+
+#include "stock1.h"
+using namespace StockMarket;
 
 //added by qyp 2001.10.9
 #include "LogonDlg.h"
 #include "DlgShowInformation.h"
 #include "XgnExtDataDlg.h"
 #include "CwdCloseWork.h"
-
-#include "DlgMYXMZ.h"
 
 #define TJXG_ALERT  400   
 
@@ -256,8 +260,6 @@ CMainFrame::CMainFrame():m_dlgLeftPop(this)
 	m_bLogonInterface=FALSE;
 	m_bLogonSuccess=FALSE;
 #endif
-
-	m_pViewMYXMZ = NULL;
 }
 
 CMainFrame::~CMainFrame()
@@ -266,7 +268,6 @@ CMainFrame::~CMainFrame()
 	delete m_pClientTransmitManageWnd;
 #endif
 
-	if (m_pViewMYXMZ) delete m_pViewMYXMZ;
 }
 
 
@@ -285,15 +286,15 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;      
 	}
 
-	if(!m_TestDialogbar.Create(IDD_DIALOGBAR,this))
-	{
-		TRACE0("Failed to create Dialog bar\n");
-		return -1;   
-	}
+	//if(!m_TestDialogbar.Create(IDD_DIALOGBAR,this))
+	//{
+	//	TRACE0("Failed to create Dialog bar\n");
+	//	return -1;   
+	//}
 
 	CRect Rect;
 	GetClientRect(&Rect);
-	m_TestDialogbar.SetWindowPos(NULL,1,0,Rect.Width( )-4,55,SWP_NOMOVE);
+	//m_TestDialogbar.SetWindowPos(NULL,1,0,Rect.Width( )-4,55,SWP_NOMOVE);
 
 
 	if (!m_wndStatusBar.Create(this))
@@ -476,7 +477,7 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 	CRect rc;
 	CMDIFrameWnd::GetWindowRect(&rc);
 
-	m_TestDialogbar.SetWindowPos(NULL,1,0,cx - 4,46,SWP_NOMOVE|SWP_DRAWFRAME);
+	//m_TestDialogbar.SetWindowPos(NULL,1,0,cx - 4,46,SWP_NOMOVE|SWP_DRAWFRAME);
 
 
 	CRect rPop;
@@ -506,10 +507,10 @@ LRESULT CMainFrame::OnNcHitTest(CPoint point)
 			return 0;
 
 		delete pView;
-		if(!m_dlgLeftPop.IsWindowVisible ())
-			m_TestDialogbar.ShowWindow(SW_SHOW);
-		else
-			m_TestDialogbar.ShowWindow(SW_HIDE);
+		//if(!m_dlgLeftPop.IsWindowVisible ())
+		//	m_TestDialogbar.ShowWindow(SW_SHOW);
+		//else
+		//	m_TestDialogbar.ShowWindow(SW_HIDE);
 		break;
 	case HTLEFT:
 
@@ -520,7 +521,7 @@ LRESULT CMainFrame::OnNcHitTest(CPoint point)
 		else if(pView->IsKindOf(RUNTIME_CLASS(CPreviewView)))
 			return 0;
 
-		m_TestDialogbar.ShowWindow(SW_HIDE);
+		//m_TestDialogbar.ShowWindow(SW_HIDE);
 		break;
 	case HTMENU:
 		if(m_bFullScreen)
@@ -533,10 +534,10 @@ LRESULT CMainFrame::OnNcHitTest(CPoint point)
 				return 0;
 
 			delete pView;
-			if(!m_dlgLeftPop.IsWindowVisible ())
-				m_TestDialogbar.ShowWindow(SW_SHOW);
-			else
-				m_TestDialogbar.ShowWindow(SW_HIDE);
+			//if(!m_dlgLeftPop.IsWindowVisible ())
+			//	m_TestDialogbar.ShowWindow(SW_SHOW);
+			//else
+			//	m_TestDialogbar.ShowWindow(SW_HIDE);
 		}
 		break;
 	}
@@ -549,8 +550,8 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 	if(pMsg-> message==WM_MOUSEMOVE)
 	{
 		int y = HIWORD(pMsg->lParam);
-		if(y > 65)
-			m_TestDialogbar.ShowWindow(SW_HIDE );
+		//if(y > 65)
+		//	m_TestDialogbar.ShowWindow(SW_HIDE );
 	}
 	if(pMsg-> message==WM_MOUSEMOVE)
 	{
@@ -566,8 +567,8 @@ BOOL CMainFrame::PreTranslateMessage(MSG* pMsg)
 
 	}
 
-	if(pMsg-> message==WM_COMMAND)
-		m_TestDialogbar.ShowWindow(SW_HIDE );
+	//if(pMsg-> message==WM_COMMAND)
+	//	m_TestDialogbar.ShowWindow(SW_HIDE );
 
 	return CMDIFrameWnd::PreTranslateMessage(pMsg);
 }
@@ -1556,12 +1557,12 @@ int CMainFrame::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message)
 	GetCursorPos(&point);
 	ScreenToClient(&point);
 	CView *pView;
-	if(point.x<=1)
-	{
+	//if(point.x<=1)
+	//{
 
-		m_dlgLeftPop.ShowWindow(SW_SHOW);
-		m_TestDialogbar.ShowWindow(SW_HIDE);
-	}
+	//	m_dlgLeftPop.ShowWindow(SW_SHOW);
+	//	m_TestDialogbar.ShowWindow(SW_HIDE);
+	//}
 	return CMDIFrameWnd::OnMouseActivate(pDesktopWnd, nHitTest, message);
 }
 
@@ -1657,46 +1658,45 @@ void CMainFrame::OnGdfxRegister()
 
 void CMainFrame::ShowMYXMZ()
 {
-	if (m_pViewMYXMZ == NULL)
-	{
-		m_pViewMYXMZ = new CDialogMYXMZ();
-		m_pViewMYXMZ->Create(IDD_MYXMZ);
-	}
-
-	m_pViewMYXMZ->ShowWindow(SW_SHOW);
-	m_pViewMYXMZ->UpdateWindow();
 }
 
 
 
+CGenericThread* pThread = NULL;
 
-void CMainFrame::HqStock_Init()    
+DWORD ThreadProc(void* lpData)
 {
-#ifndef WIDE_NET_VERSION
+	communication();
+	return 0;
+}
 
-	int ok;
+void CMainFrame::HqStock_Init()
+{
+	char szInfo[MAX_PATH];
 
-	char a[MAX_PATH];
-	ok = gSTOCKDLL.Stock_Init(m_hWnd, Gp_Msg_StkData, RCV_WORK_SENDMSG);
-	gSTOCKDLL.GetStockDrvInfo(RI_SUPPORTEXTHQ, (void*)a);
+	if (!gSTOCKDLL.LoadDriver(_T("D:\\NetStock\\JStockclt\\Stock.dll")))
+		return;
 
-	//gSTOCKDLL.SetExtMsg(DA_SERVICE_MSG_EXT);
+	gSTOCKDLL.Stock_Init(m_hWnd, Gp_Msg_StkData, RCV_WORK_SENDMSG);
+	//gSTOCKDLL.GetStockDrvInfo(RI_SUPPORTEXTHQ, (void*)szInfo);
+
+	//pThread = COSManager::CreateThread(ThreadProc);
+	//pThread->Start(NULL);
+
+	//TSKReceiver()->StartEngine();
+
 	m_taiShanDoc->m_bCloseReceiver = TRUE;
 
 	SetTimer(1007, 2000, NULL);
-#endif
 }
 
 void CMainFrame::HqStock_Quit()
 {
-#ifndef WIDE_NET_VERSION
-	{
-		gSTOCKDLL.Stock_Quit(m_hWnd);
-	}
+	gSTOCKDLL.Stock_Quit(m_hWnd);
+
+	//TSKReceiver()->StopEngine();
 
 	m_taiShanDoc->m_bCloseReceiver = FALSE;
-#endif
-	TSKReceiver()->StopEngine();
 }
 
 void CMainFrame::OnClearRealdata() 
@@ -1751,277 +1751,254 @@ LONG CMainFrame::OnStkDataOK(UINT wFileType, LONG lPara)
 		return 0;
 
 
-	try
+	switch (wFileType)
 	{
-		switch (wFileType)
+	case RCV_REPORT:		// 行情报表
 		{
-		case RCV_REPORT:		// 行情报表
+			BYTE* pBuffBase = (BYTE*)pHeader->m_pReport;
+			int nBuffSize = pHeader->m_pReport->m_cbSize;
+
+			for (i = 0; i < pHeader->m_nPacketNum; i++)
 			{
-				//BYTE* pBuffBase = (BYTE*)&pHeader->m_pReport[0];
-				//int nBuffSize = pHeader->m_pReport[0].m_cbSize;
-
-				for (i = 0; i < pHeader->m_nPacketNum; i++)
-				{
-#ifdef WIDE_NET_VERSION
-					RCV_WIDOFEREPORT_STRUCTEx report = pHeader->m_pWideReport[i];
-					m_taiShanDoc->m_sharesCompute.WideStockDataUpdate(&report);
-#else
-					//RCV_REPORT_STRUCTEx* pReport = (RCV_REPORT_STRUCTEx*)(pBuffBase + nBuffSize * i);
-					//m_taiShanDoc->m_sharesCompute.StockDataUpdate(pReport);
-					RCV_REPORT_STRUCTEx report = pHeader->m_pReport[i];
-					m_taiShanDoc->m_sharesCompute.StockDataUpdate(&report);
-#endif
-				}
-
-				m_wndStatusBar.bColor[m_wndStatusBar.nCount] = RGB(0, 128, 255);
-				m_wndStatusBar.PaintRect();
-				m_wndStatusBar.nCount++;
-				m_wndStatusBar.nCount %= 6;
+				RCV_REPORT_STRUCTEx* pReport = (RCV_REPORT_STRUCTEx*)(pBuffBase + nBuffSize * i);
+				m_taiShanDoc->m_sharesCompute.StockDataUpdate(pReport);
 			}
+
+			m_wndStatusBar.bColor[m_wndStatusBar.nCount] = RGB(0, 128, 255);
+			m_wndStatusBar.PaintRect();
+			m_wndStatusBar.nCount++;
+			m_wndStatusBar.nCount %= 6;
+		}
+		break;
+
+	case RCV_FILEDATA:
+		if (!pHeader->m_pData || pHeader->m_wDataType == FILE_TYPE_RES)
+		{
 			break;
+		}
 
-		case RCV_FILEDATA:
-			if (!pHeader->m_pData || pHeader->m_wDataType == FILE_TYPE_RES)
+		switch (pHeader->m_wDataType)
+		{
+		case FILE_HISTORY_EX:		// 历史数据
 			{
-				break;
-			}
-			switch (pHeader->m_wDataType)
-			{
-			case FILE_HISTORY_EX:						
-				DAY_TOTAL_STRUCTEx m_GpDay;
-				m_GpDay.m_RcvDay= pHeader->m_pDay;
-				m_GpDay.Day_Count = pHeader->m_nPacketNum;
+				RCV_HISTORY_STRUCTEx* pHistory = pHeader->m_pDay;
+				int nCount = pHeader->m_nPacketNum;
 				if (m_taiShanDoc->m_systemOption.autoday)
 				{
-					m_taiShanDoc->m_sharesCompute.StockDataDayUpdate(&m_GpDay);
+					m_taiShanDoc->m_sharesCompute.StockDataDayUpdate(pHistory, nCount);
 
 					m_wndStatusBar.bColor[m_wndStatusBar.nCount] = RGB(255, 0, 0);
 					m_wndStatusBar.PaintRect();
 					m_wndStatusBar.nCount++;
 					m_wndStatusBar.nCount %= 6;
 				}
-				break;
+			}
+			break;
 
-			case FILE_POWER_EX:					// 除权信息
-#ifndef WIDE_NET_VERSION
-				POWER_TOTAL_STRUCTEx m_PowerData;
-				m_PowerData.Power_Count = pHeader->m_nPacketNum;
-				m_PowerData.m_RcvPower = pHeader->m_pPower;
-				m_taiShanDoc->m_sharesCompute.StockDataPowerUpdate(&m_PowerData);
-#endif
-				break;
-
-			case FILE_MINUTE_EX:					
-				MIN_TOTAL_STRUCTEx m_GpMinute;
-				m_GpMinute.m_RcvMinute = pHeader->m_pMinute;
-				m_GpMinute.Min_Count = pHeader->m_nPacketNum;
-#ifdef WIDE_NET_VERSION
-				m_taiShanDoc->m_sharesCompute.WideStockDataMinUpdate(& m_GpMinute);                           
-#else
-				if(m_taiShanDoc->m_systemOption.autominute)
+		case FILE_MINUTE_EX:		// 分时数据
+			{
+				RCV_MINUTE_STRUCTEx* pMinute = pHeader->m_pMinute;
+				int nCount = pHeader->m_nPacketNum;
+				if (m_taiShanDoc->m_systemOption.autominute)
 				{
-					m_taiShanDoc->m_sharesCompute.StockDataMinUpdate(& m_GpMinute);                           
-					m_wndStatusBar.bColor[m_wndStatusBar.nCount]=RGB(128,0,255);
+					m_taiShanDoc->m_sharesCompute.StockDataMinUpdate(pMinute, nCount);
+
+					m_wndStatusBar.bColor[m_wndStatusBar.nCount] = RGB(128, 0, 255);
 					m_wndStatusBar.PaintRect();
 					m_wndStatusBar.nCount++;
-					m_wndStatusBar.nCount%=6;
+					m_wndStatusBar.nCount %= 6;
 				}
-#endif
+			}
+			break;
 
-				break;
+		case FILE_POWER_EX:			// 除权信息
+			{
+				RCV_POWER_STRUCTEx* pPower = pHeader->m_pPower;
+				int nCount = pHeader->m_nPacketNum;
+				m_taiShanDoc->m_sharesCompute.StockDataPowerUpdate(pPower, nCount);
 
-			case FILE_BASE_EX:
-				m_File.Format("%s", pHeader->m_File.m_szFileName);
-
-				if (TRUE)
-				{
-					SetCurrentDirectory(m_taiShanDoc->m_CurrentWorkDirectory);
-
-					if (pHeader->m_File.m_dwAttrib == SH_MARKET_EX)
-					{
-						m_FileName = g_sF10sh + m_File;
-					}
-					else
-					{
-						m_FileName = g_sF10sz + m_File;
-					}
-
-					m_FileLong = pHeader->m_File.m_dwLen;
-					m_FileType = pHeader->m_wDataType;
-					m_dwAttrib = pHeader->m_File.m_dwAttrib;
-					if (m_dwAttrib == -1)
-						break; 
-
-					if ((fp = fopen(m_FileName.GetBuffer(0), "wb+")) != NULL)
-					{
-						fwrite(pHeader->m_pData, sizeof(char), m_FileLong, fp);
-						fclose(fp);
-					}
-
-					fp = _fsopen("news\\news.log", "r+b", SH_DENYNO);
-					fseek(fp, 0, SEEK_END);
-
-					char filename[256];
-					strcpy(filename, m_File.GetBuffer(0));
-					fwrite(filename, 50, 1, fp);
-					fclose(fp);
-
-					m_taiShanDoc->m_NewsFileNameMap[m_File] = m_File;
-				}
-
-				m_wndStatusBar.bColor[m_wndStatusBar.nCount] = RGB(255, 255, 0);
+				m_wndStatusBar.bColor[m_wndStatusBar.nCount] = RGB(128, 0, 255);
 				m_wndStatusBar.PaintRect();
 				m_wndStatusBar.nCount++;
 				m_wndStatusBar.nCount %= 6;
-				break;
-
-			case FILE_NEWS_EX:					
-				m_File.Format("%s", pHeader->m_File.m_szFileName);
-
-				if (m_taiShanDoc->m_NewsFileNameMap.Lookup(m_File, m_FileName) != TRUE)
-				{
-					SetCurrentDirectory(m_taiShanDoc->m_CurrentWorkDirectory);
-
-					BOOL bPath = FALSE;
-					int nTmp;
-					int ab;
-
-					int nPos = m_File.Find("\\", 0);
-					if (nPos == -1)
-					{
-						nTmp = m_File.Find("/", 0);
-
-						while (nTmp == 0)
-						{
-							CString delchar = m_File.Mid(1);
-							nTmp = delchar.Find("/", 0);
-							m_File = delchar;
-						}
-
-						if (nTmp == -1)
-						{
-							bPath = FALSE;
-						}
-						else
-						{
-							bPath = TRUE;
-						}
-
-						ab = nTmp;
-					}
-					else
-					{
-						while (nPos == 0)
-						{
-							CString delchar = m_File.Mid(1);
-							nPos = delchar.Find("\\", 0);
-							m_File = delchar;
-						}
-						if (nPos != -1)
-						{
-							ab = nPos;
-							bPath = TRUE;
-						}
-						nTmp = m_File.Find("/", 0);
-						while (nTmp == 0)
-						{
-							CString delchar = m_File.Mid(1);
-							nTmp = delchar.Find("/", 0);
-							m_File = delchar;
-						}
-						if (nTmp != -1)
-						{
-							ab = nTmp;
-							bPath = TRUE;
-						}
-					}
-
-					if (!bPath)
-					{
-
-						switch (pHeader->m_File.m_dwAttrib)
-						{
-						case News_Sha_Ex:
-							m_FileName.Format("news\\shanghai\\%d.dat", m_taiShanDoc->m_lDay);
-							break;
-						case News_Szn_Ex:
-							m_FileName.Format("news\\shenzhen\\%d.dat", m_taiShanDoc->m_lDay);
-							break;
-						case News_Fin_Ex:
-							m_FileName.Format("news\\cj\\%d.dat", m_taiShanDoc->m_lDay);
-							break;
-						case News_TVSta_Ex:
-							return 0; 
-						case News_Unknown_Ex:
-							return 0 ;
-						}
-					}
-					else
-					{
-						CString sTmp;
-						sTmp = m_File;
-						sTmp = m_File.Left(ab);
-						if (_access(sTmp, 0) == -1)
-						{
-							sTmp = "news\\" + sTmp;
-							_mkdir(sTmp);
-						}
-						m_FileName = sTmp;
-						m_FileName += "\\";
-						CString sFName = m_File.Mid(ab + 1);
-						m_FileName += sFName;
-					}
-
-					m_FileLong = pHeader->m_File.m_dwLen;
-					m_FileType = pHeader->m_wDataType;
-					m_dwAttrib = pHeader->m_File.m_dwAttrib;
-					if (m_dwAttrib == -1)
-						break; 
-
-					if (_access(m_FileName.GetBuffer(0), 0) != 0)
-					{
-						fp = _fsopen(m_FileName.GetBuffer(0), "w+b", SH_DENYNO);
-						fclose(fp);
-					}
-					if ((fp = fopen(m_FileName.GetBuffer(0) ,"r+b")) != NULL)
-					{
-						fseek(fp, 0, SEEK_END);
-						fwrite(pHeader->m_pData,sizeof(char), m_FileLong, fp);
-						fclose(fp);
-					}
-
-					fp = _fsopen("news\\news.log", "r+b", SH_DENYNO);
-					fseek(fp, 0, SEEK_END);
-
-					char filename[256];
-					strcpy(filename, m_File.GetBuffer(0));
-					fwrite(filename, 50, 1, fp);
-					fclose(fp);
-					m_taiShanDoc->m_NewsFileNameMap[m_File] = m_File;
-				}
-
-			default:
-				return 0;
 			}
 			break;
+
+		case FILE_BASE_EX:
+			m_File.Format("%s", pHeader->m_File.m_szFileName);
+
+			if (TRUE)
+			{
+				SetCurrentDirectory(m_taiShanDoc->m_CurrentWorkDirectory);
+
+				if (pHeader->m_File.m_dwAttrib == SH_MARKET_EX)
+				{
+					m_FileName = g_sF10sh + m_File;
+				}
+				else
+				{
+					m_FileName = g_sF10sz + m_File;
+				}
+
+				m_FileLong = pHeader->m_File.m_dwLen;
+				m_FileType = pHeader->m_wDataType;
+				m_dwAttrib = pHeader->m_File.m_dwAttrib;
+				if (m_dwAttrib == -1)
+					break; 
+
+				if ((fp = fopen(m_FileName.GetBuffer(0), "wb+")) != NULL)
+				{
+					fwrite(pHeader->m_pData, sizeof(char), m_FileLong, fp);
+					fclose(fp);
+				}
+
+				fp = _fsopen("news\\news.log", "r+b", SH_DENYNO);
+				fseek(fp, 0, SEEK_END);
+
+				char filename[256];
+				strcpy(filename, m_File.GetBuffer(0));
+				fwrite(filename, 50, 1, fp);
+				fclose(fp);
+
+				m_taiShanDoc->m_NewsFileNameMap[m_File] = m_File;
+			}
+
+			m_wndStatusBar.bColor[m_wndStatusBar.nCount] = RGB(255, 255, 0);
+			m_wndStatusBar.PaintRect();
+			m_wndStatusBar.nCount++;
+			m_wndStatusBar.nCount %= 6;
+			break;
+
+		case FILE_NEWS_EX:					
+			m_File.Format("%s", pHeader->m_File.m_szFileName);
+
+			if (m_taiShanDoc->m_NewsFileNameMap.Lookup(m_File, m_FileName) != TRUE)
+			{
+				SetCurrentDirectory(m_taiShanDoc->m_CurrentWorkDirectory);
+
+				BOOL bPath = FALSE;
+				int nTmp;
+				int ab;
+
+				int nPos = m_File.Find("\\", 0);
+				if (nPos == -1)
+				{
+					nTmp = m_File.Find("/", 0);
+
+					while (nTmp == 0)
+					{
+						CString delchar = m_File.Mid(1);
+						nTmp = delchar.Find("/", 0);
+						m_File = delchar;
+					}
+
+					if (nTmp == -1)
+					{
+						bPath = FALSE;
+					}
+					else
+					{
+						bPath = TRUE;
+					}
+
+					ab = nTmp;
+				}
+				else
+				{
+					while (nPos == 0)
+					{
+						CString delchar = m_File.Mid(1);
+						nPos = delchar.Find("\\", 0);
+						m_File = delchar;
+					}
+					if (nPos != -1)
+					{
+						ab = nPos;
+						bPath = TRUE;
+					}
+					nTmp = m_File.Find("/", 0);
+					while (nTmp == 0)
+					{
+						CString delchar = m_File.Mid(1);
+						nTmp = delchar.Find("/", 0);
+						m_File = delchar;
+					}
+					if (nTmp != -1)
+					{
+						ab = nTmp;
+						bPath = TRUE;
+					}
+				}
+
+				if (!bPath)
+				{
+
+					switch (pHeader->m_File.m_dwAttrib)
+					{
+					case News_Sha_Ex:
+						m_FileName.Format("news\\shanghai\\%d.dat", m_taiShanDoc->m_lDay);
+						break;
+					case News_Szn_Ex:
+						m_FileName.Format("news\\shenzhen\\%d.dat", m_taiShanDoc->m_lDay);
+						break;
+					case News_Fin_Ex:
+						m_FileName.Format("news\\cj\\%d.dat", m_taiShanDoc->m_lDay);
+						break;
+					case News_TVSta_Ex:
+						return 0; 
+					case News_Unknown_Ex:
+						return 0 ;
+					}
+				}
+				else
+				{
+					CString sTmp;
+					sTmp = m_File;
+					sTmp = m_File.Left(ab);
+					if (_access(sTmp, 0) == -1)
+					{
+						sTmp = "news\\" + sTmp;
+						_mkdir(sTmp);
+					}
+					m_FileName = sTmp;
+					m_FileName += "\\";
+					CString sFName = m_File.Mid(ab + 1);
+					m_FileName += sFName;
+				}
+
+				m_FileLong = pHeader->m_File.m_dwLen;
+				m_FileType = pHeader->m_wDataType;
+				m_dwAttrib = pHeader->m_File.m_dwAttrib;
+				if (m_dwAttrib == -1)
+					break; 
+
+				if (_access(m_FileName.GetBuffer(0), 0) != 0)
+				{
+					fp = _fsopen(m_FileName.GetBuffer(0), "w+b", SH_DENYNO);
+					fclose(fp);
+				}
+				if ((fp = fopen(m_FileName.GetBuffer(0) ,"r+b")) != NULL)
+				{
+					fseek(fp, 0, SEEK_END);
+					fwrite(pHeader->m_pData,sizeof(char), m_FileLong, fp);
+					fclose(fp);
+				}
+
+				fp = _fsopen("news\\news.log", "r+b", SH_DENYNO);
+				fseek(fp, 0, SEEK_END);
+
+				char filename[256];
+				strcpy(filename, m_File.GetBuffer(0));
+				fwrite(filename, 50, 1, fp);
+				fclose(fp);
+				m_taiShanDoc->m_NewsFileNameMap[m_File] = m_File;
+			}
+
+		default:
+			return 0;
 		}
-	}
-	catch(...)
-	{
-		ASSERT(FALSE);
+		break;
 	}
 
-
-#ifndef WIDE_NET_VERSION
-	HWND mywnd;
-	mywnd=(HWND)FindWindow(NULL,"图文卡数据接收明细");
-	if(mywnd!=NULL)
-	{
-		CDialogMYXMZ *pDlg=(CDialogMYXMZ*)mywnd;			 
-		::SendMessage(pDlg->m_hWnd,WM_MYMSG,wFileType,(LPARAM)lPara);
-	}
-
-#endif
 	return 0L;
 }
-

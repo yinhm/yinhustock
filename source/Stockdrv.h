@@ -45,10 +45,10 @@
 // 文件数据类型
 // 结构数组形式的文件数据
 
-#define FILE_HISTORY_EX				2			// 补日线数据
-#define FILE_MINUTE_EX				4			// 补分钟线数据
-#define FILE_POWER_EX				6
-#define FILE_HISTORY_MINUTE_EX		8          //补历史五分钟数据
+#define FILE_HISTORY_EX				2			// 补历史数据
+#define FILE_MINUTE_EX				4			// 补分时数据
+#define FILE_POWER_EX				6			// 补除权信息
+
 #define FILE_BASEINFO_EX			10          //补充全部股票财务数据
 #define FILE_DISPARTBARGAINING_EX	12          //补分笔交易明细数据
 #define FILE_STOCKLABELLIST_EX		14          //接收全部股票代码表
@@ -56,6 +56,8 @@
 #define FILE_INDEXATTRIBUTE_EX		18          //大盘红绿军 
 #define FILE_LOGINAUTH_EX			20          //客户登入授权
 #define FILE_TECHNICINDEX			22          //客户端技术指标
+
+#define FILE_HISTORY_MINUTE_EX		81			// 补历史五分钟数据
 
 #define		FILE_BASE_EX			0x1000		// 钱龙兼容基本资料文件,m_szFileName仅包含文件名
 #define		FILE_NEWS_EX			0x1002		// 新闻类,其类型由m_szFileName中子目录名来定
@@ -67,13 +69,13 @@
 
 #define		FILE_TYPE_RES			-1			// 保留
 
-// 消息子类型
-#define		News_Sha_Ex				 2			// 上证消息
-#define		News_Szn_Ex				 4			// 深证消息
-#define		News_Fin_Ex				 6			// 财经报道
-#define		News_TVSta_Ex			 8			// 电视台通知
-#define     News_SzEb_Ex            10          // 深圳二板
-#define		News_Unknown_Ex			 -1			// 未知提供者
+/* 消息子类型 */
+#define News_Sha_Ex					2			// 上证消息
+#define News_Szn_Ex					4			// 深证消息
+#define News_Fin_Ex					6			// 财经报道
+#define News_TVSta_Ex				8			// 电视台通知
+#define News_SzEb_Ex				10			// 深圳二板
+#define News_Unknown_Ex				-1			// 未知提供者
 
 //Definition For nInfo of Function GetStockDrvInfo(int nInfo,void * pBuf);
 #define		RI_IDSTRING				1			// 厂商名称,返回(LPCSTR)厂商名
@@ -181,22 +183,6 @@ typedef struct	tagRCV_EKE_HEADEx
 	char	m_szLabel[STKLABEL_LEN];					// 股票代码
 }RCV_EKE_HEADEx;
 
-//-------------------------------------补充历史五分钟K线数据----------------------------------------
-typedef union tagRCV_HISMINUTE_STRUCTEx
-{
-	struct
-	{
-		time_t  m_time;                  //UCT
-		float  m_fOpen;			          //开盘
-		float	m_fHigh;			          //最高
-		float  m_fLow;                    //最低
-		float  m_fClose;                   //收盘
-		float  m_fVolume;                 //量
-		float  m_fAmount;                 //额
-		float   m_fActiveBuyVol;          //主动买量如没有计算m_fActiveBuyVol=0
-	};
-	RCV_EKE_HEADEx  m_head;
-}RCV_HISMINUTE_STRUCTEx;
 //------------------------------------------------补明细数据-----------------------------------------------
 typedef  union  tagRCV_DISPBARGAINING_STRUCTEx
 {
@@ -214,20 +200,6 @@ typedef  union  tagRCV_DISPBARGAINING_STRUCTEx
 	RCV_EKE_HEADEx  m_head;
 }RCV_DISPBARGAINING_STRUCTEx;
 
-
-//------------------------------------- 除权数据 ------------------------------
-typedef union tagRCV_POWER_STRUCTEx
-{
-	struct
-	{
-		time_t m_time;				// UCT
-		float m_fGive;				// 每股送
-		float m_fPei;				// 每股配
-		float m_fPeiPrice;			// 配股价
-		float m_fProfit;			// 每股红利
-	};
-	RCV_EKE_HEADEx m_head;
-} RCV_POWER_STRUCTEx;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -266,77 +238,64 @@ typedef struct tagRCV_REPORT_STRUCTEx
 } RCV_REPORT_STRUCTEx;
 
 
-//============================旧结构==============
-typedef struct tagRCV_REPORT_STRUCTEx_OLD
-{
-	WORD	m_wMarket;									// 股票市场类型
-	char	m_szLabel[STKLABEL_LEN];					// 股票代码,以'\0'结尾
-	char	m_szName[STKNAME_LEN];						// 股票名称,以'\0'结尾
-	
-	float	m_fLastClose;								// 昨收
-	float	m_fOpen;									// 今开
-	float	m_fHigh;									// 最高
-	float	m_fLow;										// 最低
-	float	m_fNewPrice;								// 最新
-	float	m_fVolume;									// 成交量,以股为单位,股的含义依股票类型定义
-	float	m_fAmount;									// 成交额,以元为单位
 
-	float	m_fBuyPrice[3];								// 申买价1,2,3
-	float	m_fBuyVolume[3];							// 申买量1,2,3
-	float	m_fSellPrice[3];							// 申卖价1,2,3
-	float	m_fSellVolume[3];							// 申卖量1,2,3
-} RCV_REPORT_STRUCTEx_OLD;
-//============================旧结构===================
-//--------------------------------宽带行情数据结构-------------------------------------------------------
-typedef struct tagRCV_WIDOFEREPORT_STRUCTEx
-{
-	RCV_REPORT_STRUCTEx *pMarketReport;
-	float m_fActiveBuyVolumn;   //主动买入量  
-	float m_fConsignTotalBuyVolumn;  //委托总买量 
-	float m_fConsignTotalSellVolumn; //委托总卖量
-}RCV_WIDOFEREPORT_STRUCTEx;
-
-
-//补充日线数据
-//	注:
-//		每一数据结构都应通过 m_time == EKE_HEAD_TAG,判断是否为 m_head,然后再作解释
+// 历史数据
+// 注一:
+//		每一数据结构都应通过 m_time == EKE_HEAD_TAG, 判断是否为 m_head, 然后再作解释
 typedef union tagRCV_HISTORY_STRUCTEx
 {
 	struct
 	{
-		time_t	m_time;				//UCT
-		float	m_fOpen;			//开盘
-		float	m_fHigh;			//最高
-		float	m_fLow;				//最低
-		float	m_fClose;			//收盘
-		float	m_fVolume;			//量
-		float	m_fAmount;			//额
+		time_t	m_time;				// UCT
+		float	m_fOpen;			// 开盘
+		float	m_fHigh;			// 最高
+		float	m_fLow;				// 最低
+		float	m_fClose;			// 收盘
+		float	m_fVolume;			// 量
+		float	m_fAmount;			// 额
 		union
 		{
 			struct
 			{
-				WORD  m_wAdvance;    //涨数,仅大盘有效
-				WORD  m_wDecline;     //跌数,仅大盘有效
+				WORD m_wAdvance;	// 涨数,仅大盘有效
+				WORD m_wDecline;	// 跌数,仅大盘有效
 			};
-			float   m_fActiveBuyVol;      //主动买量
+			float m_fActiveBuyVol;	// 主动买量
 		};
 	};
-	RCV_EKE_HEADEx	m_head;
-}RCV_HISTORY_STRUCTEx;
+	RCV_EKE_HEADEx m_head;
+} RCV_HISTORY_STRUCTEx;
 
-//补充分时线数据
-//	注:
-//		每一数据结构都应通过 m_time == EKE_HEAD_TAG,判断是否为 m_head,然后再作解释
+// 分时数据
+// 注一:
+//		每一数据结构都应通过 m_time == EKE_HEAD_TAG, 判断是否为 m_head, 然后再作解释
 typedef union tagRCV_MINUTE_STRUCTEx
 {
-	struct{
-		time_t	m_time;				// UCT
-		float	m_fPrice;
-		float	m_fVolume;
-		float	m_fAmount;
+	struct
+	{
+		time_t m_time;				// UCT
+		float m_fPrice;				// 价
+		float m_fVolume;			// 量
+		float m_fAmount;			// 额
 	};
-	RCV_EKE_HEADEx	m_head; 
-}RCV_MINUTE_STRUCTEx;
+	RCV_EKE_HEADEx m_head; 
+} RCV_MINUTE_STRUCTEx;
+
+// 除权数据
+// 注一:
+//		每一数据结构都应通过 m_time == EKE_HEAD_TAG, 判断是否为 m_head, 然后再作解释
+typedef union tagRCV_POWER_STRUCTEx
+{
+	struct
+	{
+		time_t m_time;				// UCT
+		float m_fGive;				// 每股送
+		float m_fPei;				// 每股配
+		float m_fPeiPrice;			// 配股价
+		float m_fProfit;			// 每股红利
+	};
+	RCV_EKE_HEADEx m_head;
+} RCV_POWER_STRUCTEx;
 
 //////////////////////////////////////////////////////////////////////////////////
 // 文件类型数据包头
@@ -370,32 +329,33 @@ typedef struct tagRCV_FILE_HEADEx
 #define RCV_REPORT			0x3f001234
 #define RCV_FILEDATA		0x3f001235
 
+
+
 // 注一:
-//	  记录数表示行情数据和补充数据(包括 Header)的数据包数,对文件类型数据, = 1
+//		记录数表示行情数据和补充数据(包括 Header)的数据包数, 对文件类型数据, = 1
 // 注二:
-//	  若 m_bDISK = FALSE, m_pData 为消息股评等数据缓冲区指针
+//		若 m_bDISK = FALSE, m_pData 为消息股评等数据缓冲区指针
 //
-//		 ******** 数据共享,不能修改数据 **********
+//		******** 数据共享,不能修改数据 **********
 //
-//		 m_bDISK = TRUE,  m_pData 为该文件的存盘文件名,一般情况只有
-//		 升级软件等大文件用存盘方式
+//		m_bDISK = TRUE, m_pData 为该文件的存盘文件名, 一般情况只有
+//		升级软件等大文件用存盘方式
 typedef struct tagRCV_DATA
 {
 	int					m_wDataType;			// 文件类型
-	int					m_nPacketNum;			// 记录数,参见注一
+	int					m_nPacketNum;			// 记录数, 参见注一
 	RCV_FILE_HEADEx		m_File;					// 文件接口
 	BOOL				m_bDISK;				// 文件是否已存盘的文件
 	union
 	{
+		RCV_HISTORY_STRUCTEx* m_pDay;					// 补日线数据
+		RCV_MINUTE_STRUCTEx* m_pMinute;					// 补分时数据   
+		RCV_POWER_STRUCTEx* m_pPower;					// 补除权数据
+
 		RCV_REPORT_STRUCTEx *m_pReport;                   //行情数据
-		RCV_WIDOFEREPORT_STRUCTEx *m_pWideReport;         //宽带版行情数据 
-		RCV_HISTORY_STRUCTEx *m_pDay;                     //日线数据 
-		RCV_MINUTE_STRUCTEx *m_pMinute;                   //补当天分时数据   
-		RCV_POWER_STRUCTEx *m_pPower;                     //除权数据
 		RCV_DISPBARGAINING_STRUCTEx *m_pDispBargaining;  //明细数据
 		RCV_BASEINFO_STRUCTEx *m_pBaseInfo;               //财务数据
 		RCV_STKLABEL_STRUCTEx *m_pStkLabel;               //代码对照表
-		RCV_HISMINUTE_STRUCTEx *m_pHisMinute;             //补历史五分钟线
 		RCV_SYSTEMRUN_STRUCTEx *m_pSystemRun;            //系统运行参数
 		RCV_INDEXATTRIBUTE_STRUCTEx *m_pIndexAttribute;   //大盘红绿军 
 		RCV_LOGINAUTH_STRUCTEx *m_pLoginAuth;             //返回授权状态       
@@ -403,14 +363,16 @@ typedef struct tagRCV_DATA
 	};
 } RCV_DATA;
 
-// ===================== 飞狐交易师 ===========================================
 
+// ===================== 飞狐交易师 ===========================================
 typedef struct tagFOX_DATA
 {
 	DWORD	m_dwFlag;
 	DWORD	m_dwType;
 	int		m_nCount;
 } FOX_DATA;
+
+
 
 //==================同网络通讯层接口总数据到达结构=====================
 typedef struct RCV_COMMINTERFACE_STRUCTEx
@@ -645,50 +607,3 @@ DWORD WINAPI GetStockDrvInfo(int nInfo, void* pBuf);
 
 
 #endif // __STOCKDRV_100_H__
-
-
-
-
-/* 图文卡兼容消息处理程序示例
-LONG OnStkDataOK(UINT wParam,LONG lParam)
-{
-RCV_DATA    *       pHeader;
-int         i;
-
-    pHeader = (RCV_DATA *)lParam;
-
-//  对于处理速度慢的数据类型,最好将 pHeader->m_pData 指向的数据备份,再作处理
-
-    switch( wParam )
-    {
-    case RCV_REPORT:                        // 共享数据引用方式,股票行情
-        for(i=0; i<pHeader->m_nPacketNum; i++)
-        {
-            pHeader->m_pReport[i] ...
-            // 数据处理
-        }
-        break;
-
-    case RCV_FILEDATA:                      // 共享数据引用方式,文件
-        switch(pHeader->m_wDataType)
-        {
-        case FILE_HISTORY_EX:               // 补日线数据
-            break;
-
-        case FILE_MINUTE_EX:                // 补分钟线数据
-            break;
-
-        case FILE_BASE_EX:                  // 钱龙兼容基本资料文件,m_szFileName仅包含文件名
-            break;
-
-        case FILE_NEWS_EX:                  // 新闻类,其类型由m_szFileName中子目录名来定
-            break;
-        }
-        break;
-
-    default:
-        return 0;                           // unknown data
-    }
-    return 1;
-}
-*/

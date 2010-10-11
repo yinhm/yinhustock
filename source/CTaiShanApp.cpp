@@ -18,9 +18,11 @@
 #include "CTaiKlineFileKLine.h"
 #include "FyRegister.h"
 
-//#include <afxpriv.h>
+
+#include "SocketBase.h"
 
 #include "StkDatabase.h"
+
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -112,6 +114,13 @@ BOOL CTaiShanApp::InitInstance()
 	int nResult;
 	m_bAppAuthorized=TRUE;
 
+
+
+
+	if (!CSocketBase::InitializeSockets(TRUE, 2))
+	{
+		return FALSE;
+	}
 
 
 	// 设置当前文件夹
@@ -241,6 +250,18 @@ BOOL CTaiShanApp::InitInstance()
 	return TRUE;
 }
 
+int CTaiShanApp::ExitInstance()
+{
+	CSocketBase::ShutdownSockets();
+
+	if (pDrawTemplate)
+		delete pDrawTemplate;
+
+	ReleaseMutex(hAppMutex);
+
+	return CWinApp::ExitInstance();
+}
+
 
 
 
@@ -322,19 +343,6 @@ BOOL CAboutDlg::OnInitDialog()
 
 }
 
-
-int CTaiShanApp::ExitInstance() 
-{
-	if(pDrawTemplate)
-		delete pDrawTemplate;
-
-	ReleaseMutex(hAppMutex);
-
-
-
-
-	return CWinApp::ExitInstance();
-}
 
 void CTaiShanApp::OnFilePrintSetup() 
 {

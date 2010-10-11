@@ -7,7 +7,7 @@
 #include "CTaiKlineWideNet.h"
 #include "MainFrm.h"
 #include "CTaiShanDoc.h"
-#include "CTaiKlineMemFile.h"
+//#include "CTaiKlineMemFile.h"
 #include "CTaiKlineFileKLine.h"
 #include "CTaiScreenParent.h"
 #include "CTaiKlineFileHS.h"

@@ -1148,8 +1148,9 @@ void CStkBlockManager::RefreshHistoryDayLineData(char * pszStockTypeCode,CProgre
 	CString strStockTypeCode=pszStockTypeCode;
 	CTaiKlineFileKLine::ZeroKlineData(strStockTypeCode,STKTYPE,TRUE);
 
+	std::string symobl(strStockTypeCode);
 	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer (strStockTypeCode,STKTYPE,true);
-	pFile ->WriteKLine(strStockTypeCode,pKline,nTotalCount,CTaiKlineFileKLine::overWriteAll);
+	pFile ->WriteKLine(symobl,pKline,nTotalCount,CTaiKlineFileKLine::overWriteAll);
 	//**************************************************************
 	if(pKline)
 	{

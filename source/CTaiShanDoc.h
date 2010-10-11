@@ -228,7 +228,6 @@ public:
 
 
 	INFOINIT	m_infoInit;	
-	CTypedPtrArray<CPtrArray,NAMESYMBOL*> m_namesymbol;
 	CArray<CString,CString&>		index_keyb_f;
 	CArray<CString,CString&>		index_keyb_a;	
 

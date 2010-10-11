@@ -62,7 +62,11 @@ public:
 	void AddStockSymbol(WORD wMarket, char* szLabel);
 
 public:
+	// 处理行情报表
 	void ProcessReport(RCV_REPORT_STRUCTEx* pReport, int nCount);
+
+	// 处理历史数据
+	void ProcessHistory(RCV_HISTORY_STRUCTEx* pHistory, int nCount);
 };
 
 CStkDatabase* TSKDatabase();

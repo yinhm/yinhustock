@@ -790,7 +790,8 @@ void CTaiKlineMin1::InitHs(bool bRemoveAll,bool bSkip)
 	long addr = 0;
 	short Curr_Min;
 
-	Curr_Min=m_pFileHs->GetDataCount(pView->m_sharesSymbol);
+	std::string symbol(pView->m_sharesSymbol);
+	Curr_Min=m_pFileHs->GetDataCount(symbol);
 
 	int first=0;
 	if(bRemoveAll==true)

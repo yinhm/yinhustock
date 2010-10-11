@@ -35,7 +35,7 @@
 #include "ChildFrm.h"
 #include "CTaiKlineSplitWnd.h"
 #include "CTaiKlineFileKLine.h"
-#include "CTaiKlineMemFile.h"
+//#include "CTaiKlineMemFile.h"
 #include "CTaiKlineFileKLine.h"
 #include "CTaiKlineFileHS.h"
 #include "CTaiKlineDlgJishuClassify.h"
@@ -5441,10 +5441,15 @@ void CTaiShanKlineShowView::WriteKLine(int nFoot,bool bOne,bool bDelete )
 
 	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(m_sharesSymbol,m_stkKind,true);
 
+	std::string symbol(m_sharesSymbol);
 	if(bDelete == false)
-		pFile->WriteKLine (m_sharesSymbol,&m_pkline [nFoot],1,0);
+	{
+		pFile->WriteKLine (symbol,&m_pkline [nFoot],1,0);
+	}
 	else
-		pFile->DeleteKlineData(m_sharesSymbol, nFoot);
+	{
+		pFile->DeleteKlineData(symbol, nFoot);
+	}
 
 }
 
@@ -7985,7 +7990,8 @@ int CTaiShanKlineShowView::ReadKLine(CString fName,int stkKind,Kline*& pKline,in
 
 	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(fName,stkKind,true);
 
-	int rtnK = pFile->ReadKLine (fName,pKline,nRead,1);
+	std::string symbol(fName);
+	int rtnK = pFile->ReadKLine (symbol,pKline,nRead,1);
 
 
 	if(GetDocument()->m_bInitDone==TRUE && GetDocument()->m_bCloseWorkDone==false)
@@ -8077,7 +8083,8 @@ int CTaiShanKlineShowView::ReadKline5Min(CString fName,int stkKind, Kline *&pKli
 
 {
 	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(fName,stkKind,false);
-	int rtnK = pFile->ReadKLine (fName,pKline,nRead,48);
+	std::string symbol(fName);
+	int rtnK = pFile->ReadKLine (symbol,pKline,nRead,48);
 
 	return rtnK;
 }
@@ -8493,8 +8500,8 @@ void CTaiShanKlineShowView::OnLSplit4()
 		{
 			int addr = 16+i*64;
 			pFile->Seek(addr,CTaiKlineFileKLine::begin);
-			KLINE_SMALLHEAD* pKlineSmallHead = (KLINE_SMALLHEAD*)pFile->GetFileCurrentPointer();
-			CString symbol (pKlineSmallHead->StockSign);
+			TSK_KLINEINDEX* pKlineSmallHead = (TSK_KLINEINDEX*)pFile->GetFileCurrentPointer();
+			CString symbol (pKlineSmallHead->stockCode);
 			for(int j=0;j<26;j++)
 			{
 				if(pKlineSmallHead->symBlock [j] == 0xffff) break;

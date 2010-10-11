@@ -8,7 +8,7 @@
 #include "CTaiScreenParent.h"
 #include "MainFrm.h"
 #include "CTaiShanDoc.h"
-#include "CTaiKlineMemFile.h"
+//#include "CTaiKlineMemFile.h"
 #include "CTaiKlineFileKLine.h"
 #include "CTaiKlineFileHS.h"
 #include "SelectStock.h"
