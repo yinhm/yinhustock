@@ -810,7 +810,10 @@ void CImportData::InstallStockKlineEach(CString symbol,int wMarketType,int Begin
 			}
 
 		case 1013 : 
-			pFile ->WriteKLine(symbol,m_InstallArray.GetData(),m_InstallArray.GetSize(),CTaiKlineFileKLine::overWriteAll);
+			{
+				std::string code(symbol);
+				pFile ->WriteKLine(code,m_InstallArray.GetData(),m_InstallArray.GetSize(),CTaiKlineFileKLine::overWriteAll);
+			}
 			break;
 		}
 }
@@ -954,7 +957,7 @@ void CImportData::InstallFenxijia(CString srcfilename ,int BeginDate, int EndDat
 		AfxMessageBox("不是分析家日线数据文件格式!");
 		return;
 	}
-	if(!SourceFile.Open(srcfilename,CTaiKlineMemFile::modeRead))
+	if(!SourceFile.Open(srcfilename,CStkFile::modeRead))
 	{
 		AfxMessageBox("打开文件出错,请检查相关设置!");
 		return;

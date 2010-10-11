@@ -23,11 +23,21 @@
 #include <wininet.h>
 #include <afxcmn.h>
 
+
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <queue>
+#include <set>
+#include <string>
+#include <vector>
+using namespace std;
+
+
 #include "resource.h"
 #include "stockdrv.h"
 #include "StructTaiShares.h"
 #include "CSharesInformation.h"
-#include "CSharesCompute.h"
 #include "StructKlineView.h"
 #include "StkBlockManager.h"
 #include "JiShuColumnInfo.h"

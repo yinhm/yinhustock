@@ -38,7 +38,6 @@ public:
 	};
 
 protected:
-	CMapStringToPtr*	m_pSymbolToPos;
 
 	int		MaxNumStock;
 	int		m_nAddReMap;
@@ -84,4 +83,6 @@ protected:
 	virtual int GetID();
 	virtual void ReMapFromBegin(int nCount);
 	virtual BOOL ReMap(int nAdd = 1024);
+
+	virtual BOOL IsOpen() { return TRUE; }
 };

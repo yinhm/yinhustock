@@ -13,7 +13,7 @@
 #include "CTaiScreen.h"
 #include "CTaiScreenTest.h"
 #include "CStatusBarTai.h"
-#include "CTaiKlineMemFile.h"
+//#include "CTaiKlineMemFile.h"
 #include "DialogCwdLeftPop.h"
 #include "ClientTransmitManageWnd.h"
 
@@ -24,8 +24,6 @@ class CMDIChildWnd ;
 class CAlertSystem;
 class CAlertPopDlg;
 class CTaiKlineDlgNeuralLearn;
-
-class CDialogMYXMZ;
 
 class CMainFrame : public CXTPMDIFrameWnd
 {
@@ -189,9 +187,6 @@ protected:
 	afx_msg void OnLoginServer();
 	afx_msg void OnRecvStockcode();
 #endif
-
-protected:
-	CDialogMYXMZ*	m_pViewMYXMZ;
 
 public:
 	void ShowMYXMZ();

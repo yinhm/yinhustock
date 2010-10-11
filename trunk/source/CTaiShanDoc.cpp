@@ -1530,7 +1530,8 @@ void CTaiShanDoc::StockCloseWork()
 			nTransferKline.TransferKlineToday(StockId,Cdat->kind,MinKline,nClount,1);
 			if(nClount == 48)
 			{
-				CTaiKlineFileKLine::GetFilePointer(StockId,Cdat->kind,false)->WriteKLine(StockId,MinKline,48,0);   //增加K线数据
+				std::string symbol(StockId);
+				CTaiKlineFileKLine::GetFilePointer(StockId,Cdat->kind,false)->WriteKLine(symbol,MinKline,48,0);   //增加K线数据
 			}
 
 			m_index++;

@@ -6,9 +6,9 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "CTaiKlineMemFile.h"
+//#include "CTaiKlineMemFile.h"
 
-class CHistoryFile : public CTaiKlineMemFile  
+class CHistoryFile : public CStkFile  
 {
 public:
 	void GetDateNavigated(bool bMovePre);

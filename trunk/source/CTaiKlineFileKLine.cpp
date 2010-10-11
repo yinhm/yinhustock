@@ -9,22 +9,25 @@
 
 #include "StkDatabase.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
-#define new DEBUG_NEW
-#endif
+
+#define TSK_FILEHEADER_SIZE		sizeof(TSK_FILEHEADER)
+#define KlineByteEach			sizeof(Kline)
+#define FixedKlinePerBlock		240
+#define KLINESMALLHEAD			TSK_FILEHEADER_SIZE + sizeof(TSK_KLINEINDEX) * MAX_STOCK_NUM
+
 
 CTaiKlineFileKLine*	CTaiKlineFileKLine::m_fileDaySh = NULL;
 CTaiKlineFileKLine*	CTaiKlineFileKLine::m_fileDaySz = NULL;
 CTaiKlineFileKLine*	CTaiKlineFileKLine::m_fileMin5Sh = NULL;
 CTaiKlineFileKLine*	CTaiKlineFileKLine::m_fileMin5Sz = NULL;
 
+
 CTaiKlineFileKLine::CTaiKlineFileKLine()
 {
 	m_kindKline = DAY_KLINE;
 	m_nMarket = SZ_MARKET_EX;
 	m_bFirstWrite = TRUE;
+	m_bIndex = FALSE;
 }
 
 CTaiKlineFileKLine::CTaiKlineFileKLine(int nKind, int nMarket)
@@ -32,6 +35,7 @@ CTaiKlineFileKLine::CTaiKlineFileKLine(int nKind, int nMarket)
 	m_kindKline = nKind;
 	m_nMarket = nMarket;
 	m_bFirstWrite = TRUE;
+	m_bIndex = FALSE;
 
 	m_nAddReMap = KlineByteEach * FixedKlinePerBlock * 5;
 }
@@ -211,9 +215,9 @@ int CTaiKlineFileKLine::LookTwoPath(time_t& tmt ,Kline *pKline, int nMax, bool &
 
 
 }
-int CTaiKlineFileKLine::TimeToFoot(KLINE_SMALLHEAD* pKlineSmallHead,CTime &tm,BOOL& bAdd)//according the time ,to compute the foot of kline in file.
+int CTaiKlineFileKLine::TimeToFoot(TSK_KLINEINDEX* pKlineIndex,CTime &tm,BOOL& bAdd)//according the time ,to compute the foot of kline in file.
 {
-	int nCount = pKlineSmallHead->numKln ;
+	int nCount = pKlineIndex->klineCount ;
 	bAdd = false;
 	if(nCount<=0)
 	{
@@ -231,11 +235,11 @@ int CTaiKlineFileKLine::TimeToFoot(KLINE_SMALLHEAD* pKlineSmallHead,CTime &tm,BO
 		bDay = true;
 	for(i = (nCount-1)/FixedKlinePerBlock ; i>=0 ;i--)
 	{
-		int addr = KLINESMALLHEAD + pKlineSmallHead->symBlock[i] 
+		int nAddr = KLINESMALLHEAD + pKlineIndex->symBlock[i] 
 				* KlineByteEach *  FixedKlinePerBlock
 					 ;
 									 
-		this->Seek(addr,this->begin);
+		this->Seek(nAddr,this->begin);
 		int tmFile;
 		Read(&tmFile,4);
 		if(RegularTime(tmFile,bDay)<(int)RegularTime(tmt,bDay))
@@ -253,12 +257,12 @@ int CTaiKlineFileKLine::TimeToFoot(KLINE_SMALLHEAD* pKlineSmallHead,CTime &tm,BO
 	if(i>0)
 	{
 	
-		ASSERT(pKlineSmallHead->symBlock[i]!=0xffff);
-		int addr = KLINESMALLHEAD + pKlineSmallHead->symBlock[i] 
+		ASSERT(pKlineIndex->symBlock[i]!=0xffff);
+		int nAddr = KLINESMALLHEAD + pKlineIndex->symBlock[i] 
 				* KlineByteEach *  FixedKlinePerBlock
 					 ;
 									  
-		Seek(addr,begin);
+		Seek(nAddr,begin);
 		Kline *pKline = (Kline *)this->GetFileCurrentPointer ();
 		int nMax;
 
@@ -297,11 +301,11 @@ int CTaiKlineFileKLine::TimeToFoot(KLINE_SMALLHEAD* pKlineSmallHead,CTime &tm,BO
 		else
 		{
 		
-			int addr = KLINESMALLHEAD + pKlineSmallHead->symBlock[0] 
+			int nAddr = KLINESMALLHEAD + pKlineIndex->symBlock[0] 
 					* KlineByteEach *  FixedKlinePerBlock
 						 ;
 										  
-			Seek(addr,begin);
+			Seek(nAddr,begin);
 			Kline *pKline = (Kline *)this->GetFileCurrentPointer ();
 
 			int nMax;
@@ -318,7 +322,7 @@ int CTaiKlineFileKLine::TimeToFoot(KLINE_SMALLHEAD* pKlineSmallHead,CTime &tm,BO
 	}
 
 
-	if(pKlineSmallHead->numKln<=rtn)
+	if(pKlineIndex->klineCount<=rtn)
 	{
 		rtn =-1;
 		bAdd = true;
@@ -331,26 +335,28 @@ int CTaiKlineFileKLine::ReadKlinePeriod(CString symbol, Kline *&kline, CTime& ti
 {
 	if(symbol.GetLength ()!=6&&symbol.GetLength ()!=4) return 0;
 
-	KLINE_SMALLHEAD klineSmallHead;
-	KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-	int nIndexStock = GetKlineSmallHeader(symbol,pKlineSmallHead);
+	TSK_KLINEINDEX klineIndex;
+	TSK_KLINEINDEX* pKlineIndex = &klineIndex;
+
+	std::string code(symbol);
+	int nIndexStock = GetKlineIndex(code,pKlineIndex);
 
 	if(kline != NULL)
 		delete [] kline ;
 	BOOL bAdd;
 
-	int nFootB = TimeToFoot(pKlineSmallHead,timeStart, bAdd);
+	int nFootB = TimeToFoot(pKlineIndex,timeStart, bAdd);
 	if(nFootB ==  -1&&bAdd == true)
 	{
 
 		kline = new Kline[1+nAddBlank];
 		return 0;
 	}
-	int nFootE = TimeToFoot(pKlineSmallHead,timeEnd, bAdd);
+	int nFootE = TimeToFoot(pKlineIndex,timeEnd, bAdd);
 	if(nFootE ==  -1&&bAdd == true)
 	{
 
-		nFootE = pKlineSmallHead ->numKln -1;
+		nFootE = pKlineIndex ->klineCount -1;
 		bAdd = false;
 	}
 	int nCount = nFootE - nFootB+1;
@@ -367,13 +373,13 @@ int CTaiKlineFileKLine::ReadKlinePeriod(CString symbol, Kline *&kline, CTime& ti
 
 	for(int i=nFootB;i<nFootB+nCount ;i++)
 	{
-		int blkCount= i / FixedKlinePerBlock  ;	 
-		int stockCount=i % FixedKlinePerBlock  ;	  
-		int addr = KLINESMALLHEAD + pKlineSmallHead->symBlock[blkCount] 
+		int blockIndex= i / FixedKlinePerBlock  ;	 
+		int stockIndex=i % FixedKlinePerBlock  ;	  
+		int nAddr = KLINESMALLHEAD + pKlineIndex->symBlock[blockIndex] 
 				* KlineByteEach *  FixedKlinePerBlock
-					 + stockCount * KlineByteEach;
+					 + stockIndex * KlineByteEach;
 									
-		this->Seek(addr,this->begin);
+		this->Seek(nAddr,this->begin);
 		Read(kline+i-nFootB,KlineByteEach);
 	}
 	if(!CTaiShanKlineShowView::IsIndexStock3(symbol))
@@ -383,245 +389,7 @@ int CTaiKlineFileKLine::ReadKlinePeriod(CString symbol, Kline *&kline, CTime& ti
 
 }
 
-bool CTaiKlineFileKLine::WriteKLine(CString symbol,Kline* pKline,int nWrite,int nType)	
-{
-	if(symbol.GetLength ()!=6&&symbol.GetLength ()!=4) return false;
-
-	{
-		CTime tm=CTime::GetCurrentTime ();
-		int tmt = tm.GetTime ()+24*60*60;
-		for(int i=0;i<nWrite;i++)
-		{
-			if(pKline[i].day >tmt)
-			{
-				ASSERT(FALSE);
-
-				return false;
-			}
-		}
-	}
-	KLINE_SMALLHEAD klineSmallHead;
-	KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-	int nIndexStock = GetKlineSmallHeader(symbol,pKlineSmallHead);
-	int nMaxBlock = CalcMaxCountBlock();
-	if(pKlineSmallHead->numKln > nMaxBlock*FixedKlinePerBlock)
-	{
-		int n1 = pKlineSmallHead->numKln/FixedKlinePerBlock;
-		int n2 = pKlineSmallHead->numKln%FixedKlinePerBlock == 0 ? 0:1;
-		int nBlockCur = n1 + n2;
-		int nMoveBlock = nBlockCur - nMaxBlock ;
-		if(nMoveBlock>0)
-		{
-			for(int i=0;i<nMoveBlock;i++)
-			{
-				WORD wdVal = pKlineSmallHead->symBlock [0];
-				for(int j=0;j<nBlockCur-1;j++)
-				{
-					pKlineSmallHead->symBlock [j] = pKlineSmallHead->symBlock [j+1];
-					ASSERT(pKlineSmallHead->symBlock [j+1]!=0xffff);
-				}
-				if(nBlockCur-1>=0)
-					pKlineSmallHead->symBlock [nBlockCur-1] = wdVal;
-				else
-					ASSERT(FALSE);
-	
-			}
-			pKlineSmallHead->numKln = pKlineSmallHead->numKln - nMoveBlock*FixedKlinePerBlock;
-		}
-		else
-		{
-			pKlineSmallHead->numKln = 0;
-			ASSERT(FALSE);
-		}
-		this->SetKlineSmallHeader (nIndexStock,pKlineSmallHead);
-	}
-
-	ASSERT(pKlineSmallHead!=NULL);
-
-	if(pKline == NULL || nWrite<=0) 
-		return false;
-
-
-	if(nWrite>1 && m_kindKline == 0)
-	{
-		CString tmt = "19800101";
-		for(int i=0;i<nWrite;i++)
-		{
-				
-			CTime tm2(pKline[i].day);
-			CString s=tm2.Format ("%Y%m%d");
-			while(1)
-			{	
-				if(nWrite<=i)
-					break;
-				tm2 = CTime(pKline[i].day);
-				s=tm2.Format ("%Y%m%d");
-				if(s<=tmt)
-				{
-					if(nWrite-i-1>0)
-						memmove(pKline+i,pKline+i+1,(nWrite-i-1)*sizeof(Kline));
-					nWrite--;
-				}
-				else
-					break;
-			}
-			tmt = s;
-
-		}
-
-	}
-
-	if(pKlineSmallHead->numKln <=0)
-		pKlineSmallHead->numKln =0;
-
-
-	CTime timeStart((time_t)pKline[0].day );
-	BOOL bAdd;
-	int nFootB = TimeToFoot(pKlineSmallHead,timeStart, bAdd);
-	if(nFootB == -1 )
-	{
-		if(bAdd ==true)
-			nFootB = pKlineSmallHead->numKln ;
-		else
-			ASSERT(FALSE);
-	}
-	timeStart = CTime((time_t)pKline[nWrite-1].day );
-	int nFootE = TimeToFoot(pKlineSmallHead,timeStart, bAdd);
-	if(nFootE == -1 )
-	{
-		if(bAdd ==true)
-			nFootE = pKlineSmallHead->numKln ;
-		else
-			ASSERT(FALSE);
-	}
-	else if(bAdd == false)
-	{
-		if(nFootE <pKlineSmallHead->numKln)
-			nFootE++;
-		else
-			ASSERT(FALSE);
-	}
-	int nKlineToOverWrite = nFootE - nFootB;
-
-	
-	Kline* pKlineFile = NULL;
-	Kline* pKlineMid = pKline;
-	CArray<Kline,Kline&> klineArray;
-	int nWrite2=0;
-
-	if(nType == this->overWriteAll)
-	{
-	
-		int nMove = nWrite -nKlineToOverWrite;
-		int nRtn;
-		if(nMove!=0)
-		{
-			nRtn = ReadKLine( symbol,pKlineFile,pKlineSmallHead->numKln - nFootE,1);
-			ASSERT(nRtn == pKlineSmallHead->numKln - nFootE);
-		}
-
-	
-		nWrite2 = pKlineSmallHead->numKln-nFootE;
-		if(nWrite2<0 || nMove==0)
-			nWrite2 =0;
-
-	}
-	else
-	{
-		
-		nWrite2 = pKlineSmallHead->numKln-nFootE;
-		if(nWrite2<0)
-			nWrite2 =0;
-		int i ;
-		Kline kln;
-		if(nWrite2!=0)
-		{
-			for( i=nFootB;i<nFootE;i++)
-			{
-				int blkCount= i / FixedKlinePerBlock  ;	  
-				int stockCount=i % FixedKlinePerBlock  ;	 
-				int addr = KLINESMALLHEAD + pKlineSmallHead->symBlock[blkCount] 
-						* KlineByteEach *  FixedKlinePerBlock
-							 + stockCount * KlineByteEach;
-											 
-				this->Seek(addr,this->begin);
-				Read(&kln,KlineByteEach);
-				klineArray.Add (kln);
-			}
-		}
-
-		bool bDay  = false;
-		if((m_kindKline+1)%2==1)
-			bDay = true;
-		for(i=0;i<nWrite;i++)
-		{
-			int nDay =RegularTime(pKline[i].day ,bDay);
-			if(klineArray.GetSize()==0)
-			{
-				klineArray.Add(pKline[i]);
-				continue;
-			}
-			for(int j=0;j< klineArray.GetSize();j++)
-			{
-				if(RegularTime(klineArray[j].day ,bDay)<nDay)
-				{
-					klineArray.InsertAt(j,pKline[i]);
-					break;
-				}
-				else if(RegularTime(klineArray[j].day ,bDay) == nDay)
-					break;
-			}
-		}
-		int nMove = klineArray.GetSize () -nKlineToOverWrite;//>0 is 'write from back' ,==0 is need not write,<0 is ' write from begin'
-		if(nMove==0)
-			nWrite2 =0;
-		if(nWrite2>0)
-		{
-			int nRtn = ReadKLine( symbol,pKlineFile,pKlineSmallHead->numKln - nFootB,1);
-			ASSERT(nRtn == pKlineSmallHead->numKln - nFootB);
-		}
-
-		pKlineMid = klineArray.GetData ();
-	}
-	int nDeleted = 0;
-	int blkCount= nFootB / FixedKlinePerBlock  ;	  
-	for(int i=nFootB;i<nFootB+ nWrite + nWrite2;i++)
-	{
-		int stockCount=i % FixedKlinePerBlock  ;	 
-
-
-		if(stockCount == 0)
-		{
-			blkCount= i / FixedKlinePerBlock  ;	 
-			nDeleted += CreateOrMoveSmallBlock(pKlineSmallHead, blkCount);
-		}
-
-		int addr = KLINESMALLHEAD + pKlineSmallHead->symBlock[blkCount] 
-				* KlineByteEach *  FixedKlinePerBlock
-					 + stockCount * KlineByteEach;
-									  
-		this->Seek(addr,this->begin);
-
-		Kline * pKln = pKlineMid+i-nFootB;
-		if(i>=nFootB+ nWrite)//from file old
-			pKln = pKlineFile+i-nFootB-nWrite;
-		if(!CTaiShanKlineShowView::IsIndexStock3(symbol))
-			TestKlineVolpositive(pKln, 1);
-		Write(pKln,KlineByteEach);
-
-	}
-	
-	pKlineSmallHead->numKln = nFootB+ nWrite + pKlineSmallHead->numKln-nFootE - nDeleted;
-	ASSERT(pKlineSmallHead->numKln>=0);
-	if(pKlineFile != NULL)
-		delete [] pKlineFile;
-
-	SetKlineSmallHeader(nIndexStock,pKlineSmallHead);
-	return true;
-
-}
-
-int CTaiKlineFileKLine::CreateOrMoveSmallBlock(KLINE_SMALLHEAD *pKlineSmallHead,int& nBlock)//to create a new block,or move
+int CTaiKlineFileKLine::CreateOrMoveSmallBlock(TSK_KLINEINDEX *pKlineIndex,int& nBlock)//to create a new block,or move
 
 {
 
@@ -629,16 +397,16 @@ int CTaiKlineFileKLine::CreateOrMoveSmallBlock(KLINE_SMALLHEAD *pKlineSmallHead,
 	int nMax = CalcMaxCountBlock();
 	if(nBlock>=nMax)
 	{
-		WORD first = pKlineSmallHead->symBlock[0];
+		WORD first = pKlineIndex->symBlock[0];
 		for(int j = 0;j<nMax-1;j++)
 		{
-			pKlineSmallHead->symBlock[j] = pKlineSmallHead->symBlock[j+1];
+			pKlineIndex->symBlock[j] = pKlineIndex->symBlock[j+1];
 		}
-		pKlineSmallHead->symBlock[nMax-1] = first;
+		pKlineIndex->symBlock[nMax-1] = first;
 
 
 		nBlock = nMax-1;
-		ASSERT(pKlineSmallHead->symBlock[nBlock]!=0xffff);
+		ASSERT(pKlineIndex->symBlock[nBlock]!=0xffff);
 		if(nBlock<0)
 		{
 			ASSERT(FALSE);
@@ -648,7 +416,7 @@ int CTaiKlineFileKLine::CreateOrMoveSmallBlock(KLINE_SMALLHEAD *pKlineSmallHead,
 		return rtn;
 	}
 
-	if(pKlineSmallHead->symBlock[nBlock]==0xffff)
+	if(pKlineIndex->symBlock[nBlock]==0xffff)
 	{
 		int nCountBlock = this->GetSmallBlockCount ();
 		this->SetSmallBlockCount (nCountBlock+1);
@@ -663,7 +431,7 @@ int CTaiKlineFileKLine::CreateOrMoveSmallBlock(KLINE_SMALLHEAD *pKlineSmallHead,
 
 
 		ASSERT(nBlock>=0&&nBlock<26);
-		pKlineSmallHead->symBlock[nBlock]=(WORD)nCountBlock;
+		pKlineIndex->symBlock[nBlock]=(WORD)nCountBlock;
 		nCountBlock++;
 	}
 
@@ -675,17 +443,17 @@ int CTaiKlineFileKLine::CreateOrMoveSmallBlock(KLINE_SMALLHEAD *pKlineSmallHead,
 		int nStock = GetStockNumber ();
 		for(int i=0;i<nStock;i++)
 		{
-			int addr = 16+i*64;
-			Seek(addr,CTaiKlineFileKLine::begin);
-			KLINE_SMALLHEAD klineSmallHead ;
-			KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-			Read(pKlineSmallHead,sizeof(KLINE_SMALLHEAD));
-			CString symbol (pKlineSmallHead->StockSign);
+			int nAddr = TSK_FILEHEADER_SIZE+i*64;
+			Seek(nAddr,CTaiKlineFileKLine::begin);
+			TSK_KLINEINDEX klineIndex ;
+			TSK_KLINEINDEX* pKlineIndex = &klineIndex;
+			Read(pKlineIndex,sizeof(TSK_KLINEINDEX));
+			CString symbol (pKlineIndex->stockCode);
 			for(int j=0;j<26;j++)
 			{
-				if(pKlineSmallHead->symBlock [j] == 0xffff) break;
+				if(pKlineIndex->symBlock [j] == 0xffff) break;
 				int iData = -1;
-				int iIn = pKlineSmallHead->symBlock [j] ;
+				int iIn = pKlineIndex->symBlock [j] ;
 				if(iIn == 3844 || iIn == 3843)
 					iIn = iIn;
 				if(map.Lookup(iIn,iData))
@@ -693,12 +461,12 @@ int CTaiKlineFileKLine::CreateOrMoveSmallBlock(KLINE_SMALLHEAD *pKlineSmallHead,
 
 					int nBolck = j;
 					ASSERT(j>=0&&j<26);
-					if(pKlineSmallHead->numKln >(j)*FixedKlinePerBlock)
-						pKlineSmallHead->numKln = (j)*FixedKlinePerBlock;
+					if(pKlineIndex->klineCount >(j)*FixedKlinePerBlock)
+						pKlineIndex->klineCount = (j)*FixedKlinePerBlock;
 					for(int k=j;k<26;k++)
-						pKlineSmallHead->symBlock [k] = 0xffff;
+						pKlineIndex->symBlock [k] = 0xffff;
 
-					this->SetKlineSmallHeader (i,pKlineSmallHead);
+					this->SetKlineIndex (i,pKlineIndex);
 					break;
 
 								;
@@ -720,9 +488,11 @@ int CTaiKlineFileKLine::ReadKlineAccordingTime(CString symbol, Kline *&kline, CT
 {
 	if(symbol.GetLength ()!=6&&symbol.GetLength ()!=4) return 0;
 
-	KLINE_SMALLHEAD klineSmallHead;
-	KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-	int nIndexStock = GetKlineSmallHeader(symbol,pKlineSmallHead);
+	TSK_KLINEINDEX klineIndex;
+	TSK_KLINEINDEX* pKlineIndex = &klineIndex;
+
+	std::string code(symbol);
+	int nIndexStock = GetKlineIndex(code,pKlineIndex);
 
 	if(nCount<=0)
 		return 0;
@@ -739,17 +509,17 @@ int CTaiKlineFileKLine::ReadKlineAccordingTime(CString symbol, Kline *&kline, CT
 	int tm = RegularTime((int)time.GetTime (),bDay);
 
 	
-	for(int i=pKlineSmallHead->numKln-1;i>=0 ;i--)
+	for(int i=pKlineIndex->klineCount-1;i>=0 ;i--)
 	{
 		if(k>=nCount)
 			break;
-		int blkCount= i / FixedKlinePerBlock  ;	  
-		int stockCount=i % FixedKlinePerBlock  ;	  
-		int addr = KLINESMALLHEAD + pKlineSmallHead->symBlock[blkCount] 
+		int blockIndex= i / FixedKlinePerBlock  ;	  
+		int stockIndex=i % FixedKlinePerBlock  ;	  
+		int nAddr = KLINESMALLHEAD + pKlineIndex->symBlock[blockIndex] 
 				* KlineByteEach *  FixedKlinePerBlock
-					 + stockCount * KlineByteEach;
+					 + stockIndex * KlineByteEach;
 									  
-		this->Seek(addr,this->begin);
+		this->Seek(nAddr,this->begin);
 		Read(kline+nCount-1 - k ,KlineByteEach);
 		if(RegularTime(kline[nCount-1 - k].day,bDay) <= tm)
 			k++;
@@ -791,18 +561,18 @@ void CTaiKlineFileKLine::ReorgnizeFile(bool bSh, bool bSz,bool bDayKline)
 		
 		int n0 ;
 		int i;
-		KLINE_SMALLHEAD klineSmallHead;
-		CArray<KLINE_SMALLHEAD,KLINE_SMALLHEAD> arrayHead;
-		CArray<KLINE_SMALLHEAD,KLINE_SMALLHEAD> arrayHeadAll;
+		TSK_KLINEINDEX klineIndex;
+		CArray<TSK_KLINEINDEX,TSK_KLINEINDEX> arrayHead;
+		CArray<TSK_KLINEINDEX,TSK_KLINEINDEX> arrayHeadAll;
 		int nStock = pFile->GetStockNumber ();
 		int nDelete[8192];
 		for(i=0;i<nStock;i++)
 		{
-			int addr = 16;
-			pFile->Seek(addr+i*64,pFile->begin);
-			KLINE_SMALLHEAD* pKlineSmallHead3 = (KLINE_SMALLHEAD*)pFile->GetFileCurrentPointer();
-			klineSmallHead = * pKlineSmallHead3;
-			arrayHeadAll.Add (klineSmallHead);
+			int nAddr = TSK_FILEHEADER_SIZE;
+			pFile->Seek(nAddr+i*64,pFile->begin);
+			TSK_KLINEINDEX* pKlineSmallHead3 = (TSK_KLINEINDEX*)pFile->GetFileCurrentPointer();
+			klineIndex = * pKlineSmallHead3;
+			arrayHeadAll.Add (klineIndex);
 			nDelete[i]=0;
 		}
 
@@ -821,39 +591,40 @@ void CTaiKlineFileKLine::ReorgnizeFile(bool bSh, bool bSz,bool bDayKline)
 				if(pStockData==NULL)
 					continue;
 				CString symbol(pStockData->id);
+				std::string code(symbol);
 				int k;
-				pFile ->LookUpIndexFromMap( symbol,k);
+				pFile ->LookupIndex( code,k);
 				if(k==-1)
 					continue;
-				k = pFile ->GetKlineSmallHeader( symbol,&klineSmallHead);
+				k = pFile ->GetKlineIndex( code,&klineIndex);
 				if(k<0) k = 4096;
 				nDelete[k] = 1;
-				if(strlen(klineSmallHead.StockSign )!=4&&strlen(klineSmallHead.StockSign )!=6)
+				if(strlen(klineIndex.stockCode )!=4&&strlen(klineIndex.stockCode )!=6)
 					ASSERT(FALSE);
-				arrayHead.Add (klineSmallHead);
+				arrayHead.Add (klineIndex);
 			}
 		}
 
 		
-		pFile ->m_pSymbolToPos->RemoveAll();
+		//pFile ->m_pSymbolToPos->RemoveAll();
 		k = arrayHead.GetSize();
 		pFile ->SetStockNumber(k);
 		for(int j=0;j<k;j++)
 		{
-			int addr = 16+j*64;
-			pFile ->Seek(addr,pFile ->begin);
-			pFile ->Write (&arrayHead[j],sizeof(KLINE_SMALLHEAD));
-			CString s2(arrayHead[j].StockSign );
-			pFile ->m_pSymbolToPos->SetAt(s2, (void*)j);
+			int nAddr = TSK_FILEHEADER_SIZE+j*64;
+			pFile ->Seek(nAddr,pFile ->begin);
+			pFile ->Write (&arrayHead[j],sizeof(TSK_KLINEINDEX));
+			CString s2(arrayHead[j].stockCode );
+			//pFile ->m_pSymbolToPos->SetAt(s2, (void*)j);
 		}
 		for(int j = 0;j<nStock;j++)
 		{
 			if(nDelete[j] == 0)
 			{
-				int addr = 16+k*64;
-				pFile ->Seek(addr,pFile ->begin);
-				pFile ->Write (&arrayHeadAll[j],sizeof(KLINE_SMALLHEAD));
-				CString s2(arrayHeadAll[j].StockSign );
+				int nAddr = TSK_FILEHEADER_SIZE+k*64;
+				pFile ->Seek(nAddr,pFile ->begin);
+				pFile ->Write (&arrayHeadAll[j],sizeof(TSK_KLINEINDEX));
+				CString s2(arrayHeadAll[j].stockCode );
 
 				k++;
 			}
@@ -1071,7 +842,10 @@ int CTaiKlineFileKLine::ReadKLineAny(CString symbol,int stkKind, Kline *&pKline,
 
 		//read now
 		if(tmEnd ==NULL && tmBegin == NULL)
-			n = pFile->ReadKLine(symbol,pKline,nRead,nAdd)	;
+		{
+			std::string code(symbol);
+			n = pFile->ReadKLine(code,pKline,nRead,nAdd)	;
+		}
 		else if(tmEnd!=NULL && tmBegin != NULL)
 			n = pFile->ReadKlinePeriod( symbol, pKline, *tmBegin, *tmEnd,false,nAdd );
 		else
@@ -1095,48 +869,6 @@ int CTaiKlineFileKLine::ReadKLineAny(CString symbol,int stkKind, Kline *&pKline,
 }
 
 
-int CTaiKlineFileKLine::GetFirstKline(CString sSymbol,int stkKind,bool bDay,int nFoot ,float * pClose)
-{
-	CTaiShanDoc* pDoc =CMainFrame::m_taiShanDoc ;
-	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(sSymbol,stkKind,bDay);
-	KLINE_SMALLHEAD smallHead;
-	pFile->GetKlineSmallHeader (sSymbol,&smallHead);
-	if(smallHead.numKln <=0)
-	{
-		if(nFoot!=-1) *pClose = -1;
-		return -1;
-	}
-
-	Kline kln;
-	if(nFoot !=-1)
-	{
-		if(smallHead.numKln <=nFoot)
-		{
-			*pClose = -1;
-			return -1;
-		}
-		int blkCount= nFoot / FixedKlinePerBlock  ;	 
-		int stockCount=nFoot % FixedKlinePerBlock  ;	  
-		int addr = KLINESMALLHEAD + smallHead.symBlock[blkCount] 
-				* KlineByteEach *  FixedKlinePerBlock
-					 + stockCount * KlineByteEach;
-									  
-		pFile->Seek(addr,pFile->begin);
-		pFile->Read(&kln,KlineByteEach);
-		*pClose = kln.close ;
-	}
-	else
-	{
-		int addr = KLINESMALLHEAD + smallHead.symBlock[0] 
-				* KlineByteEach *  FixedKlinePerBlock;
-									  
-		pFile->Seek(addr,pFile->begin);
-		pFile->Read(&kln,KlineByteEach);
-	}
-
-	return kln.day ;
-}
-
 bool CTaiKlineFileKLine::IsDayKline(int nKlineType)
 {
 	return nKlineType>=5 && nKlineType<= 8
@@ -1144,39 +876,15 @@ bool CTaiKlineFileKLine::IsDayKline(int nKlineType)
 
 }
 
-CString CTaiKlineFileKLine::CheckSymbolValid(CString symbol)
+void CTaiKlineFileKLine::TestKlineVolpositive(Kline* pKline, int nCount)
 {
-	int nLen = symbol.GetLength ();
-	bool bValid = true;
-	for(int i=0;i<nLen;i++)
+	for (int i = 0; i < nCount; i++)
 	{
-		if(!(symbol[i]>='0' && symbol[i]<='9' 
-			|| (i==1&& symbol[i]>='A' && symbol[i]<='Z' )))
+		if (pKline[i].volPositive > pKline[i].vol || pKline[i].volPositive < 1 && pKline[i].volPositive != 0)
 		{
-			bValid = false;
+			pKline[i].volPositive = pKline[i].vol / 2;
 		}
 	}
-	if(bValid == false)
-	{
-		symbol = "0Z00";
-		if(nLen == 6)
-			symbol+="00";
-	}
-	return symbol;
-
-}
-
-void CTaiKlineFileKLine::TestKlineVolpositive(Kline *pKline, int nCount)
-{
-	for(int i=0;i<nCount;i++)
-	{
-		if(pKline[i].volPositive  >pKline[i].vol 
-			||pKline[i].volPositive  <1 && pKline[i].volPositive!=0 )
-		{
-			pKline[i].volPositive = pKline[i].vol/2;
-		}
-	}
-
 }
 
 void CTaiKlineFileKLine::AddSmallHeadBlock()
@@ -1188,18 +896,18 @@ void CTaiKlineFileKLine::AddSmallHeadBlock()
 
 
 	int nStock = GetStockNumber ();
-	KLINE_SMALLHEAD klineSmallHead;
+	TSK_KLINEINDEX klineIndex;
 	int j = 0;
 	int i = 0;
 	bool bFound = false;
 	for(i=0;i<nStock;i++)
 	{
-		int addr = 16;
-		Seek(addr+i*64,begin);
-		Read(&klineSmallHead,sizeof(KLINE_SMALLHEAD));
+		int nAddr = TSK_FILEHEADER_SIZE;
+		Seek(nAddr+i*64,begin);
+		Read(&klineIndex,sizeof(TSK_KLINEINDEX));
 		for(j = 0;j<26;j++)
 		{
-			if(klineSmallHead.symBlock [j] == n)
+			if(klineIndex.symBlock [j] == n)
 			{
 				bFound = true;
 				break;
@@ -1216,24 +924,24 @@ void CTaiKlineFileKLine::AddSmallHeadBlock()
 		Kline kline;
 		for(int k=0;k<FixedKlinePerBlock ;k++)
 		{
-			int blkCount= j ;
-			int stockCount=k  ;
-			int addr = KLINESMALLHEAD + klineSmallHead.symBlock[blkCount]
+			int blockIndex= j ;
+			int stockIndex=k  ;
+			int nAddr = KLINESMALLHEAD + klineIndex.symBlock[blockIndex]
 			* KlineByteEach *  FixedKlinePerBlock
-				+ stockCount * KlineByteEach;
+				+ stockIndex * KlineByteEach;
 
-			this->Seek(addr,this->begin);
+			this->Seek(nAddr,this->begin);
 			Read(&kline,KlineByteEach);
-			addr = KLINESMALLHEAD + klineSmallHead.symBlock[nNewBlock]
+			nAddr = KLINESMALLHEAD + klineIndex.symBlock[nNewBlock]
 			* KlineByteEach *  FixedKlinePerBlock
-				+ stockCount * KlineByteEach;
-			this->Seek(addr,this->begin);
+				+ stockIndex * KlineByteEach;
+			this->Seek(nAddr,this->begin);
 			Write(&kline,KlineByteEach);
 		}
 
 
-		klineSmallHead.symBlock [j] = (WORD)nNewBlock;
-		this->SetKlineSmallHeader(i, &klineSmallHead);
+		klineIndex.symBlock [j] = (WORD)nNewBlock;
+		this->SetKlineIndex(i, &klineIndex);
 
 
 		nNewBlock++;
@@ -1275,46 +983,109 @@ CTaiKlineFileKLine* CTaiKlineFileKLine::GetFilePointer(CString symbol, int stkKi
 	return pFile;
 }
 
+int CTaiKlineFileKLine::GetFirstKline(CString sSymbol,int stkKind,bool bDay,int nFoot ,float * pClose)
+{
+	CTaiShanDoc* pDoc =CMainFrame::m_taiShanDoc ;
+	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(sSymbol,stkKind,bDay);
+
+	std::string code(sSymbol);
+	TSK_KLINEINDEX smallHead;
+	pFile->GetKlineIndex (code,&smallHead);
+	if(smallHead.klineCount <=0)
+	{
+		if(nFoot!=-1) *pClose = -1;
+		return -1;
+	}
+
+	Kline kln;
+	if(nFoot !=-1)
+	{
+		if(smallHead.klineCount <=nFoot)
+		{
+			*pClose = -1;
+			return -1;
+		}
+		int blockIndex= nFoot / FixedKlinePerBlock  ;	 
+		int stockIndex=nFoot % FixedKlinePerBlock  ;	  
+		int nAddr = KLINESMALLHEAD + smallHead.symBlock[blockIndex] 
+				* KlineByteEach *  FixedKlinePerBlock
+					 + stockIndex * KlineByteEach;
+									  
+		pFile->Seek(nAddr,pFile->begin);
+		pFile->Read(&kln,KlineByteEach);
+		*pClose = kln.close ;
+	}
+	else
+	{
+		int nAddr = KLINESMALLHEAD + smallHead.symBlock[0] 
+				* KlineByteEach *  FixedKlinePerBlock;
+									  
+		pFile->Seek(nAddr,pFile->begin);
+		pFile->Read(&kln,KlineByteEach);
+	}
+
+	return kln.day ;
+}
+
 int CTaiKlineFileKLine::GetKlineCount(CString symbol, int stkKind, BOOL bDayKline)
 {
 	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(symbol, stkKind, bDayKline);
-	KLINE_SMALLHEAD klineSmallHead;
-	KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-	pFile->GetKlineSmallHeader(symbol, pKlineSmallHead);
+	if (!pFile)
+	{
+		return -1;
+	}
 
-	return klineSmallHead.numKln;
+	std::string code(symbol);
+	TSK_KLINEINDEX klineIndex;
+	TSK_KLINEINDEX* pKlineIndex = &klineIndex;
+	pFile->GetKlineIndex(code, pKlineIndex);
+
+	return klineIndex.klineCount;
 }
 
 float CTaiKlineFileKLine::GetLastClose(CString symbol, int stkKind)
 {
 	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(symbol, stkKind, TRUE);
-	KLINE_SMALLHEAD smallHead;
-	pFile->GetKlineSmallHeader(symbol, &smallHead);
-	if (smallHead.numKln <= 0)
+	if (!pFile)
 	{
 		return -1;
 	}
 
+	TSK_KLINEINDEX smallHead;
+	std::string code(symbol);
+	pFile->GetKlineIndex(code, &smallHead);
+	if (smallHead.klineCount <= 0)
+	{
+		return -1;
+	}
+
+	float fClose = -1;
+
 	Kline* pKline = NULL;
-	float f = -1;
-	int n = pFile->ReadKLine(symbol, pKline, 1, 0);
-	if (n > 0)
+	int nRead = pFile->ReadKLine(code, pKline, 1, 0);
+	if (nRead > 0)
 	{
 		if (pKline != NULL)
-			f = pKline->close;
+		{
+			fClose = pKline->close;
+		}
 	}
 
 	if (pKline != NULL) delete []pKline;
 
-	return f;
+	return fClose;
 }
 
 int CTaiKlineFileKLine::ReadKLineS(CString symbol, int stkKind, Kline*& pKline, int nRead, int nAddBlank, BOOL bDay)
 {
 	int nCount = 0;
+
 	CTaiKlineFileKLine* pFile = GetFilePointer(symbol, stkKind, bDay);
 	if (pFile)
-		nCount = pFile->ReadKLine(symbol, pKline, nRead, nAddBlank);
+	{
+		std::string code(symbol);
+		nCount = pFile->ReadKLine(code, pKline, nRead, nAddBlank);
+	}
 
 	return nCount;
 }
@@ -1322,9 +1093,13 @@ int CTaiKlineFileKLine::ReadKLineS(CString symbol, int stkKind, Kline*& pKline, 
 BOOL CTaiKlineFileKLine::WriteKLineS(CString symbol, int stkKind, Kline* pKline, int nWrite, int nType, BOOL bDay)
 {
 	BOOL bResult = FALSE;
+
 	CTaiKlineFileKLine* pFile = GetFilePointer(symbol, stkKind, bDay);
 	if (pFile)
-		bResult = pFile->WriteKLine(symbol, pKline, nWrite, nType);
+	{
+		std::string code(symbol);
+		bResult = pFile->WriteKLine(code, pKline, nWrite, nType);
+	}
 
 	return bResult;
 }
@@ -1332,21 +1107,24 @@ BOOL CTaiKlineFileKLine::WriteKLineS(CString symbol, int stkKind, Kline* pKline,
 void CTaiKlineFileKLine::ZeroKlineData(CString symbol, int stkKind, BOOL bDay)
 {
 	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(symbol, stkKind, bDay);
-	KLINE_SMALLHEAD smallHead;
-	int nIndex = pFile->GetKlineSmallHeader(symbol, &smallHead);
-	smallHead.numKln = 0;
-	pFile->SetKlineSmallHeader(nIndex, &smallHead);
+	TSK_KLINEINDEX smallHead;
+	std::string code(symbol);
+	int nIndex = pFile->GetKlineIndex(code, &smallHead);
+	smallHead.klineCount = 0;
+	pFile->SetKlineIndex(nIndex, &smallHead);
 }
 
 BOOL CTaiKlineFileKLine::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFileEnd, CFileException* pException)
 {
 	BOOL bOk = TRUE;
 
-	bOk = CTaiKlineMemFile::Open(lpszFileName, nOpenFlags, 0, pException);
+	bOk = CStkFile::Open(lpszFileName, nOpenFlags, 0, pException);
 	if (bOk == FALSE)
 	{
 		return bOk;
 	}
+
+	m_pHeader = (TSK_FILEHEADER*)GetFileBeginPointer();
 
 	DWORD dwLen = GetLength();
 	if (dwLen <= KLINESMALLHEAD || bOk == FALSE)
@@ -1397,23 +1175,23 @@ BOOL CTaiKlineFileKLine::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToF
 					int nStock = GetStockNumber();
 					for (int i = 0; i < nStock; i++)
 					{
-						int addr = 16 + i * 64;
-						Seek(addr, CTaiKlineFileKLine::begin);
-						KLINE_SMALLHEAD klineSmallHead;
-						KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-						Read(pKlineSmallHead, sizeof(KLINE_SMALLHEAD));
-						CString symbol(pKlineSmallHead->StockSign);
+						int nAddr = TSK_FILEHEADER_SIZE + i * 64;
+						Seek(nAddr, CTaiKlineFileKLine::begin);
+						TSK_KLINEINDEX klineIndex;
+						TSK_KLINEINDEX* pKlineIndex = &klineIndex;
+						Read(pKlineIndex, sizeof(TSK_KLINEINDEX));
+						CString symbol(pKlineIndex->stockCode);
 						for (int j = 0; j < 26; j++)
 						{
-							if (pKlineSmallHead->symBlock[j] == 0xFFFF) break;
+							if (pKlineIndex->symBlock[j] == 0xFFFF) break;
 							int iData = -1;
-							int iIn = pKlineSmallHead->symBlock[j];
+							int iIn = pKlineIndex->symBlock[j];
 							if (iIn >= nLen)
 							{
-								pKlineSmallHead->numKln = (j) * FixedKlinePerBlock;
+								pKlineIndex->klineCount = (j) * FixedKlinePerBlock;
 								for ( ; j < 26; j++)
-									pKlineSmallHead->symBlock[j] = 0xFFFF;
-								SetKlineSmallHeader(i, pKlineSmallHead);
+									pKlineIndex->symBlock[j] = 0xFFFF;
+								SetKlineIndex(i, pKlineIndex);
 								break;
 							}
 						}
@@ -1429,56 +1207,19 @@ BOOL CTaiKlineFileKLine::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToF
 	return TRUE;
 }
 
-void CTaiKlineFileKLine::AddIndexToMap()
-{
-	int nStock = GetStockNumber();
-	m_pSymbolToPos = new CMapStringToPtr((int)(nStock * 1.25) + 1);
-	ASSERT(nStock <= MaxNumStock);
-	for (int i = 0; i < nStock; i++)
-	{
-		int addr = 16 + i * 64;
-		Seek(addr, begin);
-		KLINE_SMALLHEAD* pKlineSmallHead = (KLINE_SMALLHEAD*)GetFileCurrentPointer();
-		CString symbol(pKlineSmallHead->StockSign);
-		m_pSymbolToPos->SetAt(symbol,(CObject*)i);
-	}
-}
-
-void CTaiKlineFileKLine::DeleteMap()
-{
-	if (m_pSymbolToPos != NULL)
-	{
-		m_pSymbolToPos->RemoveAll();
-		delete m_pSymbolToPos;
-		m_pSymbolToPos = NULL;
-	}
-}
-
-void CTaiKlineFileKLine::LookUpIndexFromMap(CString symbol, int& nIndex)
-{
-	nIndex = -1;
-	if (m_pSymbolToPos == NULL)
-		AddIndexToMap();
-
-	if (!m_pSymbolToPos->Lookup(symbol, (void*&)nIndex))
-		nIndex = -1;
-}
-
 void CTaiKlineFileKLine::WriteHeaderInfo()
 {
 	SeekToBegin();
 
-	int nStock = 0;
-	Write(&nStock, 4);
-	Write(&nStock, 4);
+	m_pHeader = (TSK_FILEHEADER*)GetFileBeginPointer();
+	memset(m_pHeader, 0, sizeof(TSK_FILEHEADER));
+	m_pHeader->stocksum = 0;
+	m_pHeader->blocksum = 0;
+	m_pHeader->flag = 65798809;
+	m_pHeader->w1 = 240;
+	m_pHeader->stockmax = 4096;
+	Write(m_pHeader, sizeof(TSK_FILEHEADER));
 
-	nStock = 65798809;
-	Write(&nStock, 4);
-
-	WORD wd = 240;
-	Write(&wd, 2);
-	wd = 4096;
-	Write(&wd, 2);
 
 	char buff[4096];
 	memset(buff, 255, 4096);
@@ -1523,7 +1264,7 @@ int CTaiKlineFileKLine::CalcMaxCountBlock()
 	return rtn;
 }
 
-int CTaiKlineFileKLine::AddNewStockToFile(CString symbol, KLINE_SMALLHEAD*& pKlineSmallHead)
+int CTaiKlineFileKLine::AddNewStockToFile(std::string symbol, TSK_KLINEINDEX*& pKlineIndex)
 {
 	int nLen = 6;
 	int nStock = GetStockNumber();
@@ -1554,166 +1295,39 @@ int CTaiKlineFileKLine::AddNewStockToFile(CString symbol, KLINE_SMALLHEAD*& pKli
 		}
 	}
 
-	if (!(symbol.GetLength() == 4 || symbol.GetLength() == 6))
-	{
-		symbol = symbol.Left(nLen);
-	}
-	symbol = CheckSymbolValid(symbol);
+	//if (!(symbol.GetLength() == 4 || symbol.GetLength() == 6))
+	//{
+	//	symbol = symbol.Left(nLen);
+	//}
+	//symbol = CheckSymbolValid(symbol);
 
-	int addr = 16 + nStock * 64;
-	Seek(addr, begin);
+	int nAddr = TSK_FILEHEADER_SIZE + nStock * 64;
+	Seek(nAddr, begin);
 
 	int rValue = 0;
-	if (m_pSymbolToPos->Lookup(symbol, (void*&)rValue))
+	MapIndex::const_iterator stock = m_mapIndex.find(symbol);
+	if (stock != m_mapIndex.end())
 	{
-		addr = 16 + (int)(rValue) * 64;
-		Seek(addr, begin);
-		pKlineSmallHead = (KLINE_SMALLHEAD*)GetFileCurrentPointer();
+		rValue = stock->second;
+		nAddr = TSK_FILEHEADER_SIZE + (int)(rValue) * 64;
+		Seek(nAddr, begin);
+		pKlineIndex = (TSK_KLINEINDEX*)GetFileCurrentPointer();
 		return rValue;
 	}
 
-	Write(symbol.GetBuffer(8), 8);
+	Write(symbol.c_str(), 8);
 
 	int nKline = 0;
 	Write(&nKline, 4);
 
-	Seek(addr, begin);
-	pKlineSmallHead = (KLINE_SMALLHEAD*)GetFileCurrentPointer();
+	Seek(nAddr, begin);
+	pKlineIndex = (TSK_KLINEINDEX*)GetFileCurrentPointer();
 
-	m_pSymbolToPos->SetAt(symbol, (CObject*)nStock);
+	m_mapIndex[symbol] = nStock;
 	nStock++;
 	SetStockNumber(nStock);
 
 	return nStock - 1;
-}
-
-int CTaiKlineFileKLine::GetKlineSmallHeader(CString symbol, KLINE_SMALLHEAD* pKlineSmallHead)
-{
-	if (m_pSymbolToPos == NULL)
-		AddIndexToMap();
-
-	KLINE_SMALLHEAD* pKlineSmallHead3 = NULL;
-
-	int i;
-	LookUpIndexFromMap(symbol, i);
-	if (i == -1)
-	{
-		i = AddNewStockToFile(symbol, pKlineSmallHead3);
-		if (i < 0)
-		{
-			ASSERT(FALSE);
-		}
-	}
-	else
-	{
-		int addr = 16;
-		Seek(addr + i * 64, begin);
-		pKlineSmallHead3 = (KLINE_SMALLHEAD*)GetFileCurrentPointer();
-	}
-
-	memcpy(pKlineSmallHead, pKlineSmallHead3, sizeof(KLINE_SMALLHEAD));
-	ASSERT(pKlineSmallHead3 != NULL);
-
-	return i;
-}
-
-BOOL CTaiKlineFileKLine::SetKlineSmallHeader(int nIndex, KLINE_SMALLHEAD* pKlineSmallHead)
-{
-	int nStock = GetStockNumber();
-	ASSERT(nIndex < nStock);
-	if (nIndex >= nStock)
-		return FALSE;
-
-	int addr = 16 + nIndex * 64;
-	Seek(addr, begin);
-	CString s(pKlineSmallHead->StockSign);
-	KLINE_SMALLHEAD* pKlineSmallHead2 = (KLINE_SMALLHEAD*)GetFileCurrentPointer();
-	CString s2(pKlineSmallHead2->StockSign);
-	if (s != s2)
-	{
-		ASSERT(FALSE);
-
-	}
-
-	Write(pKlineSmallHead, sizeof(KLINE_SMALLHEAD));
-
-	return TRUE;
-}
-
-CString CTaiKlineFileKLine::GetSymbol(int nIndex)
-{
-	int addr = 16;
-	Seek(addr + nIndex * 64, begin);
-	KLINE_SMALLHEAD* pKlineSmallHead = (KLINE_SMALLHEAD*)GetFileCurrentPointer();
-	CString symbol(pKlineSmallHead->StockSign);
-
-	return symbol;
-}
-
-int CTaiKlineFileKLine::ReadKLine(int nIndex, Kline*& pKline, int nRead)
-{
-	CString symbol = GetSymbol(nIndex);
-	return ReadKLine(symbol, pKline, nRead, 0);
-}
-
-int CTaiKlineFileKLine::ReadKLine(CString symbol, Kline*& pKline, int nRead, int nAddBlank)
-{
-	if (symbol.GetLength() != 6 && symbol.GetLength() != 4) return 0;
-
-	KLINE_SMALLHEAD klineSmallHead;
-	KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-	int nIndexStock = GetKlineSmallHeader(symbol, pKlineSmallHead);
-
-	int nCount = nRead;
-	if (nCount <= -1 || nCount > pKlineSmallHead->numKln)
-		nCount = pKlineSmallHead->numKln;
-	if (pKline != NULL)
-		delete []pKline;
-
-	ASSERT(nAddBlank >= 0);
-	pKline = new Kline[nCount + nAddBlank + 1];
-	if (nCount == 0)
-		return 0;
-
-	//SeekToBegin();
-	//CString ss = pKlineSmallHead->StockSign;
-	ASSERT(nCount <= 0 ? TRUE : KLINESMALLHEAD + pKlineSmallHead->symBlock[(nCount - 1) / FixedKlinePerBlock] * KlineByteEach * FixedKlinePerBlock < GetLength());
-
-	for (int i = pKlineSmallHead->numKln - nCount; i < pKlineSmallHead->numKln; i++)
-	{
-		int blkCount = i / FixedKlinePerBlock;
-		int stockCount = i % FixedKlinePerBlock;
-		int addr = KLINESMALLHEAD + pKlineSmallHead->symBlock[blkCount]	* KlineByteEach * FixedKlinePerBlock + stockCount * KlineByteEach;
-
-		Seek(addr, begin);
-		Read(pKline + i - pKlineSmallHead->numKln + nCount, KlineByteEach);
-	}
-
-	if (!CTaiShanKlineShowView::IsIndexStock3(symbol))
-		TestKlineVolpositive(pKline, nCount);
-
-	return nCount;
-}
-
-void CTaiKlineFileKLine::DeleteKlineData(CString symbol, int nFoot, int nCount)
-{
-	Kline* pKline = NULL;
-	int n = ReadKLine(symbol, pKline, -1, 0);
-	if (n <= 0) return;
-	if (n > nFoot + 1) 
-		memmove(pKline + nFoot, pKline + nFoot + 1, (n - nFoot - 1) * sizeof(Kline));
-	n--;
-
-	KLINE_SMALLHEAD klineSmallHead;
-	KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-	int nIndexStock = GetKlineSmallHeader(symbol, pKlineSmallHead);
-	pKlineSmallHead->numKln = 0;
-	SetKlineSmallHeader(nIndexStock, pKlineSmallHead);
-
-	if (n > 0) WriteKLine(symbol, pKline, n, 0);
-
-	if (pKline == NULL)
-		delete []pKline;
 }
 
 BOOL CTaiKlineFileKLine::WriteKlinePeriod(CString symbol, Kline* pKline, int nKline, CTime& timeStart, CTime& timeEnd)
@@ -1721,7 +1335,7 @@ BOOL CTaiKlineFileKLine::WriteKlinePeriod(CString symbol, Kline* pKline, int nKl
 	return TRUE;
 }
 
-BOOL CTaiKlineFileKLine::WriteKLineToRepair(CString symbol, Kline* pKline, int nWrite)
+BOOL CTaiKlineFileKLine::WriteKLineToRepair(CString code, Kline* pKline, int nWrite)
 {
 	ASSERT(nWrite > 0);
 	if (nWrite <= 0)
@@ -1729,18 +1343,20 @@ BOOL CTaiKlineFileKLine::WriteKLineToRepair(CString symbol, Kline* pKline, int n
 		return FALSE;
 	}
 
+	std::string symbol(code);
+
 	BOOL bAdd;
 	CTime timeStart((time_t)pKline[0].day);
 
-	KLINE_SMALLHEAD klineSmallHead;
-	KLINE_SMALLHEAD* pKlineSmallHead = &klineSmallHead;
-	int nIndexStock = GetKlineSmallHeader(symbol, pKlineSmallHead);
+	TSK_KLINEINDEX klineIndex;
+	TSK_KLINEINDEX* pKlineIndex = &klineIndex;
+	int nIndexStock = GetKlineIndex(symbol, pKlineIndex);
 
-	int nFootB = TimeToFoot(pKlineSmallHead, timeStart, bAdd);
+	int nFootB = TimeToFoot(pKlineIndex, timeStart, bAdd);
 	if (nFootB != -1 && bAdd == FALSE)
 	{
 		timeStart = CTime((time_t)pKline[nWrite - 1].day);
-		int nFootE = TimeToFoot(pKlineSmallHead, timeStart, bAdd);
+		int nFootE = TimeToFoot(pKlineIndex, timeStart, bAdd);
 		if (nFootE != -1 && bAdd == FALSE)
 		{
 			if (nFootE - nFootB + 1 == nWrite)
@@ -1753,7 +1369,491 @@ BOOL CTaiKlineFileKLine::WriteKLineToRepair(CString symbol, Kline* pKline, int n
 	return TRUE;
 }
 
+
+
+WORD CTaiKlineFileKLine::GetMaxNumStock()
+{
+	if (!IsOpen() && !m_pHeader)
+	{
+		return -1;
+	}
+
+	TSK_FILEHEADER* pHeader = (TSK_FILEHEADER*)GetFileBeginPointer();
+	return pHeader->stockmax;
+}
+
+void CTaiKlineFileKLine::SetMaxNumStock(WORD wStock)
+{
+	if (!IsOpen() && !m_pHeader && wStock > 8096)
+	{
+		return;
+	}
+
+	TSK_FILEHEADER* pHeader = (TSK_FILEHEADER*)GetFileBeginPointer();
+	pHeader->stockmax = wStock;
+	SeekToBegin();
+	Write(pHeader, sizeof(TSK_FILEHEADER));
+}
+
+int CTaiKlineFileKLine::GetStockNumber()
+{
+	if (!IsOpen() && !m_pHeader)
+	{
+		return -1;
+	}
+
+	TSK_FILEHEADER* pHeader = (TSK_FILEHEADER*)GetFileBeginPointer();
+	return pHeader->stocksum;
+};
+
+void CTaiKlineFileKLine::SetStockNumber(int nStock)
+{
+	if (!IsOpen() && !m_pHeader && nStock > 8096)
+	{
+		return;
+	}
+
+	TSK_FILEHEADER* pHeader = (TSK_FILEHEADER*)GetFileBeginPointer();
+	pHeader->stocksum = nStock;
+	SeekToBegin();
+	Write(pHeader, sizeof(TSK_FILEHEADER));
+};
+
+int CTaiKlineFileKLine::GetSmallBlockCount()
+{
+	if (!IsOpen() && !m_pHeader)
+	{
+		return -1;
+	}
+
+	TSK_FILEHEADER* pHeader = (TSK_FILEHEADER*)GetFileBeginPointer();
+	return pHeader->blocksum;
+}
+
+void CTaiKlineFileKLine::SetSmallBlockCount(int nBlock)
+{
+	if (!IsOpen() && !m_pHeader)
+	{
+		return;
+	}
+
+	TSK_FILEHEADER* pHeader = (TSK_FILEHEADER*)GetFileBeginPointer();
+	pHeader->blocksum = nBlock;
+	SeekToBegin();
+	Write(pHeader, sizeof(TSK_FILEHEADER));
+}
+
 /* ============================================================================
 int nKind, int nMarket 数据类型 日线、五分、一分 市场类型 上海、深圳 枚举
 
 */
+
+void CTaiKlineFileKLine::AddIndexToMap()
+{
+	int nStock = GetStockNumber();
+	if (nStock <= 0 || nStock > GetMaxNumStock() || m_bIndex)
+		return;
+
+	for (int iIndex = 0; iIndex < nStock; iIndex++)
+	{
+		int nAddr = TSK_FILEHEADER_SIZE + TSK_KLINEINDEX_SIZE * iIndex;
+		Seek(nAddr, begin);
+		TSK_KLINEINDEX* pKlineIndex = (TSK_KLINEINDEX*)GetFileCurrentPointer();
+
+		std::string symbol(pKlineIndex->stockCode);
+		m_mapIndex[symbol] = iIndex;
+	}
+
+	m_bIndex = TRUE;
+}
+
+void CTaiKlineFileKLine::DeleteMap()
+{
+	if (m_bIndex && m_mapIndex.size() > 0)
+	{
+		m_mapIndex.clear();
+	}
+}
+
+void CTaiKlineFileKLine::LookupIndex(std::string symbol, int& nIndex)
+{
+	if (!m_bIndex)
+	{
+		AddIndexToMap();
+	}
+
+	nIndex = -1;
+
+	MapIndex::iterator stock = m_mapIndex.find(symbol);
+	if (stock != m_mapIndex.end())
+	{
+		nIndex = stock->second;
+	}
+}
+
+int CTaiKlineFileKLine::GetKlineIndex(std::string symbol, TSK_KLINEINDEX* pKlineIndex)
+{
+	if (!m_bIndex)
+	{
+		AddIndexToMap();
+	}
+
+	TSK_KLINEINDEX* pIndex = NULL;
+	int iIndex = -1;
+
+	LookupIndex(symbol, iIndex);
+	if (iIndex == -1)
+	{
+		iIndex = AddNewStockToFile(symbol, pIndex);
+		if (iIndex < 0)
+			return -1;
+	}
+	else
+	{
+		int nAddr = TSK_FILEHEADER_SIZE;
+		Seek(nAddr + TSK_KLINEINDEX_SIZE * iIndex, begin);
+		pIndex = (TSK_KLINEINDEX*)GetFileCurrentPointer();
+	}
+
+	memcpy(pKlineIndex, pIndex, sizeof(TSK_KLINEINDEX));
+
+	return iIndex;
+}
+
+BOOL CTaiKlineFileKLine::SetKlineIndex(int nIndex, TSK_KLINEINDEX* pKlineIndex)
+{
+	int nStock = GetStockNumber();
+	if (nIndex >= nStock)
+		return FALSE;
+
+	int nAddr = TSK_FILEHEADER_SIZE + TSK_KLINEINDEX_SIZE * nIndex;
+	Seek(nAddr, begin);
+
+	Write(pKlineIndex, sizeof(TSK_KLINEINDEX));
+
+	return TRUE;
+}
+
+CString CTaiKlineFileKLine::GetSymbol(int nIndex)
+{
+	int nAddr = TSK_FILEHEADER_SIZE;
+	Seek(nAddr + nIndex * TSK_KLINEINDEX_SIZE, begin);
+	TSK_KLINEINDEX* pKlineIndex = (TSK_KLINEINDEX*)GetFileCurrentPointer();
+	CString symbol(pKlineIndex->stockCode);
+
+	return symbol;
+}
+
+int CTaiKlineFileKLine::ReadKLine(int nIndex, Kline*& pKline, int nRead)
+{
+	CString symbol = GetSymbol(nIndex);
+	std::string code(symbol);
+	return ReadKLine(code, pKline, nRead, 0);
+}
+
+int CTaiKlineFileKLine::ReadKLine(std::string symbol, Kline*& pKline, int nRead, int nAddBlank)
+{
+	//if (symbol.GetLength() != 6 && symbol.GetLength() != 4) return 0;
+
+	TSK_KLINEINDEX klineIndex;
+	TSK_KLINEINDEX* pKlineIndex = &klineIndex;
+	int nIndexStock = GetKlineIndex(symbol, pKlineIndex);
+
+	int nCount = nRead;
+	if (nCount <= -1 || nCount > pKlineIndex->klineCount)
+		nCount = pKlineIndex->klineCount;
+	if (pKline != NULL)
+		delete []pKline;
+
+	ASSERT(nAddBlank >= 0);
+	pKline = new Kline[nCount + nAddBlank + 1];
+	if (nCount == 0)
+		return 0;
+
+	//SeekToBegin();
+	//CString ss = pKlineIndex->stockCode;
+	ASSERT(nCount <= 0 ? TRUE : KLINESMALLHEAD + pKlineIndex->symBlock[(nCount - 1) / FixedKlinePerBlock] * KlineByteEach * FixedKlinePerBlock < GetLength());
+
+	for (int i = pKlineIndex->klineCount - nCount; i < pKlineIndex->klineCount; i++)
+	{
+		int blockIndex = i / FixedKlinePerBlock;
+		int stockIndex = i % FixedKlinePerBlock;
+		int nAddr = KLINESMALLHEAD + KlineByteEach * FixedKlinePerBlock * pKlineIndex->symBlock[blockIndex] + KlineByteEach * stockIndex;
+
+		Seek(nAddr, begin);
+		Read(pKline + i - pKlineIndex->klineCount + nCount, KlineByteEach);
+	}
+
+	//if (!CTaiShanKlineShowView::IsIndexStock3(symbol))
+	//	TestKlineVolpositive(pKline, nCount);
+
+	return nCount;
+}
+
+BOOL CTaiKlineFileKLine::WriteKLine(std::string symbol,Kline* pKline,int nWrite,int nType)	
+{
+	//if(symbol.GetLength ()!=6&&symbol.GetLength ()!=4) return false;
+
+	{
+		CTime tm=CTime::GetCurrentTime ();
+		int tmt = tm.GetTime ()+24*60*60;
+		for(int i=0;i<nWrite;i++)
+		{
+			if(pKline[i].day >tmt)
+			{
+				ASSERT(FALSE);
+
+				return false;
+			}
+		}
+	}
+	TSK_KLINEINDEX klineIndex;
+	TSK_KLINEINDEX* pKlineIndex = &klineIndex;
+	int nIndexStock = GetKlineIndex(symbol,pKlineIndex);
+	int nMaxBlock = CalcMaxCountBlock();
+	if(pKlineIndex->klineCount > nMaxBlock*FixedKlinePerBlock)
+	{
+		int n1 = pKlineIndex->klineCount/FixedKlinePerBlock;
+		int n2 = pKlineIndex->klineCount%FixedKlinePerBlock == 0 ? 0:1;
+		int nBlockCur = n1 + n2;
+		int nMoveBlock = nBlockCur - nMaxBlock ;
+		if(nMoveBlock>0)
+		{
+			for(int i=0;i<nMoveBlock;i++)
+			{
+				WORD wdVal = pKlineIndex->symBlock [0];
+				for(int j=0;j<nBlockCur-1;j++)
+				{
+					pKlineIndex->symBlock [j] = pKlineIndex->symBlock [j+1];
+					ASSERT(pKlineIndex->symBlock [j+1]!=0xffff);
+				}
+				if(nBlockCur-1>=0)
+					pKlineIndex->symBlock [nBlockCur-1] = wdVal;
+				else
+					ASSERT(FALSE);
+	
+			}
+			pKlineIndex->klineCount = pKlineIndex->klineCount - nMoveBlock*FixedKlinePerBlock;
+		}
+		else
+		{
+			pKlineIndex->klineCount = 0;
+			ASSERT(FALSE);
+		}
+		this->SetKlineIndex (nIndexStock,pKlineIndex);
+	}
+
+	ASSERT(pKlineIndex!=NULL);
+
+	if(pKline == NULL || nWrite<=0) 
+		return false;
+
+
+	if(nWrite>1 && m_kindKline == 0)
+	{
+		CString tmt = "19800101";
+		for(int i=0;i<nWrite;i++)
+		{
+				
+			CTime tm2(pKline[i].day);
+			CString s=tm2.Format ("%Y%m%d");
+			while(1)
+			{	
+				if(nWrite<=i)
+					break;
+				tm2 = CTime(pKline[i].day);
+				s=tm2.Format ("%Y%m%d");
+				if(s<=tmt)
+				{
+					if(nWrite-i-1>0)
+						memmove(pKline+i,pKline+i+1,(nWrite-i-1)*sizeof(Kline));
+					nWrite--;
+				}
+				else
+					break;
+			}
+			tmt = s;
+
+		}
+
+	}
+
+	if(pKlineIndex->klineCount <=0)
+		pKlineIndex->klineCount =0;
+
+
+	CTime timeStart((time_t)pKline[0].day );
+	BOOL bAdd;
+	int nFootB = TimeToFoot(pKlineIndex,timeStart, bAdd);
+	if(nFootB == -1 )
+	{
+		if(bAdd ==true)
+			nFootB = pKlineIndex->klineCount ;
+		else
+			ASSERT(FALSE);
+	}
+	timeStart = CTime((time_t)pKline[nWrite-1].day );
+	int nFootE = TimeToFoot(pKlineIndex,timeStart, bAdd);
+	if(nFootE == -1 )
+	{
+		if(bAdd ==true)
+			nFootE = pKlineIndex->klineCount ;
+		else
+			ASSERT(FALSE);
+	}
+	else if(bAdd == false)
+	{
+		if(nFootE <pKlineIndex->klineCount)
+			nFootE++;
+		else
+			ASSERT(FALSE);
+	}
+	int nKlineToOverWrite = nFootE - nFootB;
+
+	
+	Kline* pKlineFile = NULL;
+	Kline* pKlineMid = pKline;
+	CArray<Kline,Kline&> klineArray;
+	int nWrite2=0;
+
+	if(nType == this->overWriteAll)
+	{
+	
+		int nMove = nWrite -nKlineToOverWrite;
+		int nRtn;
+		if(nMove!=0)
+		{
+			nRtn = ReadKLine( symbol,pKlineFile,pKlineIndex->klineCount - nFootE,1);
+			ASSERT(nRtn == pKlineIndex->klineCount - nFootE);
+		}
+
+	
+		nWrite2 = pKlineIndex->klineCount-nFootE;
+		if(nWrite2<0 || nMove==0)
+			nWrite2 =0;
+
+	}
+	else
+	{
+		
+		nWrite2 = pKlineIndex->klineCount-nFootE;
+		if(nWrite2<0)
+			nWrite2 =0;
+		int i ;
+		Kline kln;
+		if(nWrite2!=0)
+		{
+			for( i=nFootB;i<nFootE;i++)
+			{
+				int blockIndex= i / FixedKlinePerBlock  ;	  
+				int stockIndex=i % FixedKlinePerBlock  ;	 
+				int nAddr = KLINESMALLHEAD + pKlineIndex->symBlock[blockIndex] 
+						* KlineByteEach *  FixedKlinePerBlock
+							 + stockIndex * KlineByteEach;
+											 
+				this->Seek(nAddr,this->begin);
+				Read(&kln,KlineByteEach);
+				klineArray.Add (kln);
+			}
+		}
+
+		bool bDay  = false;
+		if((m_kindKline+1)%2==1)
+			bDay = true;
+		for(i=0;i<nWrite;i++)
+		{
+			int nDay =RegularTime(pKline[i].day ,bDay);
+			if(klineArray.GetSize()==0)
+			{
+				klineArray.Add(pKline[i]);
+				continue;
+			}
+			for(int j=0;j< klineArray.GetSize();j++)
+			{
+				if(RegularTime(klineArray[j].day ,bDay)<nDay)
+				{
+					klineArray.InsertAt(j,pKline[i]);
+					break;
+				}
+				else if(RegularTime(klineArray[j].day ,bDay) == nDay)
+					break;
+			}
+		}
+		int nMove = klineArray.GetSize () -nKlineToOverWrite;//>0 is 'write from back' ,==0 is need not write,<0 is ' write from begin'
+		if(nMove==0)
+			nWrite2 =0;
+		if(nWrite2>0)
+		{
+			int nRtn = ReadKLine( symbol,pKlineFile,pKlineIndex->klineCount - nFootB,1);
+			ASSERT(nRtn == pKlineIndex->klineCount - nFootB);
+		}
+
+		pKlineMid = klineArray.GetData ();
+	}
+	int nDeleted = 0;
+	int blockIndex= nFootB / FixedKlinePerBlock  ;	  
+	for(int i=nFootB;i<nFootB+ nWrite + nWrite2;i++)
+	{
+		int stockIndex=i % FixedKlinePerBlock  ;	 
+
+
+		if(stockIndex == 0)
+		{
+			blockIndex= i / FixedKlinePerBlock  ;	 
+			nDeleted += CreateOrMoveSmallBlock(pKlineIndex, blockIndex);
+		}
+
+		int nAddr = KLINESMALLHEAD + pKlineIndex->symBlock[blockIndex] 
+				* KlineByteEach *  FixedKlinePerBlock
+					 + stockIndex * KlineByteEach;
+									  
+		this->Seek(nAddr,this->begin);
+
+		Kline * pKln = pKlineMid+i-nFootB;
+		if(i>=nFootB+ nWrite)//from file old
+			pKln = pKlineFile+i-nFootB-nWrite;
+		//if(!CTaiShanKlineShowView::IsIndexStock3(symbol))
+		//	TestKlineVolpositive(pKln, 1);
+		Write(pKln,KlineByteEach);
+
+	}
+	
+	pKlineIndex->klineCount = nFootB+ nWrite + pKlineIndex->klineCount-nFootE - nDeleted;
+	ASSERT(pKlineIndex->klineCount>=0);
+	if(pKlineFile != NULL)
+		delete [] pKlineFile;
+
+	SetKlineIndex(nIndexStock,pKlineIndex);
+	return true;
+
+}
+
+void CTaiKlineFileKLine::DeleteKlineData(std::string symbol, int nFoot, int nCount)
+{
+	Kline* pKline = NULL;
+
+	int nKline = ReadKLine(symbol, pKline, -1, 0);
+	if (nKline <= 0)
+		return;
+
+	if (nKline > nFoot + 1)
+	{
+		memmove(pKline + nFoot, pKline + nFoot + 1, KlineByteEach * (nKline - nFoot - 1));
+	}
+
+	nKline--;
+
+	TSK_KLINEINDEX klineIndex;
+	TSK_KLINEINDEX* pKlineIndex = &klineIndex;
+	int nIndexStock = GetKlineIndex(symbol, pKlineIndex);
+	pKlineIndex->klineCount = 0;
+	SetKlineIndex(nIndexStock, pKlineIndex);
+
+	if (nKline > 0)
+	{
+		WriteKLine(symbol, pKline, nKline, 0);
+	}
+
+	if (pKline == NULL)
+		delete []pKline;
+}

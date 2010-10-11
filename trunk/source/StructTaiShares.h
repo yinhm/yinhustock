@@ -1,5 +1,6 @@
-#ifndef __WSSTOCKSTRUCT_1000_H__
-#define __WSSTOCKSTRUCT_1000_H__
+
+#pragma once
+
 
 #define CALLOC(n,x)    ((x *) farcalloc((long)(n),sizeof(x)))
 #define FREE(x)        farfree(x)
@@ -36,12 +37,9 @@ typedef struct tagBASEINFOHEAD
 } BASEINFOHEAD;
 typedef BASEINFOHEAD* PBASEINFOHEAD;
 
-typedef struct tagPOWER_TOTAL_STRUCTEx
-{
-	RCV_POWER_STRUCTEx* m_RcvPower;
-	long Power_Count;
-} POWER_TOTAL_STRUCTEx;
 
+
+// ³ýÈ¨Êý¾Ý
 typedef struct tagSPLIT
 {
 	int		nFlags;
@@ -354,31 +352,6 @@ typedef struct _SHARES_DATA_ADD
 }SHARES_DATA_ADD;
 
 
-
-typedef struct  NameSymbolStr 
-{
-	char   stocksymblo[7];
-	char   stockname[9];
-	char   stockhypy[5];
-	char   group;
-}NAMESYMBOL;
-
-
-typedef struct  tagMIN_TOTAL_STRUCTEx 
-{
-	RCV_MINUTE_STRUCTEx *m_RcvMinute;    
-	long Min_Count;                      
-
-}MIN_TOTAL_STRUCTEx;
-
-
-typedef struct  tagDAY_TOTAL_STRUCTEx 
-{
-	RCV_HISTORY_STRUCTEx *m_RcvDay;   
-	long Day_Count;                      
-
-}DAY_TOTAL_STRUCTEx;
-
 /////////////////////////////////////////////////////////////
 
 struct TAI_SHAN_DATA
@@ -425,14 +398,6 @@ typedef struct
 	char  m_zqdm[7]; 
 	float SortID;
 } SORTSTRUCT;
-
-
-typedef struct
-{
-	long day;
-	Misd misd[48];
-}MINUTEData;
-
 
 typedef struct _ADD_DATA_DAY_LINE
 {
@@ -488,11 +453,3 @@ typedef struct _SystemInitData
 	int  BlockTime;                    
 	TotalNineViewData m_TotalNineViewData;
 }SYSTEMINITDATA;	 
-
-
-
-
-
-
-
-#endif 

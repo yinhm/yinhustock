@@ -299,7 +299,7 @@ CGridCtrl::CGridCtrl(int nRows, int nCols, int nFixedRows, int nFixedCols)
     m_GridLineColor = RGB(0,0,255);    
    
     NONCLIENTMETRICS ncm;
-    ncm.cbSize = sizeof(NONCLIENTMETRICS);
+    ncm.cbSize = sizeof(NONCLIENTMETRICS) - sizeof(ncm.iPaddedBorderWidth); 
      VERIFY(SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0));    
     memcpy(&m_Logfont, &(ncm.lfMessageFont), sizeof(LOGFONT));
     m_Logfont.lfWeight=550;

@@ -12,18 +12,11 @@
 #include "CTaiKlineTransferKline.h"
 
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
-#define new DEBUG_NEW
-#endif
-
-
-#define HS_HEAD					16
-#define HsSmallHeadByteEach		48								// sizeof(HSSMALLHEAD)
-#define FixedHsPerBlock			240								// 
-#define HsByteEach				sizeof(TRADE_DETAIL_H_PER)		// 
-#define SMALLHEADLENGTH			4096 * 48 + 16					// 数据起始地址
+#define TSK_FILEHEADER_SIZE			16
+#define HsSmallHeadByteEach			sizeof(TSK_TICKINDEX)
+#define FixedHsPerBlock				240
+#define HsByteEach					sizeof(TRADE_DETAIL_H_PER)
+#define SMALLHEADLENGTH				TSK_FILEHEADER_SIZE + HsSmallHeadByteEach * MAX_STOCK_NUM
 
 
 CTaiKlineFileHS* CTaiKlineFileHS::m_fileHsSh = NULL;
@@ -34,6 +27,7 @@ CTaiKlineFileHS::CTaiKlineFileHS()
 {
 	m_nMarket = SZ_MARKET_EX;
 	m_bToday = TRUE;
+	m_bIndex = FALSE;
 }
 
 CTaiKlineFileHS::CTaiKlineFileHS(int nMarket, BOOL bToday)
@@ -45,6 +39,7 @@ CTaiKlineFileHS::CTaiKlineFileHS(int nMarket, BOOL bToday)
 	m_nAddReMap = HsByteEach * FixedHsPerBlock * 5;
 
 	pDoc = ((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc;
+	m_bIndex = FALSE;
 }
 
 CTaiKlineFileHS::~CTaiKlineFileHS()
@@ -67,9 +62,11 @@ int CTaiKlineFileHS::ReadHS(CString symbol,CBuySellList& buySellList,bool bClear
 		}
 
 #ifndef WIDE_NET_VERSION
-		HSSMALLHEAD hsSmallHead;
-		HSSMALLHEAD* pHsSmallHead = &hsSmallHead;
-		int nIndexStock = GetHsSmallHeader(symbol,pHsSmallHead);
+		TSK_TICKINDEX tickIndex;
+		TSK_TICKINDEX* pTickIndex = &tickIndex;
+
+		std::string code(symbol);
+		int nIndexStock = GetTickIndex(code,pTickIndex);
 
 		TRADE_DETAIL_H_PER hsFirst;
 		TRADE_DETAIL_H_PER* pHs = NULL;
@@ -305,49 +302,6 @@ void CTaiKlineFileHS::Cdat1ToHs(CReportData *pCdat, TRADE_DETAIL_H_PER *pHs,bool
 
 	}
 }
-bool CTaiKlineFileHS::WriteHS(CReportData* pCdat,bool bFirstOne)
-{
-	CString symbol (pCdat->id );
-	if(CTaiShanKlineShowView::IsIndexStock(symbol))
-		return false;
-
-
-
-	HSSMALLHEAD hsSmallHead;
-	HSSMALLHEAD* pHsSmallHead = &hsSmallHead;
-
-	int nIndexStock = GetHsSmallHeader(symbol,pHsSmallHead);
-	if(pCdat->m_serialNumber <0)
-	{
-		pCdat->m_serialNumber =0;
-	}
-	this->Seek(16+pCdat->m_serialNumber *sizeof(HSSMALLHEAD),this->begin);
-	hsSmallHead = *((HSSMALLHEAD*)this->GetFileCurrentPointer());
-	CString symb ( hsSmallHead.StockSign);
-	if(symb!=symbol)
-	{
-		nIndexStock = GetHsSmallHeader(symbol,pHsSmallHead);
-		pCdat->m_serialNumber = nIndexStock;
-	}
-
-
-
-
-	TRADE_DETAIL_H_PER hs ;
-	Cdat1ToHs(pCdat, &hs);
-	WriteHS( pHsSmallHead,&hs);
-
-
-	this->SetHsSmallHeader (nIndexStock,pHsSmallHead);
-	//	}
-
-	return true;
-
-}
-void CTaiKlineFileHS::ClearHS()	
-{
-
-}
 int CTaiKlineFileHS::TransferHsToMin1(CBuySellList& buySellList,TRADE_DETAIL_H_PER* pHs,int nTotal)//transfer hs to 1 minute line
 {
 
@@ -418,69 +372,8 @@ int CTaiKlineFileHS::TransferHsToMin1(CBuySellList& buySellList,TRADE_DETAIL_H_P
 
 }
 
-int CTaiKlineFileHS::GetHsSmallHeader(CString symbol,HSSMALLHEAD* pHsSmallHead)
 
-{
-	if(m_pSymbolToPos == NULL)
-		AddIndexToMap();
-
-
-	HSSMALLHEAD* pHsSmallHead3 = NULL;
-
-	int i=-1;
-	if(symbol.GetLength ()!=4&&symbol.GetLength ()!=6)
-	{
-		symbol = symbol.Left (6);
-	}
-	if(!m_pSymbolToPos->Lookup(symbol,(void*&)i))
-		i = -1;
-
-	if(i==-1)
-	{
-
-		AddNewStockToFile(symbol,pHsSmallHead3);
-		if(GetStockNumber()>0)
-			i = GetStockNumber()-1;
-		else
-			ASSERT(FALSE);
-	}
-	else
-	{
-		int addr = 16;
-		this->Seek(addr+i*48,this->begin);
-		pHsSmallHead3 = (HSSMALLHEAD*)this->GetFileCurrentPointer();
-	}
-
-	memcpy(pHsSmallHead,pHsSmallHead3,sizeof(HSSMALLHEAD));
-	ASSERT(pHsSmallHead3!=NULL);
-
-	return i;
-}
-
-
-bool CTaiKlineFileHS::SetHsSmallHeader(int nIndex,HSSMALLHEAD* pHsSmallHead)
-{
-	int nStock = this->GetStockNumber ();
-
-
-	if(nIndex>=nStock)
-		return false;
-
-	int addr = 16+nIndex*HsSmallHeadByteEach;
-	this->Seek(addr,this->begin);
-	CString s(pHsSmallHead->StockSign );
-	HSSMALLHEAD *pHsSmallHead2 = (HSSMALLHEAD *)this->GetFileCurrentPointer ();
-	CString s2(pHsSmallHead2->StockSign );
-	if(s!=s2)
-	{
-		ASSERT(FALSE);
-		return false;
-	}
-	this->Write (pHsSmallHead,sizeof(HSSMALLHEAD));
-	return true;
-}
-
-void CTaiKlineFileHS::AddNewStockToFile(CString symbol,HSSMALLHEAD*& pHsSmallHead)
+void CTaiKlineFileHS::AddNewStockToFile(CString symbol,TSK_TICKINDEX*& pTickIndex)
 {
 	int nStock = this->GetStockNumber ();
 
@@ -492,8 +385,8 @@ void CTaiKlineFileHS::AddNewStockToFile(CString symbol,HSSMALLHEAD*& pHsSmallHea
 	ASSERT(nStock<=MaxNumStock);
 	int addr = 16+nStock*HsSmallHeadByteEach;
 	this->Seek(addr,this->begin);
-	pHsSmallHead = (HSSMALLHEAD*)this->GetFileCurrentPointer();
-	memset(pHsSmallHead,0xff,sizeof(HSSMALLHEAD));
+	pTickIndex = (TSK_TICKINDEX*)this->GetFileCurrentPointer();
+	memset(pTickIndex,0xff,sizeof(TSK_TICKINDEX));
 	if(symbol.GetLength ()!=4&&symbol.GetLength ()!=6)
 	{
 		symbol = symbol.Left (6);
@@ -505,25 +398,25 @@ void CTaiKlineFileHS::AddNewStockToFile(CString symbol,HSSMALLHEAD*& pHsSmallHea
 	Write(&nKline,4);
 
 	this->Seek(addr,this->begin);
-	pHsSmallHead = (HSSMALLHEAD*)this->GetFileCurrentPointer();
+	pTickIndex = (TSK_TICKINDEX*)this->GetFileCurrentPointer();
 
 
-	//
-	m_pSymbolToPos->SetAt(symbol,(CObject*)nStock);
+	std::string code(symbol);
+	m_mapIndex[code] = nStock;
 	nStock++;
 	this->SetStockNumber (nStock);
 
 
 
 }
-int CTaiKlineFileHS::CreateOrMoveSmallBlock(HSSMALLHEAD* pHsSmallHead,int& nBlock)
+int CTaiKlineFileHS::CreateOrMoveSmallBlock(TSK_TICKINDEX* pTickIndex,int& nBlock)
 {
 
 	int rtn = 0;
 	int nMax = 16;
 	ASSERT(nBlock<nMax);
 
-	if(pHsSmallHead->symBlock[nBlock]==0xffff)
+	if(pTickIndex->symBlock[nBlock]==0xffff)
 	{
 		int nCountBlock = this->GetSmallBlockCount ();
 		this->SetSmallBlockCount (nCountBlock+1);
@@ -536,7 +429,7 @@ int CTaiKlineFileHS::CreateOrMoveSmallBlock(HSSMALLHEAD* pHsSmallHead,int& nBloc
 		this->Write (buff,HsByteEach *  FixedHsPerBlock);
 
 		ASSERT(nBlock>=0);
-		pHsSmallHead->symBlock[nBlock]=(WORD)nCountBlock;
+		pTickIndex->symBlock[nBlock]=(WORD)nCountBlock;
 		nCountBlock++;
 	}
 	return 0;
@@ -552,7 +445,7 @@ BOOL CTaiKlineFileHS::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFile
 			return FALSE;
 	}
 	BOOL bOk = TRUE;
-	bOk = CTaiKlineMemFile::Open( lpszFileName,  nOpenFlags,  0,
+	bOk = CStkFile::Open( lpszFileName,  nOpenFlags,  0,
 		pException);
 	if(bOk == FALSE) return bOk;
 
@@ -596,24 +489,24 @@ BOOL CTaiKlineFileHS::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFile
 					for(int i=0;i<nStock;i++)
 					{
 						int addr = 16+i*HsSmallHeadByteEach;
-						Seek(addr,CTaiKlineMemFile::begin);
-						HSSMALLHEAD hsSmallHead;
-						HSSMALLHEAD* pHsSmallHead = &hsSmallHead;
+						Seek(addr,CStkFile::begin);
+						TSK_TICKINDEX tickIndex;
+						TSK_TICKINDEX* pTickIndex = &tickIndex;
 
-						Read(pHsSmallHead,sizeof(HSSMALLHEAD));
-						pHsSmallHead->StockSign[6]=0;
-						CString symbol (pHsSmallHead->StockSign);
+						Read(pTickIndex,sizeof(TSK_TICKINDEX));
+						pTickIndex->stockCode[6]=0;
+						CString symbol (pTickIndex->stockCode);
 						for(int j=0;j<16;j++)
 						{
-							if(pHsSmallHead->symBlock [j] == 0xffff) break;
+							if(pTickIndex->symBlock [j] == 0xffff) break;
 							int iData = -1;
-							int iIn = pHsSmallHead->symBlock [j] ;
+							int iIn = pTickIndex->symBlock [j] ;
 							if(iIn>=nLen)
 							{
-								pHsSmallHead->numHS  = (j)*FixedHsPerBlock;
+								pTickIndex->tickCount  = (j)*FixedHsPerBlock;
 								for(;j<16;j++)
-									pHsSmallHead->symBlock [j] = 0xffff;
-								this->SetHsSmallHeader  (i,pHsSmallHead);
+									pTickIndex->symBlock [j] = 0xffff;
+								this->SetTickIndex  (i,pTickIndex);
 								break;
 							}
 						}
@@ -628,22 +521,6 @@ BOOL CTaiKlineFileHS::Open(LPCTSTR lpszFileName, UINT nOpenFlags, int nAddToFile
 	ASSERT(MaxNumStock == 4096);
 
 	return TRUE;
-}
-
-void CTaiKlineFileHS::AddIndexToMap()
-{
-	int nStock = GetStockNumber();
-	ASSERT(nStock <= MaxNumStock);
-	m_pSymbolToPos = new CMapStringToPtr((int)(nStock * 1.25) + 1);
-
-	for (int i = 0; i < nStock; i++)
-	{
-		int addr = 16 + i * 48;
-		Seek(addr, begin);
-		HSSMALLHEAD* pHsSmallHead = (HSSMALLHEAD*)GetFileCurrentPointer();
-		CString symbol(pHsSmallHead->StockSign);
-		m_pSymbolToPos->SetAt(symbol, (CObject*)i);
-	}
 }
 
 void CTaiKlineFileHS::WriteHeaderInfo()
@@ -667,72 +544,27 @@ void CTaiKlineFileHS::WriteHeaderInfo()
 		Write(buff, MaxNumStock);
 }
 
-int CTaiKlineFileHS::ReadHS2(CString symbol, CBuySellList& buySellList, BOOL bClearAll)
+BOOL CTaiKlineFileHS::WriteHS(TSK_TICKINDEX* pTickIndex,TRADE_DETAIL_H_PER *pHs)
 {
+	CString symbol(pTickIndex->stockCode);
 	//if (symbol.GetLength() != 6 && symbol.GetLength() != 4) return 0;
 
-	HSSMALLHEAD hsSmallHead;
-	HSSMALLHEAD* pHsSmallHead = &hsSmallHead;
-	int nIndexStock = GetHsSmallHeader(symbol, pHsSmallHead);
+	ASSERT(pTickIndex->tickCount <= 0 ? TRUE : (int)pTickIndex->symBlock[(pTickIndex->tickCount - 1) / FixedHsPerBlock] < 0xFFFF);
 
-	if (bClearAll == TRUE)
+	int i = pTickIndex->tickCount;
+	int blockIndex = i / FixedHsPerBlock;
+	int stockIndex = i % FixedHsPerBlock;
+	if (stockIndex == 0)
 	{
-		RemoveHs(buySellList);
+		CString s2(pTickIndex->stockCode);
+		CreateOrMoveSmallBlock(pTickIndex, blockIndex);
 	}
 
-	int nList = buySellList.GetCount();
-	if (nList > pHsSmallHead->numHS)
-	{
-		ASSERT(FALSE);
-		return nList;
-	}
-
-	SeekToBegin();
-	ASSERT(pHsSmallHead->numHS <= 0 ? TRUE : (int)pHsSmallHead->symBlock[(pHsSmallHead->numHS - 1) / FixedHsPerBlock] < 0xFFFF);
-
-	for (int i = nList; i < pHsSmallHead->numHS; i++)
-	{
-		int blkCount = i / FixedHsPerBlock;
-		int stockCount = i % FixedHsPerBlock;
-		int addr = SMALLHEADLENGTH + pHsSmallHead->symBlock[blkCount] * HsByteEach * FixedHsPerBlock + stockCount * HsByteEach;
-
-		Seek(addr, begin);
-		TRADE_DETAIL_H_PER* pHs = new TRADE_DETAIL_H_PER;
-		Read(pHs, HsByteEach);
-		if (pHs->price == 0)
-		{
-			delete pHs;
-		}
-		else
-		{
-			buySellList.AddHead(pHs);
-		}
-	}
-
-	return buySellList.GetCount();
-}
-
-BOOL CTaiKlineFileHS::WriteHS(HSSMALLHEAD* pHsSmallHead,TRADE_DETAIL_H_PER *pHs)
-{
-	CString symbol(pHsSmallHead->StockSign);
-	//if (symbol.GetLength() != 6 && symbol.GetLength() != 4) return 0;
-
-	ASSERT(pHsSmallHead->numHS <= 0 ? TRUE : (int)pHsSmallHead->symBlock[(pHsSmallHead->numHS - 1) / FixedHsPerBlock] < 0xFFFF);
-
-	int i = pHsSmallHead->numHS;
-	int blkCount = i / FixedHsPerBlock;
-	int stockCount = i % FixedHsPerBlock;
-	if (stockCount == 0)
-	{
-		CString s2(pHsSmallHead->StockSign);
-		CreateOrMoveSmallBlock(pHsSmallHead, blkCount);
-	}
-
-	int addr = SMALLHEADLENGTH + pHsSmallHead->symBlock[blkCount] * HsByteEach * FixedHsPerBlock + stockCount * HsByteEach;
+	int addr = SMALLHEADLENGTH + pTickIndex->symBlock[blockIndex] * HsByteEach * FixedHsPerBlock + stockIndex * HsByteEach;
 
 	Seek(addr, begin);
 	Write(pHs, HsByteEach);
-	pHsSmallHead->numHS++;
+	pTickIndex->tickCount++;
 
 	return TRUE;
 }
@@ -741,23 +573,25 @@ BOOL CTaiKlineFileHS::WriteHS2(CString symbol, CBuySellList& buySellList)
 {
 	//if (symbol.GetLength() != 6 && symbol.GetLength() != 4) return 0;
 
-	HSSMALLHEAD hsSmallHead;
-	HSSMALLHEAD* pHsSmallHead = &hsSmallHead;
-	int nIndexStock = GetHsSmallHeader(symbol, pHsSmallHead);
+	TSK_TICKINDEX tickIndex;
+	TSK_TICKINDEX* pTickIndex = &tickIndex;
+
+	std::string code(symbol);
+	int nIndexStock = GetTickIndex(code, pTickIndex);
 
 	int nList = buySellList.GetCount();
 
 	for (int i = 0; i < nList; i++)
 	{
-		int blkCount = i / FixedHsPerBlock;
-		int stockCount = i % FixedHsPerBlock;
-		if (stockCount == 0)
+		int blockIndex = i / FixedHsPerBlock;
+		int stockIndex = i % FixedHsPerBlock;
+		if (stockIndex == 0)
 		{
-			CString s2(pHsSmallHead->StockSign);
-			CreateOrMoveSmallBlock(pHsSmallHead, blkCount);
+			CString s2(pTickIndex->stockCode);
+			CreateOrMoveSmallBlock(pTickIndex, blockIndex);
 		}
 
-		int addr = SMALLHEADLENGTH + pHsSmallHead->symBlock[blkCount] * HsByteEach * FixedHsPerBlock + stockCount * HsByteEach;
+		int addr = SMALLHEADLENGTH + pTickIndex->symBlock[blockIndex] * HsByteEach * FixedHsPerBlock + stockIndex * HsByteEach;
 
 		Seek(addr, begin);
 		POSITION pos = buySellList.FindIndex(nList - i - 1);
@@ -765,40 +599,10 @@ BOOL CTaiKlineFileHS::WriteHS2(CString symbol, CBuySellList& buySellList)
 		Write(pHs, HsByteEach);
 	}
 
-	pHsSmallHead->numHS = nList;
-	SetHsSmallHeader(nIndexStock, pHsSmallHead);
+	pTickIndex->tickCount = nList;
+	SetTickIndex(nIndexStock, pTickIndex);
 
 	return TRUE;
-}
-
-void CTaiKlineFileHS::ZeroHsCountEach()
-{
-	int addr = 16;
-	int nStock = GetStockNumber();
-	for (int i = 0; i < nStock; i++)
-	{
-		Seek(addr, begin);
-		HSSMALLHEAD* pHsSmallHead = (HSSMALLHEAD*)GetFileCurrentPointer();
-		memset(pHsSmallHead, 0xFF, sizeof(HSSMALLHEAD));
-		pHsSmallHead->numHS = 0;
-		addr += HsSmallHeadByteEach;
-	}
-
-	DeleteMap();
-
-	SetStockNumber(0);
-	SetSmallBlockCount(0);
-}
-
-int CTaiKlineFileHS::GetDataCount(CString symbol)
-{
-	HSSMALLHEAD hsSmallHead;
-	HSSMALLHEAD* pHsSmallHead = &hsSmallHead;
-	int nIndexStock = GetHsSmallHeader(symbol, pHsSmallHead);
-	if (pHsSmallHead == NULL)
-		return 0;
-
-	return pHsSmallHead->numHS;
 }
 
 void CTaiKlineFileHS::TransferHs(CBuySellList *pBuySellList, ARRAY_BE &pp, int nMax, int nKindIn, int nOther, KlineEx *pKlineEx)
@@ -999,11 +803,11 @@ void CTaiKlineFileHS::WriteHistoryHsFile(bool bSh,CProgressDialog* pDlg)
 
 		fileHist.Seek(addr,begin);
 		pFileToday->Seek(addr,begin);
-		HSSMALLHEAD* pHsSmallHead = (HSSMALLHEAD*)fileHist.GetFileCurrentPointer();
-		HSSMALLHEAD* pHsSmallHeadToday = (HSSMALLHEAD*)pFileToday->GetFileCurrentPointer();
-		CString symbol(pHsSmallHeadToday->StockSign );
-		pHsSmallHead->numHS =0;
-		strcpy(pHsSmallHead->StockSign ,symbol);
+		TSK_TICKINDEX* pTickIndex = (TSK_TICKINDEX*)fileHist.GetFileCurrentPointer();
+		TSK_TICKINDEX* pHsSmallHeadToday = (TSK_TICKINDEX*)pFileToday->GetFileCurrentPointer();
+		CString symbol(pHsSmallHeadToday->stockCode );
+		pTickIndex->tickCount =0;
+		strcpy(pTickIndex->stockCode ,symbol);
 
 
 		if(CTaiShanKlineShowView::IsIndexStock3(symbol))
@@ -1198,16 +1002,6 @@ int CTaiKlineFileHS::GetMinuteSecond(int timet)
 	return atoi(tm.Format ("%H%M"));
 }
 
-void CTaiKlineFileHS::DeleteMap()
-{
-	if(m_pSymbolToPos!=NULL)
-	{
-		m_pSymbolToPos->RemoveAll ();
-		delete m_pSymbolToPos;
-		m_pSymbolToPos = NULL;
-	}
-}
-
 BOOL CTaiKlineFileHS::OpenAll()
 {
 	m_fileHsSh = new CTaiKlineFileHS(SH_MARKET_EX);
@@ -1286,7 +1080,8 @@ CTaiKlineFileHS* CTaiKlineFileHS::GetFilePointer2(int nMarket)
 int CTaiKlineFileHS::GetDataCountAll(CString symbol, int stkKind)
 {
 	CTaiKlineFileHS* pFile = GetFilePointer(symbol, stkKind);
-	return pFile->GetDataCount(symbol);
+	std::string code(symbol);
+	return pFile->GetDataCount(code);
 }
 
 void CTaiKlineFileHS::RemoveHs(CBuySellList& buySellList)
@@ -1302,16 +1097,17 @@ void CTaiKlineFileHS::RemoveHs(CBuySellList& buySellList)
 	buySellList.RemoveAll();
 }
 
-int CTaiKlineFileHS::GetCountPre(CString symbol,int stkKind)
+int CTaiKlineFileHS::GetCountPre(CString symbol, int stkKind)
 {
-	int n = 0;
-	HSSMALLHEAD hsSmallHead;
-	memset(&hsSmallHead,0,sizeof(HSSMALLHEAD));
-	HSSMALLHEAD* pHsSmallHead = &hsSmallHead;
-	CTaiKlineFileHS* pFile = GetFilePointer( symbol,stkKind);
-	int nIndexStock = pFile->GetHsSmallHeader(symbol,pHsSmallHead);
-	n = hsSmallHead.numReserved ;
-	return n;
+	TSK_TICKINDEX tickIndex;
+	TSK_TICKINDEX* pTickIndex = &tickIndex;
+	memset(pTickIndex, 0, sizeof(TSK_TICKINDEX));
+
+	std::string code(symbol);
+	CTaiKlineFileHS* pFile = GetFilePointer(symbol, stkKind);
+	int nIndexStock = pFile->GetTickIndex(code, pTickIndex);
+
+	return tickIndex.numReserved;
 }
 
 bool CTaiKlineFileHS::IsNeedHsHistData(CString symbol,int stkKind, CString sDate)
@@ -1346,14 +1142,15 @@ bool CTaiKlineFileHS::IsNeedHsHistData(CString symbol,int stkKind, CString sDate
 	}
 	else
 	{
-		HSSMALLHEAD hsSmallHead;
-		memset(&hsSmallHead,0,sizeof(HSSMALLHEAD));
-		HSSMALLHEAD* pHsSmallHead = &hsSmallHead;
+		TSK_TICKINDEX tickIndex;
+		memset(&tickIndex,0,sizeof(TSK_TICKINDEX));
+		TSK_TICKINDEX* pTickIndex = &tickIndex;
 		CTaiKlineFileHS fileHist(nMarket);
 		CString sName = sPath+sDate+".hst";
 		fileHist.Open (sName,0);
-		int nIndexStock = fileHist.GetHsSmallHeader(symbol,pHsSmallHead);
-		n = hsSmallHead.numHS  ;
+		std::string code(symbol);
+		int nIndexStock = fileHist.GetTickIndex(code,pTickIndex);
+		n = tickIndex.tickCount  ;
 		if(n>0)
 			brtn = false;
 
@@ -1428,12 +1225,13 @@ void CTaiKlineFileHS::WriteHsToFileWideNet(CString symbol,int nMarket, CString s
 
 		if(nRequest < 2000 )
 		{
-			HSSMALLHEAD hsSmallHead;
-			memset(&hsSmallHead,0,sizeof(HSSMALLHEAD));
-			HSSMALLHEAD* pHsSmallHead = &hsSmallHead;
-			int nIndexStock = pFile->GetHsSmallHeader(symbol,pHsSmallHead);
-			hsSmallHead.numReserved = n;
-			pFile->SetHsSmallHeader (nIndexStock,pHsSmallHead);
+			TSK_TICKINDEX tickIndex;
+			memset(&tickIndex,0,sizeof(TSK_TICKINDEX));
+			TSK_TICKINDEX* pTickIndex = &tickIndex;
+			std::string code(symbol);
+			int nIndexStock = pFile->GetTickIndex(code,pTickIndex);
+			tickIndex.numReserved = n;
+			pFile->SetTickIndex (nIndexStock,pTickIndex);
 		}
 
 		if(nRequest == 0 )
@@ -1482,11 +1280,12 @@ int CTaiKlineFileHS::WriteHsToFile(CString symbol, RCV_DISPBARGAINING_STRUCTEx *
 {
 
 	int n = 0;
-	HSSMALLHEAD hsSmallHead;
-	memset(&hsSmallHead,0,sizeof(HSSMALLHEAD));
-	HSSMALLHEAD* pHsSmallHead = &hsSmallHead;
-	int nIndexStock = GetHsSmallHeader(symbol,pHsSmallHead);
-	n = hsSmallHead.numReserved ;
+	TSK_TICKINDEX tickIndex;
+	memset(&tickIndex,0,sizeof(TSK_TICKINDEX));
+	TSK_TICKINDEX* pTickIndex = &tickIndex;
+	std::string code(symbol);
+	int nIndexStock = GetTickIndex(code,pTickIndex);
+	n = tickIndex.numReserved ;
 
 
 	CBuySellList buySellList;
@@ -1574,7 +1373,7 @@ void CTaiKlineFileHS::AddSmallHeadBlock()
 
 	int nStock = GetStockNumber ();
 
-	HSSMALLHEAD klineSmallHead;
+	TSK_TICKINDEX klineSmallHead;
 	int j = 0;
 	int i = 0;
 	bool bFound = false;
@@ -1582,7 +1381,7 @@ void CTaiKlineFileHS::AddSmallHeadBlock()
 	{
 		int addr = 16;
 		Seek(addr+i*HsSmallHeadByteEach,begin);
-		Read(&klineSmallHead,sizeof(HSSMALLHEAD));
+		Read(&klineSmallHead,sizeof(TSK_TICKINDEX));
 		for(j = 0;j<16;j++)
 		{
 			if(klineSmallHead.symBlock [j] == n)
@@ -1602,24 +1401,24 @@ void CTaiKlineFileHS::AddSmallHeadBlock()
 		TRADE_DETAIL_H_PER kline;
 		for(int k=0;k<FixedHsPerBlock ;k++)
 		{
-			int blkCount= j ;	  
-			int stockCount=k  ;	  
-			int addr = SMALLHEADLENGTH + klineSmallHead.symBlock[blkCount] 
+			int blockIndex= j ;	  
+			int stockIndex=k  ;	  
+			int addr = SMALLHEADLENGTH + klineSmallHead.symBlock[blockIndex] 
 			* HsByteEach *  FixedHsPerBlock
-				+ stockCount * HsByteEach;
+				+ stockIndex * HsByteEach;
 
 			this->Seek(addr,this->begin);
 			Read(&kline,HsByteEach);
 			addr = SMALLHEADLENGTH + klineSmallHead.symBlock[nNewBlock] 
 			* HsByteEach *  FixedHsPerBlock
-				+ stockCount * HsByteEach;
+				+ stockIndex * HsByteEach;
 			this->Seek(addr,this->begin);
 			Write(&kline,HsByteEach);
 		}
 
 		//write small block
 		klineSmallHead.symBlock [j] = (WORD)nNewBlock;
-		this->SetHsSmallHeader(i, &klineSmallHead);
+		this->SetTickIndex(i, &klineSmallHead);
 
 		//
 		nNewBlock++;
@@ -1631,4 +1430,218 @@ void CTaiKlineFileHS::AddSmallHeadBlock()
 	WORD nMaxNumStock = MaxNumStock;
 	SetMaxNumStock(nMaxNumStock);
 
+}
+
+
+
+
+void CTaiKlineFileHS::AddIndexToMap()
+{
+	int nStock = GetStockNumber();
+	if (nStock <= 0 || nStock > GetMaxNumStock() || m_bIndex)
+		return;
+
+	for (int iIndex = 0; iIndex < nStock; iIndex++)
+	{
+		//modify
+		int addr = 16 + iIndex * 48;
+		Seek(addr, begin);
+		TSK_TICKINDEX* pTickIndex = (TSK_TICKINDEX*)GetFileCurrentPointer();
+
+		string symbol(pTickIndex->stockCode);
+		m_mapIndex[symbol] = iIndex;
+	}
+
+	m_bIndex = TRUE;
+}
+
+void CTaiKlineFileHS::DeleteMap()
+{
+	if (m_bIndex && m_mapIndex.size() > 0)
+	{
+		m_mapIndex.clear();
+	}
+}
+
+void CTaiKlineFileHS::LookupIndex(std::string symbol, int& nIndex)
+{
+	if (!m_bIndex)
+	{
+		AddIndexToMap();
+	}
+
+	nIndex = -1;
+
+	MapIndex::iterator stock = m_mapIndex.find(symbol);
+	if (stock != m_mapIndex.end())
+	{
+		nIndex = stock->second;
+	}
+}
+
+int CTaiKlineFileHS::GetTickIndex(std::string symbol, TSK_TICKINDEX* pTickIndex)
+{
+	if (!m_bIndex)
+	{
+		AddIndexToMap();
+	}
+
+	TSK_TICKINDEX* pIndex = NULL;
+	int iIndex = -1;
+
+	LookupIndex(symbol, iIndex);
+	if (iIndex == -1)
+	{
+		//modify
+		CString code(symbol.c_str());
+		AddNewStockToFile(code, pIndex);
+		if (GetStockNumber() > 0)
+		{
+			iIndex = GetStockNumber() - 1;
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	else
+	{
+		//modify
+		int addr = 16;
+		Seek(addr + iIndex * 48, begin);
+		pIndex = (TSK_TICKINDEX*)GetFileCurrentPointer();
+	}
+
+	memcpy(pTickIndex, pIndex, sizeof(TSK_TICKINDEX));
+
+	return iIndex;
+}
+
+BOOL CTaiKlineFileHS::SetTickIndex(int nIndex, TSK_TICKINDEX* pTickIndex)
+{
+	int nStock = GetStockNumber();
+	if (nIndex >= nStock)
+		return FALSE;
+
+	//modify
+	int addr = 16 + nIndex * HsSmallHeadByteEach;
+	Seek(addr, begin);
+
+	Write(pTickIndex, sizeof(TSK_TICKINDEX));
+
+	return TRUE;
+}
+
+int CTaiKlineFileHS::GetDataCount(std::string symbol)
+{
+	TSK_TICKINDEX tickIndex;
+	TSK_TICKINDEX* pTickIndex = &tickIndex;
+
+	int nIndex = GetTickIndex(symbol, pTickIndex);
+	if (pTickIndex == NULL)
+		return 0;
+
+	return pTickIndex->tickCount;
+}
+
+void CTaiKlineFileHS::ZeroHsCountEach()
+{
+	int addr = 16;
+	int nStock = GetStockNumber();
+
+	for (int iIndex = 0; iIndex < nStock; iIndex++)
+	{
+		//modify
+		Seek(addr, begin);
+		TSK_TICKINDEX* pTickIndex = (TSK_TICKINDEX*)GetFileCurrentPointer();
+		memset(pTickIndex, 0xFF, sizeof(TSK_TICKINDEX));
+		pTickIndex->tickCount = 0;
+		addr += HsSmallHeadByteEach;
+	}
+
+	DeleteMap();
+
+	SetStockNumber(0);
+	SetSmallBlockCount(0);
+}
+
+BOOL CTaiKlineFileHS::WriteHS(CReportData* pCdat, BOOL bFirstOne)
+{
+	std::string symbol(pCdat->id);
+
+	if (CTaiShanKlineShowView::IsIndexStock(symbol.c_str()))
+		return FALSE;
+
+
+	TSK_TICKINDEX tickIndex;
+	TSK_TICKINDEX* pTickIndex = &tickIndex;
+
+	int nIndexStock = GetTickIndex(symbol, pTickIndex);
+
+	if (pCdat->m_serialNumber < 0)
+	{
+		pCdat->m_serialNumber = 0;
+	}
+
+	Seek(16 + pCdat->m_serialNumber * sizeof(TSK_TICKINDEX), begin);
+
+	//tickIndex = *((TSK_TICKINDEX*)GetFileCurrentPointer());
+	//CString symb(tickIndex.stockCode);
+	//if (symb != symbol)
+	//{
+	//	nIndexStock = GetTickIndex(symbol, pTickIndex);
+	//	pCdat->m_serialNumber = nIndexStock;
+	//}
+
+
+	TRADE_DETAIL_H_PER hs;
+	Cdat1ToHs(pCdat, &hs);
+	WriteHS(pTickIndex, &hs);
+
+	SetTickIndex(nIndexStock, pTickIndex);
+
+	return TRUE;
+}
+
+int CTaiKlineFileHS::ReadHS2(CString symbol, CBuySellList& buySellList, BOOL bClearAll)
+{
+	TSK_TICKINDEX tickIndex;
+	TSK_TICKINDEX* pTickIndex = &tickIndex;
+
+	std::string code(symbol);
+	int nIndexStock = GetTickIndex(code, pTickIndex);
+
+	if (bClearAll == TRUE)
+	{
+		RemoveHs(buySellList);
+	}
+
+	int nList = buySellList.GetCount();
+	if (nList > pTickIndex->tickCount)
+		return nList;
+
+	SeekToBegin();
+	//ASSERT(pTickIndex->tickCount <= 0 ? TRUE : (int)pTickIndex->symBlock[(pTickIndex->tickCount - 1) / FixedHsPerBlock] < 0xFFFF);
+
+	for (int iIndex = nList; iIndex < pTickIndex->tickCount; iIndex++)
+	{
+		int blockIndex = iIndex / FixedHsPerBlock;
+		int stockIndex = iIndex % FixedHsPerBlock;
+		int nAddr = SMALLHEADLENGTH + pTickIndex->symBlock[blockIndex] * HsByteEach * FixedHsPerBlock + stockIndex * HsByteEach;
+
+		Seek(nAddr, begin);
+
+		TRADE_DETAIL_H_PER* pHs = new TRADE_DETAIL_H_PER;
+		Read(pHs, HsByteEach);
+		if (pHs->price == 0)
+		{
+			delete pHs;
+		}
+		else
+		{
+			buySellList.AddHead(pHs);
+		}
+	}
+
+	return buySellList.GetCount();
 }

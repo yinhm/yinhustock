@@ -454,11 +454,14 @@ void CClearData::Clear(int nStock, bool bShanghai,bool bDayKline)
 	if(!MarkerChange)  
 		return;
 	CString s=pFile->GetSymbol(nStock);//基本资料数据结构类实现
-	KLINE_SMALLHEAD klineSmallHead;
-	int nIndexStock=pFile->GetKlineSmallHeader(s,&klineSmallHead);
-	klineSmallHead.numKln=0;
-	pFile->SetKlineSmallHeader(nIndexStock,&klineSmallHead);
-	pFile->WriteKLine(s,(Kline*)arrayKline.GetData(),arrayKline.GetSize(),0);
+	TSK_KLINEINDEX klineSmallHead;
+	std::string symbol(s);
+	int nIndexStock=pFile->GetKlineIndex(symbol,&klineSmallHead);
+	klineSmallHead.klineCount=0;
+	pFile->SetKlineIndex(nIndexStock,&klineSmallHead);
+
+
+	pFile->WriteKLine(symbol,(Kline*)arrayKline.GetData(),arrayKline.GetSize(),0);
 
 
 
@@ -570,7 +573,8 @@ void CClearData::OnClearOneStock()
 	else if(((CComboBox*)GetDlgItem(1011))->GetCurSel()==1)
 		pFile=CTaiKlineFileKLine::GetFilePointer(StockSymbol,m_nKind,false);
 	int i;
-	pFile->LookUpIndexFromMap(StockSymbol,i);
+	std::string symbol(StockSymbol);
+	pFile->LookupIndex(symbol,i);
 	if(i==-1)
 	{
 		AfxMessageBox("没有该股票！",MB_ICONASTERISK);
@@ -578,10 +582,10 @@ void CClearData::OnClearOneStock()
 	}
 	if( AfxMessageBox("真的要删除吗？",MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2)==IDNO )
 		return;
-	KLINE_SMALLHEAD klineSmallHead;
-	int nIndexStock=pFile->GetKlineSmallHeader(StockSymbol,&klineSmallHead);
-	klineSmallHead.numKln=0;
-	pFile->SetKlineSmallHeader(nIndexStock,&klineSmallHead);
+	TSK_KLINEINDEX klineSmallHead;
+	int nIndexStock=pFile->GetKlineIndex(symbol,&klineSmallHead);
+	klineSmallHead.klineCount=0;
+	pFile->SetKlineIndex(nIndexStock,&klineSmallHead);
 	AfxMessageBox("成功删除！");
 	
 }

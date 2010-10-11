@@ -7,7 +7,7 @@
 //#include "..\\mfc\\src\\afximpl.h"
 #include "MainFrm.h"
 #include "CAlertSystem.h"
-#include "DlgMYXMZ.h"
+//#include "DlgMYXMZ.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

@@ -28,7 +28,8 @@ CHistoryFile::CHistoryFile()
 	CTaiKlineFileKLine* pFileK = CTaiKlineFileKLine::GetFilePointer (symbol,0,true);
 
 	m_pKlineIndex = NULL;
-	m_nKlineIndex = pFileK->ReadKLine (symbol,m_pKlineIndex,-1);
+	std::string code(symbol);
+	m_nKlineIndex = pFileK->ReadKLine (code,m_pKlineIndex,-1);
 
 	m_strHistoryDate = "";
 	BOOL bOpen = this->Open ("HistoryRealData.dat",0, 0);

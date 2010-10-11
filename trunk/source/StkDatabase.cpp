@@ -229,3 +229,14 @@ void CStkDatabase::ProcessReport(RCV_REPORT_STRUCTEx* pReport, int nCount)
 		pDoc->m_sharesCompute.StockDataUpdate(pBuffer);
 	}
 }
+
+void CStkDatabase::ProcessHistory(RCV_HISTORY_STRUCTEx* pHistory, int nCount)
+{
+	CTaiShanDoc* pDoc = ((CMainFrame*)AfxGetMainWnd())->m_taiShanDoc;
+	if (pDoc == NULL)
+	{
+		return;
+	}
+
+	pDoc->m_sharesCompute.StockDataDayUpdate(pHistory, nCount);
+}

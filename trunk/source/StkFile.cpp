@@ -19,7 +19,6 @@ CStkFile::CStkFile()
 	m_nAddReMap = 1024;
 	m_bCloseOnDelete = FALSE;
 
-	m_pSymbolToPos = NULL;
 	MaxNumStock = 4096;
 }
 
@@ -27,9 +26,6 @@ CStkFile::~CStkFile()
 {
 	if (m_hFile != (HANDLE)hFileNull && m_bCloseOnDelete)
 		Close();
-
-	if (m_pSymbolToPos != NULL)
-		delete m_pSymbolToPos;
 }
 
 void CStkFile::SeekToBegin()

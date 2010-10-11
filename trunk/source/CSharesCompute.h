@@ -1,14 +1,12 @@
-#if !defined(AFX_STOCKDATACALC_H__4BE51F0E_A261_11D2_B30C_00C04FCCA334__INCLUDED_)
-#define AFX_STOCKDATACALC_H__4BE51F0E_A261_11D2_B30C_00C04FCCA334__INCLUDED_
 
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
+
 #include "StructKlineView.h"
 
-#define MAX_COUNT_CDAT1    30
+#define MAX_COUNT_CDAT1		30
 
 class CTaiShanDoc;
+
 class CSharesCompute  
 {
 public:
@@ -27,21 +25,14 @@ public:
 	void SendCuoHeDataToDialog(CReportData *Cdat);                                 
 	short GetStockMinute(time_t time,int mode);                               
 
-#ifdef WIDE_NET_VERSION
-	void WideStockDataUpdate(RCV_WIDOFEREPORT_STRUCTEx* m_GpHqReport);                                 
-	void WideStockItemUpdate(CReportData  *Cdat,RCV_WIDOFEREPORT_STRUCTEx* m_GpHqReport);       
-	void WideStockDataMinUpdate(MIN_TOTAL_STRUCTEx * m_GpMinute);                            
-#else
 	void StockDataUpdate(RCV_REPORT_STRUCTEx* m_GpHqReport);                                
 	void StockItemUpdate(CReportData  *Cdat,RCV_REPORT_STRUCTEx* m_GpHqReport);    
-	void StockDataMinUpdate(MIN_TOTAL_STRUCTEx * m_GpMinute);                         
 
-#endif	
+protected:
+	int CheckStockDaytime(RCV_HISTORY_STRUCTEx* pHistory, int nCount, int nIndex);
 
 public:
-	int CheckStockDaytime(DAY_TOTAL_STRUCTEx* m_GpDay, int index);
-	void StockDataDayUpdate(DAY_TOTAL_STRUCTEx* m_GpDay);
-	void StockDataPowerUpdate(POWER_TOTAL_STRUCTEx* m_GpPower);
+	void StockDataDayUpdate(RCV_HISTORY_STRUCTEx* pHistory, int nCount);
+	void StockDataMinUpdate(RCV_MINUTE_STRUCTEx* pMinute, int nCount);
+	void StockDataPowerUpdate(RCV_POWER_STRUCTEx* pPower, int nCount);
 };
-
-#endif // !defined(AFX_STOCKDATACalc_H__4BE51F0E_A261_11D2_B30C_00C04FCCA334__INCLUDED_)

@@ -6,7 +6,7 @@
 #pragma once
 #endif 
 
-class CStkDriver  
+class CStkDriver
 {
 public:
 	CStkDriver();
@@ -23,7 +23,12 @@ protected:
 	DWORD (WINAPI* m_pfnGetStockDrvInfo)(int nInfo, void* pBuf);
 
 protected:
-	void GetAdress();
+	virtual void GetAddress();
+	virtual void FreeAddress();
+
+public:
+	BOOL LoadDriver(LPCTSTR lpszDriver);
+	void UnloadDriver();
 
 public:
 	int Stock_Init(HWND hWnd, UINT uMsg, int nWorkMode);
@@ -31,6 +36,10 @@ public:
 	int GetTotalNumber();
 	int SetupReceiver(BOOL bSetup);
 	DWORD GetStockDrvInfo(int nInfo, void* pBuf);
+
+public:
+	virtual void Start(HWND hWnd, BOOL bReceive = TRUE, DWORD dwPid = -1);
+	virtual void ProcessData(WPARAM wParam, LPARAM lParam);
 };
 
 #endif 
