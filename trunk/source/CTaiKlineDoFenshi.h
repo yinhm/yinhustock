@@ -30,14 +30,10 @@ public:
 	void SetRectDraw(int nFigu);
 	CBuySellList m_hsMin1 ;
 	TRADE_DETAIL_H_PER	m_hsMin[240];
-	bool 	m_bHist;
 
 	Tidxd **m_Tidx;
 	Rsdn1 **m_Nidx;
-	CTaiKlineFileHS*	m_pFileHs;
 	int m_nCnp;
-	float m_amount[240];
-	float m_vol[240];
 	float m_volPre;
 	int  num_sun;
 	float m_max_dapan[2][2];
@@ -76,10 +72,29 @@ public:
 	int DrawHs(CDC *pDC,int nBegin, BYTE flag);
 
 
-	void InitHs(bool bRemoveAll=true,bool bSkip = true);
 
-	void DrawCapt(CDC* pDC);
+	CTaiKlineFileHS* m_pFileHs;
+
+	bool m_bHist;						// 是否显示历史回顾
+
+	CReportData		m_dt;
+	CReportData*	m_pReportData;
+	CReportData*	m_pS0;
+	CReportData*	m_pS1;
+
+	float m_amount[240];
+	float m_vol[240];
+
+	// 初始化数据
+	void InitMinuteLine();
+
+	// 初始分笔数据
+	void InitHs(bool bRemoveAll = true, bool bSkip = true);
+
+
+
 	void DrawSon(CDC* pDC);
+	void DrawCapt(CDC* pDC);
 
 
 
@@ -91,10 +106,6 @@ public:
 	virtual ~CTaiKlineMin1();
 
 public:
-	CReportData		m_dt;
-	CReportData*	m_pReportData;
-	CReportData*	m_pS0;
-	CReportData*	m_pS1;
 
 	float m_close;
 
@@ -102,7 +113,6 @@ protected:
 	void CaclMaxAdded();
 
 public:
-	void InitMinuteLine();
 	void DrawMin1Figuer(CDC* pDC);
 
 public:

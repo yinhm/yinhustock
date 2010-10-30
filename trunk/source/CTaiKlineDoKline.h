@@ -57,7 +57,6 @@ public:
 	int m_kLine_mode ;//
 	bool m_bNewStock;//
 
-	bool m_bClosed;//
 	bool m_bDrived;//
 	Kline* m_pKlineAdd[6];
 	int m_nKlineAdd[6];
@@ -94,9 +93,6 @@ public:
 	int   m_footEndOld;			
 	CRect m_rectDrawLine;	
 	ARRAY_JISHU		m_dataFormular[5];	
-	float m_min_sun[5];			
-	float m_max_sun[5];		
-	int	  m_nSon;		
 	powerArr m_PowerArray;//
 
 	bool DrawBTX(CDC* pDC);
@@ -186,9 +182,22 @@ public:
 	void InitDrawedLineBE();		//
 	int InitLineParam();	//
 	void CaclMaxFlt(Kline *pK,int footBegin);	
-	void CaclMaxFlt(float* pFlt,int footBegin,int nLine=-1);	
 
-	void DrawLineIndex(CDC* pDC,bool bFenshi = false);	
+
+
+	BOOL m_bClosed;				// 是否停盘
+
+	int m_nSon;					// 当前绘图的区域    0 主图
+
+	float m_min_sun[5];
+	float m_max_sun[5];
+
+	void CaclMaxFlt(float* pFlt, int footBegin, int nLine = -1);
+
+	// 画指标线
+	void DrawLineIndex(CDC* pDC, bool bFenshi = false);
+
+
 
 	float YTransfer(int y);		
 	int YTransfer(float y);		//
