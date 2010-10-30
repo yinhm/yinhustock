@@ -24,6 +24,8 @@
 #include "CTaiScreenParent.h"
 #include "CTaiShanReportView.h"
 
+#include "CSharesCompute.h"
+
 #ifdef _DEBUG
 #undef THIS_FILE
 static char THIS_FILE[]=__FILE__;
@@ -191,26 +193,27 @@ int CTaiKlineShowKline::YTransfer(float y)
 
 
 
-void CTaiKlineShowKline::DrawLineIndex(CDC *pDC,bool bFenshi)//
+void CTaiKlineShowKline::DrawLineIndex(CDC* pDC, bool bFenshi)
 {
-	if(m_max_sun[m_nSon]==m_min_sun[m_nSon])
+	if (m_max_sun[m_nSon] == m_min_sun[m_nSon])
 	{
-		if(pView->m_nKlineKind2==0 && strcmp(m_lineName[m_nSon][0],"成交量")==0)
+		if (pView->m_nKlineKind2 == 0 && strcmp(m_lineName[m_nSon][0], "成交量") == 0)
 			return;
 
-		m_max_sun[m_nSon]+=0.001;
-		m_min_sun[m_nSon]-=0.001;
-
+		m_max_sun[m_nSon] += 0.001;
+		m_min_sun[m_nSon] -= 0.001;
 	}
 
-	if(m_nSon == 0 && pView->m_nKlineKind2 >0)
+	if (m_nSon == 0 && pView->m_nKlineKind2 > 0)
 	{
-		if(m_rectDrawLine.left<2 && pView->m_infoInit.initIndex[0].nameIndex[0] =='\0' )
+		if (m_rectDrawLine.left < 2 && pView->m_infoInit.initIndex[0].nameIndex[0] == '\0')
 			return;
 	}
-	if(this==pView->pKlineDrawing )
+
+	if (pView->pKlineDrawing)
 	{
-		if(!ValidDoKline()) return;
+		if (!ValidDoKline())
+			return;
 	}
 
 
@@ -361,18 +364,23 @@ void CTaiKlineShowKline::DrawLineIndex(CDC *pDC,bool bFenshi)//
 			}
 			if(flag==STICK_VOL_FS)
 				break;
-		case 0:
-			j1=m_dataFormular[m_nSon].line[i].m_arrBE.line[bgnFoot];
-			pDC->MoveTo((int)(m_rectDrawLine.left+cellWidth/2+(bgnFoot-m_footBegin)*cellWidth),YTransfer(j1));
-			for(j=bgnFoot; j<=m_footEnd; j++ )
+
+		case FS_ZOUSHI:
+			// 停盘的股票不绘图
+			if (!m_bClosed)
 			{
-				int x= (int)(m_rectDrawLine.left+(cellWidth+1)/2+(j-m_footBegin)*cellWidth);
-				float y9 = (float)m_dataFormular[m_nSon].line[i].m_arrBE.line[j];
+				j1 = m_dataFormular[m_nSon].line[i].m_arrBE.line[bgnFoot];
+				pDC->MoveTo((int)(m_rectDrawLine.left + cellWidth / 2 + (bgnFoot-m_footBegin) * cellWidth), YTransfer(j1));
+				for (j = bgnFoot; j <= m_footEnd; j++)
+				{
+					int x = (int)(m_rectDrawLine.left + (cellWidth + 1) / 2 + (j - m_footBegin) * cellWidth);
+					float y9 = (float)m_dataFormular[m_nSon].line[i].m_arrBE.line[j];
 
-				pDC->LineTo(x,	YTransfer(y9));
-
+					pDC->LineTo(x, YTransfer(y9));
+				}
 			}
 			break;
+
 		case VOLSTICK:
 			widthPer =cellWidth;
 			klineWidthPer = (int)ceil(widthPer*3/5);
@@ -1226,53 +1234,71 @@ END_ADDED:
 
 
 
-void CTaiKlineShowKline::CaclMaxFlt(float *pFlt,int footBegin,int nLine)//
+void CTaiKlineShowKline::CaclMaxFlt(float* pFlt, int footBegin, int nLine)
 {
-	if(nLine>0)
-		if((m_dataFormular[m_nSon].line [nLine].type==BUY_CASE || m_dataFormular[m_nSon].line [nLine].type==SELL_CASE))
-			return;
-
-	for(int i=footBegin;i<=m_footEnd;i++)
+	if (nLine > 0)
 	{
-		float ftemp = pFlt[i];
-		if(ftemp>m_max_sun[m_nSon])
-			m_max_sun[m_nSon]=ftemp;
-		if(ftemp<m_min_sun[m_nSon])
-			m_min_sun[m_nSon]=ftemp;
+		if ((m_dataFormular[m_nSon].line[nLine].type == BUY_CASE || m_dataFormular[m_nSon].line[nLine].type == SELL_CASE))
+		{
+			return;
+		}
 	}
-	if(nLine>=0)
+
+	// 最大和最小值
+	for (int i = footBegin; i <= m_footEnd; i++)
+	{
+		float fTemp = pFlt[i];
+
+		if (fTemp > m_max_sun[m_nSon])
+		{
+			m_max_sun[m_nSon] = fTemp;
+		}
+		if (fTemp < m_min_sun[m_nSon])
+		{
+			m_min_sun[m_nSon] = fTemp;
+		}
+	}
+
+	if (nLine >= 0)
 	{
 		int j = nLine;
 		bool bVolStick = false;
-		if(m_dataFormular[m_nSon].line [j].type==VOLSTICK || m_dataFormular[m_nSon].line [j].type == STICK_VOL_FS 
-			|| m_dataFormular[m_nSon].line [j].type == STICK || m_dataFormular[m_nSon].line [j].type == LINESTICK)
-			bVolStick = true;
-		if(m_dataFormular[m_nSon].line [j].m_arrBE.kind == ARRAY_BE::DrawStickLine && m_dataFormular[m_nSon].line [j].m_arrBE.lineWidth)
+
+		if (m_dataFormular[m_nSon].line[j].type == VOLSTICK || m_dataFormular[m_nSon].line[j].type == STICK_VOL_FS ||
+			m_dataFormular[m_nSon].line[j].type == STICK || m_dataFormular[m_nSon].line[j].type == LINESTICK)
 		{
-			int n = m_dataFormular[m_nSon].line [j].m_arrBE.looseArr.GetSize();
-			for(int k = 0;k<n;k++)
+			bVolStick = true;
+		}
+
+		if (m_dataFormular[m_nSon].line[j].m_arrBE.kind == ARRAY_BE::DrawStickLine && m_dataFormular[m_nSon].line[j].m_arrBE.lineWidth)
+		{
+			int n = m_dataFormular[m_nSon].line[j].m_arrBE.looseArr.GetSize();
+			for (int k = 0; k < n; k++)
 			{
-				int nFoot = m_dataFormular[m_nSon].line [j].m_arrBE.looseArr[k].nFoot;
-				if( nFoot<footBegin
-					|| nFoot>this->m_footEnd )
+				int nFoot = m_dataFormular[m_nSon].line[j].m_arrBE.looseArr[k].nFoot;
+				if (nFoot < footBegin || nFoot > m_footEnd)
 					continue;
 
-				float ftemp = m_dataFormular[m_nSon].line [j].m_arrBE.line[nFoot] ;
-				if(ftemp>m_max_sun[m_nSon])
-					m_max_sun[m_nSon]=ftemp;
-				if(ftemp<m_min_sun[m_nSon])
-					m_min_sun[m_nSon]=ftemp;
+				float ftemp = m_dataFormular[m_nSon].line[j].m_arrBE.line[nFoot];
+				if (ftemp > m_max_sun[m_nSon])
+					m_max_sun[m_nSon] = ftemp;
+				if (ftemp < m_min_sun[m_nSon])
+					m_min_sun[m_nSon] = ftemp;
 			}
 		}
 
+		if (bVolStick && m_min_sun[m_nSon] > 0)
+		{
+			m_min_sun[m_nSon] = 0;
+		}
 
-		if(bVolStick && m_min_sun[m_nSon]>0) 
-			m_min_sun[m_nSon]=0;
-		if(bVolStick && m_max_sun[m_nSon]<0) 
-			m_max_sun[m_nSon]=0;
+		if (bVolStick && m_max_sun[m_nSon] < 0)
+		{
+			m_max_sun[m_nSon] = 0;
+		}
 	}
-
 }
+
 
 
 void CTaiKlineShowKline::CaclMaxFlt(Kline *pK,int footBegin)
