@@ -10,7 +10,7 @@ CStkCommon::~CStkCommon()
 {
 }
 
-int LoadStockCode(StockCodeMap& tskCodeList, TSKMarket tskMarket)
-{
-	return 0;
-}
+//int LoadStockCode(StockCodeMap& tskCodeList, TSKMarket tskMarket)
+//{
+//	return 0;
+//}
