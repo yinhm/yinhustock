@@ -54,13 +54,6 @@
 #include    "direct.h"
 #include "CTaiKlineDlgNeuralLearn.h"
 
-
-#include "GenericThread.h"
-#include "OSManager.h"
-
-#include "stock1.h"
-using namespace StockMarket;
-
 //added by qyp 2001.10.9
 #include "LogonDlg.h"
 #include "DlgShowInformation.h"
@@ -303,7 +296,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;    
 	}
 
-	// Initialize the command bars
+	/* Initialize the command bars
 	if (!InitCommandBars())
 		return -1;
 
@@ -323,14 +316,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	{
 		TRACE0("Failed to create menu bar.\n");
 		return -1;      // fail to create
-	}
+	}//*/
 
 	//VERIFY(m_MTIClientWnd.Attach(this, TRUE));
 	//m_MTIClientWnd.LoadState();
 	//m_MTIClientWnd.EnableToolTips();
 	//m_MTIClientWnd.SetFlags(xtpWorkspaceHideClose | xtpWorkspaceHideArrows | xtpWorkspaceShowCloseSelectedTab);
-
-	TSKReceiver()->StartEngine();
 
 	return 0;
 }
@@ -1661,40 +1652,16 @@ void CMainFrame::ShowMYXMZ()
 }
 
 
-
-CGenericThread* pThread = NULL;
-
-DWORD ThreadProc(void* lpData)
-{
-	communication();
-	return 0;
-}
-
 void CMainFrame::HqStock_Init()
 {
-	char szInfo[MAX_PATH];
-
-	if (!gSTOCKDLL.LoadDriver(_T("D:\\NetStock\\JStockclt\\Stock.dll")))
-		return;
-
-	gSTOCKDLL.Stock_Init(m_hWnd, Gp_Msg_StkData, RCV_WORK_SENDMSG);
-	//gSTOCKDLL.GetStockDrvInfo(RI_SUPPORTEXTHQ, (void*)szInfo);
-
-	//pThread = COSManager::CreateThread(ThreadProc);
-	//pThread->Start(NULL);
-
-	//TSKReceiver()->StartEngine();
+	TSKReceiver()->StartEngine();
 
 	m_taiShanDoc->m_bCloseReceiver = TRUE;
-
-	SetTimer(1007, 2000, NULL);
 }
 
 void CMainFrame::HqStock_Quit()
 {
-	gSTOCKDLL.Stock_Quit(m_hWnd);
-
-	//TSKReceiver()->StopEngine();
+	TSKReceiver()->StopEngine();
 
 	m_taiShanDoc->m_bCloseReceiver = FALSE;
 }
@@ -1932,7 +1899,6 @@ LONG CMainFrame::OnStkDataOK(UINT wFileType, LONG lPara)
 
 				if (!bPath)
 				{
-
 					switch (pHeader->m_File.m_dwAttrib)
 					{
 					case News_Sha_Ex:

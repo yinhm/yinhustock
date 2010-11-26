@@ -38,8 +38,6 @@ public:
 	static CClientTransmitManageWnd* m_pClientTransmitManageWnd;
 
 	static BOOL m_bLogonSuccess;
-#else
-	CStkDriver	gSTOCKDLL;
 #endif
 private:
 #ifdef WIDE_NET_VERSION
