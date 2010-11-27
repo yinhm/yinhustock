@@ -1,10 +1,6 @@
 
-#if !defined(AFX_WSSTOCK2000DOC_H__61A31CF1_9707_11D1_ACAB_0000E823DBFD__INCLUDED_)
-#define AFX_WSSTOCK2000DOC_H__61A31CF1_9707_11D1_ACAB_0000E823DBFD__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
+
 
 #include "CFormularContent.h"
 
@@ -15,6 +11,12 @@
 #include "NineShowView.h"
 #include "MyTreeView.h"
 #include "InfoView.h"
+
+
+
+#include "CSharesCompute.h"
+
+
 
 #define  systemcolorlength   34
 #define  comblength          9
@@ -262,17 +264,12 @@ public:
 	int GetStockKind(CString strKind);
 	CString GetStockKindString(int nKind);
 
-	long m_lDay;                                               
 	BOOL m_bInitDone;                                       
 	BOOL m_bInitCurrDone;                                   
 	int m_BlockCalcTime;
 
 	CMapStringToString m_StockTypeMap[3];
 
-	short m_nANT[3];                                           
-	short m_nOldANT[3];                                         
-	short m_nMaxANT[3];                                    
-	short m_nMaxMaxANT;                                        
 	short m_nDel_Half_ANT[3];                                  
 	short m_nDel_Start_A_hr[3];                                
 	short m_nDel_Start_A_min[3];                                   
@@ -282,7 +279,6 @@ public:
 	short m_nDel_End_A_min[3];                                
 	short m_nDel_End_B_hr[3];                                  
 	short m_nDel_End_B_min[3];                                   
-	short m_nHave_Olddata;                                       
 	int m_nNowHour;                                          
 	int m_nNowMin;                                           
 	int m_nNowSec;                                               
@@ -343,17 +339,46 @@ public:
 
 
 
-	void Init_dat();                                          
-	void Chk_Ystc();                                          
-	void chk_date();                                        
-	void Init_EveryDay();                                     
-	void Init_StockData(int mode);                            
-	int GetStocktime(int mode);                              
-	void LoadStockData(int mode);                              
-	void CreateFileData(int mode);                              
-	void LoadFileData(int mode);                             
-	float OnCalcDpTidxdData(int which_stk);                     
-	long GetStockDay(time_t time )    ;                     
+	long m_lToday;						// 今天日期
+	long m_lDay;						// 当前日期 20101010
+	short m_nHave_Olddata;				// 
+
+	short m_nANT[3];					
+	short m_nOldANT[3];					
+	short m_nMaxANT[3];					
+	short m_nMaxMaxANT;					
+
+	// 获取当天日期 20101010
+	void chk_date();
+
+	// 设置市场开收市时间信息
+	void Init_dat();
+
+	// 初始化数据 mode 0 3 初始化
+	void Init_EveryDay();
+
+protected:
+	void Init_StockData(int mode);
+	void LoadStockData(int mode);
+	void CreateFileData(int mode);
+	void LoadFileData(int mode);
+
+public:
+	// 清除前日数据并初始化
+	void ClearRealData();
+
+	// 检测是否接收到了新一天的行情数据
+	BOOL CheckNewReport(time_t time);
+
+
+
+	float OnCalcDpTidxdData(int which_stk);
+
+
+
+	// 返回指定时间的日期 20101010
+	long GetStockDay(time_t time);
+
 	void StockCloseWork();
 	void SaveFileData();
 	void StockNameConvert(char *StockName,char *pyjc);
@@ -434,9 +459,6 @@ protected:
 	void InitChooseAndStockType();
 
 public:
-	void ClearRealData();
-
-public:
 	void OnCalcHqDataProgress();
 
 protected:
@@ -445,6 +467,10 @@ protected:
 	afx_msg void OnToolClosework();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
-};
 
-#endif // !defined(AFX_WSSTOCK2000DOC_H__61A31CF1_9707_11D1_ACAB_0000E823DBFD__INCLUDED_)
+
+
+
+protected:
+	int GetStocktime(int mode);
+};

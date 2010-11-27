@@ -298,14 +298,14 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	/* Initialize the command bars
 	if (!InitCommandBars())
-		return -1;
+	return -1;
 
 	// Get a pointer to the command bars object.
 	CXTPCommandBars* pCommandBars = GetCommandBars();
 	if (pCommandBars == NULL)
 	{
-		TRACE0("Failed to create command bars object.\n");
-		return -1;      // fail to create
+	TRACE0("Failed to create command bars object.\n");
+	return -1;      // fail to create
 	}
 
 	CXTPPaintManager::SetTheme(xtpThemeOffice2003);
@@ -314,8 +314,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	CXTPToolBar* pMenuBar = pCommandBars->SetMenu(_T("Menu Bar"), IDR_MAINFRAME);
 	if (pMenuBar == NULL)
 	{
-		TRACE0("Failed to create menu bar.\n");
-		return -1;      // fail to create
+	TRACE0("Failed to create menu bar.\n");
+	return -1;      // fail to create
 	}//*/
 
 	//VERIFY(m_MTIClientWnd.Attach(this, TRUE));
@@ -1664,6 +1664,22 @@ void CMainFrame::HqStock_Quit()
 	TSKReceiver()->StopEngine();
 
 	m_taiShanDoc->m_bCloseReceiver = FALSE;
+}
+
+void CMainFrame::UpdateData(UINT nType, WPARAM wParam, LPARAM lParam)
+{
+	WORD wMarket = (WORD)wParam;
+	CString StockCode = (char*)lParam;
+
+	CTaiShanDoc* pDoc = this->m_taiShanDoc;
+
+	switch (nType)
+	{
+	case 83:
+		CTaiShanKlineShowView *pView = pDoc->m_lmbViewArray[0];
+		if (pView)
+		pView->WideNetRedraw(wParam, lParam);
+	}
 }
 
 void CMainFrame::OnClearRealdata() 

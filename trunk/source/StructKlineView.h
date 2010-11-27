@@ -655,10 +655,10 @@ union TRADE_DETAIL_INDEX
 
 struct TRADE_DETAIL_H_PER
 {
-	float	vol;	
-	float	price;
 	int		time;
-
+	float	price;
+	float	vol;	
+	float	amount;
 	TRADE_DETAIL_INDEX buySellOrIndex;
 };
 

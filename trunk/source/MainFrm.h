@@ -196,6 +196,7 @@ protected:
 public:
 	void HqStock_Init();
 	void HqStock_Quit();
+	void UpdateData(UINT nType, WPARAM wParam, LPARAM lParam);
 
 protected:
 	afx_msg void OnClearRealdata();

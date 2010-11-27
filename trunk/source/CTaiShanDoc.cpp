@@ -317,12 +317,13 @@ BOOL CTaiShanDoc::OnNewDocument()
 
 #ifdef WIDE_NET_VERSION
 	Init_dat();
-	Init_StockData(2);  
+	Init_StockData(2);
 #else
 	chk_date();
 	Init_dat();
 	Init_EveryDay();
 #endif
+
 
 	::GetCurrentDirectory(MAX_PATH,m_CurrentWorkDirectory.GetBuffer(MAX_PATH));
 	m_CurrentWorkDirectory.ReleaseBuffer();
@@ -619,192 +620,39 @@ void CTaiShanDoc::OnCloseDocument()
 
 void CTaiShanDoc::Init_dat()                                             
 {
-	FILE *inq;
-	int shanghai_shenzhen,to_find;
-	char str[80];
-	inq=_fsopen( "Stocktime.dat", "rt", SH_DENYNO );
-	if ( inq!=NULL )
+	for (int i = 0; i < 3; i++)
 	{
-		shanghai_shenzhen = -1;
-		while ( fscanf( inq, "%s", str )>0 )
-		{
-			to_find = -1;
-			if ( !strcmpi( str, "[ShangHai]" )  )
-				shanghai_shenzhen = 0;
-			else if ( !strcmpi( str, "[ShenZhen]" ) )
-				shanghai_shenzhen = 1;
-			else if ( !strcmpi( str, "[ShenZhenEB]"))
-				shanghai_shenzhen = 2;
-			else if ( !strcmpi( str, "[ShangHai]" ) ||!strcmpi( str, "[ShenZhen]" ) ||!strcmpi( str, "[ShenZhenEB]" ))
-				shanghai_shenzhen = -1;
-			else if ( !strcmpi( str, "start_A_hour=" ) )
-				to_find = 0;
-			else if ( !strcmpi( str, "start_A_min=" ) )
-				to_find = 1;
-			else if ( !strcmpi( str, "end_A_hour=" ) )
-				to_find = 2;
-			else if ( !strcmpi( str, "end_A_min=" ) )
-				to_find = 3;
-			else if ( !strcmpi( str, "start_B_hour=" ) )
-				to_find = 4;
-			else if ( !strcmpi( str, "start_B_min=" ) )
-				to_find = 5;
-			else if ( !strcmpi( str, "end_B_hour=" ) )
-				to_find = 6;
-			else if ( !strcmpi( str, "end_B_min=" ) )
-				to_find = 7;
-			if ( to_find>=0 && shanghai_shenzhen>=0 )
-			{
-				fscanf( inq, "%s", str );
-				if ( to_find==0 )
-					m_nDel_Start_A_hr[shanghai_shenzhen] = atoi( str );
-				else if ( to_find==1 )
-					m_nDel_Start_A_min[shanghai_shenzhen] = atoi( str );
-				else if ( to_find==2 )
-					m_nDel_End_A_hr[shanghai_shenzhen] = atoi( str );
-				else if ( to_find==3 )
-					m_nDel_End_A_min[shanghai_shenzhen] = atoi( str );
-				else if ( to_find==4 )
-					m_nDel_Start_B_hr[shanghai_shenzhen] = atoi( str );
-				else if ( to_find==5 )
-					m_nDel_Start_B_min[shanghai_shenzhen] = atoi( str );
-				else if ( to_find==6 )
-					m_nDel_End_B_hr[shanghai_shenzhen] = atoi( str );
-				else if ( to_find==7 )
-					m_nDel_End_B_min[shanghai_shenzhen] = atoi( str );
-			}
-		}
-		fclose(inq);
-		m_nMaxMaxANT=0;
-		for ( int i=0; i<3; i++ )
-		{
-			m_nANT[i]=0;
-			m_nOldANT[i]=0;
-			m_nDel_Half_ANT[i] = (m_nDel_End_A_hr[i]-m_nDel_Start_A_hr[i])*60-m_nDel_Start_A_min[i]+m_nDel_End_A_min[i]-1;
-			if ( m_nDel_Start_B_hr[i]>=0 )
-				m_nMaxANT[i] = m_nDel_Half_ANT[i]+((m_nDel_End_B_hr[i]-m_nDel_Start_B_hr[i])*60-m_nDel_Start_B_min[i]+m_nDel_End_B_min[i]);
-			if ( m_nMaxANT[i]>m_nMaxMaxANT )
-				m_nMaxMaxANT = m_nMaxANT[i];
-		}
+		m_nANT[i] = 0;
+		m_nOldANT[i] = 0;
+		m_nMaxANT[i] = 239;
+		m_nDel_Half_ANT[i] = 119;
+		m_nDel_Start_A_hr[i] = 9;
+		m_nDel_Start_A_min[i] = 30;
+		m_nDel_Start_B_hr[i] = 13;
+		m_nDel_Start_B_min[i] = 0;
+		m_nDel_End_A_hr[i] = 11;
+		m_nDel_End_A_min[i] = 30;
+		m_nDel_End_B_hr[i] = 15;
+		m_nDel_End_B_min[i] = 0;
 	}
-	else
+
+	m_nMaxMaxANT = 239;
+
+	for (int i = 0 ; i < 3; i++)
 	{
-		for(int i=0;i<3;i++)
-		{
-			m_nANT[i]=0;
-			m_nOldANT[i]=0;
-			m_nMaxANT[i]=239;
-			m_nDel_Half_ANT[i]=119;
-			m_nDel_Start_A_hr[i]=9;
-			m_nDel_Start_A_min[i]=30;
-			m_nDel_Start_B_hr[i]=13;
-			m_nDel_Start_B_min[i]=0;
-			m_nDel_End_A_hr[i]=11;
-			m_nDel_End_A_min[i]=30;
-			m_nDel_End_B_hr[i]=15;
-			m_nDel_End_B_min[i]=0;
-		}
-		m_nMaxMaxANT=239;
+		m_lStartMinA[i] = m_nDel_Start_A_hr[i] * 60 + m_nDel_Start_A_min[i];
+		m_lEndMinA[i] = m_nDel_End_A_hr[i] * 60 + m_nDel_End_A_min[i];
+		m_lStartMinB[i] = m_nDel_Start_B_hr[i] * 60 + m_nDel_Start_B_min[i];
+		m_lEndMinB[i] = m_nDel_End_A_hr[i] * 60 + m_nDel_End_A_min[i];
 	}
-	for(int i=0 ;i<3 ;i++)           
-	{
-		this->m_lStartMinA[i]=m_nDel_Start_A_hr[i]*60 + m_nDel_Start_A_min[i];
-		this->m_lEndMinA[i]=m_nDel_End_A_hr[i]*60 + m_nDel_End_A_min[i];
-		this->m_lStartMinB[i]=m_nDel_Start_B_hr[i]*60 + m_nDel_Start_B_min[i];
-		this->m_lEndMinB[i]=m_nDel_End_A_hr[i]*60 + m_nDel_End_A_min[i];
-	}
+
 	m_nMaxMaxANT++;
-	Chk_Ystc();                                          
 }
 
-void CTaiShanDoc::Chk_Ystc()                                         
+void CTaiShanDoc::chk_date()
 {
-	FILE *in;
-	long day;
-	if( (in=_fsopen(g_realtime,"rb",SH_DENYNO))!=NULL)
-	{  
-		fseek(in,4,SEEK_SET);
-		if ((fread(&day,4,1,in))>0)
-		{
-			if (m_lDay<=day)
-				m_nHave_Olddata=1;
-			else
-			{
-				m_nHave_Olddata=0;
-			}
-		}
-		fclose(in);
-	}
-	else
-		m_nHave_Olddata=0;
-}
-
-
-void CTaiShanDoc::chk_date()                    
-{
-	CTime m_Time = CTime::GetCurrentTime();
-	m_lDay=((long)m_Time.GetYear())*10000L+(long)(m_Time.GetDay())+(long)(m_Time.GetMonth())*100;
-}
-
-
-int CTaiShanDoc::GetStocktime(int mode)       
-{
-
-	int tmp;
-	struct tm* osTime = new tm;                            
-
-	CTime m_Time = CTime::GetCurrentTime();
-	osTime = m_Time.GetLocalTm( osTime );
-
-	if (mode==0)
-		tmp=osTime->tm_hour *60+ osTime->tm_min ;
-	else 
-	{                                                                     
-		if (osTime->tm_hour < m_nDel_Start_B_hr[mode-1] || m_nDel_Start_B_hr[mode-1]<0)
-		{   
-			tmp=(osTime->tm_hour -m_nDel_Start_A_hr[mode-1])*60 + osTime->tm_min  - m_nDel_Start_A_min[mode-1] ;
-			if (tmp>m_nDel_Half_ANT[mode-1])                                 
-				tmp=m_nDel_Half_ANT[mode-1];
-		}
-		else 
-		{                                                                  
-			tmp=(osTime->tm_hour - m_nDel_Start_B_hr[mode-1])*60+osTime->tm_min - m_nDel_Start_B_min[mode-1];
-			if (tmp<0)
-				tmp=m_nDel_Half_ANT[mode-1];                              
-			else
-			{
-				tmp+=(m_nDel_Half_ANT[mode-1]+1);
-				if (tmp>m_nMaxANT[mode-1] )                                 
-					tmp=m_nMaxANT[mode-1] ;
-			}
-		}
-	}
-	m_nNowHour=osTime->tm_hour ;                                            
-	m_nNowMin=osTime->tm_min ;                                                
-	m_nNowSec=osTime->tm_sec ;                                              
-
-	if (tmp<-88)                                    
-		tmp=-88;
-
-	delete osTime;
-
-	return(tmp);
-}
-
-
-
-
-
-long CTaiShanDoc::GetStockDay(time_t time)
-{
-	if (time <= 0)
-		return 0;
-
-	int tmp;
-	CTime m_Time = time;
-	tmp = ((long)m_Time.GetYear()) * 10000L + (long)(m_Time.GetMonth()) * 100 + (long)(m_Time.GetDay());
-
-	return (tmp);
+	CTime m_time = CTime::GetCurrentTime();
+	m_lToday = m_lDay = ((long)m_time.GetYear()) * 10000L + ((long)m_time.GetMonth()) * 100 + ((long)m_time.GetDay());
 }
 
 void CTaiShanDoc::Init_EveryDay()
@@ -817,51 +665,53 @@ void CTaiShanDoc::Init_EveryDay()
 		if (m_week.tm_wday == 0 || m_week.tm_wday == 6)
 		{
 			Init_StockData(2);
-
-			//((CMainFrame *)(AfxGetApp()->m_pMainWnd))->HqStock_Init();
 		}
 		else if (m_nHave_Olddata == 1)
 		{
 			Init_StockData(1);
 		}
-		else if (tmp >= m_lStartMinA[0] || tmp >= m_lStartMinA[1])
+		//else if (tmp >= m_lStartMinA[0] || tmp >= m_lStartMinA[1])
+		//{
+		//	int rtn = MessageBox(NULL, "清除昨天分时数据吗？", "警告", MB_YESNO | MB_ICONWARNING);
+		//	if (rtn == 6)
+		//	{
+		//		ClearRealData();
+		//	}
+		//	else
+		//	{
+		//		Init_StockData(2);
+		//	}
+		//}
+		//else if ((tmp >= m_lStartMinA[0] - 5 ) || (tmp >= m_lStartMinA[1] - 5))
+		//{
+		//	int rtn = MessageBox(NULL, "清除昨天分时数据吗？", "警告", MB_YESNO | MB_ICONWARNING);
+		//	if (rtn == 6)
+		//	{
+		//		ClearRealData();
+		//	}
+		//	else
+		//	{
+		//		Init_StockData(2);
+		//	}
+		//}
+		//else if (tmp < m_lStartMinA[0] - 5 || tmp < m_lStartMinA[1] - 5)
+		//{
+		//	int rtn = MessageBox(NULL, "清除昨天分时数据吗？", "警告", MB_YESNO | MB_ICONWARNING);
+		//	if (rtn == 6)
+		//	{
+		//		ClearRealData();
+		//	}
+		//	else
+		//	{
+		//		Init_StockData(2);
+		//	}
+		//}
+		else
 		{
-			int rtn = MessageBox(NULL, "清除昨天分时数据吗？", "警告", MB_YESNO | MB_ICONWARNING);
-			if (rtn == 6)
-			{
-				ClearRealData();
-			}
-			else
-			{
-				Init_StockData(2);
-			}
-		}
-		else if ((tmp >= m_lStartMinA[0] - 5 ) || (tmp >= m_lStartMinA[1] - 5))
-		{
-			int rtn = MessageBox(NULL, "清除昨天分时数据吗？", "警告", MB_YESNO | MB_ICONWARNING);
-			if (rtn == 6)
-			{
-				ClearRealData();
-			}
-			else
-			{
-				Init_StockData(2);
-			}
-		}
-		else if (tmp < m_lStartMinA[0] - 5 || tmp < m_lStartMinA[1] - 5)
-		{
-			int rtn = MessageBox(NULL, "清除昨天分时数据吗？", "警告", MB_YESNO | MB_ICONWARNING);
-			if (rtn == 6)
-			{
-				ClearRealData();
-			}
-			else
-			{
-				Init_StockData(2);
-			}
+			Init_StockData(2);
 		}
 	}
-	catch(...)
+	catch (...)
 	{
 	}
 
@@ -873,8 +723,11 @@ void CTaiShanDoc::Init_StockData(int mode)
 {
 	LoadStockData(mode);
 
-	if (mode == 2)
+	if (mode == 2 || (m_week.tm_wday == 0 || m_week.tm_wday == 6))
 	{
+		m_nOldANT[0] = m_nMaxANT[0];
+		m_nOldANT[1] = m_nMaxANT[1];
+		m_nOldANT[2] = m_nMaxANT[2];
 		m_nANT[0] = m_nOldANT[0];
 		m_nANT[1] = m_nOldANT[1];
 		m_nANT[2] = m_nOldANT[2];
@@ -901,18 +754,18 @@ void CTaiShanDoc::Init_StockData(int mode)
 
 void CTaiShanDoc::LoadStockData(int mode)
 {
-	CString path;
-	GetCurrentDirectory(MAX_PATH, path.GetBuffer(MAX_PATH));
-	path.ReleaseBuffer();
+	CString strPath;
+	GetCurrentDirectory(MAX_PATH, strPath.GetBuffer(MAX_PATH));
+	strPath.ReleaseBuffer();
 
 	if (mode != 3)
 	{
-		m_sharesInformation.InitRealTimeData(path);
-		m_ManagerStockTypeData.InitStockTypeData(path);
+		m_sharesInformation.InitRealTimeData(strPath);
+		m_ManagerStockTypeData.InitStockTypeData(strPath);
 		InitChooseAndStockType();
 	}
 
-	switch(mode)
+	switch (mode)
 	{
 	case 0:
 	case 3:
@@ -938,6 +791,7 @@ void CTaiShanDoc::CreateFileData(int mode)
 	fclose(fp);
 
 	CString FileName;
+
 	FileName.Format("news\\shanghai\\%d.dat", m_lDay);
 	fp = _fsopen(FileName.GetBuffer(0), "w+b", SH_DENYNO);
 	fclose(fp);
@@ -953,9 +807,18 @@ void CTaiShanDoc::CreateFileData(int mode)
 	REALDATA* RealFileHead;
 	m_sharesInformation.SetRealDataHead(RealFileHead);
 	RealFileHead->Day = m_lDay;
-	RealFileHead->OldANT[0] = m_nANT[0];
-	RealFileHead->OldANT[1] = m_nANT[1];
-	RealFileHead->OldANT[2] = m_nANT[2];
+	if (m_week.tm_wday == 0 || m_week.tm_wday == 6)
+	{
+		m_nANT[0] = m_nMaxANT[0];
+		m_nANT[1] = m_nMaxANT[1];
+		m_nANT[2] = m_nMaxANT[2];
+	}
+	else
+	{
+		RealFileHead->OldANT[0] = m_nANT[0];
+		RealFileHead->OldANT[1] = m_nANT[1];
+		RealFileHead->OldANT[2] = m_nANT[2];
+	}
 	RealFileHead->CloseWorkDone = m_bCloseWorkDone = FALSE;
 }
 
@@ -972,13 +835,13 @@ void CTaiShanDoc::LoadFileData(int mode)
 
 	if (m_week.tm_wday == 0 || m_week.tm_wday == 6)
 	{
-		m_nANT[0] = m_nOldANT[0];
-		m_nANT[1] = m_nOldANT[1];
-		m_nANT[2] = m_nOldANT[2];
+		m_nANT[0] = m_nMaxANT[0];
+		m_nANT[1] = m_nMaxANT[1];
+		m_nANT[2] = m_nMaxANT[2];
 	}
 
 	CFile fl;
-	if (fl.Open ("news\\news.log", CFile::modeCreate | CFile::modeNoTruncate))
+	if (fl.Open("news\\news.log", CFile::modeCreate | CFile::modeNoTruncate))
 	{
 		fl.Close();
 	}
@@ -999,6 +862,45 @@ void CTaiShanDoc::LoadFileData(int mode)
 	}
 
 	fclose(fp);
+}
+
+void CTaiShanDoc::ClearRealData()
+{
+	Init_StockData(0);
+
+	STOCKTYPEHEAD* pStockTypeHead;
+	m_ManagerStockTypeData.GetStockTypeHeadPoint(pStockTypeHead);
+	pStockTypeHead->m_lLastTime = 0;
+}
+
+BOOL CTaiShanDoc::CheckNewReport(time_t time)
+{
+	CTime m_time = time;
+	long date = (long)m_time.GetYear() * 10000L + (long)m_time.GetMonth() * 100L + (long)m_time.GetDay();
+	if (date != m_lDay)
+	{
+		m_lDay = date;
+
+		ClearRealData();
+	}
+
+	return FALSE;
+}
+
+
+
+
+
+long CTaiShanDoc::GetStockDay(time_t time)
+{
+	if (time <= 0)
+		return 0;
+
+	int date;
+	CTime m_time = time;
+	date = ((long)m_time.GetYear()) * 10000L + ((long)m_time.GetMonth()) * 100L + ((long)m_time.GetDay());
+
+	return date;
 }
 
 void CTaiShanDoc::SaveFileData()
@@ -1068,15 +970,6 @@ void CTaiShanDoc::InitChooseAndStockType()
 	}
 	if (m_sharesInformation.GetStockTypeCount(10) == 0)
 		m_ManagerStockTypeData.InitStockTypePoint();                 
-}
-
-void CTaiShanDoc::ClearRealData()
-{
-	Init_StockData(0);
-
-	STOCKTYPEHEAD* pStockTypeHead;
-	m_ManagerStockTypeData.GetStockTypeHeadPoint(pStockTypeHead);
-	pStockTypeHead->m_lLastTime = 0;
 }
 
 void CTaiShanDoc::OnCalcHqDataProgress()
@@ -2511,4 +2404,56 @@ void CTaiShanDoc::OnToolClosework()
 			StockCloseWork();
 		}
 	}
+}
+
+int CTaiShanDoc::GetStocktime(int mode)       
+{
+	int tmp;
+	struct tm* osTime = new tm;
+
+	CTime m_Time = CTime::GetCurrentTime();
+	osTime = m_Time.GetLocalTm(osTime);
+
+	if (mode == 0)
+	{
+		tmp = osTime->tm_hour * 60 + osTime->tm_min;
+	}
+	else 
+	{
+		if (osTime->tm_hour < m_nDel_Start_B_hr[mode - 1] || m_nDel_Start_B_hr[mode - 1] < 0)
+		{   
+			tmp = (osTime->tm_hour - m_nDel_Start_A_hr[mode - 1]) * 60 + osTime->tm_min - m_nDel_Start_A_min[mode - 1];
+			if (tmp > m_nDel_Half_ANT[mode - 1])
+			{
+				tmp = m_nDel_Half_ANT[mode - 1];
+			}
+		}
+		else
+		{
+			tmp = (osTime->tm_hour - m_nDel_Start_B_hr[mode - 1]) * 60 + osTime->tm_min - m_nDel_Start_B_min[mode - 1];
+			if (tmp < 0)
+			{
+				tmp = m_nDel_Half_ANT[mode - 1];
+			}
+			else
+			{
+				tmp += (m_nDel_Half_ANT[mode - 1] + 1);
+				if (tmp > m_nMaxANT[mode - 1])
+				{
+					tmp = m_nMaxANT[mode - 1];
+				}
+			}
+		}
+	}
+
+	m_nNowHour = osTime->tm_hour;
+	m_nNowMin = osTime->tm_min;
+	m_nNowSec = osTime->tm_sec;
+
+	if (tmp < -88)
+		tmp = -88;
+
+	delete osTime;
+
+	return tmp;
 }

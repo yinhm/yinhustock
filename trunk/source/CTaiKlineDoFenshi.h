@@ -1,12 +1,6 @@
-// CTaiKlineDoFenshi.h: interface for the CTaiKlineMin1 class.
 
-
-#if !defined(AFX_LDOFENSHI_H__20183F81_BDC6_11D2_91D9_0080C8E1242B__INCLUDED_)
-#define AFX_LDOFENSHI_H__20183F81_BDC6_11D2_91D9_0080C8E1242B__INCLUDED_
-
-#if _MSC_VER > 1000
 #pragma once
-#endif // _MSC_VER > 1000
+
 const int  FS_ZOUSHI=		0;
 const int  FS_VOL	=		1;
 const int  FS_MMLD	=	2;
@@ -29,7 +23,6 @@ public:
 	static void GetFenJia(int first,CBuySellList &buySellList,CFJList&	fenjiaUp,CFJList&	fenjiaDown,int nFlag = 0);
 	void SetRectDraw(int nFigu);
 	CBuySellList m_hsMin1 ;
-	TRADE_DETAIL_H_PER	m_hsMin[240];
 
 	Tidxd **m_Tidx;
 	Rsdn1 **m_Nidx;
@@ -85,11 +78,8 @@ public:
 	float m_amount[240];
 	float m_vol[240];
 
-	// 初始化数据
-	void InitMinuteLine();
+	TRADE_DETAIL_H_PER m_hsMin[240];
 
-	// 初始分笔数据
-	void InitHs(bool bRemoveAll = true, bool bSkip = true);
 
 
 
@@ -117,6 +107,12 @@ public:
 
 public:
 	int TransferX(int x);
-};
 
-#endif // !defined(AFX_LDOFENSHI_H__20183F81_BDC6_11D2_91D9_0080C8E1242B__INCLUDED_)
+
+
+	// 初始分笔数据
+	void InitHs(bool bRemoveAll = true, bool bSkip = true);
+
+	// 初始化数据
+	void InitMinuteLine();
+};
