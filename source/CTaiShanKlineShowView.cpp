@@ -59,6 +59,8 @@
 #include "CwdSelectFormu.h"
 #include "BjDlgChengBenSetting.h"
 
+#include "CSharesCompute.h"
+#include "StkReceiver.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -374,6 +376,9 @@ CTaiShanKlineShowView::CTaiShanKlineShowView():m_screenStockShow(this)
 	m_GetFocus = TRUE;
 	bExtend=false;
 	lineTypeDrawed=-1;
+
+	m_bChanged = FALSE;
+	m_bRequest = FALSE;
 }
 
 CTaiShanKlineShowView::~CTaiShanKlineShowView()
@@ -2068,36 +2073,42 @@ void CTaiShanKlineShowView::DrawRightText(CDC *pDC,float vl,int x, int yNum, int
 }
 
 
-void CTaiShanKlineShowView::DrawRightbox(CDC *pDC,bool bClearAll)
+
+void CTaiShanKlineShowView::DrawRightbox(CDC* pDC, bool bClearAll)
 {
-	if(pMin1Drawing->m_pReportData==NULL)
+	if (pMin1Drawing->m_pReportData == NULL)
 		return;
-	CString sN=m_sharesSymbol ;
-	if(IsIndexStock(m_sharesSymbol))
+
+	CString sN = m_sharesSymbol;
+
+	// 指数大盘
+	if (IsIndexStock(m_sharesSymbol))
 	{
-		m_infoFiguer=2;
-		DrawRightBoxDapan(pDC,bClearAll);
+		m_infoFiguer = 2;
+		DrawRightBoxDapan(pDC, bClearAll);
 		return;
 	}
-	m_infoFiguer=1;
+
+	m_infoFiguer = 1;
 
 	CRect rt;
-
 	GetCurrClientRect(rt);
-	CRect rt1(rt.right-m_rightLength+1,0,rt.right,19*RIGHTBOX_PERLINE);
-
-	ClearBack(pDC, rt1,pMin1Drawing->m_bHist);
+	CRect rt1(rt.right - m_rightLength + 1, 0, rt.right, 19 * RIGHTBOX_PERLINE);
 
 
-	CPen pen_line(PS_SOLID  ,1,GetDocument()->m_colorArray[2]); 
-	CPen* pOldpen=pDC->SelectObject(&pen_line);
-	if(pDC->IsPrinting ())
+	ClearBack(pDC, rt1, pMin1Drawing->m_bHist);
+
+
+	CPen pen_line(PS_SOLID, 1, GetDocument()->m_colorArray[2]);
+	CPen* pOldpen = pDC->SelectObject(&pen_line);
+
+	if (pDC->IsPrinting())
 	{
-		pDC->MoveTo (0,0);
-		pDC->LineTo (rt.right-1,0);
-		pDC->LineTo (rt.right-1,rt.bottom);
-		pDC->LineTo (0,rt.bottom);
-		pDC->LineTo (0,0);
+		pDC->MoveTo(0, 0);
+		pDC->LineTo(rt.right - 1, 0);
+		pDC->LineTo(rt.right - 1, rt.bottom);
+		pDC->LineTo(0, rt.bottom);
+		pDC->LineTo(0, 0);
 	}
 
 	pDC->MoveTo(rt.right-m_rightLength,RIGHTBOX_PERLINE);
@@ -6399,39 +6410,67 @@ void CTaiShanKlineShowView::OnUpdateZhutuDiejia(CCmdUI* pCmdUI)
 	}
 }
 
-void CTaiShanKlineShowView::ShowAll(CString sharesymbol,bool bCaclStockPos,	bool bInitFoot)
+void CTaiShanKlineShowView::ShowAll(CString sharesymbol, bool bCaclStockPos, bool bInitFoot)
 {
-
 	CReportData* pdt;
+
 	CTaiShanDoc* pDoc = GetDocument();
-	if(pDoc->m_sharesInformation.Lookup(sharesymbol.GetBuffer (0),pdt,m_stkKind)==0)
+	if (pDoc->m_sharesInformation.Lookup(sharesymbol.GetBuffer(0), pdt, m_stkKind) == 0)
 	{
-		sharesymbol.ReleaseBuffer ();
+		sharesymbol.ReleaseBuffer();
 		sharesymbol = CSharesCompute::GetIndexSymbol(0);
 	}
 	else
-		sharesymbol.ReleaseBuffer ();
+	{
+		sharesymbol.ReleaseBuffer();
+	}
 
 
 	m_sharesSymbol = sharesymbol;
 	SetWindowText(m_sharesSymbol);
-	if(m_bMultiFiguer==1)
+
+	if ((m_stkKind != m_oldKind || m_sharesSymbol != m_oldSymbol) || !m_bRequest)
+	{
+		m_oldKind = m_stkKind;
+		m_oldSymbol = m_sharesSymbol;
+
+		m_bChanged = TRUE;
+		m_bRequest = FALSE;
+	}
+	else
+	{
+		m_bChanged = FALSE;
+	}
+
+
+	if (m_bMultiFiguer == 1)
 	{
 		int nFiguer;
-		if(pDoc->m_systemOption.fourgraph==FALSE)//kline
-			nFiguer=4;
-		else
-			nFiguer=9;
-		for(int j= 0;j<nFiguer;j++)
+		if (pDoc->m_systemOption.fourgraph == FALSE)
 		{
-			this->m_symbol9 [j] = GetMultiSymbol(j,m_stkKind9[j]);
+			nFiguer = 4;
+		}
+		else
+		{
+			nFiguer = 9;
+		}
+
+		for (int j = 0; j < nFiguer; j++)
+		{
+			m_symbol9[j] = GetMultiSymbol(j, m_stkKind9[j]);
 		}
 	}
 
-	if(m_pWideNet) m_pWideNet->AddStockFirst(m_sharesSymbol,m_stkKind);
 
-	ASSERT(m_sharesSymbol.GetLength()>3);
+	if (m_pWideNet)
+	{
+		m_pWideNet->AddStockFirst(m_sharesSymbol, m_stkKind);
+	}
+
+
+	ASSERT(m_sharesSymbol.GetLength() > 3);
 	pMin1Drawing->InitMinuteLine();
+
 
 	if(m_nKlineKind2==0)
 	{
@@ -6462,23 +6501,30 @@ void CTaiShanKlineShowView::ShowAll(CString sharesymbol,bool bCaclStockPos,	bool
 	}
 
 
-	this->KlineReadTransferData ();
-	pKlineDrawing->m_bToCacl =TRUE;
+	// 读取转换Kline数据
+	KlineReadTransferData();
 
-	pKlineDrawing ->m_bInitFoot =bInitFoot;//
-	pDrawLine->m_lineTypeOld=-1;
-	if(bCaclStockPos==true)
+	pKlineDrawing->m_bToCacl = TRUE;
+	pKlineDrawing->m_bInitFoot = bInitFoot;
+	pDrawLine->m_lineTypeOld = -1;
+
+	if (bCaclStockPos == true)
 	{
-		pKlineDrawing->m_klinNumDefault=82;
+		pKlineDrawing->m_klinNumDefault = 82;
 		pKlineDrawing->m_bNewStock = true;
 	}
+
 	RedrawWindow();
-	if(bCaclStockPos==true)
+
+	if (bCaclStockPos == true)
+	{
 		CaclStockPos();
+	}
 
-	if(m_isShowCross==1)
+	if (m_isShowCross == 1)
+	{
 		m_dlgShowCross->RedrawWindow();
-
+	}
 }
 
 void CTaiShanKlineShowView::OnKillFocus(CWnd* pNewWnd) 
@@ -7970,28 +8016,30 @@ BOOL CTaiShanKlineShowView::DoOnCommand(WPARAM wParam, LPARAM lParam)
 
 }
 
-int CTaiShanKlineShowView::ReadKLine(CString fName,int stkKind,Kline*& pKline,int nRead)
+int CTaiShanKlineShowView::ReadKLine(CString fName, int stkKind, Kline*& pKline, int nRead)
 {
-
-
-	if( m_nKlineKind2 >= HS_K_LINE)
+	if (m_nKlineKind2 >= HS_K_LINE)
 		return 0 ;
 
 
 	CTaiShanDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
+
+
 	pDoc->m_sharesSymbol = fName;
-	CMainFrame* pFm=(CMainFrame*)AfxGetMainWnd();
+	CMainFrame* pFm = (CMainFrame*)AfxGetMainWnd();
 
 	pDrawLine->ReadLineself();
 	if( m_nKlineKind2>=1&& m_nKlineKind2<5)
 		return ReadKline5Min( fName,stkKind, pKline,nRead);
-	pKlineDrawing->ReadPower(fName,stkKind);
 
-	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(fName,stkKind,true);
+
+	pKlineDrawing->ReadPower(fName, stkKind);
+
+	CTaiKlineFileKLine* pFile = CTaiKlineFileKLine::GetFilePointer(fName, stkKind, true);
 
 	std::string symbol(fName);
-	int rtnK = pFile->ReadKLine (symbol,pKline,nRead,1);
+	int rtnK = pFile->ReadKLine(symbol, pKline, nRead, 1);
 
 
 	if(GetDocument()->m_bInitDone==TRUE && GetDocument()->m_bCloseWorkDone==false)
@@ -8013,8 +8061,18 @@ int CTaiShanKlineShowView::ReadKLine(CString fName,int stkKind,Kline*& pKline,in
 	}
 
 	time_t mt = 0;
-	if(rtnK>0) mt= pKline[rtnK-1].day;
-	//((CMainFrame*)AfxGetMainWnd())->gSTOCKDLL.QueryKData(fName, CSharesCompute::GetMarketKind(stkKind),mt);
+	if (rtnK > 0)
+	{
+		mt = pKline[rtnK - 1].day;
+	}
+
+	if (m_bChanged || !m_bRequest)
+	{
+		//((CMainFrame*)AfxGetMainWnd())->gSTOCKDLL.QueryKData(fName, CSharesCompute::GetMarketKind(stkKind),mt);
+		TSKReceiver()->RequestData(CSharesCompute::GetMarketKind(stkKind), fName.GetBuffer(0), 5);
+		m_bRequest = TRUE;
+	}
+
 	return rtnK;
 }
 
@@ -9492,43 +9550,6 @@ BOOL CTaiShanKlineShowView::OnHelpInfo(HELPINFO* pHelpInfo)
 
 	DoHtmlHelp(this);
 	return TRUE;
-}
-
-bool CTaiShanKlineShowView::CheckDiskFreeSpace()
-{
-	try
-	{
-		void* pGetDiskFreeSpaceEx = (void*)GetProcAddress( GetModuleHandle("kernel32.dll"),
-			"GetDiskFreeSpaceExA");
-
-		if (pGetDiskFreeSpaceEx)
-		{
-			char ch[256];
-			ULARGE_INTEGER i64FreeBytesToCaller,i64TotalBytes,i64FreeBytes;		
-			::GetCurrentDirectory(256,ch);
-			BOOL fResult = GetDiskFreeSpaceEx (ch,
-				(PULARGE_INTEGER)&i64FreeBytesToCaller,
-				(PULARGE_INTEGER)&i64TotalBytes,
-				(PULARGE_INTEGER)&i64FreeBytes);
-
-			if(fResult)
-			{
-				CString s;
-				int nZhao = i64FreeBytesToCaller.QuadPart /(1024*1024);
-				if(nZhao<50)
-				{
-					s.Format ("您的硬盘空间已经低于%d,\r\n请删除无用文件！",nZhao);
-					AfxMessageBox(s);
-					return false;
-				}
-			}
-
-		}
-	}
-	catch(...)
-	{
-	}
-	return true;
 }
 
 void CTaiShanKlineShowView::ViewSetFocus(CTaiShanKlineShowView *pView)

@@ -15,7 +15,9 @@
 #include "CTaiKlineDialogShiDuanTJ.h"
 
 #include "CSharesCompute.h"
+
 #include "StkDatabase.h"
+#include "StkReceiver.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -104,559 +106,19 @@ CTaiKlineMin1::~CTaiKlineMin1()
 	delete []m_lineDapan[1][2];
 }
 
-
-
-
-
-void CTaiKlineMin1::InitMinuteLine()
-{
-	m_pReportData = &m_dt;
-
-	CString symbol = pView->m_sharesSymbol;
-	pDoc->m_sharesSymbol = symbol;
-
-	m_lineBgn = 0;
-	m_footBegin = 0;
-
-	int isSz = 0;
-	CString sIndex = CSharesCompute::GetIndexSymbol(0);
-
-
-	m_bHist = false;
-	if (pView->m_pDlgDealHistory != NULL)
-	{
-		if (pView->m_pDlgDealHistory->InitDoFenshi(this, symbol, pView->m_stkKind) == true)
-		{
-			m_bHist = true;
-		}
-	}
-
-
-	if (m_bHist == false)
-	{
-		m_pFileHs = TSKDatabase()->GetTickFile(symbol, pView->m_stkKind);
-
-		isSz = 0;
-		if (CSharesCompute::GetMarketKind(pView->m_stkKind) == SZ_MARKET_EX)
-		{
-			isSz = 1;
-		}
-
-		CReportData* pdt = NULL;
-		if (pDoc->m_sharesInformation.Lookup(symbol.GetBuffer(0), pdt, pView->m_stkKind) == 0)
-		{
-			return;
-		}
-		ASSERT(pdt);
-
-		bool b = !(m_sOldSymbol == symbol && m_sOldStkKind == pView->m_stkKind);
-		InitHs(b, false);
-		if (b)
-		{
-			time_t mt = CTime::GetCurrentTime().GetTime();
-			//((CMainFrame*)AfxGetMainWnd())->gSTOCKDLL.QueryMinData(symbol, CSharesCompute::GetMarketKind(pView->m_stkKind),mt);
-		}
-
-		if(pDoc->m_bInitDone ==FALSE)
-			m_footEnd=pDoc->m_nOldANT [0];
-		else
-			m_footEnd=pDoc->m_nANT [isSz];
-
-		{
-			memcpy(&m_dt,pdt,sizeof(CReportData));
-		}
-#ifndef WIDE_NET_VERSION
-		if(!CTaiShanKlineShowView::IsIndexStock(symbol))
-		{
-			for(int j=0;j<=m_footEnd;j++)
-			{
-				float f3 =FABSMY(m_hsMin[j].vol);
-				if(m_pReportData->m_Kdata1[j].Volume  < f3 )
-				{
-					m_pReportData->m_Kdata1[j].Price = m_hsMin[j].price ;
-					m_pReportData->m_Kdata1[j].Volume  = f3  ;
-				}
-				else
-				{
-					if(m_pReportData->m_Kdata1[j].Price>0) m_hsMin[j].price = m_pReportData->m_Kdata1[j].Price;
-					if(m_pReportData->m_Kdata1[j].Volume>f3) m_hsMin[j].vol = m_pReportData->m_Kdata1[j].Volume;
-				}
-			}
-		}
-#endif
-
-		pDoc->m_sharesInformation.GetIndexTidxd(m_Tidx);
-		pDoc->m_sharesInformation.GetIndexRsdn(m_Nidx);
-
-		m_pS0 = NULL;
-		m_pS1 = NULL;
-
-		int stkKind = /*SHZS*/SHAG;
-		if (pDoc->m_sharesInformation.Lookup(sIndex.GetBuffer(0), m_pS0, stkKind) == 0)
-			return;
-		sIndex = CSharesCompute::GetIndexSymbol(1);
-		stkKind = SZZS;
-		if (pDoc->m_sharesInformation.Lookup(sIndex.GetBuffer(0), m_pS1, stkKind) == 0)
-			m_pS1 = m_pS0;
-
-		m_volPre = m_pReportData->totv;
-		if (pView->m_isShowCross == 0)
-		{
-			m_footCurrent = m_footEnd;
-		}
-	}
-	else
-	{
-		m_footEnd = 239;
-		m_volPre = 10e15;
-	}
-
-	m_sOldSymbol = symbol;
-	m_sOldStkKind = pView->m_stkKind;
-
-
-	if (m_footEnd < 0) m_footEnd = 0;
-	if (m_footEnd > 239) m_footEnd = 0;
-
-
-	CReportData* pS0=NULL;
-	pS0 = m_pS0;
-	CReportData* pS1=m_pS1;
-
-
-
-
-	CReportData* pdtInInit = m_pReportData;
-	m_close = pdtInInit->ystc;
-
-	if(CSharesCompute::GetMarketKind(pView->m_stkKind) == SZ_MARKET_EX)
-	{
-		CReportData* pS = pS0;
-		pS0 = pS1;
-		pS1 = pS;
-	}
-	m_close_Dapan[0]=pS0->ystc;
-	m_close_Dapan[1]=pS1->ystc;
-
-	if(m_footEnd+1>m_klinNumDefault)
-	{
-		ASSERT(FALSE);
-		return;
-	}
-
-	//
-	bool bZhiShu=false;
-	if(CTaiShanKlineShowView::IsIndexStock(symbol))
-	{
-		m_pFlg[0]=pView->m_infoInit.flag_dapan[0];
-		m_pFlg[1]=pView->m_infoInit.flag_dapan[1];
-		if(CTaiShanKlineShowView::IsIndexStock3(symbol))
-		{
-			m_pFlg[0]=FS_LINXIAN;
-			m_pFlg[1]=FS_VOL;
-			if(m_nTextBox==0)
-				m_nTextBox=1;
-		}
-		m_pFlg[2]=pView->m_infoInit.flag_dapan[2];
-		m_pFlg[3]=pView->m_infoInit.flag_dapan[3];
-		m_pFlg[4]=pView->m_infoInit.flag_dapan[4];
-		bZhiShu=true;
-	}
-	else
-	{
-		m_pFlg[0]=pView->m_infoInit.flag[0];
-		m_pFlg[1]=pView->m_infoInit.flag[1];
-		m_pFlg[2]=pView->m_infoInit.flag[2];
-		m_pFlg[3]=pView->m_infoInit.flag[3];
-		m_pFlg[4]=pView->m_infoInit.flag[4];
-
-	}
-
-	float high=pS0->higp  ;
-	float lowDapan=pS0->lowp  ;
-
-
-	if((pS0->m_Kdata1)->Price>0)
-		*m_lineDapan[0][0]=(pS0->m_Kdata1)->Price;
-	else
-	{
-		if(pS0->opnp >0)
-			*m_lineDapan[0][0]=pS0->opnp;
-		else
-			*m_lineDapan[0][0]=pS0->ystc ;
-	}
-	for(int k=1;k<=m_footEnd;k++)
-	{
-		if(((pS0->m_Kdata1)+k)->Price>0)
-			*(m_lineDapan[0][0]+k)=((pS0->m_Kdata1)+k)->Price;
-		else
-			*(m_lineDapan[0][0]+k)=*(m_lineDapan[0][0]+k-1);
-	}
-	*m_lineDapan[0][2]=(pS0->m_Kdata1)->Volume;
-	for(int k=1;k<=m_footEnd;k++)
-	{
-		if(((pS0->m_Kdata1)+k)->Volume>pS0->totv && pS0->kind != SZZS)
-			((pS0->m_Kdata1)+k)->Volume=((pS0->m_Kdata1)+k-1)->Volume;
-		if(((pS0->m_Kdata1)+k)->Volume<((pS0->m_Kdata1)+k-1)->Volume)
-			((pS0->m_Kdata1)+k)->Volume=((pS0->m_Kdata1)+k-1)->Volume;
-		if(((pS0->m_Kdata1)+k)->Volume>0)
-			*(m_lineDapan[0][2]+k)=((pS0->m_Kdata1)+k)->Volume
-			-((pS0->m_Kdata1)+k-1)->Volume;
-		else
-		{
-			((pS0->m_Kdata1)+k)->Volume=((pS0->m_Kdata1)+k-1)->Volume;
-			*(m_lineDapan[0][2]+k)=0;
-		}
-	}
-	//1
-	if(bZhiShu)
-	{
-		if((pS1->m_Kdata1)->Price>0)
-			*m_lineDapan[1][0]=(pS1->m_Kdata1)->Price;
-		else
-		{
-			if(pS1->opnp >0)
-				*m_lineDapan[1][0]=pS1->opnp;
-			else
-				*m_lineDapan[1][0]=pS1->ystc ;
-		}
-		for(int k=1;k<=m_footEnd;k++)
-		{
-			if(((pS1->m_Kdata1)+k)->Price>0)
-				*(m_lineDapan[1][0]+k)=((pS1->m_Kdata1)+k)->Price;
-			else
-				*(m_lineDapan[1][0]+k)=*(m_lineDapan[1][0]+k-1);
-		}
-		*m_lineDapan[1][2]=(pS1->m_Kdata1)->Volume;
-		for(int k=1;k<=m_footEnd;k++)
-		{
-			if(((pS1->m_Kdata1)+k)->Volume>pS1->totv && pS1->kind != SZZS)
-				((pS1->m_Kdata1)+k)->Volume=((pS1->m_Kdata1)+k-1)->Volume;
-			if(((pS1->m_Kdata1)+k)->Volume<((pS1->m_Kdata1)+k-1)->Volume)
-				((pS1->m_Kdata1)+k)->Volume=((pS1->m_Kdata1)+k-1)->Volume;
-			if(((pS1->m_Kdata1)+k)->Volume>0)
-				*(m_lineDapan[1][2]+k)=((pS1->m_Kdata1)+k)->Volume
-				-((pS1->m_Kdata1)+k-1)->Volume;
-			else
-			{
-				((pS1->m_Kdata1)+k)->Volume	=((pS1->m_Kdata1)+k-1)->Volume;
-				*(m_lineDapan[1][2]+k)=0;
-			}
-		}
-	}
-
-
-
-	CString s;
-	s=pdtInInit->name;
-	s=pView->m_sharesSymbol +s;
-
-
-
-	int j = 0;
-	float* f0 = m_amount;
-	*f0 = (pdtInInit->m_Kdata1)->Amount;
-
-	for (j = 1; j<= m_footEnd; j++)
-	{
-		if ((pdtInInit->m_Kdata1 + j)->Amount <= 0)
-		{
-			(pdtInInit->m_Kdata1 + j)->Amount = (pdtInInit->m_Kdata1 + j - 1)->Amount;
-		}
-	}
-
-	for (j = 1; j <= m_footEnd; j++)
-	{
-		if ((pdtInInit->m_Kdata1 + j)->Amount > (pdtInInit->m_Kdata1 + j - 1)->Amount && (pdtInInit->m_Kdata1 + j)->Amount > 0)
-		{
-			*(f0 + j) = (pdtInInit->m_Kdata1 + j)->Amount - (pdtInInit->m_Kdata1 + j - 1)->Amount;
-		}
-		else
-		{
-			(pdtInInit->m_Kdata1 + j)->Amount = (pdtInInit->m_Kdata1 + j - 1)->Amount;
-			*(f0 + j) = 0;
-		}
-	}
-
-
-	f0=m_vol;
-	*f0=(pdtInInit->m_Kdata1)->Volume;
-	for(j=1;j<=m_footEnd;j++)
-	{
-		if((pdtInInit->m_Kdata1+j)->Volume<=0)
-			(pdtInInit->m_Kdata1+j)->Volume=(pdtInInit->m_Kdata1+j-1)->Volume;
-	}
-
-	for(j=1;j<=m_footEnd;j++)
-	{
-		if(((pdtInInit->m_Kdata1)+j)->Volume>pdtInInit->totv && pdtInInit->kind != SZZS)
-			((pdtInInit->m_Kdata1)+j)->Volume=((pdtInInit->m_Kdata1)+j-1)->Volume;
-		if((pdtInInit->m_Kdata1+j)->Volume>(pdtInInit->m_Kdata1+j-1)->Volume&&(pdtInInit->m_Kdata1+j)->Volume>0)
-			*(f0+j)=(pdtInInit->m_Kdata1+j)->Volume-(pdtInInit->m_Kdata1+j-1)->Volume;
-		else
-		{
-			(pdtInInit->m_Kdata1+j)->Volume=(pdtInInit->m_Kdata1+j-1)->Volume;
-			*(f0+j)=0;
-		}
-	}
-
-	for(int i=0;i<pView->m_infoInit.nCountMin1;i++)
-	{
-
-		for(int k=0;k<6;k++)
-		{
-			m_dataFormular[i].line[k].bNow=0;
-			m_dataFormular[i].line [k].type=0;
-		}
-
-		int tmp=*(m_pFlg+i);
-		float maxLingXian=(float)-10E20;
-		float minLingXian=(float)10E20;
-		if(i == 0)
-		{
-			if(CTaiShanKlineShowView::IsIndexStock3(symbol)==0 && tmp == FS_LINXIAN)
-				tmp = FS_ZOUSHI;
-		}
-
-
-		switch (tmp)
-		{
-		case FS_LINXIAN:
-		case FS_ZOUSHI:
-			{
-				m_nameSon[i] = "分时走势";
-				m_lineName[i][0] = "分时走势";
-				m_lineName[i][1] = "均线";
-				m_dataFormular[i].numLine = 2;
-
-				f0 = m_dataFormular[i].line[0].m_arrBE.line;
-				if ((pdtInInit->m_Kdata1)->Price <= 0)
-				{
-					// 停盘
-					if (pdtInInit->opnp <= 0)
-					{
-						*f0 = 0;
-						m_bClosed = TRUE;
-					}
-					else
-					{
-						// 默认为前日收盘价
-						*f0 = m_close;
-					}
-				}
-				else
-				{
-					*f0 = (pdtInInit->m_Kdata1)->Price;
-				}
-
-				for (j = 1; j <= m_footEnd; j++)
-				{
-					if ((pdtInInit->m_Kdata1 + j)->Price > 0)
-					{
-						*(f0 + j) = (pdtInInit->m_Kdata1 + j)->Price;
-					}
-					else
-					{
-						*(f0 + j) = *(f0 + j - 1);
-					}
-				}
-
-				if(bZhiShu==true)
-				{
-
-					f0=m_dataFormular[i].line [1].m_arrBE.line;
-					f0[0] = m_dataFormular[i].line [0].m_arrBE.line[0];
-					for (j =1;j <=m_footEnd;j++)
-					{
-						*(f0+j)=(f0[j-1]*j + m_dataFormular[i].line [0].m_arrBE.line[j])/(j+1);
-					}
-					break;
-				}
-			}
-
-			if (1)
-			{
-				bool b1 = true;
-
-				f0 = m_dataFormular[i].line[1].m_arrBE.line;
-				f0[0] = m_dataFormular[i].line[0].m_arrBE.line[0];
-
-				if ((pdtInInit->m_Kdata1)->Volume > 0.01)
-				{
-					f0[0] = (pdtInInit->m_Kdata1)->Amount / ((pdtInInit->m_Kdata1)->Volume * 100);
-				}
-
-				float totp = (pdtInInit->m_Kdata1)->Amount;
-				int rate = 100;
-				if (pdtInInit->totv > 0 && pdtInInit->lowp > 0)
-				{
-					if (pdtInInit->totp/pdtInInit->totv/pdtInInit->lowp>1000)
-						rate = 1000;
-				}
-
-				for (j = 0; j <= m_footEnd; j++)
-				{
-					float f = 0;
-					if (m_vol[j] > 0)
-					{
-						f = m_amount[j] / m_vol[j] / rate;
-						if (f > pdtInInit->higp || f < pdtInInit->lowp)
-						{
-							b1 = false;
-							break;
-						}
-					}
-				}
-
-				if(b1)
-				{
-					for (j =1;j <=m_footEnd;j++)
-					{
-
-						{
-							if((pdtInInit->m_Kdata1+j)->Volume>0.01)
-							{
-								float f = 0;
-								pView->GetPriceAve(f,((pdtInInit->m_Kdata1+j)->Volume),(pdtInInit->m_Kdata1+j)->Amount);//(pdtInInit->m_Kdata1+j)->Amount /((pdtInInit->m_Kdata1+j)->Volume);
-								*(f0+j)= f;
-								if(*(f0+j)<0.01)
-									*(f0+j) = *(f0+j-1);
-							}
-							else
-								*(f0+j)=*(f0+j-1);
-						}
-						if(*(f0+j) > pdtInInit->higp || *(f0+j) < pdtInInit->lowp)
-							*(f0+j)=*(f0+j-1);
-					}
-				}
-				else
-				{
-					for (j =1;j <=m_footEnd;j++)
-					{
-						totp+=m_vol[j]*((pdtInInit->m_Kdata1+j)->Price)*rate;
-						{
-							if((pdtInInit->m_Kdata1+j)->Volume>0.01)
-							{
-								float f = 0;
-								pView->GetPriceAve(f,((pdtInInit->m_Kdata1+j)->Volume),totp);//(pdtInInit->m_Kdata1+j)->Amount /((pdtInInit->m_Kdata1+j)->Volume);
-								*(f0+j)= f;
-								if(*(f0+j)<0.01)
-									*(f0+j) = *(f0+j-1);
-							}
-							else
-								*(f0+j)=*(f0+j-1);
-						}
-						if(*(f0+j) > pdtInInit->higp || *(f0+j) < pdtInInit->lowp)
-							*(f0+j)=*(f0+j-1);
-					}
-				}
-			}
-			break;
-
-		case FS_VOL:
-			m_nameSon[i]="";
-			m_lineName[i][0]="成交量";
-			m_dataFormular[i].numLine=1;
-
-			f0=m_dataFormular[i].line [0].m_arrBE.line; 
-			*f0=m_vol[0];
-			for(j=1;j<=m_footEnd;j++)
-			{
-				*(f0+j)=m_vol[j];
-			}
-			break;
-		case FS_MMLD:
-			m_nameSon[i]="买卖力道";
-			m_lineName[i][0]="买入";
-			m_lineName[i][1]="卖出";
-			m_lineName[i][2]="买卖差";
-			m_dataFormular[i].numLine=0;
-
-			break;
-		case FS_LB:
-			m_nameSon[i]="量比指标";
-			m_lineName[i][0]="量比";
-			m_dataFormular[i].numLine=1;
-
-
-			f0=m_dataFormular[i].line [0].m_arrBE.line; 
-			if((pdtInInit->volume5 )>0)
-				*f0=(pdtInInit->m_Kdata1)->Volume*240/(pdtInInit->volume5 );
-			else
-				*f0=0;
-			if((pdtInInit->volume5 )>0)
-			{
-				for(j=1;j<=m_footEnd;j++)
-				{
-					if((pdtInInit->m_Kdata1+j)->Volume>0)
-						*(f0+j)=(pdtInInit->m_Kdata1+j)->Volume*240/(j+1)/(pdtInInit->volume5 );
-					else
-						*(f0+j)=*(f0+j-1);
-				}
-			}
-			else
-			{
-				memset(f0,0,4*(m_footEnd+1));
-			}
-			break;
-
-		case FS_DUOKONG:
-			m_nameSon[i]="多空指标";
-			m_lineName[i][0]="多空";
-			m_dataFormular[i].numLine=1;
-
-
-			f0=m_dataFormular[i].line [0].m_arrBE.line;
-
-			{
-				for(j=0;j<=m_footEnd;j++)
-				{
-					int r=0;
-					r=(m_Tidx [isSz][j].rp  -m_Tidx [isSz][j].dp);
-					*(m_dataFormular[i].line [0].m_arrBE.line+j)=(float)r;
-				}
-			}
-
-			break;
-		case FS_TONGLUO:
-			m_nameSon[i]="腾落指数";
-			m_lineName[i][0]="腾落指数";
-			m_dataFormular[i].numLine=1;
-
-			{
-				*(m_dataFormular[i].line [0].m_arrBE.line)= (m_Nidx [isSz][0].rsn -m_Nidx [isSz][0].dnn );
-				for(j=1;j<=m_footEnd;j++)
-				{
-					*(m_dataFormular[i].line [0].m_arrBE.line+j)=*(m_dataFormular[i].line [0].m_arrBE.line+j-1) + (m_Nidx [isSz][j].rsn -m_Nidx [isSz][j].dnn );
-				}
-			}
-
-			break;
-		}
-
-		if(i==0 && m_nKlineCurrent>0)
-		{
-			for(int nStk=0;nStk<m_nKlineCurrent;nStk++)
-				AddFenshiAdded(m_symbolAdd[nStk],m_stkKindAdd[nStk],nStk+1);
-		}
-	}
-	m_nameSon[0]=s;
-
-}
-
-
-
 void CTaiKlineMin1::DrawSon(CDC *pDC)
 {
 	SetRectDraw(m_nSon);
 
 	if(m_nSon==0 && m_nKlineCurrent>0 && m_nKlineCurrent<6)
 		CaclMaxAdded();
-	for(int i=0;i<m_dataFormular[m_nSon].numLine ;i++)
+
+
+	for (int i = 0; i < m_dataFormular[m_nSon].numLine; i++)
 	{
-		CaclMaxFlt(m_dataFormular[m_nSon].line [i].m_arrBE.line,
-			m_footBegin);
+		CaclMaxFlt(m_dataFormular[m_nSon].line[i].m_arrBE.line, m_footBegin);
 	}
+
 
 	if(m_close<=0)
 	{
@@ -803,81 +265,6 @@ void CTaiKlineMin1::DrawCapt(CDC *pDC)
 	}
 
 }
-
-
-
-void CTaiKlineMin1::InitHs(bool bRemoveAll, bool bSkip)
-{
-	if ((m_bHist == true || bSkip == true) && bRemoveAll == false)
-		return;
-
-	if (m_pReportData != NULL && bSkip == false)
-	{
-		if (m_pReportData->ystc == 0)
-		{
-			pView->RemoveHs(0);
-			pView->RemoveHs(1);
-
-			if (pView->m_tabNum < 4)
-			{
-				pView->m_nBeginHS = 0;
-			}
-
-			return;
-		}
-	}
-
-
-	long addr = 0;
-	short Curr_Min;
-
-	std::string symbol(pView->m_sharesSymbol);
-	Curr_Min = m_pFileHs->GetDataCount(symbol);
-
-	int first = 0;
-	if (bRemoveAll == true)
-	{
-		pView->RemoveHs(1);
-
-		if (pView->m_tabNum < 4)
-			pView->m_nBeginHS = 0;
-
-		if (pView->m_tabNum == 0)
-			pView->m_nBeginHS = -1;
-	}
-	else
-	{
-		first = pView->m_hs.GetCount();
-		if (first >= Curr_Min)
-		{
-			return;
-		}
-	}
-
-	if (Curr_Min < 0 || Curr_Min >= 480 * 16)
-	{
-		return;
-	}
-
-
-	if (bSkip == false)
-	{
-		m_pFileHs->ReadHS(pView->m_sharesSymbol, pView->m_hs, bRemoveAll);
-	}
-	else
-	{
-		m_pFileHs->ReadHS2(pView->m_sharesSymbol, pView->m_hs, bRemoveAll);
-	}
-
-	int nCount = pView->m_hs.GetCount();
-
-	GetFenJia(first, pView->m_hs, pView->m_fenjia, pView->m_fenjia);
-
-	if (bRemoveAll == true || m_bHist == false)
-		CTaiKlineFileHS::TransferHsToMin1(pView->m_hs, m_hsMin, 240);
-}
-
-
 
 int CTaiKlineMin1::DrawHs(CDC *pDC,int nBegin,BYTE flag)
 {
@@ -2684,4 +2071,655 @@ int CTaiKlineMin1::TransferX(int x)
 	int rtn;
 	rtn = (int)((float)((x - pView->m_rtMin1.leftX) * m_klinNumDefault) / (pView->m_rtMin1.rightX - pView->m_rtMin1.leftX));
 	return rtn;
+}
+
+
+
+void CTaiKlineMin1::InitHs(bool bRemoveAll, bool bSkip)
+{
+	if ((m_bHist == true || bSkip == true) && bRemoveAll == false)
+		return;
+
+	if (m_pReportData != NULL && bSkip == false)
+	{
+		if (m_pReportData->ystc == 0)
+		{
+			pView->RemoveHs(0);
+			pView->RemoveHs(1);
+
+			if (pView->m_tabNum < 4)
+			{
+				pView->m_nBeginHS = 0;
+			}
+
+			return;
+		}
+	}
+
+
+	long addr = 0;
+	short Curr_Min;
+
+	std::string symbol(pView->m_sharesSymbol);
+	Curr_Min = m_pFileHs->GetDataCount(symbol);
+
+	int first = 0;
+	if (bRemoveAll == true)
+	{
+		pView->RemoveHs(1);
+
+		if (pView->m_tabNum < 4)
+			pView->m_nBeginHS = 0;
+
+		if (pView->m_tabNum == 0)
+			pView->m_nBeginHS = -1;
+	}
+	else
+	{
+		first = pView->m_hs.GetCount();
+		if (first >= Curr_Min)
+		{
+			return;
+		}
+	}
+
+
+	if (Curr_Min < 0 || Curr_Min >= 480 * 16)
+		return;
+
+
+	if (bSkip == false)
+	{
+		m_pFileHs->ReadHS(pView->m_sharesSymbol, pView->m_hs, bRemoveAll);
+	}
+	else
+	{
+		m_pFileHs->ReadHS2(pView->m_sharesSymbol, pView->m_hs, bRemoveAll);
+	}
+
+	int nCount = pView->m_hs.GetCount();
+
+	GetFenJia(first, pView->m_hs, pView->m_fenjia, pView->m_fenjia);
+
+	if (bRemoveAll == true || m_bHist == false)
+	{
+		CTaiKlineFileHS::TransferHsToMin1(pView->m_hs, m_hsMin, 240);
+	}
+}
+
+void CTaiKlineMin1::InitMinuteLine()
+{
+	m_pReportData = &m_dt;
+
+	CString symbol = pView->m_sharesSymbol;
+	pDoc->m_sharesSymbol = symbol;
+
+	m_lineBgn = 0;
+	m_footBegin = 0;
+
+	int isSz = 0;
+	CString sIndex = CSharesCompute::GetIndexSymbol(0);
+
+
+	m_bHist = false;
+	if (pView->m_pDlgDealHistory != NULL)
+	{
+		if (pView->m_pDlgDealHistory->InitDoFenshi(this, symbol, pView->m_stkKind) == true)
+		{
+			m_bHist = true;
+		}
+	}
+
+
+	if (m_bHist == false)
+	{
+		m_pFileHs = TSKDatabase()->GetTickFile(symbol, pView->m_stkKind);
+
+		isSz = 0;
+		if (CSharesCompute::GetMarketKind(pView->m_stkKind) == SZ_MARKET_EX)
+		{
+			isSz = 1;
+		}
+
+		CReportData* pdt = NULL;
+		if (pDoc->m_sharesInformation.Lookup(symbol.GetBuffer(0), pdt, pView->m_stkKind) == 0)
+		{
+			return;
+		}
+
+		bool bRequest = !(m_sOldSymbol == symbol && m_sOldStkKind == pView->m_stkKind);
+		InitHs(bRequest, false);
+		if (bRequest)
+		{
+			time_t mt = CTime::GetCurrentTime().GetTime();
+			TSKReceiver()->RequestData(CSharesCompute::GetMarketKind(pView->m_stkKind), symbol.GetBuffer(0), 0/*, mt*/);
+		}
+
+
+		if (pDoc->m_bInitDone == FALSE)
+		{
+			m_footEnd = pDoc->m_nOldANT[0];
+		}
+		else
+		{
+			m_footEnd = pDoc->m_nANT[isSz];
+		}
+
+		memcpy(&m_dt, pdt, sizeof(CReportData));
+
+		if (!CTaiShanKlineShowView::IsIndexStock(symbol))
+		{
+			for (int j = 0; j <= m_footEnd; j++)
+			{
+				float f3 = FABSMY(m_hsMin[j].vol);
+				if (m_pReportData->m_Kdata1[j].Volume < f3)
+				{
+					m_pReportData->m_Kdata1[j].Price = m_hsMin[j].price;
+					m_pReportData->m_Kdata1[j].Volume = f3;
+					m_pReportData->m_Kdata1[j].Amount = m_hsMin[j].amount;
+				}
+				else
+				{
+					if (m_pReportData->m_Kdata1[j].Price > 0)
+					{
+						m_hsMin[j].price = m_pReportData->m_Kdata1[j].Price;
+					}
+					if (m_pReportData->m_Kdata1[j].Volume > f3)
+					{
+						m_hsMin[j].vol = m_pReportData->m_Kdata1[j].Volume;
+					}
+					m_pReportData->m_Kdata1[j].Amount = m_hsMin[j].amount;
+				}
+			}
+		}
+
+
+		pDoc->m_sharesInformation.GetIndexTidxd(m_Tidx);
+		pDoc->m_sharesInformation.GetIndexRsdn(m_Nidx);
+
+		m_pS0 = NULL;
+		m_pS1 = NULL;
+
+		int stkKind = /*SHZS*/SHAG;
+		if (pDoc->m_sharesInformation.Lookup(sIndex.GetBuffer(0), m_pS0, stkKind) == 0)
+			return;
+		sIndex = CSharesCompute::GetIndexSymbol(1);
+		stkKind = SZZS;
+		if (pDoc->m_sharesInformation.Lookup(sIndex.GetBuffer(0), m_pS1, stkKind) == 0)
+			m_pS1 = m_pS0;
+
+		m_volPre = m_pReportData->totv;
+		if (pView->m_isShowCross == 0)
+		{
+			m_footCurrent = m_footEnd;
+		}
+	}
+	else
+	{
+		m_footEnd = 239;
+		m_volPre = 10e15;
+	}
+
+	m_sOldSymbol = symbol;
+	m_sOldStkKind = pView->m_stkKind;
+
+
+	if (m_footEnd < 0) m_footEnd = 0;
+	if (m_footEnd > 239) m_footEnd = 0;
+
+
+	CReportData* pS0=NULL;
+	pS0 = m_pS0;
+	CReportData* pS1=m_pS1;
+
+
+
+
+	CReportData* pdtInInit = m_pReportData;
+
+
+	// 上一交易日收盘价，默认为 1.00
+	m_close = pdtInInit->ystc;
+	if (m_close <= 0)
+	{
+		m_close = 1.00f;
+	}
+
+
+	if(CSharesCompute::GetMarketKind(pView->m_stkKind) == SZ_MARKET_EX)
+	{
+		CReportData* pS = pS0;
+		pS0 = pS1;
+		pS1 = pS;
+	}
+	m_close_Dapan[0]=pS0->ystc;
+	m_close_Dapan[1]=pS1->ystc;
+
+	if(m_footEnd+1>m_klinNumDefault)
+	{
+		ASSERT(FALSE);
+		return;
+	}
+
+	//
+	bool bZhiShu=false;
+	if(CTaiShanKlineShowView::IsIndexStock(symbol))
+	{
+		m_pFlg[0]=pView->m_infoInit.flag_dapan[0];
+		m_pFlg[1]=pView->m_infoInit.flag_dapan[1];
+		if(CTaiShanKlineShowView::IsIndexStock3(symbol))
+		{
+			m_pFlg[0]=FS_LINXIAN;
+			m_pFlg[1]=FS_VOL;
+			if(m_nTextBox==0)
+				m_nTextBox=1;
+		}
+		m_pFlg[2]=pView->m_infoInit.flag_dapan[2];
+		m_pFlg[3]=pView->m_infoInit.flag_dapan[3];
+		m_pFlg[4]=pView->m_infoInit.flag_dapan[4];
+		bZhiShu=true;
+	}
+	else
+	{
+		m_pFlg[0]=pView->m_infoInit.flag[0];
+		m_pFlg[1]=pView->m_infoInit.flag[1];
+		m_pFlg[2]=pView->m_infoInit.flag[2];
+		m_pFlg[3]=pView->m_infoInit.flag[3];
+		m_pFlg[4]=pView->m_infoInit.flag[4];
+
+	}
+
+	float high=pS0->higp  ;
+	float lowDapan=pS0->lowp  ;
+
+
+	if((pS0->m_Kdata1)->Price>0)
+		*m_lineDapan[0][0]=(pS0->m_Kdata1)->Price;
+	else
+	{
+		if(pS0->opnp >0)
+			*m_lineDapan[0][0]=pS0->opnp;
+		else
+			*m_lineDapan[0][0]=pS0->ystc ;
+	}
+	for(int k=1;k<=m_footEnd;k++)
+	{
+		if(((pS0->m_Kdata1)+k)->Price>0)
+			*(m_lineDapan[0][0]+k)=((pS0->m_Kdata1)+k)->Price;
+		else
+			*(m_lineDapan[0][0]+k)=*(m_lineDapan[0][0]+k-1);
+	}
+	*m_lineDapan[0][2]=(pS0->m_Kdata1)->Volume;
+	for(int k=1;k<=m_footEnd;k++)
+	{
+		if(((pS0->m_Kdata1)+k)->Volume>pS0->totv && pS0->kind != SZZS)
+			((pS0->m_Kdata1)+k)->Volume=((pS0->m_Kdata1)+k-1)->Volume;
+		if(((pS0->m_Kdata1)+k)->Volume<((pS0->m_Kdata1)+k-1)->Volume)
+			((pS0->m_Kdata1)+k)->Volume=((pS0->m_Kdata1)+k-1)->Volume;
+		if(((pS0->m_Kdata1)+k)->Volume>0)
+			*(m_lineDapan[0][2]+k)=((pS0->m_Kdata1)+k)->Volume
+			-((pS0->m_Kdata1)+k-1)->Volume;
+		else
+		{
+			((pS0->m_Kdata1)+k)->Volume=((pS0->m_Kdata1)+k-1)->Volume;
+			*(m_lineDapan[0][2]+k)=0;
+		}
+	}
+	//1
+	if(bZhiShu)
+	{
+		if((pS1->m_Kdata1)->Price>0)
+			*m_lineDapan[1][0]=(pS1->m_Kdata1)->Price;
+		else
+		{
+			if(pS1->opnp >0)
+				*m_lineDapan[1][0]=pS1->opnp;
+			else
+				*m_lineDapan[1][0]=pS1->ystc ;
+		}
+		for(int k=1;k<=m_footEnd;k++)
+		{
+			if(((pS1->m_Kdata1)+k)->Price>0)
+				*(m_lineDapan[1][0]+k)=((pS1->m_Kdata1)+k)->Price;
+			else
+				*(m_lineDapan[1][0]+k)=*(m_lineDapan[1][0]+k-1);
+		}
+		*m_lineDapan[1][2]=(pS1->m_Kdata1)->Volume;
+		for(int k=1;k<=m_footEnd;k++)
+		{
+			if(((pS1->m_Kdata1)+k)->Volume>pS1->totv && pS1->kind != SZZS)
+				((pS1->m_Kdata1)+k)->Volume=((pS1->m_Kdata1)+k-1)->Volume;
+			if(((pS1->m_Kdata1)+k)->Volume<((pS1->m_Kdata1)+k-1)->Volume)
+				((pS1->m_Kdata1)+k)->Volume=((pS1->m_Kdata1)+k-1)->Volume;
+			if(((pS1->m_Kdata1)+k)->Volume>0)
+				*(m_lineDapan[1][2]+k)=((pS1->m_Kdata1)+k)->Volume
+				-((pS1->m_Kdata1)+k-1)->Volume;
+			else
+			{
+				((pS1->m_Kdata1)+k)->Volume	=((pS1->m_Kdata1)+k-1)->Volume;
+				*(m_lineDapan[1][2]+k)=0;
+			}
+		}
+	}
+
+
+
+	CString s;
+	s=pdtInInit->name;
+	s=pView->m_sharesSymbol +s;
+
+
+
+	int j = 0;
+	float* f0 = m_amount;
+	*f0 = (pdtInInit->m_Kdata1)->Amount;
+
+	for (j = 1; j<= m_footEnd; j++)
+	{
+		if ((pdtInInit->m_Kdata1 + j)->Amount <= 0)
+		{
+			(pdtInInit->m_Kdata1 + j)->Amount = (pdtInInit->m_Kdata1 + j - 1)->Amount;
+		}
+	}
+
+	for (j = 1; j <= m_footEnd; j++)
+	{
+		if ((pdtInInit->m_Kdata1 + j)->Amount > (pdtInInit->m_Kdata1 + j - 1)->Amount && (pdtInInit->m_Kdata1 + j)->Amount > 0)
+		{
+			*(f0 + j) = (pdtInInit->m_Kdata1 + j)->Amount - (pdtInInit->m_Kdata1 + j - 1)->Amount;
+		}
+		else
+		{
+			(pdtInInit->m_Kdata1 + j)->Amount = (pdtInInit->m_Kdata1 + j - 1)->Amount;
+			*(f0 + j) = 0;
+		}
+	}
+
+
+
+	// 成交量数据
+	f0 = m_vol;
+	*f0 = (pdtInInit->m_Kdata1)->Volume;
+	for (j = 1; j <= m_footEnd; j++)
+	{
+		if ((pdtInInit->m_Kdata1 + j)->Volume <= 0)
+			(pdtInInit->m_Kdata1 + j)->Volume = (pdtInInit->m_Kdata1 + j - 1)->Volume;
+	}
+
+	for (j = 1; j <= m_footEnd; j++)
+	{
+		if (((pdtInInit->m_Kdata1) + j)->Volume > pdtInInit->totv && pdtInInit->kind != SZZS)
+		{
+			((pdtInInit->m_Kdata1) + j)->Volume = ((pdtInInit->m_Kdata1) + j - 1)->Volume;
+		}
+
+		if ((pdtInInit->m_Kdata1 + j)->Volume > (pdtInInit->m_Kdata1 + j - 1)->Volume && (pdtInInit->m_Kdata1 + j)->Volume > 0)
+		{
+			*(f0 + j) = (pdtInInit->m_Kdata1 + j)->Volume - (pdtInInit->m_Kdata1 + j - 1)->Volume;
+		}
+		else
+		{
+			(pdtInInit->m_Kdata1 + j)->Volume = (pdtInInit->m_Kdata1 + j - 1)->Volume;
+			*(f0 + j) = 0;
+		}
+	}
+
+
+
+	for (int i = 0; i < pView->m_infoInit.nCountMin1; i++)
+	{
+		for (int k = 0; k < 6; k++)
+		{
+			m_dataFormular[i].line[k].bNow = 0;
+			m_dataFormular[i].line[k].type = 0;
+		}
+
+		int tmp = *(m_pFlg + i);
+		float maxLingXian = (float)-10E20;
+		float minLingXian = (float)10E20;
+
+		if (i == 0)
+		{
+			if(CTaiShanKlineShowView::IsIndexStock3(symbol) == 0 && tmp == FS_LINXIAN)
+				tmp = FS_ZOUSHI;
+		}
+
+		switch (tmp)
+		{
+		case FS_LINXIAN:
+		case FS_ZOUSHI:
+			{
+				m_nameSon[i] = "分时走势";
+				m_lineName[i][0] = "分时走势";
+				m_lineName[i][1] = "均线";
+				m_dataFormular[i].numLine = 2;
+
+				f0 = m_dataFormular[i].line[0].m_arrBE.line;
+				if ((pdtInInit->m_Kdata1)->Price <= 0)
+				{
+					// 停盘
+					if (pdtInInit->opnp <= 0)
+					{
+						*f0 = 0;
+						//m_bClosed = TRUE;
+					}
+					else
+					{
+						// 默认为前日收盘价
+						*f0 = m_close;
+						//m_bClosed = FALSE;
+					}
+				}
+				else
+				{
+					*f0 = (pdtInInit->m_Kdata1)->Price;
+				}
+
+				for (j = 1; j <= m_footEnd; j++)
+				{
+					if ((pdtInInit->m_Kdata1 + j)->Price > 0)
+					{
+						*(f0 + j) = (pdtInInit->m_Kdata1 + j)->Price;
+					}
+					else
+					{
+						*(f0 + j) = *(f0 + j - 1);
+					}
+				}
+
+				if(bZhiShu==true)
+				{
+
+					f0=m_dataFormular[i].line [1].m_arrBE.line;
+					f0[0] = m_dataFormular[i].line [0].m_arrBE.line[0];
+					for (j =1;j <=m_footEnd;j++)
+					{
+						*(f0+j)=(f0[j-1]*j + m_dataFormular[i].line [0].m_arrBE.line[j])/(j+1);
+					}
+					break;
+				}
+			}
+
+
+			// 均线计算
+			if (1)
+			{
+				bool b1 = true;
+
+				f0 = m_dataFormular[i].line[1].m_arrBE.line;
+				f0[0] = m_dataFormular[i].line[0].m_arrBE.line[0];
+
+				if ((pdtInInit->m_Kdata1)->Volume > 0.01)
+				{
+					f0[0] = (pdtInInit->m_Kdata1)->Amount / ((pdtInInit->m_Kdata1)->Volume * 100);
+				}
+
+				float totp = (pdtInInit->m_Kdata1)->Amount;
+				int rate = 100;
+				if (pdtInInit->totv > 0 && pdtInInit->lowp > 0)
+				{
+					if (pdtInInit->totp / pdtInInit->totv / pdtInInit->lowp > 1000)
+					{
+						rate = 1000;
+					}
+				}
+
+				for (j = 0; j <= m_footEnd; j++)
+				{
+					float f = 0;
+					if (m_vol[j] > 0)
+					{
+						f = m_amount[j] / m_vol[j] / rate;
+						if (f > pdtInInit->higp || f < pdtInInit->lowp)
+						{
+							b1 = false;
+							break;
+						}
+					}
+				}
+
+				if (b1)
+				{
+					for (j = 1; j <= m_footEnd; j++)
+					{
+						if ((pdtInInit->m_Kdata1 + j)->Volume > 0.01)
+						{
+							float f = 0;
+							pView->GetPriceAve(f, ((pdtInInit->m_Kdata1 + j)->Volume), (pdtInInit->m_Kdata1 + j)->Amount);
+							*(f0 + j) = f;
+							if (*(f0 + j) < 0.01)
+							{
+								*(f0 + j) = *(f0 + j - 1);
+							}
+						}
+						else
+						{
+							*(f0 + j) = *(f0 + j - 1);
+						}
+
+						if (*(f0 + j) > pdtInInit->higp || *(f0 + j) < pdtInInit->lowp)
+						{
+							*(f0 + j) = *(f0 + j - 1);
+						}
+					}
+				}
+				else
+				{
+					for (j = 1; j <= m_footEnd; j++)
+					{
+						totp += m_vol[j] * ((pdtInInit->m_Kdata1 + j)->Price) * rate;
+						if ((pdtInInit->m_Kdata1 + j)->Volume > 0.01)
+						{
+							float f = 0;
+							pView->GetPriceAve(f, ((pdtInInit->m_Kdata1 + j)->Volume), totp);
+							*(f0 + j) = f;
+							if (*(f0 + j) < 0.01)
+							{
+								*(f0 + j) = *(f0 + j - 1);
+							}
+						}
+						else
+						{
+							*(f0 + j) = *(f0 + j - 1);
+						}
+
+						if (*(f0 + j) > pdtInInit->higp || *(f0 + j) < pdtInInit->lowp)
+						{
+							*(f0 + j) = *(f0 + j - 1);
+						}
+					}
+				}
+			}
+			break;
+
+		case FS_VOL:					// 成交量
+			m_nameSon[i] = _T("");
+			m_lineName[i][0] = _T("成交量");
+			m_dataFormular[i].numLine = 1;
+
+			f0 = m_dataFormular[i].line[0].m_arrBE.line;
+			*f0 = m_vol[0];
+			for (j = 1; j <= m_footEnd; j++)
+			{
+				*(f0 + j) = m_vol[j];
+			}
+			break;
+
+		case FS_MMLD:
+			m_nameSon[i]="买卖力道";
+			m_lineName[i][0]="买入";
+			m_lineName[i][1]="卖出";
+			m_lineName[i][2]="买卖差";
+			m_dataFormular[i].numLine=0;
+
+			break;
+		case FS_LB:
+			m_nameSon[i]="量比指标";
+			m_lineName[i][0]="量比";
+			m_dataFormular[i].numLine=1;
+
+
+			f0=m_dataFormular[i].line [0].m_arrBE.line; 
+			if((pdtInInit->volume5 )>0)
+				*f0=(pdtInInit->m_Kdata1)->Volume*240/(pdtInInit->volume5 );
+			else
+				*f0=0;
+			if((pdtInInit->volume5 )>0)
+			{
+				for(j=1;j<=m_footEnd;j++)
+				{
+					if((pdtInInit->m_Kdata1+j)->Volume>0)
+						*(f0+j)=(pdtInInit->m_Kdata1+j)->Volume*240/(j+1)/(pdtInInit->volume5 );
+					else
+						*(f0+j)=*(f0+j-1);
+				}
+			}
+			else
+			{
+				memset(f0,0,4*(m_footEnd+1));
+			}
+			break;
+
+		case FS_DUOKONG:
+			m_nameSon[i]="多空指标";
+			m_lineName[i][0]="多空";
+			m_dataFormular[i].numLine=1;
+
+
+			f0=m_dataFormular[i].line [0].m_arrBE.line;
+
+			{
+				for(j=0;j<=m_footEnd;j++)
+				{
+					int r=0;
+					r=(m_Tidx [isSz][j].rp  -m_Tidx [isSz][j].dp);
+					*(m_dataFormular[i].line [0].m_arrBE.line+j)=(float)r;
+				}
+			}
+
+			break;
+		case FS_TONGLUO:
+			m_nameSon[i]="腾落指数";
+			m_lineName[i][0]="腾落指数";
+			m_dataFormular[i].numLine=1;
+
+			{
+				*(m_dataFormular[i].line [0].m_arrBE.line)= (m_Nidx [isSz][0].rsn -m_Nidx [isSz][0].dnn );
+				for(j=1;j<=m_footEnd;j++)
+				{
+					*(m_dataFormular[i].line [0].m_arrBE.line+j)=*(m_dataFormular[i].line [0].m_arrBE.line+j-1) + (m_Nidx [isSz][j].rsn -m_Nidx [isSz][j].dnn );
+				}
+			}
+
+			break;
+		}
+
+		if(i==0 && m_nKlineCurrent>0)
+		{
+			for(int nStk=0;nStk<m_nKlineCurrent;nStk++)
+				AddFenshiAdded(m_symbolAdd[nStk],m_stkKindAdd[nStk],nStk+1);
+		}
+	}
+
+	m_nameSon[0] = s;
 }

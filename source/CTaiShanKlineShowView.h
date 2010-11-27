@@ -145,7 +145,6 @@ public:
 	void RemoveHs(int flag);
 	int FindTimeK(int keyVlu);
 	int ReadKline5Min(CString fName,int stkKind, Kline *&pKline,int nRead=-1);
-	int ReadKLine(CString fName,int stkKind,Kline*& pKline,int nRead=-1);
 
 
 
@@ -181,13 +180,11 @@ public:
 	void DoF4();
 	void ShowMark(CFormularContent* pJishu = NULL);
 	void WideNetRedraw(WPARAM wp,LPARAM lp);
-	int m_stkKind;
 	int GetDataKind();
 	CString GetMultiSymbol(int iSymbol,int &stkKind);
 	void YHParam();
 	void HistoryAStep(int nFoot);
 	static float GetCapital(CReportData* pdt);
-	static bool CheckDiskFreeSpace();
 	static bool CheckStockSymbol(CString s);
 	void InvertFocusRect2(CDC* pDC);
 	void ShowDlgCross(BOOL bShow = TRUE);
@@ -226,7 +223,6 @@ public:
 	CFJList	m_fenjia;
 	Kline* m_pkline;	
 	bool m_bAddKline;
-	CString m_sharesSymbol;
 	int m_nCountKline;
 	int m_nCountKlineFile;
 	int m_nCountKlineToday;
@@ -313,7 +309,6 @@ public:
 
 	void CaclStockPos();
 
-	void ShowAll(CString sharesymbol,bool bCaclStockPos = true,bool bInitFoot = true);    
 
 
 
@@ -352,6 +347,22 @@ public:
 	void OnSizeMy(int cx, int cy);
 
 
+
+	BOOL m_bChanged;
+	BOOL m_bRequest;
+
+	int m_oldKind;
+	int m_stkKind;
+	CString m_oldSymbol;
+	CString m_sharesSymbol;
+
+
+
+	void ShowAll(CString sharesymbol, bool bCaclStockPos = true, bool bInitFoot = true);
+
+	int ReadKLine(CString fName, int stkKind, Kline*& pKline, int nRead = -1);
+
+
 	void SetPictYPos(int which,int y);
 
 
@@ -359,10 +370,16 @@ public:
 	void DrawRightText(CDC *pDC,float vl,int x, int yNum, int flag,int floatBit=2);
 
 
-	void DrawRightbox(CDC* pDC,bool bClearAll=true);
+	// 画坐标线 Y 轴
+	void DrawRulorBoxY(int y);
+
+	// 画右侧报价区域
+	void DrawRightbox(CDC* pDC, bool bClearAll = true);
+
+
+
 	void CalcCursorShape(CPoint pt);
 
-	void DrawRulorBoxY(int y);	
 	void DrawRulorBoxX(int x,bool bKey=false);	
 	void DrawFenShi(CDC* pDC);	
 
